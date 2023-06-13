@@ -3,9 +3,15 @@ package io.horizontalsystems.bankwallet.modules.swap.confirmation.oneinch
 import io.horizontalsystems.bankwallet.core.EvmError
 import io.horizontalsystems.bankwallet.core.subscribeIO
 import io.horizontalsystems.bankwallet.entities.DataState
-import io.horizontalsystems.bankwallet.modules.evmfee.*
+import io.horizontalsystems.bankwallet.modules.evmfee.FeeSettingsError
+import io.horizontalsystems.bankwallet.modules.evmfee.GasData
+import io.horizontalsystems.bankwallet.modules.evmfee.GasDataError
+import io.horizontalsystems.bankwallet.modules.evmfee.GasPriceInfo
+import io.horizontalsystems.bankwallet.modules.evmfee.IEvmFeeService
+import io.horizontalsystems.bankwallet.modules.evmfee.IEvmGasPriceService
+import io.horizontalsystems.bankwallet.modules.evmfee.Transaction
+import io.horizontalsystems.bankwallet.modules.swap.SwapMainModule.OneInchSwapParameters
 import io.horizontalsystems.bankwallet.modules.swap.oneinch.OneInchKitHelper
-import io.horizontalsystems.bankwallet.modules.swap.oneinch.OneInchSwapParameters
 import io.horizontalsystems.ethereumkit.core.EthereumKit
 import io.horizontalsystems.ethereumkit.models.TransactionData
 import io.horizontalsystems.oneinchkit.Swap
@@ -30,8 +36,6 @@ class OneInchFeeService(
     private var retryDelayTimeInSeconds = 3L
     private var retryDisposable: Disposable? = null
 
-    private val gasLimitSurchargePercent: Int = 25
-
     private val evmBalance: BigInteger
         get() = evmKit.accountState?.balance ?: BigInteger.ZERO
 
@@ -53,6 +57,10 @@ class OneInchFeeService(
                 sync(it)
             }
             .let { disposable.add(it) }
+    }
+
+    override fun reset() {
+        gasPriceService.setRecommended()
     }
 
     private fun sync(gasPriceServiceState: DataState<GasPriceInfo>) {
@@ -92,7 +100,7 @@ class OneInchFeeService(
     private fun sync(swap: Swap, gasPriceInfo: GasPriceInfo) {
         val swapTx = swap.transaction
         val gasData = GasData(
-            gasLimit = getSurchargedGasLimit(swapTx.gasLimit),
+            gasLimit = swapTx.gasLimit,
             gasPrice = gasPriceInfo.gasPrice
         )
 
@@ -101,7 +109,7 @@ class OneInchFeeService(
         )
 
         val transactionData = TransactionData(swapTx.to, swapTx.value, swapTx.data)
-        val transaction = Transaction(transactionData, gasData, gasPriceInfo.warnings, gasPriceInfo.errors)
+        val transaction = Transaction(transactionData, gasData, gasPriceInfo.default, gasPriceInfo.warnings, gasPriceInfo.errors)
 
         transactionStatus = if (transaction.totalAmount > evmBalance) {
             DataState.Success(
@@ -125,9 +133,5 @@ class OneInchFeeService(
                     sync(gasPriceInfo)
                 }
         }
-    }
-
-    private fun getSurchargedGasLimit(estimatedGasLimit: Long): Long {
-        return (estimatedGasLimit + estimatedGasLimit / 100.0 * gasLimitSurchargePercent).toLong()
     }
 }

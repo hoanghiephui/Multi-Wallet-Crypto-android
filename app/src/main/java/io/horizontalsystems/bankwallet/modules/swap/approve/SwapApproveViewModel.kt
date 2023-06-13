@@ -11,9 +11,9 @@ import io.reactivex.disposables.CompositeDisposable
 import java.math.BigDecimal
 
 class SwapApproveViewModel(
-        val dex: SwapMainModule.Dex,
-        private val service: SwapApproveService,
-        private val coinService: EvmCoinService
+    val dex: SwapMainModule.Dex,
+    private val service: SwapApproveService,
+    private val coinService: EvmCoinService
 ) : ViewModel() {
 
     val initialAmount = service.amount?.let {

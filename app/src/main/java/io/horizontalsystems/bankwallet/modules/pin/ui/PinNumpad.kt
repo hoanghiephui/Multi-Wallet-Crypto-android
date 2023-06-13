@@ -11,12 +11,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.modules.pin.unlock.PinUnlockModule.InputState
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
+import io.horizontalsystems.core.helpers.HudHelper
 
 
 @Composable
@@ -64,11 +67,21 @@ fun PinNumpad(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            ImageKey(R.drawable.icon_touch_id_24, showFingerScanner, enabled) {
+            ImageKey(
+                image = R.drawable.icon_touch_id_24,
+                contentDescription = stringResource(R.string.Unlock_BiometricScanner),
+                visible = showFingerScanner,
+                enabled = enabled
+            ) {
                 showBiometricPrompt?.invoke()
             }
             NumberKey(0, null, enabled) { number -> onNumberClick(number) }
-            ImageKey(R.drawable.ic_backspace, true, enabled) { onDeleteClick.invoke() }
+            ImageKey(
+                image = R.drawable.ic_backspace,
+                contentDescription = stringResource(R.string.Button_Delete),
+                visible = true,
+                enabled = enabled
+            ) { onDeleteClick.invoke() }
         }
         Spacer(Modifier.height(56.dp))
     }
@@ -82,6 +95,8 @@ private fun NumberKey(
     enabled: Boolean,
     onClick: (Int) -> Unit
 ) {
+    val context = LocalContext.current
+
     Box(
         modifier = Modifier
             .size(72.dp)
@@ -89,7 +104,10 @@ private fun NumberKey(
             .border(1.dp, ComposeAppTheme.colors.steel20, CircleShape)
             .clickable(
                 enabled = enabled,
-                onClick = { onClick.invoke(number) }
+                onClick = {
+                    HudHelper.vibrate(context)
+                    onClick.invoke(number)
+                }
             )
     ) {
         Column(
@@ -117,14 +135,25 @@ private fun NumberKey(
 }
 
 @Composable
-private fun ImageKey(image: Int, visible: Boolean, enabled: Boolean, onClick: () -> Unit) {
+private fun ImageKey(
+    image: Int,
+    contentDescription: String? = null,
+    visible: Boolean,
+    enabled: Boolean,
+    onClick: () -> Unit
+) {
+    val context = LocalContext.current
+
     Box(
         modifier = Modifier
             .size(72.dp)
             .clip(CircleShape)
             .clickable(
                 enabled = visible && enabled,
-                onClick = onClick
+                onClick = {
+                    HudHelper.vibrate(context)
+                    onClick.invoke()
+                }
             )
     ) {
         if (visible) {
@@ -132,7 +161,7 @@ private fun ImageKey(image: Int, visible: Boolean, enabled: Boolean, onClick: ()
                 modifier = Modifier.align(Alignment.Center),
                 painter = painterResource(image),
                 tint = ComposeAppTheme.colors.grey,
-                contentDescription = null,
+                contentDescription = contentDescription,
             )
         }
     }

@@ -22,7 +22,6 @@ class BinanceAdapter(
     private val symbol: String,
     private val feeToken: Token,
     private val wallet: Wallet,
-    private val testMode: Boolean
 ) : IAdapter, ITransactionsAdapter, IBalanceAdapter, IReceiveAdapter, ISendBinanceAdapter {
 
     private val asset = binanceKit.register(symbol)
@@ -52,9 +51,6 @@ class BinanceAdapter(
     override val debugInfo: String
         get() = ""
 
-    // IBaseAdapter
-
-    override val isMainnet = true
 
     // IBalanceAdapter
 
@@ -145,8 +141,8 @@ class BinanceAdapter(
         }
     }
 
-    override fun getTransactionUrl(transactionHash: String): String? =
-        if (testMode) "https://testnet-explorer.binance.org/tx/$transactionHash" else "https://explorer.binance.org/tx/$transactionHash"
+    override fun getTransactionUrl(transactionHash: String): String =
+        "https://explorer.binance.org/tx/$transactionHash"
 
     // ISendBinanceAdapter
 
@@ -206,9 +202,8 @@ class BinanceAdapter(
         const val confirmationsThreshold = 1
         val transferFee = BigDecimal.valueOf(0.000075)
 
-        fun clear(walletId: String, testMode: Boolean) {
-            val networkType =
-                if (testMode) BinanceChainKit.NetworkType.TestNet else BinanceChainKit.NetworkType.MainNet
+        fun clear(walletId: String) {
+            val networkType = BinanceChainKit.NetworkType.MainNet
             BinanceChainKit.clear(App.instance, networkType, walletId)
         }
 

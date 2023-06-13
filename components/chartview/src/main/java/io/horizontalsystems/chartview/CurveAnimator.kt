@@ -4,21 +4,22 @@ import io.horizontalsystems.chartview.models.ChartPointF
 
 class CurveAnimator(
     private val toValues: LinkedHashMap<Long, Float>,
-    private val toStartTimestamp: Long,
-    private val toEndTimestamp: Long,
-    private val toMinValue: Float,
-    private val toMaxValue: Float,
+    private var toStartTimestamp: Long,
+    private var toEndTimestamp: Long,
+    private var toMinValue: Float,
+    private var toMaxValue: Float,
     prevCurveAnimator: CurveAnimator?,
     private val xMax: Float,
     private val yMax: Float,
     private val curveTopOffset: Float,
     private val curveBottomOffset: Float,
+    private val horizontalOffset: Float,
 ) {
-    private val fromValues: LinkedHashMap<Long, Float>
-    private val fromStartTimestamp: Long
-    private val fromEndTimestamp: Long
-    private val fromMinValue: Float
-    private val fromMaxValue: Float
+    private var fromValues: LinkedHashMap<Long, Float>
+    private var fromStartTimestamp: Long
+    private var fromEndTimestamp: Long
+    private var fromMinValue: Float
+    private var fromMaxValue: Float
 
     var frameValues: LinkedHashMap<Long, Float>
         private set
@@ -43,11 +44,23 @@ class CurveAnimator(
             fromMinValue = prevCurveAnimator.frameMinValue
             fromMaxValue = prevCurveAnimator.frameMaxValue
         } else {
-            fromValues = LinkedHashMap(
-                toValues.map { (timestamp, _) ->
-                    timestamp to 0F
-                }.toMap()
-            )
+            fromValues = toValues
+            fromStartTimestamp = toStartTimestamp
+            fromEndTimestamp = toEndTimestamp
+            fromMinValue = toMinValue
+            fromMaxValue = toMaxValue
+        }
+
+        if (toMinValue == toMaxValue) {
+            toMinValue *= 0.9f
+            toMaxValue *= 1.1f
+        }
+
+        if (toStartTimestamp == toEndTimestamp) {
+            toStartTimestamp = (toStartTimestamp * 0.9).toLong()
+            toEndTimestamp = (toEndTimestamp * 1.1).toLong()
+
+            fromValues = toValues
             fromStartTimestamp = toStartTimestamp
             fromEndTimestamp = toEndTimestamp
             fromMinValue = toMinValue
@@ -108,20 +121,20 @@ class CurveAnimator(
         return start + (change * animatedFraction)
     }
 
-    fun getFramePoints(): List<ChartPointF> {
+    fun getFramePoints(extraVerticalOffset: Float = 0f): List<ChartPointF> {
         // timestamp = ax + startTimestamp
         // x = (timestamp - startTimestamp) / a
         // a = (timestamp - startTimestamp) / x
-        val xRatio = (frameEndTimestamp - frameStartTimestamp) / xMax
+        val xRatio = (frameEndTimestamp - frameStartTimestamp) / (xMax - horizontalOffset * 2)
 
         // value = ay + minValue
         // y = (value - minValue) / a
         // a = (value - minValue) / y
-        val yRatio = (frameMaxValue - frameMinValue) / (yMax - curveTopOffset - curveBottomOffset)
+        val yRatio = (frameMaxValue - frameMinValue) / (yMax - curveTopOffset - curveBottomOffset - 2 * extraVerticalOffset)
 
         return frameValues.map { (timestamp, value) ->
-            val x = (timestamp - frameStartTimestamp) / xRatio
-            val y = (value - frameMinValue) / yRatio + curveBottomOffset
+            val x = (timestamp - frameStartTimestamp) / xRatio + horizontalOffset
+            val y = (value - frameMinValue) / yRatio + curveBottomOffset + extraVerticalOffset
 
             val y2 = (y * -1) + yMax
 

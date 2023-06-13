@@ -10,23 +10,22 @@ class EvmBlockchainManager(
     private val syncSourceManager: EvmSyncSourceManager,
     private val marketKit: MarketKitWrapper,
     private val accountManagerFactory: EvmAccountManagerFactory,
-    private val evmTestnetManager: EvmTestnetManager
 ) {
     private val evmKitManagersMap = mutableMapOf<BlockchainType, Pair<EvmKitManager, EvmAccountManager>>()
 
     val allBlockchainTypes = listOf(
             BlockchainType.Ethereum,
-            BlockchainType.EthereumGoerli,
             BlockchainType.BinanceSmartChain,
             BlockchainType.Polygon,
             BlockchainType.Avalanche,
             BlockchainType.Optimism,
             BlockchainType.ArbitrumOne,
             BlockchainType.Gnosis,
+            BlockchainType.Fantom,
     )
 
     val allBlockchains: List<Blockchain>
-        get() = marketKit.blockchains(allBlockchainTypes.map { it.uid }) + evmTestnetManager.blockchains()
+        get() = marketKit.blockchains(allBlockchainTypes.map { it.uid })
 
     val allMainNetBlockchains: List<Blockchain>
         get() = marketKit.blockchains(allBlockchainTypes.map { it.uid })
@@ -50,13 +49,13 @@ class EvmBlockchainManager(
 
     fun getChain(blockchainType: BlockchainType) = when (blockchainType) {
         BlockchainType.Ethereum -> Chain.Ethereum
-        BlockchainType.EthereumGoerli -> Chain.EthereumGoerli
         BlockchainType.BinanceSmartChain -> Chain.BinanceSmartChain
         BlockchainType.Polygon -> Chain.Polygon
         BlockchainType.Avalanche -> Chain.Avalanche
         BlockchainType.Optimism -> Chain.Optimism
         BlockchainType.ArbitrumOne -> Chain.ArbitrumOne
         BlockchainType.Gnosis -> Chain.Gnosis
+        BlockchainType.Fantom -> Chain.Fantom
         else -> throw IllegalArgumentException("Unsupported blockchain type $blockchainType")
     }
 
@@ -76,6 +75,6 @@ class EvmBlockchainManager(
         getEvmKitManagers(blockchainType).second
 
     fun getBaseToken(blockchainType: BlockchainType): Token? =
-        marketKit.token(TokenQuery(blockchainType, TokenType.Native)) ?: evmTestnetManager.getNativeToken(blockchainType)
+        marketKit.token(TokenQuery(blockchainType, TokenType.Native))
 
 }

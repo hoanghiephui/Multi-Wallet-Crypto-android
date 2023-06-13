@@ -3,8 +3,7 @@ package io.horizontalsystems.bankwallet.modules.evmfee.legacy
 import io.horizontalsystems.bankwallet.core.Warning
 import io.horizontalsystems.bankwallet.core.subscribeIO
 import io.horizontalsystems.bankwallet.entities.DataState
-import io.horizontalsystems.bankwallet.modules.evmfee.FeeRangeConfig
-import io.horizontalsystems.bankwallet.modules.evmfee.FeeRangeConfig.Bound
+import io.horizontalsystems.bankwallet.modules.evmfee.Bound
 import io.horizontalsystems.bankwallet.modules.evmfee.FeeSettingsWarning
 import io.horizontalsystems.bankwallet.modules.evmfee.GasPriceInfo
 import io.horizontalsystems.bankwallet.modules.evmfee.IEvmGasPriceService
@@ -20,16 +19,11 @@ import java.math.BigDecimal
 class LegacyGasPriceService(
     private val gasPriceProvider: LegacyGasPriceProvider,
     private val minRecommendedGasPrice: Long? = null,
-    private val initialGasPrice: Long? = null,
+    initialGasPrice: Long? = null,
 ) : IEvmGasPriceService {
 
     var recommendedGasPrice: Long? = null
     private var disposable: Disposable? = null
-
-    private val gasPriceRangeConfig = FeeRangeConfig(
-        lowerBound = Bound.Multiplied(BigDecimal(0.6)),
-        upperBound = Bound.Multiplied(BigDecimal(3.0))
-    )
 
     private val overpricingBound = Bound.Multiplied(BigDecimal(1.5))
     private val riskOfStuckBound = Bound.Multiplied(BigDecimal(0.9))
@@ -51,15 +45,7 @@ class LegacyGasPriceService(
                 .doOnSuccess { gasPrice ->
                     val adjustedGasPrice = max(gasPrice.toLong(), minRecommendedGasPrice ?: 0)
                     recommendedGasPrice = adjustedGasPrice
-                    syncGasPriceRange(adjustedGasPrice)
                 }
-
-    val defaultGasPriceRange: LongRange = 1_000_000_000..100_000_000_000
-    var gasPriceRange: LongRange? = null
-        private set
-
-    override var isRecommendedGasPriceSelected = true
-        private set
 
     init {
         if (initialGasPrice != null) {
@@ -69,9 +55,7 @@ class LegacyGasPriceService(
         }
     }
 
-    fun setRecommended() {
-        isRecommendedGasPriceSelected = true
-
+    override fun setRecommended() {
         state = DataState.Loading
         disposable?.dispose()
 
@@ -80,6 +64,8 @@ class LegacyGasPriceService(
                 state = DataState.Success(
                     GasPriceInfo(
                         gasPrice = GasPrice.Legacy(recommended),
+                        gasPriceDefault = GasPrice.Legacy(recommended),
+                        default = true,
                         warnings = listOf(),
                         errors = listOf()
                     )
@@ -92,8 +78,6 @@ class LegacyGasPriceService(
     }
 
     fun setGasPrice(value: Long) {
-        isRecommendedGasPriceSelected = false
-
         state = DataState.Loading
         disposable?.dispose()
 
@@ -103,37 +87,26 @@ class LegacyGasPriceService(
                 val errors = mutableListOf<Throwable>()
 
                 if (value < riskOfStuckBound.calculate(recommended)) {
-                    warnings.add(FeeSettingsWarning.RiskOfGettingStuck)
+                    warnings.add(FeeSettingsWarning.RiskOfGettingStuckLegacy)
                 }
 
                 if (value >= overpricingBound.calculate(recommended)) {
                     warnings.add(FeeSettingsWarning.Overpricing)
                 }
 
-                state = DataState.Success(GasPriceInfo(GasPrice.Legacy(value), warnings, errors))
+                state = DataState.Success(
+                    GasPriceInfo(
+                        gasPrice = GasPrice.Legacy(value),
+                        gasPriceDefault = GasPrice.Legacy(recommended),
+                        default = false,
+                        warnings = warnings,
+                        errors = errors
+                    )
+                )
             }, {
                 state = DataState.Error(it)
             }).let {
                 disposable = it
             }
     }
-
-    private fun syncGasPriceRange(recommendedGasPrice: Long) {
-        val range = gasPriceRange
-
-        val lowerBound = if (range == null || range.first > recommendedGasPrice) {
-            gasPriceRangeConfig.lowerBound.calculate(recommendedGasPrice)
-        } else {
-            range.first
-        }
-
-        val upperBound = if (range == null || range.last < recommendedGasPrice) {
-            gasPriceRangeConfig.upperBound.calculate(recommendedGasPrice)
-        } else {
-            range.last
-        }
-
-        gasPriceRange = lowerBound..upperBound
-    }
-
 }

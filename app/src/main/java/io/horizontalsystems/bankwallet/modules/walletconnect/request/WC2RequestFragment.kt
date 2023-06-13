@@ -15,6 +15,7 @@ import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.AppLogger
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.modules.evmfee.EvmFeeCellViewModel
+import io.horizontalsystems.bankwallet.modules.send.evm.settings.SendEvmNonceViewModel
 import io.horizontalsystems.bankwallet.modules.sendevmtransaction.SendEvmTransactionViewModel
 import io.horizontalsystems.bankwallet.modules.walletconnect.request.sendtransaction.WCRequestModule
 import io.horizontalsystems.bankwallet.modules.walletconnect.request.sendtransaction.WCSendEthereumTransactionRequestViewModel
@@ -54,8 +55,11 @@ class WC2RequestFragment : BaseFragment() {
                     is WC2SendEthereumTransactionRequest -> {
                         val vmFactory by lazy { WCRequestModule.FactoryV2(requestData) }
                         val viewModel by viewModels<WCSendEthereumTransactionRequestViewModel> { vmFactory }
-                        val sendEvmTransactionViewModel by viewModels<SendEvmTransactionViewModel> { vmFactory }
+                        val sendEvmTransactionViewModel by navGraphViewModels<SendEvmTransactionViewModel>(R.id.wc2RequestFragment) { vmFactory }
                         val feeViewModel by navGraphViewModels<EvmFeeCellViewModel>(R.id.wc2RequestFragment) { vmFactory }
+                        val nonceViewModel by navGraphViewModels<SendEvmNonceViewModel>(R.id.wc2RequestFragment) { vmFactory }
+
+                        val cachedNonceViewModel = nonceViewModel //needed in SendEvmSettingsFragment
 
                         sendEvmTransactionViewModel.sendSuccessLiveData.observe(viewLifecycleOwner) { transactionHash ->
                             viewModel.approve(transactionHash)

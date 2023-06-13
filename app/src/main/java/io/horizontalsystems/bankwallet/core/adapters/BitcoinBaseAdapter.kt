@@ -1,7 +1,6 @@
 package io.horizontalsystems.bankwallet.core.adapters
 
 import io.horizontalsystems.bankwallet.core.*
-import io.horizontalsystems.bankwallet.entities.AccountType
 import io.horizontalsystems.bankwallet.entities.LastBlockInfo
 import io.horizontalsystems.bankwallet.entities.TransactionDataSortMode
 import io.horizontalsystems.bankwallet.entities.Wallet
@@ -15,7 +14,6 @@ import io.horizontalsystems.bitcoincore.BitcoinCore
 import io.horizontalsystems.bitcoincore.core.IPluginData
 import io.horizontalsystems.bitcoincore.models.*
 import io.horizontalsystems.core.BackgroundManager
-import io.horizontalsystems.hdwalletkit.HDWallet.Purpose
 import io.horizontalsystems.hodler.HodlerOutputData
 import io.horizontalsystems.hodler.HodlerPlugin
 import io.horizontalsystems.marketkit.models.Token
@@ -33,7 +31,8 @@ abstract class BitcoinBaseAdapter(
     open val syncMode: BitcoinCore.SyncMode,
     backgroundManager: BackgroundManager,
     val wallet: Wallet,
-    protected val testMode: Boolean
+    private val confirmationsThreshold: Int,
+    protected val decimal: Int = 8
 ) : IAdapter, ITransactionsAdapter, IBalanceAdapter, IReceiveAdapter, BackgroundManager.Listener {
 
     init {
@@ -128,8 +127,6 @@ abstract class BitcoinBaseAdapter(
 
         return observable.toFlowable(BackpressureStrategy.BUFFER)
     }
-
-    override val isMainnet = true
 
     override val debugInfo: String = ""
 
@@ -229,12 +226,6 @@ abstract class BitcoinBaseAdapter(
             satoshiToBTC(kit.minimumSpendableValue(address).toLong(), RoundingMode.CEILING)
         } catch (e: Exception) {
             null
-        }
-    }
-
-    fun maximumSendAmount(pluginData: Map<Byte, IPluginData>): BigDecimal? {
-        return kit.maximumSpendLimit(pluginData)?.let { maximumSpendLimit ->
-            satoshiToBTC(maximumSpendLimit, RoundingMode.CEILING)
         }
     }
 
@@ -348,20 +339,10 @@ abstract class BitcoinBaseAdapter(
     }
 
     companion object {
-        const val confirmationsThreshold = 3
-        const val decimal = 8
-
         fun getTransactionSortingType(sortType: TransactionDataSortMode?): TransactionDataSortType = when (sortType) {
             TransactionDataSortMode.Bip69 -> TransactionDataSortType.Bip69
             else -> TransactionDataSortType.Shuffle
         }
-
-        fun getPurpose(derivation: AccountType.Derivation): Purpose = when (derivation) {
-            AccountType.Derivation.bip44 -> Purpose.BIP44
-            AccountType.Derivation.bip49 -> Purpose.BIP49
-            AccountType.Derivation.bip84 -> Purpose.BIP84
-        }
-
     }
 
 }

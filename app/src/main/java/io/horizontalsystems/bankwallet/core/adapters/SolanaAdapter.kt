@@ -46,7 +46,10 @@ class SolanaAdapter(kitWrapper: SolanaKitWrapper) : BaseSolanaAdapter(kitWrapper
 
     // ISendSolanaAdapter
     override val availableBalance: BigDecimal
-        get() = solanaKit.balance?.toBigDecimal()?.movePointLeft(decimal) ?: BigDecimal.ZERO
+        get() {
+            val availableBalance = balanceData.available - SolanaKit.fee - SolanaKit.accountRentAmount
+            return if (availableBalance < BigDecimal.ZERO) BigDecimal.ZERO else availableBalance
+        }
 
     override suspend fun send(amount: BigDecimal, to: Address): FullTransaction {
         if (signer == null) throw Exception()
@@ -78,7 +81,7 @@ class SolanaAdapter(kitWrapper: SolanaKitWrapper) : BaseSolanaAdapter(kitWrapper
     companion object {
         const val decimal = 9
 
-        fun clear(walletId: String, testMode: Boolean) {
+        fun clear(walletId: String) {
             SolanaKit.clear(App.instance, walletId)
         }
     }

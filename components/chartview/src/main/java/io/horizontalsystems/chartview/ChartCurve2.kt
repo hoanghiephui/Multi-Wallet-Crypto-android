@@ -36,8 +36,13 @@ class ChartCurve2(private val config: ChartConfig) : ChartDraw {
         if (!isVisible) return
         val tmpCurveAnimator = curveAnimator ?: return
 
-        val points = tmpCurveAnimator.getFramePoints()
+        val points = tmpCurveAnimator.getFramePoints(paint.strokeWidth / 2f)
         if (points.isEmpty()) return
+        if (points.size == 1) {
+            val pointF = points.first()
+            canvas.drawLine(0f, pointF.y, shape.width(), pointF.y, paint)
+            return
+        }
 
         val path = Path()
         val firstPoint = points.first()

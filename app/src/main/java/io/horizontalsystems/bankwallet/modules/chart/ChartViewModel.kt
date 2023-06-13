@@ -1,7 +1,9 @@
 package io.horizontalsystems.bankwallet.modules.chart
 
 import android.util.Range
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.horizontalsystems.bankwallet.R
@@ -12,35 +14,47 @@ import io.horizontalsystems.bankwallet.entities.Currency
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.entities.viewState
 import io.horizontalsystems.bankwallet.modules.coin.ChartInfoData
-import io.horizontalsystems.bankwallet.modules.coin.details.CoinDetailsModule
 import io.horizontalsystems.bankwallet.modules.market.Value
 import io.horizontalsystems.bankwallet.ui.compose.components.TabItem
-import io.horizontalsystems.chartview.ChartDataBuilder
-import io.horizontalsystems.chartview.ChartDataItemImmutable
-import io.horizontalsystems.chartview.Indicator
-import io.horizontalsystems.chartview.models.ChartIndicator
+import io.horizontalsystems.chartview.ChartData
+import io.horizontalsystems.chartview.models.ChartPoint
 import io.horizontalsystems.core.helpers.DateHelper
 import io.horizontalsystems.marketkit.models.HsTimePeriod
-import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.*
 
 open class ChartViewModel(
     private val service: AbstractChartService,
-    private val valueFormatter: ChartModule.ChartNumberFormatter
+    private val valueFormatter: ChartModule.ChartNumberFormatter,
 ) : ViewModel() {
-    val tabItemsLiveData = MutableLiveData<List<TabItem<HsTimePeriod?>>>()
-    val indicatorsLiveData = MutableLiveData<List<TabItem<ChartIndicator>>>()
-    val dataWrapperLiveData = MutableLiveData<ChartDataWrapper>()
-    val loadingLiveData = MutableLiveData<Boolean>()
-    val viewStateLiveData = MutableLiveData<ViewState>(ViewState.Loading)
+
+    private var tabItems = listOf<TabItem<HsTimePeriod?>>()
+    private var chartHeaderView: ChartModule.ChartHeaderView? = null
+    private var chartInfoData: ChartInfoData? = null
+    private var loading = false
+    private var viewState: ViewState = ViewState.Success
+
+    var uiState by mutableStateOf(
+        ChartUiState(
+            tabItems = tabItems,
+            chartHeaderView = chartHeaderView,
+            chartInfoData = chartInfoData,
+            loading = loading,
+            viewState = viewState,
+            hasVolumes = service.hasVolumes,
+            chartViewType = service.chartViewType
+        )
+    )
+        private set
 
     private val disposables = CompositeDisposable()
 
     init {
-        loadingLiveData.postValue(true)
+        loading = true
+        emitState()
 
         service.chartTypeObservable
             .subscribeIO { chartType ->
@@ -48,28 +62,9 @@ open class ChartViewModel(
                     val titleResId = it?.stringResId ?: R.string.CoinPage_TimeDuration_All
                     TabItem(Translator.getString(titleResId), it == chartType.orElse(null), it)
                 }
-                tabItemsLiveData.postValue(tabItems)
-            }
-            .let {
-                disposables.add(it)
-            }
+                this.tabItems = tabItems
 
-        Observable
-            .combineLatest(
-                service.indicatorObservable,
-                service.indicatorsEnabledObservable,
-                { selectedIndicator, enabled ->
-                    Pair(selectedIndicator, enabled)
-                }
-            )
-            .subscribeIO { (selectedIndicator, enabled) ->
-                val indicators = service.chartIndicators.map { indicator ->
-                    TabItem(Translator.getString(indicator.stringResId),
-                        indicator == selectedIndicator.orElse(null),
-                        indicator,
-                        enabled = enabled)
-                }
-                indicatorsLiveData.postValue(indicators)
+                emitState()
             }
             .let {
                 disposables.add(it)
@@ -78,14 +73,14 @@ open class ChartViewModel(
         service.chartPointsWrapperObservable
             .subscribeIO { chartItemsDataState ->
                 chartItemsDataState.viewState?.let {
-                    viewStateLiveData.postValue(it)
+                    viewState = it
                 }
 
-                loadingLiveData.postValue(false)
+                loading = false
 
-                chartItemsDataState.getOrNull()?.let {
-                    syncChartItems(it)
-                }
+                syncChartItems(chartItemsDataState.getOrNull())
+
+                emitState()
             }
             .let {
                 disposables.add(it)
@@ -96,52 +91,100 @@ open class ChartViewModel(
         }
     }
 
+    private fun emitState() {
+        viewModelScope.launch {
+            uiState = ChartUiState(
+                tabItems = tabItems,
+                chartHeaderView = chartHeaderView,
+                chartInfoData = chartInfoData,
+                loading = loading,
+                viewState = viewState,
+                hasVolumes = service.hasVolumes,
+                chartViewType = service.chartViewType,
+            )
+        }
+    }
+
     fun onSelectChartInterval(chartInterval: HsTimePeriod?) {
-        loadingLiveData.postValue(true)
+        loading = true
+        viewModelScope.launch {
+            // Solution to prevent flickering.
+            //
+            // When items are loaded fast for chartInterval change
+            // it shows loading state for a too little period of time.
+            // It looks like a flickering.
+            // It is true for most cases. Updating UI with some delay resolves it.
+            // Since it is true for the most cases here we set delay.
+            delay(300)
+            emitState()
+        }
+
         service.updateChartInterval(chartInterval)
     }
 
-    fun onSelectIndicator(chartIndicator: ChartIndicator?) {
-        loadingLiveData.postValue(true)
-        service.updateIndicator(chartIndicator)
-    }
-
     fun refresh() {
-        loadingLiveData.postValue(true)
+        loading = true
+        emitState()
+
         service.refresh()
     }
 
-    private fun syncChartItems(chartPointsWrapper: ChartPointsWrapper) {
-        val chartItems = chartPointsWrapper.items
-        if (chartItems.isEmpty()) return
+    private fun syncChartItems(chartPointsWrapper: ChartPointsWrapper?) {
+        if (chartPointsWrapper == null || chartPointsWrapper.items.isEmpty()) {
+            chartHeaderView = null
+            chartInfoData = null
 
-        val chartData = ChartDataBuilder.buildFromPoints(
-            chartPointsWrapper.items,
-            chartPointsWrapper.startTimestamp,
-            chartPointsWrapper.endTimestamp,
-            chartPointsWrapper.isExpired,
-            chartPointsWrapper.isMovementChart
-        )
+            return
+        }
+
+        val chartData = ChartData(chartPointsWrapper.items, chartPointsWrapper.isMovementChart, false)
 
         val headerView = if (!chartPointsWrapper.isMovementChart) {
-            val sum = valueFormatter.formatValue(service.currency, chartData.sum())
-            CoinDetailsModule.ChartHeaderView.Sum(sum)
+            val value = valueFormatter.formatValue(service.currency, chartData.sum())
+            ChartModule.ChartHeaderView(
+                value = value,
+                valueHint = null,
+                date = null,
+                diff = null,
+                extraData = null
+            )
         } else {
-            val lastItemValue = chartItems.last().value
+            val chartItems = chartPointsWrapper.items
+
+            val latestItem = chartItems.last()
+            val lastItemValue = latestItem.value
             val currentValue = valueFormatter.formatValue(service.currency, lastItemValue.toBigDecimal())
-            CoinDetailsModule.ChartHeaderView.Latest(currentValue, Value.Percent(chartData.diff()))
+
+            val dominanceData = latestItem.dominance?.let { dominance ->
+                val earliestItem = chartItems.first()
+                val diff = earliestItem.dominance?.let { earliestDominance ->
+                    Value.Percent((dominance - earliestDominance).toBigDecimal())
+                }
+
+                ChartModule.ChartHeaderExtraData.Dominance(
+                    App.numberFormatter.format(dominance, 0, 2, suffix = "%"),
+                    diff
+                )
+            }
+            ChartModule.ChartHeaderView(
+                value = currentValue,
+                valueHint = null,
+                date = null,
+                diff = Value.Percent(chartData.diff()),
+                extraData = dominanceData
+            )
         }
 
         val (minValue, maxValue) = getMinMax(chartData.valueRange)
 
         val chartInfoData = ChartInfoData(
             chartData,
-            chartPointsWrapper.chartInterval,
             maxValue,
             minValue
         )
 
-        dataWrapperLiveData.postValue(ChartDataWrapper(headerView, chartInfoData))
+        this.chartHeaderView = headerView
+        this.chartInfoData = chartInfoData
     }
 
     private val noChangesLimitPercent = 0.2f
@@ -170,67 +213,37 @@ open class ChartViewModel(
         service.stop()
     }
 
-    fun getSelectedPoint(item: ChartDataItemImmutable): SelectedPoint? {
-        return item.values[Indicator.Candle]?.let { candle ->
-            val value = valueFormatter.formatValue(service.currency, candle.value.toBigDecimal())
-            val dayAndTime = DateHelper.getFullDate(Date(item.timestamp * 1000))
+    fun getSelectedPoint(item: ChartPoint): ChartModule.ChartHeaderView {
+        val value = valueFormatter.formatValue(service.currency, item.value.toBigDecimal())
+        val dayAndTime = DateHelper.getFullDate(Date(item.timestamp * 1000))
 
-            SelectedPoint(
-                value = value,
-                date = dayAndTime,
-                extraData = getItemExtraData(item),
-            )
-        }
+        return ChartModule.ChartHeaderView(
+            value = value,
+            valueHint = null,
+            date = dayAndTime,
+            diff = null,
+            extraData = getItemExtraData(item)
+        )
     }
 
-    private fun getItemExtraData(item: ChartDataItemImmutable): SelectedPoint.ExtraData? {
-        if (service.indicator == ChartIndicator.Macd) {
-            val macd = item.values[Indicator.Macd]?.let {
-                App.numberFormatter.format(it.value, 0, 2)
-            }
-            val histogram = item.values[Indicator.MacdHistogram]?.let {
-                App.numberFormatter.format(it.value, 0, 2)
-            }
-            val signal = item.values[Indicator.MacdSignal]?.let {
-                App.numberFormatter.format(it.value, 0, 2)
-            }
-
-            return SelectedPoint.ExtraData.Macd(macd, histogram, signal)
-        }
-
-        val dominance = item.values[Indicator.Dominance]
-        val volume = item.values[Indicator.Volume]
+    private fun getItemExtraData(item: ChartPoint): ChartModule.ChartHeaderExtraData? {
+        val dominance = item.dominance
+        val volume = item.volume
 
         return when {
-            dominance != null -> SelectedPoint.ExtraData.Dominance(
-                App.numberFormatter.format(dominance.value, 0, 2, suffix = "%")
-            )
-            volume != null -> SelectedPoint.ExtraData.Volume(
-                App.numberFormatter.formatFiatShort(volume.value.toBigDecimal(), service.currency.symbol, 2)
+            dominance != null -> {
+                ChartModule.ChartHeaderExtraData.Dominance(
+                    App.numberFormatter.format(dominance, 0, 2, suffix = "%"),
+                    null
+                )
+            }
+            volume != null -> ChartModule.ChartHeaderExtraData.Volume(
+                App.numberFormatter.formatFiatShort(volume.toBigDecimal(), service.currency.symbol, 2)
             )
             else -> null
         }
     }
 }
-
-data class SelectedPoint(
-    val value: String,
-    val date: String,
-    val extraData: ExtraData?
-) {
-    sealed class ExtraData {
-        class Volume(val volume: String) : ExtraData()
-        class Dominance(val dominance: String) : ExtraData()
-        class Macd(val macd: String?, val histogram: String?, val signal: String?) : ExtraData()
-    }
-}
-
-private val ChartIndicator.stringResId: Int
-    get() = when (this) {
-        ChartIndicator.Ema -> R.string.CoinPage_IndicatorEMA
-        ChartIndicator.Macd -> R.string.CoinPage_IndicatorMACD
-        ChartIndicator.Rsi -> R.string.CoinPage_IndicatorRSI
-    }
 
 val HsTimePeriod.stringResId: Int
     get() = when (this) {

@@ -6,21 +6,32 @@ import io.horizontalsystems.bankwallet.entities.DataState
 import io.horizontalsystems.bankwallet.modules.swap.settings.IRecipientAddressService
 import io.horizontalsystems.bankwallet.modules.swap.settings.ISwapDeadlineService
 import io.horizontalsystems.bankwallet.modules.swap.settings.ISwapSlippageService
-import io.horizontalsystems.bankwallet.modules.swap.settings.SwapSettingsModule.InvalidSlippageType
-import io.horizontalsystems.bankwallet.modules.swap.settings.SwapSettingsModule.SwapSettingsError
+import io.horizontalsystems.bankwallet.modules.swap.settings.SwapSettingsModule
 import io.horizontalsystems.bankwallet.modules.swap.settings.uniswap.UniswapSettingsModule.State
 import io.horizontalsystems.uniswapkit.models.TradeOptions
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import java.math.BigDecimal
-import java.util.*
+import java.util.Optional
 
 class UniswapSettingsService(
-        tradeOptions: SwapTradeOptions
+    recipientAddress: Address?,
+    slippage: BigDecimal?,
+    ttl: Long?
 ) : IRecipientAddressService, ISwapSlippageService, ISwapDeadlineService {
 
-    var state: State = State.Valid(tradeOptions)
+    private var recipient: Address? = recipientAddress
+    private var slippage: BigDecimal = slippage ?: TradeOptions.defaultAllowedSlippage
+    private var deadline: Long = ttl ?: TradeOptions.defaultTtl
+
+    var state: State = State.Valid(
+        SwapTradeOptions(
+            allowedSlippage = this.slippage,
+            ttl = deadline,
+            recipient = recipient
+        )
+    )
         private set(value) {
             field = value
             stateObservable.onNext(value)
@@ -35,10 +46,8 @@ class UniswapSettingsService(
             errorsObservable.onNext(value)
         }
 
-    // region ISwapSlippageService
     private val limitSlippageBounds = Range(BigDecimal("0.01"), BigDecimal("50"))
     private val usualHighestSlippage = BigDecimal(5)
-    private var slippage: BigDecimal = tradeOptions.allowedSlippage
 
     override val initialSlippage: BigDecimal?
         get() = state.let {
@@ -67,12 +76,8 @@ class UniswapSettingsService(
     }
 
     private fun getSlippageError(errors: List<Throwable>): Throwable? {
-        return errors.find { it is SwapSettingsError.InvalidSlippage }
+        return errors.find { it is SwapSettingsModule.SwapSettingsError.InvalidSlippage }
     }
-    //endregion
-
-    //region ISwapDeadlineService
-    private var deadline: Long = tradeOptions.ttl
 
     override val initialDeadline: Long?
         get() = state.let {
@@ -95,17 +100,14 @@ class UniswapSettingsService(
         get() = errorsObservable.map { errors -> Optional.ofNullable(getDeadlineError(errors)) }
 
     private fun getDeadlineError(errors: List<Throwable>): Throwable? {
-        return errors.find { it is SwapSettingsError.ZeroDeadline }
+        return errors.find { it is SwapSettingsModule.SwapSettingsError.ZeroDeadline }
     }
 
     override fun setDeadline(value: Long) {
         deadline = value
         sync()
     }
-    //endregion
 
-    //region IRecipientAddressService
-    private var recipient: Address? = tradeOptions.recipient
     private var recipientError: Throwable? = null
         set(value) {
             field = value
@@ -144,8 +146,6 @@ class UniswapSettingsService(
     override fun setRecipientAmount(amount: BigDecimal) {
     }
 
-    //endregion
-
     init {
         sync()
     }
@@ -157,19 +157,22 @@ class UniswapSettingsService(
 
         tradeOptions.recipient = recipient
         recipientError?.let {
-            errs.add(SwapSettingsError.InvalidAddress)
+            errs.add(SwapSettingsModule.SwapSettingsError.InvalidAddress)
         }
 
         when {
             slippage.compareTo(BigDecimal.ZERO) == 0 -> {
-                errs.add(SwapSettingsError.ZeroSlippage)
+                errs.add(SwapSettingsModule.SwapSettingsError.ZeroSlippage)
             }
+
             slippage > limitSlippageBounds.upper -> {
-                errs.add(SwapSettingsError.InvalidSlippage(InvalidSlippageType.Higher(limitSlippageBounds.upper)))
+                errs.add(SwapSettingsModule.SwapSettingsError.InvalidSlippage(SwapSettingsModule.InvalidSlippageType.Higher(limitSlippageBounds.upper)))
             }
+
             slippage < limitSlippageBounds.lower -> {
-                errs.add(SwapSettingsError.InvalidSlippage(InvalidSlippageType.Lower(limitSlippageBounds.lower)))
+                errs.add(SwapSettingsModule.SwapSettingsError.InvalidSlippage(SwapSettingsModule.InvalidSlippageType.Lower(limitSlippageBounds.lower)))
             }
+
             else -> {
                 tradeOptions.allowedSlippage = slippage
             }
@@ -178,7 +181,7 @@ class UniswapSettingsService(
         if (deadline != 0L) {
             tradeOptions.ttl = deadline
         } else {
-            errs.add(SwapSettingsError.ZeroDeadline)
+            errs.add(SwapSettingsModule.SwapSettingsError.ZeroDeadline)
         }
 
         errors = errs

@@ -59,19 +59,21 @@ class TransactionRecordRepository(
             when (wallet.source.blockchain.type) {
                 BlockchainType.Bitcoin,
                 BlockchainType.BitcoinCash,
+                BlockchainType.ECash,
                 BlockchainType.Litecoin,
                 BlockchainType.Dash,
                 BlockchainType.Zcash,
                 BlockchainType.BinanceChain -> mergedWallets.add(wallet)
                 BlockchainType.Ethereum,
-                BlockchainType.EthereumGoerli,
                 BlockchainType.BinanceSmartChain,
                 BlockchainType.Polygon,
                 BlockchainType.Avalanche,
                 BlockchainType.Optimism,
                 BlockchainType.ArbitrumOne,
                 BlockchainType.Gnosis,
-                BlockchainType.Solana -> {
+                BlockchainType.Fantom,
+                BlockchainType.Solana,
+                BlockchainType.Tron -> {
                     if (mergedWallets.none { it.source == wallet.source }) {
                         mergedWallets.add(TransactionWallet(null, wallet.source, null))
                     }

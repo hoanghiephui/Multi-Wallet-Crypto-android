@@ -14,6 +14,9 @@ import io.horizontalsystems.bankwallet.modules.evmfee.IEvmGasPriceService
 import io.horizontalsystems.bankwallet.modules.evmfee.eip1559.Eip1559GasPriceService
 import io.horizontalsystems.bankwallet.modules.evmfee.legacy.LegacyGasPriceService
 import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmData
+import io.horizontalsystems.bankwallet.modules.send.evm.settings.SendEvmNonceService
+import io.horizontalsystems.bankwallet.modules.send.evm.settings.SendEvmNonceViewModel
+import io.horizontalsystems.bankwallet.modules.send.evm.settings.SendEvmSettingsService
 import io.horizontalsystems.bankwallet.modules.sendevmtransaction.SendEvmTransactionService
 import io.horizontalsystems.bankwallet.modules.sendevmtransaction.SendEvmTransactionViewModel
 import io.horizontalsystems.bankwallet.modules.transactions.TransactionSource
@@ -56,7 +59,7 @@ object TransactionInfoOptionsModule {
                 Chain.Optimism -> BlockchainType.Optimism
                 Chain.ArbitrumOne -> BlockchainType.ArbitrumOne
                 Chain.Gnosis -> BlockchainType.Gnosis
-                Chain.EthereumGoerli -> BlockchainType.EthereumGoerli
+                Chain.Fantom -> BlockchainType.Fantom
                 else -> BlockchainType.Ethereum
             }
             App.evmBlockchainManager.getBaseToken(blockchainType)!!
@@ -88,20 +91,27 @@ object TransactionInfoOptionsModule {
         private val transactionData by lazy {
             when (optionType) {
                 Type.SpeedUp -> {
-                    TransactionData(transaction.to!!, transaction.value!!, transaction.input!!, transaction.nonce)
+                    TransactionData(transaction.to!!, transaction.value!!, transaction.input!!)
                 }
                 Type.Cancel -> {
                     TransactionData(
                         evmKitWrapper.evmKit.receiveAddress,
                         BigInteger.ZERO,
-                        byteArrayOf(),
-                        transaction.nonce
+                        byteArrayOf()
                     )
                 }
             }
         }
-        private val transactionService by lazy {
-            val gasDataService = EvmCommonGasDataService.instance(evmKitWrapper.evmKit, evmKitWrapper.blockchainType, gasLimit = transaction.gasLimit)
+        private val feeService by lazy {
+            val gasLimit = when (optionType) {
+                Type.SpeedUp -> transaction.gasLimit
+                Type.Cancel -> null
+            }
+            val gasDataService = EvmCommonGasDataService.instance(
+                evmKitWrapper.evmKit,
+                evmKitWrapper.blockchainType,
+                gasLimit = gasLimit
+            )
             EvmFeeService(evmKitWrapper.evmKit, gasPriceService, gasDataService, transactionData)
         }
 
@@ -110,17 +120,17 @@ object TransactionInfoOptionsModule {
                 baseToken,
                 App.marketKit,
                 App.currencyManager,
-                App.evmTestnetManager,
                 App.coinManager
             )
         }
         private val cautionViewItemFactory by lazy { CautionViewItemFactory(coinServiceFactory.baseCoinService) }
-
+        private val nonceService = SendEvmNonceService(evmKitWrapper.evmKit, transaction.nonce)
+        private val settingsService by lazy { SendEvmSettingsService(feeService, nonceService) }
         private val sendService by lazy {
             SendEvmTransactionService(
                 SendEvmData(transactionData),
                 evmKitWrapper,
-                transactionService,
+                settingsService,
                 App.evmLabelManager
             )
         }
@@ -129,10 +139,16 @@ object TransactionInfoOptionsModule {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return when (modelClass) {
                 SendEvmTransactionViewModel::class.java -> {
-                    SendEvmTransactionViewModel(sendService, coinServiceFactory, cautionViewItemFactory, App.evmLabelManager) as T
+                    SendEvmTransactionViewModel(
+                        sendService,
+                        coinServiceFactory,
+                        cautionViewItemFactory,
+                        blockchainType = source.blockchain.type,
+                        contactsRepo = App.contactsRepository
+                    ) as T
                 }
                 EvmFeeCellViewModel::class.java -> {
-                    EvmFeeCellViewModel(transactionService, gasPriceService, coinServiceFactory.baseCoinService) as T
+                    EvmFeeCellViewModel(feeService, gasPriceService, coinServiceFactory.baseCoinService) as T
                 }
                 TransactionSpeedUpCancelViewModel::class.java -> {
                     TransactionSpeedUpCancelViewModel(
@@ -140,6 +156,9 @@ object TransactionInfoOptionsModule {
                         optionType,
                         fullTransaction.transaction.blockNumber == null
                     ) as T
+                }
+                SendEvmNonceViewModel::class.java -> {
+                    SendEvmNonceViewModel(nonceService) as T
                 }
                 else -> throw IllegalArgumentException()
             }

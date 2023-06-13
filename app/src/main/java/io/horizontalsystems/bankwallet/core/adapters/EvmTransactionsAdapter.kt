@@ -1,7 +1,6 @@
 package io.horizontalsystems.bankwallet.core.adapters
 
 import io.horizontalsystems.bankwallet.core.AdapterState
-import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.ICoinManager
 import io.horizontalsystems.bankwallet.core.ITransactionsAdapter
 import io.horizontalsystems.bankwallet.core.managers.EvmKitWrapper
@@ -12,7 +11,6 @@ import io.horizontalsystems.bankwallet.modules.transactions.FilterTransactionTyp
 import io.horizontalsystems.bankwallet.modules.transactions.TransactionSource
 import io.horizontalsystems.ethereumkit.core.EthereumKit
 import io.horizontalsystems.ethereumkit.core.hexStringToByteArray
-import io.horizontalsystems.ethereumkit.models.Chain
 import io.horizontalsystems.ethereumkit.models.TransactionTag
 import io.horizontalsystems.marketkit.models.Token
 import io.horizontalsystems.marketkit.models.TokenType
@@ -34,7 +32,7 @@ class EvmTransactionsAdapter(
     override val explorerTitle: String
         get() = evmTransactionSource.name
 
-    override fun getTransactionUrl(transactionHash: String): String? =
+    override fun getTransactionUrl(transactionHash: String): String =
         evmTransactionSource.transactionUrl(transactionHash)
 
     override val lastBlockInfo: LastBlockInfo?
@@ -106,26 +104,5 @@ class EvmTransactionsAdapter(
         }
 
         return listOfNotNull(filterCoin, filterTag).map { listOf(it) }
-    }
-
-    companion object {
-        const val decimal = 18
-
-        fun clear(walletId: String, testMode: Boolean) {
-            val networkTypes = when {
-                testMode -> listOf(Chain.EthereumGoerli)
-                else -> listOf(
-                    Chain.Ethereum,
-                    Chain.BinanceSmartChain,
-                    Chain.Polygon,
-                    Chain.Optimism,
-                    Chain.ArbitrumOne,
-                    Chain.Gnosis,
-                )
-            }
-            networkTypes.forEach {
-                EthereumKit.clear(App.instance, it, walletId)
-            }
-        }
     }
 }

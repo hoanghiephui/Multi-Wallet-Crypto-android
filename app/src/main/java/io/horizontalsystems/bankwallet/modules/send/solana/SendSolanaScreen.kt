@@ -54,8 +54,8 @@ fun SendSolanaScreen(
         }
 
         SendScreen(
-                navController = navController,
-                fullCoin = fullCoin
+            fullCoin = fullCoin,
+            onCloseClick = { navController.popBackStack() }
         ) {
             AvailableBalance(
                     coinCode = wallet.coin.code,
@@ -88,11 +88,12 @@ fun SendSolanaScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
             HSAddressInput(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    tokenQuery = wallet.token.tokenQuery,
-                    coinCode = wallet.coin.code,
-                    error = addressError,
-                    textPreprocessor = paymentAddressViewModel
+                modifier = Modifier.padding(horizontal = 16.dp),
+                tokenQuery = wallet.token.tokenQuery,
+                coinCode = wallet.coin.code,
+                error = addressError,
+                textPreprocessor = paymentAddressViewModel,
+                navController = navController
             ) {
                 viewModel.onEnterAddress(it)
             }

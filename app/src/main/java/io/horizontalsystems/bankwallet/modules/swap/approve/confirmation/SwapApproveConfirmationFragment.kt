@@ -23,12 +23,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
-import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.navGraphViewModels
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.AppLogger
 import io.horizontalsystems.bankwallet.core.BaseFragment
+import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
 import io.horizontalsystems.bankwallet.modules.evmfee.EvmFeeCellViewModel
 import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmData
@@ -37,6 +37,8 @@ import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmModule.additional
 import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmModule.backButtonKey
 import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmModule.blockchainTypeKey
 import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmModule.transactionDataKey
+import io.horizontalsystems.bankwallet.modules.send.evm.settings.SendEvmNonceViewModel
+import io.horizontalsystems.bankwallet.modules.send.evm.settings.SendEvmSettingsFragment
 import io.horizontalsystems.bankwallet.modules.sendevmtransaction.SendEvmTransactionView
 import io.horizontalsystems.bankwallet.modules.sendevmtransaction.SendEvmTransactionViewModel
 import io.horizontalsystems.bankwallet.modules.swap.approve.SwapApproveModule
@@ -72,8 +74,9 @@ class SwapApproveConfirmationFragment : BaseFragment() {
             blockchainType!!
         )
     }
-    private val sendEvmTransactionViewModel by viewModels<SendEvmTransactionViewModel> { vmFactory }
+    private val sendEvmTransactionViewModel by navGraphViewModels<SendEvmTransactionViewModel>(R.id.swapApproveConfirmationFragment) { vmFactory }
     private val feeViewModel by navGraphViewModels<EvmFeeCellViewModel>(R.id.swapApproveConfirmationFragment) { vmFactory }
+    private val nonceViewModel by navGraphViewModels<SendEvmNonceViewModel>(R.id.swapApproveConfirmationFragment) { vmFactory }
     private val transactionData: TransactionData
         get() {
             val transactionDataParcelable =
@@ -102,6 +105,7 @@ class SwapApproveConfirmationFragment : BaseFragment() {
                 SwapApproveConfirmationScreen(
                     sendEvmTransactionViewModel = sendEvmTransactionViewModel,
                     feeViewModel = feeViewModel,
+                    nonceViewModel = nonceViewModel,
                     parentNavGraphId = R.id.swapApproveConfirmationFragment,
                     navController = findNavController(),
                     onSendClick = {
@@ -153,6 +157,7 @@ class SwapApproveConfirmationFragment : BaseFragment() {
 private fun SwapApproveConfirmationScreen(
     sendEvmTransactionViewModel: SendEvmTransactionViewModel,
     feeViewModel: EvmFeeCellViewModel,
+    nonceViewModel: SendEvmNonceViewModel,
     parentNavGraphId: Int,
     navController: NavController,
     onSendClick: () -> Unit,
@@ -183,10 +188,14 @@ private fun SwapApproveConfirmationScreen(
                     navigationIcon = navigationIcon,
                     menuItems = listOf(
                         MenuItem(
-                            title = TranslatableString.ResString(R.string.Button_Close),
-                            icon = R.drawable.ic_close,
+                            title = TranslatableString.ResString(R.string.SendEvmSettings_Title),
+                            icon = R.drawable.ic_manage_2,
+                            tint = ComposeAppTheme.colors.jacob,
                             onClick = {
-                                navController.popBackStack(R.id.swapFragment, false)
+                                navController.slideFromBottom(
+                                    resId = R.id.sendEvmSettingsFragment,
+                                    args = SendEvmSettingsFragment.prepareParams(parentNavGraphId)
+                                )
                             }
                         )
                     )
@@ -202,8 +211,8 @@ private fun SwapApproveConfirmationScreen(
                     SendEvmTransactionView(
                         sendEvmTransactionViewModel,
                         feeViewModel,
-                        navController,
-                        parentNavGraphId,
+                        nonceViewModel,
+                        navController
                     )
                 }
                 ButtonsGroupWithShade {

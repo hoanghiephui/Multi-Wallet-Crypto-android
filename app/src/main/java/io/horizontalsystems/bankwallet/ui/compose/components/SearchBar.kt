@@ -43,7 +43,7 @@ fun SearchBar(
     var searchText by remember { mutableStateOf("") }
 
     TopAppBar(
-        modifier = Modifier.height(56.dp),
+        modifier = Modifier.height(64.dp),
         title = {
             title3_leah(
                 text = if (searchMode) "" else title,
@@ -65,7 +65,7 @@ fun SearchBar(
             }) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_back),
-                    contentDescription = "back button",
+                    contentDescription = stringResource(R.string.Button_Back),
                     tint = ComposeAppTheme.colors.jacob
                 )
             }
@@ -114,7 +114,7 @@ fun SearchBar(
                             }) {
                                 Icon(
                                     painter = painterResource(R.drawable.ic_close),
-                                    contentDescription = null,
+                                    contentDescription = stringResource(R.string.Button_Cancel),
                                     tint = ComposeAppTheme.colors.jacob
                                 )
                             }
@@ -132,7 +132,7 @@ fun SearchBar(
                 AppBarMenuButton(
                     icon = R.drawable.ic_search,
                     onClick = { searchMode = true },
-                    description = stringResource(R.string.ManageCoins_Search),
+                    description = stringResource(R.string.Button_Search),
                 )
 
                 menuItems.forEach { menuItem ->

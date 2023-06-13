@@ -7,16 +7,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.providers.Translator
-import io.horizontalsystems.bankwallet.modules.swap.SwapMainModule
+import io.horizontalsystems.bankwallet.modules.swap.ErrorShareService
 import io.horizontalsystems.bankwallet.modules.swap.SwapViewItemHelper
+import io.horizontalsystems.bankwallet.modules.swap.SwapMainModule.SwapError
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlow
 
 class SwapAllowanceViewModel(
-        private val service: SwapMainModule.ISwapService,
-        private val allowanceService: SwapAllowanceService,
-        private val pendingAllowanceService: SwapPendingAllowanceService,
-        private val formatter: SwapViewItemHelper
+    private val errorShareService: ErrorShareService,
+    private val allowanceService: SwapAllowanceService,
+    private val pendingAllowanceService: SwapPendingAllowanceService,
+    private val formatter: SwapViewItemHelper
 ) : ViewModel() {
 
     private var isVisible = false
@@ -36,13 +36,13 @@ class SwapAllowanceViewModel(
 
     init {
         viewModelScope.launch {
-            allowanceService.stateObservable.asFlow()
+            allowanceService.stateFlow
                 .collect { allowanceState ->
-                    handle(allowanceState.orElse(null))
+                    handle(allowanceState)
                 }
         }
         viewModelScope.launch {
-            service.errorsObservable.asFlow()
+            errorShareService.errorsStateFlow
                 .collect { errors ->
                     handle(errors)
                 }
@@ -72,8 +72,8 @@ class SwapAllowanceViewModel(
     }
 
     private fun handle(errors: List<Throwable>) {
-        isError = errors.any { it is SwapMainModule.SwapError.InsufficientAllowance }
-        revokeRequired = errors.any { it is SwapMainModule.SwapError.RevokeAllowanceRequired }
+        isError = errors.any { it is SwapError.InsufficientAllowance }
+        revokeRequired = errors.any { it is SwapError.RevokeAllowanceRequired }
 
         syncVisible()
         emitState()

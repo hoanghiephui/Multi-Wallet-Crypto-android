@@ -7,8 +7,10 @@ import android.net.Uri
 import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.App
-import io.horizontalsystems.bankwallet.core.utils.RootUtil
+import io.horizontalsystems.bankwallet.entities.Account
+import io.horizontalsystems.bankwallet.modules.walletconnect.version1.WC1Manager
 import kotlinx.parcelize.Parcelize
 
 object MainModule {
@@ -16,7 +18,6 @@ object MainModule {
     class Factory(private val wcDeepLink: String?) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            val service = MainService(RootUtil, App.localStorage)
             return MainViewModel(
                 App.pinComponent,
                 App.rateAppManager,
@@ -24,8 +25,7 @@ object MainModule {
                 App.termsManager,
                 App.accountManager,
                 App.releaseNotesManager,
-                service,
-                App.torKitManager,
+                App.localStorage,
                 App.wc2SessionManager,
                 App.wc1Manager,
                 wcDeepLink
@@ -52,17 +52,35 @@ object MainModule {
         class BadgeNumber(val number: Int) : BadgeType()
     }
 
+    data class NavigationViewItem(
+        val mainNavItem: MainNavigation,
+        val selected: Boolean,
+        val enabled: Boolean,
+        val badge: BadgeType? = null
+    )
+
     @Parcelize
-    enum class MainTab : Parcelable {
-        Market,
-        Balance,
-        Transactions,
-        Settings;
+    enum class MainNavigation(val iconRes: Int, val titleRes: Int) : Parcelable {
+        Market(R.drawable.ic_market_24, R.string.Market_Title),
+        Balance(R.drawable.ic_wallet_24, R.string.Balance_Title),
+        Transactions(R.drawable.ic_transactions, R.string.Transactions_Title),
+        Settings(R.drawable.ic_settings, R.string.Settings_Title);
 
         companion object {
-            private val map = values().associateBy(MainTab::name)
+            private val map = values().associateBy(MainNavigation::name)
 
-            fun fromString(type: String?): MainTab? = map[type]
+            fun fromString(type: String?): MainNavigation? = map[type]
         }
     }
+
+    data class UiState(
+        val selectedPageIndex: Int,
+        val mainNavItems: List<NavigationViewItem>,
+        val showRateAppDialog: Boolean,
+        val contentHidden: Boolean,
+        val showWhatsNew: Boolean,
+        val activeWallet: Account?,
+        val torEnabled: Boolean,
+        val wcSupportState: WC1Manager.SupportState?
+    )
 }

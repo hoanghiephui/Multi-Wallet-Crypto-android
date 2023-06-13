@@ -9,7 +9,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -39,7 +38,6 @@ class ExperimentalFeaturesFragment : BaseFragment() {
             setContent {
                 ExperimentalScreen(
                     onCloseClick = { findNavController().popBackStack() },
-                    openTestnetSettings = { findNavController().slideFromRight(R.id.testnetSettingsFragment) },
                     openTimeLock = { findNavController().slideFromRight(R.id.timeLockFragment) },
                 )
             }
@@ -50,7 +48,6 @@ class ExperimentalFeaturesFragment : BaseFragment() {
 @Composable
 private fun ExperimentalScreen(
     onCloseClick: () -> Unit,
-    openTestnetSettings: () -> Unit,
     openTimeLock: () -> Unit,
 ) {
     ComposeAppTheme {
@@ -60,13 +57,7 @@ private fun ExperimentalScreen(
             AppBar(
                 title = TranslatableString.ResString(R.string.ExperimentalFeatures_Title),
                 navigationIcon = {
-                    HsIconButton(onClick = onCloseClick) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_back),
-                            contentDescription = "back button",
-                            tint = ComposeAppTheme.colors.jacob
-                        )
-                    }
+                    HsBackButton(onClick = onCloseClick)
                 }
             )
             Column(
@@ -78,11 +69,9 @@ private fun ExperimentalScreen(
                 )
                 Spacer(Modifier.height(24.dp))
                 CellUniversalLawrenceSection(
-                    listOf({
+                    listOf {
                         ItemCell(R.string.BitcoinHodling_Title, openTimeLock)
-                    }, {
-                        ItemCell(R.string.TestnetSettings_EvmTestnet, openTestnetSettings)
-                    })
+                    }
                 )
                 Spacer(Modifier.height(24.dp))
             }

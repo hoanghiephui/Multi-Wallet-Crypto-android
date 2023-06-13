@@ -16,7 +16,8 @@ import io.horizontalsystems.core.helpers.DateHelper
 import io.horizontalsystems.marketkit.models.Blockchain
 import io.horizontalsystems.marketkit.models.BlockchainType
 import io.reactivex.disposables.CompositeDisposable
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 
 class TransactionsViewModel(
     private val service: TransactionsService,
@@ -150,17 +151,19 @@ data class TransactionViewItem(
     sealed class Icon {
         class ImageResource(val resourceId: Int) : Icon()
         class Regular(val url: String?, val placeholder: Int?, val rectangle: Boolean = false) : Icon()
-        class Double(val back: Regular, val front: Regular): Icon()
+        class Double(val back: Regular, val front: Regular) : Icon()
         object Failed : Icon()
-        class Platform(source: TransactionSource) : Icon() {
-            val iconRes = when (source.blockchain.type) {
+        class Platform(blockchainType: BlockchainType) : Icon() {
+            val iconRes = when (blockchainType) {
                 BlockchainType.BinanceSmartChain -> R.drawable.logo_chain_bsc_trx_24
                 BlockchainType.Ethereum -> R.drawable.logo_chain_ethereum_trx_24
                 BlockchainType.Polygon -> R.drawable.logo_chain_polygon_trx_24
-                BlockchainType.Avalanche ->  R.drawable.logo_chain_avalanche_trx_24
-                BlockchainType.Optimism ->  R.drawable.logo_chain_optimism_trx_24
-                BlockchainType.ArbitrumOne ->  R.drawable.logo_chain_arbitrum_one_trx_24
-                BlockchainType.Gnosis ->  R.drawable.logo_chain_gnosis_trx_32
+                BlockchainType.Avalanche -> R.drawable.logo_chain_avalanche_trx_24
+                BlockchainType.Optimism -> R.drawable.logo_chain_optimism_trx_24
+                BlockchainType.ArbitrumOne -> R.drawable.logo_chain_arbitrum_one_trx_24
+                BlockchainType.Gnosis -> R.drawable.logo_chain_gnosis_trx_32
+                BlockchainType.Fantom -> R.drawable.logo_chain_fantom_trx_32
+                BlockchainType.Tron -> R.drawable.logo_chain_tron_trx_32
                 else -> null
             }
         }

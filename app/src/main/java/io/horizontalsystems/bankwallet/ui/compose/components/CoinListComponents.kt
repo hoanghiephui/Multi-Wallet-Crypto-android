@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.iconPlaceholder
-import io.horizontalsystems.bankwallet.core.iconUrl
 import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.modules.market.ImageSource
 import io.horizontalsystems.bankwallet.modules.market.MarketViewItem
@@ -80,7 +79,7 @@ fun CoinList(
                     Icon(
                         painter = painterResource(id = if (item.favorited) R.drawable.ic_star_off_24 else R.drawable.ic_star_24),
                         tint = ComposeAppTheme.colors.claude,
-                        contentDescription = "delete",
+                        contentDescription = stringResource(if (item.favorited) R.string.CoinPage_Unfavorite else R.string.CoinPage_Favorite),
                     )
                 }
                 DraggableCardSimple(
@@ -98,7 +97,7 @@ fun CoinList(
                         MarketCoin(
                             item.fullCoin.coin.name,
                             item.fullCoin.coin.code,
-                            item.fullCoin.coin.iconUrl,
+                            item.fullCoin.coin.imageUrl,
                             item.fullCoin.iconPlaceholder,
                             item.coinRate,
                             item.marketDataValue,
@@ -129,9 +128,22 @@ fun ListErrorView(
     errorText: String,
     onClick: () -> Unit
 ) {
+    ListErrorView(
+        errorText = errorText,
+        icon = R.drawable.ic_sync_error,
+        onClick = onClick,
+    )
+}
+
+@Composable
+fun ListErrorView(
+    errorText: String,
+    @DrawableRes icon: Int = R.drawable.ic_sync_error,
+    onClick: () -> Unit
+) {
     ScreenMessageWithAction(
         text = errorText,
-        icon = R.drawable.ic_sync_error,
+        icon = icon,
     ) {
         ButtonPrimaryYellow(
             modifier = Modifier

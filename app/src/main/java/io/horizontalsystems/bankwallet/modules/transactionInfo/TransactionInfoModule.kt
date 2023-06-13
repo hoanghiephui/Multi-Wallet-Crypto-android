@@ -36,10 +36,12 @@ object TransactionInfoModule {
                 Translator,
                 DateHelper,
                 App.evmLabelManager,
-                transactionSource.blockchain.type.resendable
+                transactionSource.blockchain.type.resendable,
+                App.contactsRepository,
+                transactionSource.blockchain.type
             )
 
-            return TransactionInfoViewModel(service, factory) as T
+            return TransactionInfoViewModel(service, factory, App.contactsRepository) as T
         }
 
     }

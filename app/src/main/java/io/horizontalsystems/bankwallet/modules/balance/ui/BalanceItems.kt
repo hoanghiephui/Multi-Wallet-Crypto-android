@@ -21,13 +21,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
+import io.horizontalsystems.bankwallet.core.managers.FaqManager
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.modules.balance.*
-import io.horizontalsystems.bankwallet.modules.markdown.MarkdownFragment
 import io.horizontalsystems.bankwallet.modules.rateapp.RateAppModule
 import io.horizontalsystems.bankwallet.modules.rateapp.RateAppViewModel
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
@@ -216,6 +215,7 @@ fun BalanceItems(
             } else {
                 ButtonSecondaryCircle(
                     icon = R.drawable.ic_manage_2,
+                    contentDescription = stringResource(R.string.ManageCoins_title),
                     onClick = {
                         navController.slideFromRight(R.id.manageWalletsFragment)
                     }
@@ -232,7 +232,10 @@ fun BalanceItems(
                     modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp),
                     text = stringResource(R.string.AccountRecovery_MigrationRequired),
                     onClick = {
-                        openMarkDown(viewModel.getFaqUrl(HeaderNote.NonStandardAccount), navController)
+                        FaqManager.showFaqPage(
+                            navController,
+                            FaqManager.faqPathMigrationRequired
+                        )
                     }
                 )
             }
@@ -241,7 +244,10 @@ fun BalanceItems(
                     modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp),
                     text = stringResource(R.string.AccountRecovery_MigrationRecommended),
                     onClick = {
-                        openMarkDown(viewModel.getFaqUrl(HeaderNote.NonRecommendedAccount), navController)
+                        FaqManager.showFaqPage(
+                            navController,
+                            FaqManager.faqPathMigrationRecommended
+                        )
                     },
                     onClose = {
                         viewModel.onCloseHeaderNote(HeaderNote.NonRecommendedAccount)
@@ -252,20 +258,6 @@ fun BalanceItems(
 
         Wallets(balanceViewItems, viewModel, navController, accountViewItem.id, viewModel.sortType, uiState)
     }
-}
-
-private fun openMarkDown(
-    markDownUrl: String,
-    navController: NavController
-) {
-    val arguments = bundleOf(
-        MarkdownFragment.markdownUrlKey to markDownUrl,
-        MarkdownFragment.handleRelativeUrlKey to true
-    )
-    navController.slideFromRight(
-        R.id.markdownFragment,
-        arguments
-    )
 }
 
 @Composable

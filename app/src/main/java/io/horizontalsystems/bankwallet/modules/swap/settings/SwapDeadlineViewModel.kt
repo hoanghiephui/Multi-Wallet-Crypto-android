@@ -12,7 +12,7 @@ import io.horizontalsystems.bankwallet.modules.swap.settings.SwapSettingsModule.
 import io.horizontalsystems.bankwallet.modules.swap.settings.ui.InputButton
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
-import java.util.*
+import java.util.Optional
 import kotlin.math.floor
 
 interface ISwapDeadlineService {
@@ -91,7 +91,6 @@ class SwapDeadlineViewModel(
         disposable.clear()
     }
 }
-
 
 interface IVerifiedInputViewModel {
     val inputButtons: List<InputButton> get() = listOf()

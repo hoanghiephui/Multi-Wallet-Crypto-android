@@ -2,7 +2,11 @@ package io.horizontalsystems.bankwallet.modules.swap.settings.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Text
@@ -19,6 +23,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.entities.DataState
@@ -28,7 +33,12 @@ import io.horizontalsystems.bankwallet.modules.swap.settings.SwapDeadlineViewMod
 import io.horizontalsystems.bankwallet.modules.swap.settings.SwapSlippageViewModel
 import io.horizontalsystems.bankwallet.ui.compose.ColoredTextStyle
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
-import io.horizontalsystems.bankwallet.ui.compose.components.*
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryCircle
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryDefault
+import io.horizontalsystems.bankwallet.ui.compose.components.FormsInputStateWarning
+import io.horizontalsystems.bankwallet.ui.compose.components.HeaderText
+import io.horizontalsystems.bankwallet.ui.compose.components.InfoText
+import io.horizontalsystems.bankwallet.ui.compose.components.body_grey50
 import io.horizontalsystems.marketkit.models.BlockchainType
 import io.horizontalsystems.marketkit.models.TokenQuery
 import io.horizontalsystems.marketkit.models.TokenType
@@ -43,6 +53,7 @@ fun SlippageAmount(
     InputWithButtons(
         modifier = Modifier.padding(horizontal = 16.dp),
         hint = slippageViewModel.inputFieldPlaceholder,
+        initial = slippageViewModel.initialValue,
         buttons = slippageViewModel.inputButtons,
         state = slippageViewModel.errorState,
         onValueChange = {
@@ -62,6 +73,7 @@ fun TransactionDeadlineInput(deadlineViewModel: SwapDeadlineViewModel) {
     InputWithButtons(
         modifier = Modifier.padding(horizontal = 16.dp),
         hint = deadlineViewModel.inputFieldPlaceholder,
+        initial = deadlineViewModel.initialValue,
         buttons = deadlineViewModel.inputButtons,
         state = deadlineViewModel.errorState,
         onValueChange = {
@@ -76,7 +88,8 @@ fun TransactionDeadlineInput(deadlineViewModel: SwapDeadlineViewModel) {
 @Composable
 fun RecipientAddress(
     blockchainType: BlockchainType,
-    recipientAddressViewModel: RecipientAddressViewModel
+    recipientAddressViewModel: RecipientAddressViewModel,
+    navController: NavController,
 ) {
     val tokenQuery = TokenQuery(blockchainType, TokenType.Native)
     App.marketKit.token(tokenQuery)?.let { token ->
@@ -88,6 +101,7 @@ fun RecipientAddress(
             initial = recipientAddressViewModel.initialAddress,
             tokenQuery = token.tokenQuery,
             coinCode = token.coin.code,
+            navController = navController,
             onStateChange = {
                 recipientAddressViewModel.setAddressWithError(
                     it?.dataOrNull,
@@ -105,6 +119,7 @@ fun RecipientAddress(
 fun InputWithButtons(
     modifier: Modifier = Modifier,
     hint: String? = null,
+    initial: String? = null,
     buttons: List<InputButton>,
     state: DataState<Any>? = null,
     onValueChange: (String) -> Unit,
@@ -137,8 +152,8 @@ fun InputWithButtons(
                 .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            var textState by rememberSaveable("", stateSaver = TextFieldValue.Saver) {
-                mutableStateOf(TextFieldValue(""))
+            var textState by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+                mutableStateOf(TextFieldValue(initial ?: ""))
             }
 
             BasicTextField(
@@ -186,6 +201,7 @@ fun InputWithButtons(
                                 text = button.rawValue,
                                 selection = TextRange(button.rawValue.length)
                             )
+                            onValueChange.invoke(button.rawValue)
                         },
                     )
                 }

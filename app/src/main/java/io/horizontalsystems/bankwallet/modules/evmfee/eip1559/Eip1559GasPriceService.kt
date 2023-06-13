@@ -4,7 +4,6 @@ import io.horizontalsystems.bankwallet.core.Warning
 import io.horizontalsystems.bankwallet.core.subscribeIO
 import io.horizontalsystems.bankwallet.entities.DataState
 import io.horizontalsystems.bankwallet.modules.evmfee.*
-import io.horizontalsystems.bankwallet.modules.evmfee.FeeRangeConfig.Bound
 import io.horizontalsystems.ethereumkit.core.EthereumKit
 import io.horizontalsystems.ethereumkit.core.eip1559.Eip1559GasPriceProvider
 import io.horizontalsystems.ethereumkit.core.eip1559.FeeHistory
@@ -34,16 +33,8 @@ class Eip1559GasPriceService(
     private val initialBaseFee: Long? = initialGasPrice?.let { it.maxFeePerGas - it.maxPriorityFeePerGas }
     private val initialPriorityFee: Long? = initialGasPrice?.maxPriorityFeePerGas
 
-    private val baseFeeRangeConfig = FeeRangeConfig(
-        lowerBound = Bound.Multiplied(BigDecimal(0.5)),
-        upperBound = Bound.Multiplied(BigDecimal(3.0))
-    )
-    private val priorityFeeRangeConfig = FeeRangeConfig(
-        lowerBound = Bound.Fixed(0),
-        upperBound = Bound.Multiplied(BigDecimal(10))
-    )
     private val overpricingBound = Bound.Multiplied(BigDecimal(1.5))
-    private val riskOfStuckBound = Bound.Multiplied(BigDecimal(0.9))
+    private val riskOfStuckBound = Bound.Multiplied(BigDecimal(1))
 
     private var recommendedGasPrice: GasPrice.Eip1559? = null
 
@@ -57,21 +48,12 @@ class Eip1559GasPriceService(
     override val stateObservable: Observable<DataState<GasPriceInfo>>
         get() = stateSubject
 
-    override var isRecommendedGasPriceSelected = true
-        private set
+    private var recommendedGasPriceSelected = true
 
     var currentBaseFee: Long? = null
         private set
 
     var currentPriorityFee: Long? = null
-        private set
-
-    val defaultBaseFeeRange: LongRange = 1_000_000_000..100_000_000_000
-    var baseFeeRange: LongRange? = null
-        private set
-
-    val defaultPriorityFeeRange: LongRange = 1_000_000_000..100_000_000_000
-    var priorityFeeRange: LongRange? = null
         private set
 
     init {
@@ -88,18 +70,26 @@ class Eip1559GasPriceService(
             .let { disposable.add(it) }
     }
 
-    fun setRecommended() {
-        isRecommendedGasPriceSelected = true
+    override fun setRecommended() {
+        recommendedGasPriceSelected = true
 
         recommendedGasPrice?.let {
-            state = DataState.Success(GasPriceInfo(it, listOf(), listOf()))
+            state = DataState.Success(
+                GasPriceInfo(
+                    gasPrice = it,
+                    gasPriceDefault = it,
+                    default = true,
+                    warnings = listOf(),
+                    errors = listOf()
+                )
+            )
         } ?: syncRecommended()
     }
 
-    fun setGasPrice(baseFee: Long, maxPriorityFee: Long) {
-        isRecommendedGasPriceSelected = false
+    fun setGasPrice(maxFee: Long, priorityFee: Long) {
+        recommendedGasPriceSelected = false
 
-        val newGasPrice = GasPrice.Eip1559(baseFee + maxPriorityFee, maxPriorityFee)
+        val newGasPrice = GasPrice.Eip1559(maxFee, priorityFee)
         state = validatedGasPriceInfoState(newGasPrice)
     }
 
@@ -125,10 +115,7 @@ class Eip1559GasPriceService(
             val tip = min(gasPriceEip1559.maxFeePerGas - recommendedBaseFee, gasPriceEip1559.maxPriorityFeePerGas)
 
             when {
-                tip < 0 -> {
-                    errors.add(FeeSettingsError.LowMaxFee)
-                }
-                tip <= riskOfStuckBound.calculate(recommendedGasPrice.maxPriorityFeePerGas) -> {
+                tip < riskOfStuckBound.calculate(recommendedGasPrice.maxPriorityFeePerGas) -> {
                     warnings.add(FeeSettingsWarning.RiskOfGettingStuck)
                 }
                 tip >= overpricingBound.calculate(recommendedGasPrice.maxPriorityFeePerGas) -> {
@@ -137,7 +124,13 @@ class Eip1559GasPriceService(
             }
         }
 
-        return GasPriceInfo(gasPriceEip1559, warnings, errors)
+        return GasPriceInfo(
+            gasPrice = gasPriceEip1559,
+            gasPriceDefault = recommendedGasPrice ?: gasPriceEip1559,
+            default = recommendedGasPriceSelected,
+            warnings = warnings,
+            errors = errors
+        )
     }
 
     private fun syncRecommended() {
@@ -165,11 +158,9 @@ class Eip1559GasPriceService(
 
         val newRecommendGasPrice = GasPrice.Eip1559(recommendedBaseFee + recommendedPriorityFee, recommendedPriorityFee)
 
-        syncFeeRanges(newRecommendGasPrice)
-
         recommendedGasPrice = newRecommendGasPrice
 
-        if (isRecommendedGasPriceSelected) {
+        if (recommendedGasPriceSelected) {
             state = validatedGasPriceInfoState(newRecommendGasPrice)
         } else {
             state.dataOrNull?.let {
@@ -192,49 +183,9 @@ class Eip1559GasPriceService(
                 priorityFeesCount += 1
             }
         }
-        val priorityFee = if (priorityFeesCount > 0)
+        return if (priorityFeesCount > 0)
             priorityFeesSum / priorityFeesCount
         else
             0
-
-        return priorityFee
     }
-
-    private fun syncFeeRanges(newRecommendGasPrice: GasPrice.Eip1559) {
-        val recommendedBaseFee = newRecommendGasPrice.maxFeePerGas - newRecommendGasPrice.maxPriorityFeePerGas
-        val recommendedPriorityFee = newRecommendGasPrice.maxPriorityFeePerGas
-
-        baseFeeRange = getAdjustedFeeRange(
-            baseFeeRange,
-            recommendedBaseFee,
-            baseFeeRangeConfig
-        )
-
-        priorityFeeRange = getAdjustedFeeRange(
-            priorityFeeRange,
-            recommendedPriorityFee,
-            priorityFeeRangeConfig
-        )
-    }
-
-    private fun getAdjustedFeeRange(
-        feeRange: LongRange?,
-        recommendedFee: Long,
-        config: FeeRangeConfig
-    ): LongRange {
-        val baseFeeRangeLowerBound = if (feeRange == null || feeRange.first > recommendedFee) {
-            config.lowerBound.calculate(recommendedFee)
-        } else {
-            feeRange.first
-        }
-
-        val baseFeeRangeUpperBound = if (feeRange == null || feeRange.last < recommendedFee) {
-            config.upperBound.calculate(recommendedFee)
-        } else {
-            feeRange.last
-        }
-
-        return baseFeeRangeLowerBound..baseFeeRangeUpperBound
-    }
-
 }

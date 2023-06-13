@@ -25,9 +25,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
-import io.horizontalsystems.bankwallet.ui.compose.components.HsIconButton
-import io.horizontalsystems.bankwallet.ui.compose.components.body_grey
-import io.horizontalsystems.bankwallet.ui.compose.components.headline2_leah
+import io.horizontalsystems.bankwallet.ui.compose.components.*
 
 open class BaseComposableBottomSheetFragment : BottomSheetDialogFragment() {
 
@@ -63,6 +61,67 @@ fun BottomSheetHeader(
     iconTint: ColorFilter? = null,
     content: @Composable() (ColumnScope.() -> Unit),
 ) {
+    BottomSheetHeader(
+        iconPainter = iconPainter,
+        titleContent = {
+            headline2_leah(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .weight(1f)
+                    .align(Alignment.CenterVertically),
+                text = title,
+                maxLines = 1,
+            )
+        },
+        onCloseClick = onCloseClick,
+        iconTint = iconTint,
+        content = content
+    )
+}
+
+@Composable
+fun BottomSheetHeaderMultiline(
+    iconPainter: Painter,
+    title: String,
+    subtitle: String,
+    onCloseClick: () -> Unit,
+    iconTint: ColorFilter? = null,
+    content: @Composable() (ColumnScope.() -> Unit),
+) {
+    BottomSheetHeader(
+        iconPainter = iconPainter,
+        titleContent = {
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .weight(1f)
+                    .align(Alignment.CenterVertically),
+            ) {
+                body_leah(
+                    text = title,
+                    maxLines = 1,
+                )
+                Spacer(modifier = Modifier.height(1.dp))
+                subhead2_grey(
+                    text = subtitle,
+                    maxLines = 1,
+                )
+            }
+        },
+        onCloseClick = onCloseClick,
+        iconTint = iconTint,
+        content = content
+    )
+}
+
+@Composable
+private fun BottomSheetHeader(
+    iconPainter: Painter,
+    titleContent: @Composable() (RowScope.() -> Unit),
+    onCloseClick: () -> Unit,
+    iconTint: ColorFilter?,
+    content: @Composable() (ColumnScope.() -> Unit)
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -70,37 +129,27 @@ fun BottomSheetHeader(
             .verticalScroll(rememberScrollState())
             .background(color = ComposeAppTheme.colors.lawrence)
     ) {
-        Box(Modifier.height(60.dp)){
-            Row(
-                modifier = Modifier
-                    .padding(start = 32.dp, top = 24.dp, end = 32.dp)
-                    .height(24.dp),
-                verticalAlignment = Alignment.CenterVertically
+        Row(
+            modifier = Modifier
+                .padding(start = 32.dp, top = 24.dp, end = 32.dp, bottom = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                modifier = Modifier.size(24.dp),
+                painter = iconPainter,
+                colorFilter = iconTint,
+                contentDescription = null
+            )
+            titleContent.invoke(this)
+            HsIconButton(
+                modifier = Modifier.size(24.dp),
+                onClick = onCloseClick
             ) {
-                Image(
-                    modifier = Modifier.size(24.dp),
-                    painter = iconPainter,
-                    colorFilter = iconTint,
-                    contentDescription = null
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_close),
+                    tint = ComposeAppTheme.colors.grey,
+                    contentDescription = null,
                 )
-                headline2_leah(
-                    text = title,
-                    maxLines = 1,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .weight(1f)
-                        .align(Alignment.CenterVertically),
-                )
-                HsIconButton(
-                    modifier = Modifier.size(24.dp),
-                    onClick = onCloseClick
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_close),
-                        tint = ComposeAppTheme.colors.grey,
-                        contentDescription = null,
-                    )
-                }
             }
         }
         Column(

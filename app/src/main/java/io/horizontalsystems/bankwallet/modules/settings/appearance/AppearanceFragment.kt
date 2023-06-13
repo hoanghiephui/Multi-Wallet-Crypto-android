@@ -24,7 +24,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseFragment
-import io.horizontalsystems.bankwallet.core.iconUrl
+import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.modules.theme.ThemeType
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.Select
@@ -83,15 +83,7 @@ fun AppearanceScreen(navController: NavController) {
                     AppBar(
                         TranslatableString.ResString(R.string.Settings_Appearance),
                         navigationIcon = {
-                            HsIconButton(
-                                onClick = { navController.popBackStack() }
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_back),
-                                    contentDescription = "back button",
-                                    tint = ComposeAppTheme.colors.jacob
-                                )
-                            }
+                            HsBackButton(onClick = { navController.popBackStack() })
                         },
                         menuItems = listOf(),
                     )
@@ -177,21 +169,12 @@ fun AppearanceScreen(navController: NavController) {
                             }
                         }
 
-                        HeaderText(text = stringResource(id = R.string.Appearance_AppIcon))
-                        AppIconSection(uiState.appIconOptions) {
-                            scope.launch {
-                                selectedAppIcon = it
-                                sheetState.show()
-                            }
-                        }
-                        Spacer(modifier = Modifier.height(24.dp))
-
                         HeaderText(text = stringResource(id = R.string.Appearance_BalanceConversion))
                         CellUniversalLawrenceSection(uiState.baseTokenOptions.options) { option ->
                             RowSelect(
                                 imageContent = {
                                     CoinImage(
-                                        iconUrl = option.coin.iconUrl,
+                                        iconUrl = option.coin.imageUrl,
                                         modifier = Modifier.size(32.dp)
                                     )
                                 },
@@ -213,6 +196,50 @@ fun AppearanceScreen(navController: NavController) {
                                 viewModel.onEnterBalanceViewType(option)
                             }
                         }
+
+                        Spacer(modifier = Modifier.height(32.dp))
+
+                        CellUniversalLawrenceSection(
+                            listOf {
+                                RowUniversal(
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                    verticalPadding = 0.dp,
+                                ) {
+                                    Image(
+                                        modifier = Modifier.size(24.dp),
+                                        painter = painterResource(id = R.drawable.ic_off_24),
+                                        contentDescription = null,
+                                        colorFilter = ColorFilter.tint(ComposeAppTheme.colors.grey)
+                                    )
+
+                                    body_leah(
+                                        text = stringResource(id = R.string.Appearance_BalanceAutoHide),
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(horizontal = 16.dp)
+                                    )
+
+                                    HsSwitch(
+                                        checked = uiState.balanceAutoHideEnabled,
+                                        onCheckedChange = {
+                                            viewModel.onSetBalanceAutoHidden(it)
+                                        }
+                                    )
+
+                                }
+
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        HeaderText(text = stringResource(id = R.string.Appearance_AppIcon))
+                        AppIconSection(uiState.appIconOptions) {
+                            scope.launch {
+                                selectedAppIcon = it
+                                sheetState.show()
+                            }
+                        }
+
                         Spacer(modifier = Modifier.height(32.dp))
                     }
                 }

@@ -6,12 +6,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
-import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -21,7 +29,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -32,7 +39,13 @@ import io.horizontalsystems.bankwallet.entities.AccountType
 import io.horizontalsystems.bankwallet.modules.manageaccounts.ManageAccountsModule
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
-import io.horizontalsystems.bankwallet.ui.compose.components.*
+import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
+import io.horizontalsystems.bankwallet.ui.compose.components.CellMultilineClear
+import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
+import io.horizontalsystems.bankwallet.ui.compose.components.HsSwitch
+import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
+import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.core.helpers.HudHelper
 import kotlinx.coroutines.delay
 
@@ -50,10 +63,18 @@ class SelectBlockchainsFragment : BaseFragment() {
                 ComposeAppTheme {
                     val popUpToInclusiveId =
                         arguments?.getInt(ManageAccountsModule.popOffOnSuccessKey, R.id.selectBlockchainsFragment) ?: R.id.selectBlockchainsFragment
+                    val inclusive =
+                        arguments?.getBoolean(ManageAccountsModule.popOffInclusiveKey) ?: false
                     val accountType = arguments?.getParcelable<AccountType>(SelectBlockchainsModule.accountTypeKey)
                     val accountName = arguments?.getString(SelectBlockchainsModule.accountNameKey)
                     if (accountType != null) {
-                        SelectBlockchainsScreen(accountType, accountName, findNavController(), popUpToInclusiveId)
+                        SelectBlockchainsScreen(
+                            accountType,
+                            accountName,
+                            findNavController(),
+                            popUpToInclusiveId,
+                            inclusive
+                        )
                     }
                 }
             }
@@ -62,7 +83,13 @@ class SelectBlockchainsFragment : BaseFragment() {
 }
 
 @Composable
-private fun SelectBlockchainsScreen(accountType: AccountType, accountName: String?, navController: NavController, popUpToInclusiveId: Int) {
+private fun SelectBlockchainsScreen(
+    accountType: AccountType,
+    accountName: String?,
+    navController: NavController,
+    popUpToInclusiveId: Int,
+    inclusive: Boolean
+) {
     val viewModel = viewModel<SelectBlockchainsViewModel>(factory = SelectBlockchainsModule.Factory(accountType, accountName))
 
     val view = LocalView.current
@@ -81,7 +108,7 @@ private fun SelectBlockchainsScreen(accountType: AccountType, accountName: Strin
                 iconTint = R.color.white
             )
             delay(300)
-            navController.popBackStack(popUpToInclusiveId, true)
+            navController.popBackStack(popUpToInclusiveId, inclusive)
         }
     }
 
@@ -91,13 +118,7 @@ private fun SelectBlockchainsScreen(accountType: AccountType, accountName: Strin
         AppBar(
             title = TranslatableString.ResString(title),
             navigationIcon = {
-                HsIconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_back),
-                        contentDescription = "back",
-                        tint = ComposeAppTheme.colors.jacob
-                    )
-                }
+                HsBackButton(onClick = { navController.popBackStack() })
             },
             menuItems = listOf(
                 MenuItem(

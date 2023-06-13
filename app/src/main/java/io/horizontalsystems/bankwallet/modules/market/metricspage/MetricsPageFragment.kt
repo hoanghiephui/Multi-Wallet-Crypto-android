@@ -23,15 +23,12 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import io.horizontalsystems.bankwallet.R
-import io.horizontalsystems.bankwallet.core.BaseFragment
-import io.horizontalsystems.bankwallet.core.iconPlaceholder
-import io.horizontalsystems.bankwallet.core.iconUrl
-import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.core.*
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.chart.ChartViewModel
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
-import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Chart
+import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.market.MarketField
 import io.horizontalsystems.bankwallet.modules.metricchart.MetricsType
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
@@ -83,14 +80,12 @@ class MetricsPageFragment : BaseFragment() {
         onCoinClick: (String) -> Unit,
     ) {
         val itemsViewState by viewModel.viewStateLiveData.observeAsState()
-        val chartViewState by chartViewModel.viewStateLiveData.observeAsState()
-        val viewState = itemsViewState?.merge(chartViewState)
+        val viewState = itemsViewState?.merge(chartViewModel.uiState.viewState)
         val marketData by viewModel.marketLiveData.observeAsState()
         val isRefreshing by viewModel.isRefreshingLiveData.observeAsState(false)
 
         Column(Modifier.background(color = ComposeAppTheme.colors.tyler)) {
             AppBar(
-                title = TranslatableString.ResString(viewModel.metricsType.title),
                 menuItems = listOf(
                     MenuItem(
                         title = TranslatableString.ResString(R.string.Button_Close),
@@ -130,6 +125,11 @@ class MetricsPageFragment : BaseFragment() {
                                 contentPadding = PaddingValues(bottom = 32.dp),
                             ) {
                                 item {
+                                    viewModel.header.let { header ->
+                                        DescriptionCard(header.title, header.description, header.icon)
+                                    }
+                                }
+                                item {
                                     Chart(chartViewModel = chartViewModel)
                                 }
                                 marketData?.let { marketData ->
@@ -144,7 +144,7 @@ class MetricsPageFragment : BaseFragment() {
                                         MarketCoinClear(
                                             marketViewItem.fullCoin.coin.name,
                                             marketViewItem.fullCoin.coin.code,
-                                            marketViewItem.fullCoin.coin.iconUrl,
+                                            marketViewItem.fullCoin.coin.imageUrl,
                                             marketViewItem.fullCoin.iconPlaceholder,
                                             marketViewItem.coinRate,
                                             marketViewItem.marketDataValue,

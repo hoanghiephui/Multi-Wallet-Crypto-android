@@ -1,6 +1,5 @@
 package io.horizontalsystems.bankwallet.modules.swap.allowance
 
-import android.os.Parcelable
 import io.horizontalsystems.bankwallet.core.IAdapterManager
 import io.horizontalsystems.bankwallet.core.adapters.Eip20Adapter
 import io.horizontalsystems.bankwallet.entities.CoinValue
@@ -10,36 +9,40 @@ import io.horizontalsystems.ethereumkit.core.EthereumKit
 import io.horizontalsystems.ethereumkit.models.Address
 import io.horizontalsystems.ethereumkit.models.DefaultBlockParameter
 import io.horizontalsystems.marketkit.models.Token
-import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.PublishSubject
-import kotlinx.parcelize.Parcelize
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.util.*
 
 class SwapAllowanceService(
-    private val spenderAddress: Address,
     private val adapterManager: IAdapterManager,
     private val ethereumKit: EthereumKit
 ) {
 
     private var token: Token? = null
-    private val stateSubject = PublishSubject.create<Optional<State>>()
+    private var spenderAddress: Address? = null
 
     var state: State? = null
         private set(value) {
-            if (field != value) {
-                field = value
-                stateSubject.onNext(Optional.ofNullable(value))
-            }
+            field = value
+            _stateFlow.tryEmit(value)
         }
-    val stateObservable: Observable<Optional<State>> = stateSubject
+
+    private val _stateFlow =
+        MutableSharedFlow<State?>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val stateFlow = _stateFlow.asSharedFlow()
 
     private val disposables = CompositeDisposable()
     private var allowanceDisposable: Disposable? = null
+
+    fun set(spenderAddress: Address?) {
+        this.spenderAddress = spenderAddress
+        sync()
+    }
 
     fun set(token: Token?) {
         this.token = token
@@ -49,16 +52,18 @@ class SwapAllowanceService(
     fun revokeEvmData(): SendEvmData? {
         val token = token
         val adapter = token?.let { adapterManager.getAdapterForToken(it) } as? Eip20Adapter ?: return null
+        val address = spenderAddress ?: return null
 
-        return SendEvmData(adapter.eip20Kit.buildApproveTransactionData(spenderAddress, BigInteger.ZERO))
+        return SendEvmData(adapter.eip20Kit.buildApproveTransactionData(address, BigInteger.ZERO))
     }
 
-    fun approveData(dex: SwapMainModule.Dex, amount: BigDecimal): ApproveData? {
+    fun approveData(dex: SwapMainModule.Dex, amount: BigDecimal): SwapMainModule.ApproveData? {
         val allowance = (state as? State.Ready)?.allowance
+        val address = spenderAddress ?: return null
 
         return allowance?.let {
             token?.let { token ->
-                ApproveData(dex, token, spenderAddress.hex, amount, allowance.value)
+                SwapMainModule.ApproveData(dex, token, address.hex, amount, allowance.value)
             }
         }
 
@@ -73,13 +78,6 @@ class SwapAllowanceService(
             .let { disposables.add(it) }
     }
 
-    fun stop() {
-        disposables.clear()
-
-        allowanceDisposable?.dispose()
-        allowanceDisposable = null
-    }
-
     fun onCleared() {
         disposables.clear()
         allowanceDisposable?.dispose()
@@ -89,10 +87,11 @@ class SwapAllowanceService(
         allowanceDisposable?.dispose()
         allowanceDisposable = null
 
+        val address = spenderAddress
         val token = token
         val adapter = token?.let { adapterManager.getAdapterForToken(it) } as? Eip20Adapter
 
-        if (token == null || adapter == null) {
+        if (address == null || token == null || adapter == null) {
             state = null
             return
         }
@@ -103,7 +102,7 @@ class SwapAllowanceService(
             state = State.Loading
         }
 
-        allowanceDisposable = adapter.allowance(spenderAddress, DefaultBlockParameter.Latest)
+        allowanceDisposable = adapter.allowance(address, DefaultBlockParameter.Latest)
             .subscribeOn(Schedulers.io())
             .subscribe({ allowance ->
                 state = State.Ready(CoinValue(token, allowance))
@@ -135,14 +134,4 @@ class SwapAllowanceService(
         }
     }
 
-    @Parcelize
-    data class ApproveData(
-        val dex: SwapMainModule.Dex,
-        val token: Token,
-        val spenderAddress: String,
-        val amount: BigDecimal,
-        val allowance: BigDecimal
-    ) : Parcelable
-
-    //endregion
 }

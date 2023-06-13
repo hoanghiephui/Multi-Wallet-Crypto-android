@@ -1,10 +1,18 @@
 package io.horizontalsystems.bankwallet.modules.restoreaccount.restoreblockchains
 
-import io.horizontalsystems.bankwallet.core.*
+import io.horizontalsystems.bankwallet.core.Clearable
+import io.horizontalsystems.bankwallet.core.IAccountFactory
+import io.horizontalsystems.bankwallet.core.IAccountManager
+import io.horizontalsystems.bankwallet.core.IWalletManager
+import io.horizontalsystems.bankwallet.core.coinSettingType
 import io.horizontalsystems.bankwallet.core.managers.EvmBlockchainManager
-import io.horizontalsystems.bankwallet.core.managers.EvmTestnetManager
 import io.horizontalsystems.bankwallet.core.managers.MarketKitWrapper
 import io.horizontalsystems.bankwallet.core.managers.RestoreSettings
+import io.horizontalsystems.bankwallet.core.managers.TokenAutoEnableManager
+import io.horizontalsystems.bankwallet.core.order
+import io.horizontalsystems.bankwallet.core.subscribeIO
+import io.horizontalsystems.bankwallet.core.supportedTokens
+import io.horizontalsystems.bankwallet.core.supports
 import io.horizontalsystems.bankwallet.entities.AccountOrigin
 import io.horizontalsystems.bankwallet.entities.AccountType
 import io.horizontalsystems.bankwallet.entities.ConfiguredToken
@@ -19,13 +27,15 @@ import io.reactivex.subjects.PublishSubject
 class RestoreBlockchainsService(
     private val accountName: String,
     private val accountType: AccountType,
+    private val manualBackup: Boolean,
+    private val fileBackup: Boolean,
     private val accountFactory: IAccountFactory,
     private val accountManager: IAccountManager,
     private val walletManager: IWalletManager,
     private val marketKit: MarketKitWrapper,
     private val enableCoinService: EnableCoinService,
     private val evmBlockchainManager: EvmBlockchainManager,
-    private val evmTestnetManager: EvmTestnetManager
+    private val tokenAutoEnableManager: TokenAutoEnableManager
 ) : Clearable {
 
     private val disposables = CompositeDisposable()
@@ -54,12 +64,15 @@ class RestoreBlockchainsService(
         BlockchainType.Optimism,
         BlockchainType.ArbitrumOne,
         BlockchainType.Gnosis,
+        BlockchainType.Fantom,
         BlockchainType.Zcash,
         BlockchainType.Dash,
         BlockchainType.BitcoinCash,
         BlockchainType.Litecoin,
         BlockchainType.BinanceChain,
         BlockchainType.Solana,
+        BlockchainType.ECash,
+        BlockchainType.Tron,
     )
 
     init {
@@ -95,11 +108,7 @@ class RestoreBlockchainsService(
             }
         }
 
-        val testnetTokens = evmTestnetManager.nativeTokens()
-            .filter { it.blockchainType.supports(accountType) }
-            .map { InternalItem(it.blockchain, it) }
-
-        internalItems = allTokens + testnetTokens
+        internalItems = allTokens
     }
 
     private fun handleEnableCoin(
@@ -180,7 +189,7 @@ class RestoreBlockchainsService(
     }
 
     fun restore() {
-        val account = accountFactory.account(accountName, accountType, AccountOrigin.Restored, true)
+        val account = accountFactory.account(accountName, accountType, AccountOrigin.Restored, manualBackup, fileBackup)
         accountManager.save(account)
 
         restoreSettingsMap.forEach { (token, settings) ->
@@ -188,10 +197,7 @@ class RestoreBlockchainsService(
         }
 
         items.filter { it.enabled }.forEach { item ->
-            val isEvm = evmBlockchainManager.allBlockchainTypes.contains(item.blockchain.type)
-            if (isEvm) {
-                evmBlockchainManager.getEvmAccountManager(item.blockchain.type).markAutoEnable(account)
-            }
+            tokenAutoEnableManager.markAutoEnable(account, item.blockchain.type)
         }
 
         if (enabledCoins.isEmpty()) return

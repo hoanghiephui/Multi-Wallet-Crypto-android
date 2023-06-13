@@ -21,11 +21,11 @@ import io.horizontalsystems.bankwallet.modules.address.HSAddressInput
 import io.horizontalsystems.bankwallet.modules.amount.AmountInputModeViewModel
 import io.horizontalsystems.bankwallet.modules.amount.HSAmountInput
 import io.horizontalsystems.bankwallet.modules.availablebalance.AvailableBalance
-import io.horizontalsystems.bankwallet.modules.fee.FeeRateCaution
 import io.horizontalsystems.bankwallet.modules.fee.HSFeeInput
 import io.horizontalsystems.bankwallet.modules.memo.HSMemoInput
 import io.horizontalsystems.bankwallet.modules.send.SendConfirmationFragment
 import io.horizontalsystems.bankwallet.modules.send.SendScreen
+import io.horizontalsystems.bankwallet.modules.send.bitcoin.advanced.FeeRateCaution
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 
@@ -57,8 +57,8 @@ fun SendBinanceScreen(
         }
 
         SendScreen(
-            navController = navController,
-            fullCoin = fullCoin
+            fullCoin = fullCoin,
+            onCloseClick = { navController.popBackStack() }
         ) {
             AvailableBalance(
                 coinCode = wallet.coin.code,
@@ -95,7 +95,8 @@ fun SendBinanceScreen(
                 tokenQuery = wallet.token.tokenQuery,
                 coinCode = wallet.coin.code,
                 error = addressError,
-                textPreprocessor = paymentAddressViewModel
+                textPreprocessor = paymentAddressViewModel,
+                navController = navController
             ) {
                 viewModel.onEnterAddress(it)
             }
@@ -111,10 +112,10 @@ fun SendBinanceScreen(
             HSFeeInput(
                 coinCode = viewModel.feeToken.coin.code,
                 coinDecimal = viewModel.feeTokenMaxAllowedDecimals,
-                fiatDecimal = viewModel.fiatMaxAllowedDecimals,
                 fee = fee,
                 amountInputType = amountInputType,
                 rate = viewModel.feeCoinRate,
+                navController = navController
             )
 
             uiState.feeCaution?.let { caution ->

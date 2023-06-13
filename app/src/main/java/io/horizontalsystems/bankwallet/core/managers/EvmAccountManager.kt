@@ -3,11 +3,9 @@ package io.horizontalsystems.bankwallet.core.managers
 import io.horizontalsystems.bankwallet.core.AppLogger
 import io.horizontalsystems.bankwallet.core.IAccountManager
 import io.horizontalsystems.bankwallet.core.IWalletManager
-import io.horizontalsystems.bankwallet.core.storage.EvmAccountStateDao
 import io.horizontalsystems.bankwallet.entities.Account
 import io.horizontalsystems.bankwallet.entities.AccountOrigin
 import io.horizontalsystems.bankwallet.entities.EnabledWallet
-import io.horizontalsystems.bankwallet.entities.EvmAccountState
 import io.horizontalsystems.erc20kit.core.DataProvider
 import io.horizontalsystems.erc20kit.events.TransferEventInstance
 import io.horizontalsystems.ethereumkit.core.EthereumKit
@@ -20,13 +18,21 @@ import io.horizontalsystems.marketkit.models.TokenQuery
 import io.horizontalsystems.marketkit.models.TokenType
 import io.horizontalsystems.oneinchkit.decorations.OneInchDecoration
 import io.horizontalsystems.oneinchkit.decorations.OneInchSwapDecoration
+import io.horizontalsystems.oneinchkit.decorations.OneInchUnknownDecoration
 import io.horizontalsystems.oneinchkit.decorations.OneInchUnoswapDecoration
 import io.horizontalsystems.uniswapkit.decorations.SwapDecoration
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.cancellable
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.rx2.await
+import kotlinx.coroutines.withContext
 import java.math.BigInteger
 import java.util.concurrent.Executors
 
@@ -36,7 +42,7 @@ class EvmAccountManager(
     private val walletManager: IWalletManager,
     private val marketKit: MarketKitWrapper,
     private val evmKitManager: EvmKitManager,
-    private val evmAccountStateDao: EvmAccountStateDao
+    private val tokenAutoEnableManager: TokenAutoEnableManager
 ) {
     private val logger = AppLogger("evm-account-manager")
     private val singleDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
@@ -83,9 +89,9 @@ class EvmAccountManager(
     }
 
     private fun handle(fullTransactions: List<FullTransaction>, account: Account, evmKitWrapper: EvmKitWrapper, initial: Boolean) {
-        val restored = evmAccountStateDao.get(account.id, evmKitManager.chain.id)?.restored ?: false
+        val shouldAutoEnableTokens = tokenAutoEnableManager.isAutoEnabled(account, blockchainType)
 
-        if (initial && account.origin == AccountOrigin.Restored && !account.isWatchAccount && !restored) {
+        if (initial && account.origin == AccountOrigin.Restored && !account.isWatchAccount && !shouldAutoEnableTokens) {
             return
         }
 
@@ -116,6 +122,13 @@ class EvmAccountManager(
 
                 is OneInchUnoswapDecoration -> {
                     val tokenOut = decoration.tokenOut
+                    if (tokenOut is OneInchDecoration.Token.Eip20Coin) {
+                        foundTokens.add(FoundToken(TokenType.Eip20(tokenOut.address.hex), tokenOut.tokenInfo))
+                    }
+                }
+
+                is OneInchUnknownDecoration -> {
+                    val tokenOut = decoration.tokenAmountOut?.token
                     if (tokenOut is OneInchDecoration.Token.Eip20Coin) {
                         foundTokens.add(FoundToken(TokenType.Eip20(tokenOut.address.hex), tokenOut.tokenInfo))
                     }
@@ -274,10 +287,6 @@ class EvmAccountManager(
         if (enabledWallets.isNotEmpty()) {
             walletManager.saveEnabledWallets(enabledWallets)
         }
-    }
-
-    fun markAutoEnable(account: Account) {
-        evmAccountStateDao.insert(EvmAccountState(account.id, evmKitManager.chain.id, 0, true))
     }
 
     data class TokenInfo(

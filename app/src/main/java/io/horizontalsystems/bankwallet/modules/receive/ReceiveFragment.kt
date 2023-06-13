@@ -5,13 +5,28 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
@@ -30,12 +45,21 @@ import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.core.iconPlaceholder
-import io.horizontalsystems.bankwallet.core.iconUrl
+import io.horizontalsystems.bankwallet.core.imageUrl
+import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.entities.Wallet
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
+import io.horizontalsystems.bankwallet.modules.evmfee.FeeSettingsInfoDialog
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString.ResString
-import io.horizontalsystems.bankwallet.ui.compose.components.*
+import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryDefault
+import io.horizontalsystems.bankwallet.ui.compose.components.C2
+import io.horizontalsystems.bankwallet.ui.compose.components.CoinImage
+import io.horizontalsystems.bankwallet.ui.compose.components.D1
+import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_jacob
 import io.horizontalsystems.bankwallet.ui.helpers.TextHelper
 import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.helpers.HudHelper
@@ -88,8 +112,7 @@ private fun ReceiveScreen(
     val context = LocalContext.current
     val fullCoin = viewModel.wallet.token.fullCoin
     val qrBitmap = TextHelper.getQrCodeBitmap(viewModel.receiveAddress)
-    val addressHint =
-        getAddressHint(viewModel.watchAccount, viewModel.testNet, viewModel.addressType)
+    val addressHint = getAddressHint(viewModel.watchAccount, viewModel.addressType)
     val title = if (viewModel.watchAccount) {
         ResString(R.string.Deposit_Address)
     } else {
@@ -102,7 +125,7 @@ private fun ReceiveScreen(
                 title = title,
                 navigationIcon = {
                     CoinImage(
-                        iconUrl = fullCoin.coin.iconUrl,
+                        iconUrl = fullCoin.coin.imageUrl,
                         placeholder = fullCoin.iconPlaceholder,
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
@@ -137,6 +160,10 @@ private fun ReceiveScreen(
                     qrBitmap?.let {
                         Image(
                             modifier = Modifier
+                                .clickable {
+                                    TextHelper.copyText(viewModel.receiveAddress)
+                                    HudHelper.showSuccessMessage(localView, R.string.Hud_Text_Copied)
+                                }
                                 .padding(8.dp)
                                 .fillMaxSize(),
                             bitmap = it.asImageBitmap(),
@@ -146,28 +173,44 @@ private fun ReceiveScreen(
                     }
                 }
 
-                if (viewModel.testNet) {
-                    Image(
-                        painter = painterResource(R.drawable.testnet),
-                        contentScale = ContentScale.FillWidth,
-                        contentDescription = null
-                    )
-                }
-
-                if (viewModel.testNet) {
-                    D5(
-                        text = addressHint,
-                        modifier = Modifier.padding(top = 23.dp),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                } else {
+                Row(
+                    modifier = Modifier.padding(top = 23.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     D1(
                         text = addressHint,
-                        modifier = Modifier.padding(top = 23.dp),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
+
+                    if (!viewModel.isAccountActive) {
+                        val infoTitle = stringResource(R.string.Tron_AddressNotActive_Title)
+                        val info = stringResource(R.string.Tron_AddressNotActive_Info)
+                        Row(
+                            modifier = Modifier
+                                .clickable(
+                                    onClick = {
+                                        navController.slideFromBottom(
+                                            R.id.feeSettingsInfoDialog,
+                                            FeeSettingsInfoDialog.prepareParams(infoTitle, info)
+                                        )
+                                    },
+                                    interactionSource = MutableInteractionSource(),
+                                    indication = null
+                                )
+                                .padding(start = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            subhead2_jacob(text = stringResource(R.string.Tron_AddressNotActive_Warning_Short))
+
+                            Image(
+                                modifier = Modifier. padding(start = 4.dp),
+                                painter = painterResource(id = R.drawable.ic_info_20),
+                                contentDescription = "",
+                                colorFilter = ColorFilter.tint(ComposeAppTheme.colors.jacob)
+                            )
+                        }
+                    }
                 }
 
                 C2(
@@ -221,12 +264,10 @@ private fun ReceiveScreen(
 }
 
 @Composable
-private fun getAddressHint(watchAddress: Boolean, testNet: Boolean, addressType: String?): String {
-    val addressTypeText = if (testNet) "Testnet" else addressType
-
+private fun getAddressHint(watchAddress: Boolean, addressType: String?): String {
     val addressHint = when {
         watchAddress -> stringResource(R.string.Deposit_Address)
-        addressType != null -> stringResource(R.string.Deposit_Your_Address) + " ($addressTypeText)"
+        addressType != null -> stringResource(R.string.Deposit_Your_Address) + " ($addressType)"
         else -> stringResource(R.string.Deposit_Your_Address)
     }
     return addressHint

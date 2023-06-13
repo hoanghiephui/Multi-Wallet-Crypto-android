@@ -3,8 +3,6 @@ package io.horizontalsystems.bankwallet.modules.coin
 import androidx.annotation.DrawableRes
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.IAppNumberFormatter
-import io.horizontalsystems.bankwallet.core.imageUrl
-import io.horizontalsystems.bankwallet.core.order
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.shorten
 import io.horizontalsystems.bankwallet.entities.Currency
@@ -12,13 +10,15 @@ import io.horizontalsystems.bankwallet.modules.coin.overview.CoinOverviewItem
 import io.horizontalsystems.bankwallet.modules.coin.overview.CoinOverviewViewItem
 import io.horizontalsystems.chartview.ChartData
 import io.horizontalsystems.core.helpers.DateHelper
-import io.horizontalsystems.marketkit.models.*
+import io.horizontalsystems.marketkit.models.HsTimePeriod
+import io.horizontalsystems.marketkit.models.LinkType
+import io.horizontalsystems.marketkit.models.MarketInfoOverview
+import io.horizontalsystems.marketkit.models.TokenHolders
 import java.math.BigDecimal
 import java.net.URI
 
 data class ChartInfoData(
     val chartData: ChartData,
-    val chartInterval: HsTimePeriod?,
     val maxValue: String?,
     val minValue: String?
 )
@@ -66,7 +66,7 @@ data class CoinDataItem(
 class MajorHolderItem(
     val index: Int,
     val address: String,
-    val share: BigDecimal,
+    val balance: String,
     val sharePercent: String
 )
 
@@ -103,28 +103,32 @@ class CoinViewFactory(
         return CoinOverviewViewItem(
             roi = getRoi(overview.performance),
             categories = overview.categories.map { it.name },
-            contracts = getContractInfo(overview.fullCoin.tokens),
             links = getLinks(overview, item.guideUrl),
             about = overview.description,
             marketData = getMarketItems(item)
         )
     }
 
-    fun getCoinMajorHolders(topTokenHolders: List<TokenHolder>): List<MajorHolderItem> {
+    fun getTop10Share(number: BigDecimal) : String = numberFormatter.format(number, 0, 2, suffix = "%",)
+
+    fun getHoldersCount(number: BigDecimal) : String = numberFormatter.formatNumberShort(number, 2)
+
+    fun getCoinMajorHolders(tokenHolders: TokenHolders): List<MajorHolderItem> {
         val list = mutableListOf<MajorHolderItem>()
-        if (topTokenHolders.isEmpty()) {
+        if (tokenHolders.topHolders.isEmpty()) {
             return list
         }
 
-        topTokenHolders
-            .sortedByDescending { it.share }
+        tokenHolders.topHolders
+            .sortedByDescending { it.percentage }
             .forEachIndexed { index, holder ->
-                val shareFormatted = numberFormatter.format(holder.share, 0, 2, suffix = "%")
+                val shareFormatted = numberFormatter.format(holder.percentage, 0, 4, suffix = "%")
+                val balanceFormatted = numberFormatter.formatNumberShort(holder.balance, 2)
                 list.add(
                     MajorHolderItem(
                         index + 1,
                         holder.address,
-                        holder.share,
+                        balanceFormatted,
                         shareFormatted
                     )
                 )
@@ -186,22 +190,6 @@ class CoinViewFactory(
         }
 
         return items
-    }
-
-    private fun getContractInfo(tokens: List<Token>) = tokens
-        .sortedBy { it.blockchainType.order }
-        .mapNotNull { token ->
-            when (val tokenType = token.type) {
-                is TokenType.Eip20 -> ContractInfo(tokenType.address, token.blockchainType.imageUrl, explorerUrl(token, tokenType.address))
-                is TokenType.Bep2 -> ContractInfo(tokenType.symbol, token.blockchainType.imageUrl,explorerUrl(token, tokenType.symbol))
-                else -> null
-            }
-    }
-
-    private fun explorerUrl(token: Token, reference: String) : String? {
-        return token.blockchain.explorerUrl?.let{
-            it.replace("\$ref", reference)
-        }
     }
 
     fun getLinks(coinMarketDetails: MarketInfoOverview, guideUrl: String?): List<CoinLink> {

@@ -2,9 +2,13 @@ package io.horizontalsystems.bankwallet.modules.balance
 
 import androidx.compose.runtime.Immutable
 import io.horizontalsystems.bankwallet.R
-import io.horizontalsystems.bankwallet.core.*
+import io.horizontalsystems.bankwallet.core.AdapterState
+import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.adapters.zcash.ZcashAdapter
+import io.horizontalsystems.bankwallet.core.iconPlaceholder
+import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.core.providers.Translator
+import io.horizontalsystems.bankwallet.core.swappable
 import io.horizontalsystems.bankwallet.entities.Currency
 import io.horizontalsystems.bankwallet.entities.Wallet
 import io.horizontalsystems.core.helpers.DateHelper
@@ -37,7 +41,6 @@ data class BalanceViewItem(
     val badge: String?,
     val swapVisible: Boolean,
     val swapEnabled: Boolean = false,
-    val mainNet: Boolean,
     val errorMessage: String?,
     val isWatchAccount: Boolean
 )
@@ -105,11 +108,11 @@ class BalanceViewItemFactory {
     private fun getDefaultSyncingProgress(blockchainType: BlockchainType) = when (blockchainType) {
         BlockchainType.Bitcoin,
         BlockchainType.BitcoinCash,
+        BlockchainType.ECash,
         BlockchainType.Litecoin,
         BlockchainType.Dash,
         BlockchainType.Zcash -> 10
         BlockchainType.Ethereum,
-        BlockchainType.EthereumGoerli,
         BlockchainType.BinanceSmartChain,
         BlockchainType.BinanceChain,
         BlockchainType.Polygon,
@@ -117,8 +120,10 @@ class BalanceViewItemFactory {
         BlockchainType.Optimism,
         BlockchainType.Solana,
         BlockchainType.Gnosis,
-        BlockchainType.ArbitrumOne -> 50
-        BlockchainType.Solana -> 50
+        BlockchainType.Fantom,
+        BlockchainType.ArbitrumOne,
+        BlockchainType.Solana,
+        BlockchainType.Tron -> 50
         is BlockchainType.Unsupported -> 0
     }
 
@@ -258,7 +263,7 @@ class BalanceViewItemFactory {
                 currencySymbol = currency.symbol,
                 coinCode = coin.code,
                 coinTitle = coin.name,
-                coinIconUrl = coin.iconUrl,
+                coinIconUrl = coin.imageUrl,
                 coinIconPlaceholder = wallet.token.iconPlaceholder,
                 primaryValue = primaryValue,
                 secondaryValue = secondaryValue,
@@ -289,7 +294,6 @@ class BalanceViewItemFactory {
                 badge = wallet.badge,
                 swapVisible = wallet.token.swappable,
                 swapEnabled = state is AdapterState.Synced,
-                mainNet = item.mainNet,
                 errorMessage = (state as? AdapterState.NotSynced)?.error?.message,
                 isWatchAccount = watchAccount
         )

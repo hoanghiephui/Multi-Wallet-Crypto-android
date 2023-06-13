@@ -8,7 +8,7 @@ import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.modules.evmfee.FeeSettingsError
 import io.horizontalsystems.bankwallet.modules.evmfee.FeeSettingsWarning
 import io.horizontalsystems.bankwallet.modules.sendevmtransaction.SendEvmTransactionService
-import io.horizontalsystems.bankwallet.modules.swap.uniswap.UniswapModule
+import io.horizontalsystems.bankwallet.modules.swap.SwapMainModule.UniswapWarnings
 
 class CautionViewItemFactory(
     private val baseCoinService: EvmCoinService
@@ -26,6 +26,13 @@ class CautionViewItemFactory(
                     CautionViewItem.Type.Warning
                 )
             }
+            FeeSettingsWarning.RiskOfGettingStuckLegacy -> {
+                CautionViewItem(
+                    Translator.getString(R.string.FeeSettings_RiskOfGettingStuckLegacy_Title),
+                    Translator.getString(R.string.FeeSettings_RiskOfGettingStuckLegacy),
+                    CautionViewItem.Type.Warning
+                )
+            }
             FeeSettingsWarning.Overpricing -> {
                 CautionViewItem(
                     Translator.getString(R.string.FeeSettings_Overpricing_Title),
@@ -33,11 +40,18 @@ class CautionViewItemFactory(
                     CautionViewItem.Type.Warning
                 )
             }
-            UniswapModule.UniswapWarnings.PriceImpactWarning -> {
+            is UniswapWarnings.PriceImpactForbidden -> {
                 CautionViewItem(
                     Translator.getString(R.string.Swap_PriceImpact),
-                    Translator.getString(R.string.Swap_PriceImpactTooHigh),
-                    CautionViewItem.Type.Warning
+                    Translator.getString(R.string.Swap_PriceImpactTooHigh, warning.providerName),
+                    CautionViewItem.Type.Error
+                )
+            }
+            UniswapWarnings.PriceImpactWarning -> {
+                CautionViewItem(
+                    Translator.getString(R.string.Swap_PriceImpact),
+                    Translator.getString(R.string.Swap_PriceImpactWarning),
+                    CautionViewItem.Type.Error
                 )
             }
             else -> {
@@ -52,13 +66,6 @@ class CautionViewItemFactory(
 
     private fun cautionViewItem(error: Throwable): CautionViewItem {
         return when (error) {
-            FeeSettingsError.LowMaxFee -> {
-                CautionViewItem(
-                    Translator.getString(R.string.EthereumTransaction_Error_LowerThanBaseGasLimit_Title),
-                    Translator.getString(R.string.EthereumTransaction_Error_LowerThanBaseGasLimit),
-                    CautionViewItem.Type.Error
-                )
-            }
             FeeSettingsError.InsufficientBalance -> {
                 CautionViewItem(
                     Translator.getString(R.string.EthereumTransaction_Error_InsufficientBalance_Title),
@@ -66,6 +73,13 @@ class CautionViewItemFactory(
                         R.string.EthereumTransaction_Error_InsufficientBalanceForFee,
                         baseCoinService.token.coin.code
                     ),
+                    CautionViewItem.Type.Error
+                )
+            }
+            FeeSettingsError.UsedNonce -> {
+                CautionViewItem(
+                    Translator.getString(R.string.SendEvmSettings_Error_NonceUsed_Title),
+                    Translator.getString(R.string.SendEvmSettings_Error_NonceUsed),
                     CautionViewItem.Type.Error
                 )
             }
@@ -87,13 +101,21 @@ class CautionViewItemFactory(
                     )
                 )
             }
-            is EvmError.InsufficientBalanceWithFee,
-            is EvmError.ExecutionReverted -> {
+            is EvmError.InsufficientBalanceWithFee -> {
                 Pair(
                     Translator.getString(R.string.EthereumTransaction_Error_Title),
                     Translator.getString(
                         R.string.EthereumTransaction_Error_InsufficientBalanceForFee,
                         baseCoinService.token.coin.code
+                    )
+                )
+            }
+            is EvmError.ExecutionReverted -> {
+                Pair(
+                    Translator.getString(R.string.EthereumTransaction_Error_Title),
+                    Translator.getString(
+                        R.string.EthereumTransaction_Error_ExecutionReverted,
+                        convertedError.message ?: ""
                     )
                 )
             }

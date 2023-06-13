@@ -31,13 +31,13 @@ class EvmSyncSourceManager(
     private fun defaultTransactionSource(blockchainType: BlockchainType): TransactionSource {
         return when (blockchainType) {
             BlockchainType.Ethereum -> TransactionSource.ethereumEtherscan(appConfigProvider.etherscanApiKey)
-            BlockchainType.EthereumGoerli -> TransactionSource.goerliEtherscan(appConfigProvider.etherscanApiKey)
             BlockchainType.BinanceSmartChain -> TransactionSource.bscscan(appConfigProvider.bscscanApiKey)
             BlockchainType.Polygon -> TransactionSource.polygonscan(appConfigProvider.polygonscanApiKey)
             BlockchainType.Avalanche -> TransactionSource.snowtrace(appConfigProvider.snowtraceApiKey)
             BlockchainType.Optimism -> TransactionSource.optimisticEtherscan(appConfigProvider.optimisticEtherscanApiKey)
             BlockchainType.ArbitrumOne -> TransactionSource.arbiscan(appConfigProvider.arbiscanApiKey)
             BlockchainType.Gnosis -> TransactionSource.gnosis(appConfigProvider.gnosisscanApiKey)
+            BlockchainType.Fantom -> TransactionSource.fantom(appConfigProvider.ftmscanApiKey)
             else -> throw Exception("Non-supported EVM blockchain")
         }
     }
@@ -70,17 +70,6 @@ class EvmSyncSourceManager(
                     type,
                     "LlamaNodes",
                     RpcSource.Http(listOf(URL("https://eth.llamarpc.com")), null),
-                    defaultTransactionSource(type)
-                )
-            )
-            BlockchainType.EthereumGoerli -> listOf(
-                evmSyncSource(
-                    type,
-                    "Goerli HTTP",
-                    RpcSource.goerliInfuraHttp(
-                        appConfigProvider.infuraProjectId,
-                        appConfigProvider.infuraProjectSecret
-                    ),
                     defaultTransactionSource(type)
                 )
             )
@@ -174,6 +163,20 @@ class EvmSyncSourceManager(
                     type,
                     "Ankr",
                     RpcSource.Http(listOf(URL("https://rpc.ankr.com/gnosis")), null),
+                    defaultTransactionSource(type)
+                )
+            )
+            BlockchainType.Fantom -> listOf(
+                evmSyncSource(
+                    type,
+                    "Fantom Chain",
+                    RpcSource.fantomRpcHttp(),
+                    defaultTransactionSource(type)
+                ),
+                evmSyncSource(
+                    type,
+                    "Ankr",
+                    RpcSource.Http(listOf(URL("https://rpc.ankr.com/fantom")), null),
                     defaultTransactionSource(type)
                 )
             )

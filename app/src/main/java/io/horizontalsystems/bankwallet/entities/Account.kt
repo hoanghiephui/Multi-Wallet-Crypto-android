@@ -2,10 +2,18 @@ package io.horizontalsystems.bankwallet.entities
 
 import android.os.Parcelable
 import io.horizontalsystems.bankwallet.R
+import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.managers.PassphraseValidator
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.shorten
-import io.horizontalsystems.hdwalletkit.*
+import io.horizontalsystems.ethereumkit.core.signer.Signer
+import io.horizontalsystems.ethereumkit.models.Chain
+import io.horizontalsystems.hdwalletkit.HDExtendedKey
+import io.horizontalsystems.hdwalletkit.HDWallet
+import io.horizontalsystems.hdwalletkit.Language
+import io.horizontalsystems.hdwalletkit.Mnemonic
+import io.horizontalsystems.hdwalletkit.WordList
+import io.horizontalsystems.marketkit.models.BlockchainType
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.math.BigInteger
@@ -17,7 +25,8 @@ data class Account(
     val name: String,
     val type: AccountType,
     val origin: AccountOrigin,
-    val isBackedUp: Boolean = false
+    val isBackedUp: Boolean = false,
+    val isFileBackedUp: Boolean = false,
 ) : Parcelable {
 
     @IgnoredOnParcel
@@ -25,7 +34,8 @@ data class Account(
         get() = when (this.type) {
             is AccountType.EvmAddress -> true
             is AccountType.SolanaAddress -> true
-            is AccountType.HdExtendedKey -> this.type.hdExtendedKey.info.isPublic
+            is AccountType.TronAddress -> true
+            is AccountType.HdExtendedKey -> this.type.hdExtendedKey.isPublic
             else -> false
         }
 
@@ -56,7 +66,7 @@ data class Account(
     val nonRecommended: Boolean by lazy {
         if (type is AccountType.Mnemonic) {
             val englishWords = WordList.wordList(Language.English).validWords(type.words)
-            val standardPassphrase = PassphraseValidator().validate(type.passphrase)
+            val standardPassphrase = PassphraseValidator().containsValidCharacters(type.passphrase)
             !englishWords || !standardPassphrase
         } else {
             false
@@ -83,6 +93,9 @@ sealed class AccountType : Parcelable {
 
     @Parcelize
     data class SolanaAddress(val address: String) : AccountType()
+
+    @Parcelize
+    data class TronAddress(val address: String): AccountType()
 
     @Parcelize
     data class Mnemonic(val words: List<String>, val passphrase: String) : AccountType() {
@@ -129,7 +142,32 @@ sealed class AccountType : Parcelable {
     enum class Derivation(val value: String) : Parcelable {
         bip44("bip44"),
         bip49("bip49"),
-        bip84("bip84");
+        bip84("bip84"),
+        bip86("bip86");
+
+        val addressType: String
+            get() = when (this) {
+                bip44 -> "Legacy"
+                bip49 -> "SegWit"
+                bip84 -> "Native SegWit"
+                bip86 -> "Taproot"
+            }
+
+        val rawName: String
+            get() = when (this) {
+                bip44 -> "BIP 44"
+                bip49 -> "BIP 49"
+                bip84 -> "BIP 84"
+                bip86 -> "BIP 86"
+            }
+
+        val purpose: HDWallet.Purpose
+            get() = when (this) {
+                bip44 -> HDWallet.Purpose.BIP44
+                bip49 -> HDWallet.Purpose.BIP49
+                bip84 -> HDWallet.Purpose.BIP84
+                bip86 -> HDWallet.Purpose.BIP86
+            }
 
         companion object {
             private val map = values().associateBy(Derivation::value)
@@ -151,12 +189,13 @@ sealed class AccountType : Parcelable {
             }
             is EvmAddress -> "EVM Address"
             is SolanaAddress -> "Solana Address"
+            is TronAddress -> "Tron Address"
             is EvmPrivateKey -> "EVM Private Key"
             is HdExtendedKey -> {
                 when (this.hdExtendedKey.derivedType) {
                     HDExtendedKey.DerivedType.Master -> "BIP32 Root Key"
                     HDExtendedKey.DerivedType.Account -> {
-                        if (hdExtendedKey.info.isPublic) {
+                        if (hdExtendedKey.isPublic) {
                             "Account xPubKey"
                         } else {
                             "Account xPrivKey"
@@ -170,10 +209,10 @@ sealed class AccountType : Parcelable {
     val supportedDerivations: List<Derivation>
         get() = when (this) {
             is Mnemonic -> {
-                listOf(Derivation.bip44, Derivation.bip49, Derivation.bip84)
+                listOf(Derivation.bip44, Derivation.bip49, Derivation.bip84, Derivation.bip86)
             }
             is HdExtendedKey -> {
-                listOf(this.hdExtendedKey.info.purpose.derivation)
+                hdExtendedKey.purposes.map { it.derivation }
             }
             else -> emptyList()
         }
@@ -185,6 +224,7 @@ sealed class AccountType : Parcelable {
         get() = when (this) {
             is EvmAddress -> this.address.shorten()
             is SolanaAddress -> this.address.shorten()
+            is TronAddress -> this.address.shorten()
             else -> this.description
         }
 
@@ -199,6 +239,30 @@ sealed class AccountType : Parcelable {
             is Mnemonic, is EvmPrivateKey -> true
             else -> false
         }
+
+    fun evmAddress(chain: Chain) = when (this) {
+        is Mnemonic -> Signer.address(seed, chain)
+        is EvmPrivateKey -> Signer.address(key)
+        else -> null
+    }
+
+    fun sign(message: ByteArray, isLegacy: Boolean = false) : ByteArray? {
+        val signer = when (this) {
+            is Mnemonic -> {
+                Signer.getInstance(seed, App.evmBlockchainManager.getChain(BlockchainType.Ethereum))
+            }
+            is EvmPrivateKey -> {
+                Signer.getInstance(key, App.evmBlockchainManager.getChain(BlockchainType.Ethereum))
+            }
+            else -> null
+        } ?: return null
+
+        return if (isLegacy) {
+            signer.signByteArrayLegacy(message)
+        } else {
+            signer.signByteArray(message)
+        }
+    }
 }
 
 val HDWallet.Purpose.derivation: AccountType.Derivation
@@ -206,27 +270,7 @@ val HDWallet.Purpose.derivation: AccountType.Derivation
         HDWallet.Purpose.BIP44 -> AccountType.Derivation.bip44
         HDWallet.Purpose.BIP49 -> AccountType.Derivation.bip49
         HDWallet.Purpose.BIP84 -> AccountType.Derivation.bip84
-    }
-
-val AccountType.Derivation.addressType: String
-    get() = when (this) {
-        AccountType.Derivation.bip44 -> "Legacy"
-        AccountType.Derivation.bip49 -> "SegWit"
-        AccountType.Derivation.bip84 -> "Native SegWit"
-    }
-
-val AccountType.Derivation.rawName: String
-    get() = when (this) {
-        AccountType.Derivation.bip44 -> "BIP 44"
-        AccountType.Derivation.bip49 -> "BIP 49"
-        AccountType.Derivation.bip84 -> "BIP 84"
-    }
-
-val AccountType.Derivation.description: String
-    get() = when (this) {
-        AccountType.Derivation.bip44 -> Translator.getString(R.string.CoinOption_bip44_Title)
-        AccountType.Derivation.bip49 -> Translator.getString(R.string.CoinOption_bip49_Title)
-        AccountType.Derivation.bip84 -> Translator.getString(R.string.CoinOption_bip84_Title)
+        HDWallet.Purpose.BIP86 -> AccountType.Derivation.bip86
     }
 
 @Parcelize

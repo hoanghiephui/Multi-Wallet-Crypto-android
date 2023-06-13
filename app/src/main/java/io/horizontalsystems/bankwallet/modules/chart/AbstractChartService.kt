@@ -4,7 +4,7 @@ import androidx.annotation.CallSuper
 import io.horizontalsystems.bankwallet.core.managers.CurrencyManager
 import io.horizontalsystems.bankwallet.core.subscribeIO
 import io.horizontalsystems.bankwallet.entities.Currency
-import io.horizontalsystems.chartview.models.ChartIndicator
+import io.horizontalsystems.chartview.ChartViewType
 import io.horizontalsystems.marketkit.models.HsTimePeriod
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -13,8 +13,9 @@ import io.reactivex.subjects.BehaviorSubject
 import java.util.*
 
 abstract class AbstractChartService {
+    open val hasVolumes = false
     abstract val chartIntervals: List<HsTimePeriod?>
-    open val chartIndicators: List<ChartIndicator> = listOf()
+    abstract val chartViewType: ChartViewType
 
     protected abstract val currencyManager: CurrencyManager
     protected abstract val initialChartInterval: HsTimePeriod
@@ -27,31 +28,16 @@ abstract class AbstractChartService {
         set(value) {
             field = value
             chartTypeObservable.onNext(Optional.ofNullable(value))
-            indicatorsEnabled = chartInterval != HsTimePeriod.Day1
-        }
-    var indicator: ChartIndicator? = null
-        private set(value) {
-            field = value
-            indicatorObservable.onNext(Optional.ofNullable(value))
-        }
-    private var indicatorsEnabled = true
-        set(value) {
-            field = value
-            indicatorsEnabledObservable.onNext(value)
         }
 
     val currency: Currency
         get() = currencyManager.baseCurrency
     val chartTypeObservable = BehaviorSubject.create<Optional<HsTimePeriod>>()
-    val indicatorObservable = BehaviorSubject.create<Optional<ChartIndicator>>()
-
-    val indicatorsEnabledObservable = BehaviorSubject.create<Boolean>()
 
     val chartPointsWrapperObservable = BehaviorSubject.create<Result<ChartPointsWrapper>>()
 
     private var fetchItemsDisposable: Disposable? = null
     private val disposables = CompositeDisposable()
-    protected var forceRefresh = false
 
     open suspend fun start() {
         currencyManager.baseCurrencyUpdatedSignal
@@ -63,7 +49,6 @@ abstract class AbstractChartService {
             }
 
         chartInterval = initialChartInterval
-        indicator = null
         fetchItems()
     }
 
@@ -83,16 +68,8 @@ abstract class AbstractChartService {
         fetchItems()
     }
 
-    fun updateIndicator(indicator: ChartIndicator?) {
-        this.indicator = indicator
-
-        fetchItems()
-    }
-
     fun refresh() {
-        forceRefresh = true
         fetchItems()
-        forceRefresh = false
     }
 
     @Synchronized

@@ -44,5 +44,4 @@ object SwapSettingsModule {
         null -> null
     }
 
-
 }

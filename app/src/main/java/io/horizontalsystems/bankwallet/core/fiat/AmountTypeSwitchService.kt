@@ -23,7 +23,6 @@ class AmountTypeSwitchService {
     val amountTypeObservable: Observable<AmountType>
         get() = amountTypeSubject
 
-
     private val toggleAvailableSubject = PublishSubject.create<Boolean>()
     var toggleAvailable: Boolean = false
         private set(value) {
@@ -63,8 +62,7 @@ class AmountTypeSwitchService {
         }
 
     private fun syncToggleAvailable() {
-        toggleAvailable = (fromListener?.toggleAvailable ?: false) &&
-                (toListener?.toggleAvailable ?: false)
+        toggleAvailable = (fromListener?.toggleAvailable ?: false) && (toListener?.toggleAvailable ?: false)
         if (!toggleAvailable && amountType == AmountType.Currency) {
             amountType = AmountType.Coin
         }

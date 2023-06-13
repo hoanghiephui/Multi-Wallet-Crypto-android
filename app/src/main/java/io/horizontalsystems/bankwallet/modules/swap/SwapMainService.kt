@@ -1,45 +1,47 @@
 package io.horizontalsystems.bankwallet.modules.swap
 
 import io.horizontalsystems.bankwallet.core.ILocalStorage
+import io.horizontalsystems.bankwallet.modules.swap.SwapMainModule.Dex
+import io.horizontalsystems.bankwallet.modules.swap.SwapMainModule.ISwapProvider
 import io.horizontalsystems.marketkit.models.Blockchain
 import io.horizontalsystems.marketkit.models.BlockchainType
 import io.horizontalsystems.marketkit.models.Token
-import io.reactivex.subjects.PublishSubject
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 class SwapMainService(
     tokenFrom: Token?,
-    private val providers: List<SwapMainModule.ISwapProvider>,
+    private val providers: List<ISwapProvider>,
     private val localStorage: ILocalStorage
 ) {
-    var dex: SwapMainModule.Dex = getDex(tokenFrom)
+    var dex: Dex = getDex(tokenFrom)
         private set
 
-    val currentProvider: SwapMainModule.ISwapProvider
-        get() = dex.provider
-    val providerObservable = PublishSubject.create<SwapMainModule.ISwapProvider>()
+    private val _providerUpdatedFlow =
+        MutableSharedFlow<ISwapProvider>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    val providerUpdatedFlow = _providerUpdatedFlow.asSharedFlow()
 
-    var providerState = SwapMainModule.SwapProviderState(tokenFrom = tokenFrom)
-
-    val availableProviders: List<SwapMainModule.ISwapProvider>
+    val availableProviders: List<ISwapProvider>
         get() = providers.filter { it.supports(dex.blockchainType) }
 
-    fun setProvider(provider: SwapMainModule.ISwapProvider) {
+    fun setProvider(provider: ISwapProvider) {
         if (dex.provider.id != provider.id) {
-            dex = SwapMainModule.Dex(dex.blockchain, provider)
-            providerObservable.onNext(provider)
+            dex = Dex(dex.blockchain, provider)
+            _providerUpdatedFlow.tryEmit(provider)
 
             localStorage.setSwapProviderId(dex.blockchainType, provider.id)
         }
     }
 
-    private fun getDex(tokenFrom: Token?): SwapMainModule.Dex {
+    private fun getDex(tokenFrom: Token?): Dex {
         val blockchain = getBlockchainForToken(tokenFrom)
         val provider = getSwapProvider(blockchain.type) ?: throw IllegalStateException("No provider found for ${blockchain.name}")
 
-        return SwapMainModule.Dex(blockchain, provider)
+        return Dex(blockchain, provider)
     }
 
-    private fun getSwapProvider(blockchainType: BlockchainType): SwapMainModule.ISwapProvider? {
+    private fun getSwapProvider(blockchainType: BlockchainType): ISwapProvider? {
         val providerId = localStorage.getSwapProviderId(blockchainType)
             ?: SwapMainModule.OneInchProvider.id
 
@@ -53,6 +55,7 @@ class SwapMainService(
         BlockchainType.Avalanche,
         BlockchainType.Optimism,
         BlockchainType.Gnosis,
+        BlockchainType.Fantom,
         BlockchainType.ArbitrumOne -> token.blockchain
         null -> Blockchain(BlockchainType.Ethereum, "Ethereum", null) // todo: find better solution
         else -> throw IllegalStateException("Swap not supported for ${token.blockchainType}")

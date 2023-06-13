@@ -19,7 +19,9 @@ object RestoreBlockchainsModule {
 
     class Factory(
         private val accountName: String,
-        private val accountType: AccountType
+        private val accountType: AccountType,
+        private val manualBackup: Boolean,
+        private val fileBackup: Boolean
     ) : ViewModelProvider.Factory {
 
         private val restoreSettingsService by lazy {
@@ -39,13 +41,15 @@ object RestoreBlockchainsModule {
             RestoreBlockchainsService(
                 accountName,
                 accountType,
+                manualBackup,
+                fileBackup,
                 App.accountFactory,
                 App.accountManager,
                 App.walletManager,
                 App.marketKit,
                 enableCoinService,
                 App.evmBlockchainManager,
-                App.evmTestnetManager
+                App.tokenAutoEnableManager
             )
         }
 

@@ -32,7 +32,7 @@ data class MenuItem(
 fun AppBarMenuButton(
     @DrawableRes icon: Int,
     onClick: () -> Unit,
-    description: String? = null,
+    description: String,
     enabled: Boolean = true,
     tint: Color = Color.Unspecified,
 ) {
@@ -41,6 +41,7 @@ fun AppBarMenuButton(
         enabled = enabled,
     ) {
         Icon(
+            modifier = Modifier.size(24.dp),
             painter = painterResource(id = icon),
             contentDescription = description,
             tint = tint
@@ -56,17 +57,36 @@ fun AppBar(
     showSpinner: Boolean = false,
     backgroundColor: Color = ComposeAppTheme.colors.tyler
 ) {
+    val titleComposable: @Composable () -> Unit = {
+        title?.let {
+            title3_leah(
+                text = title.getString(),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+
+    AppBar(
+        title = titleComposable,
+        navigationIcon = navigationIcon,
+        menuItems = menuItems,
+        showSpinner = showSpinner,
+        backgroundColor = backgroundColor
+    )
+}
+
+@Composable
+fun AppBar(
+    title: @Composable () -> Unit,
+    navigationIcon: @Composable (() -> Unit)? = null,
+    menuItems: List<MenuItem> = listOf(),
+    showSpinner: Boolean = false,
+    backgroundColor: Color = ComposeAppTheme.colors.tyler
+) {
     TopAppBar(
-        modifier = Modifier.height(56.dp),
-        title = {
-            title?.let {
-                title3_leah(
-                    text = title.getString(),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-        },
+        modifier = Modifier.height(64.dp),
+        title = title,
         backgroundColor = backgroundColor,
         navigationIcon = navigationIcon?.let {
             {
@@ -84,20 +104,24 @@ fun AppBar(
                 )
             }
             menuItems.forEach { menuItem ->
+                val color = if (menuItem.enabled) {
+                    if (menuItem.tint == Color.Unspecified)
+                        ComposeAppTheme.colors.jacob
+                    else
+                        menuItem.tint
+                } else {
+                    ComposeAppTheme.colors.grey50
+                }
+
                 if (menuItem.icon != null) {
                     AppBarMenuButton(
                         icon = menuItem.icon,
                         onClick = menuItem.onClick,
                         enabled = menuItem.enabled,
-                        tint = menuItem.tint,
+                        tint = color,
+                        description = menuItem.title.getString()
                     )
                 } else {
-                    val color = if (menuItem.enabled) {
-                        ComposeAppTheme.colors.jacob
-                    } else {
-                        ComposeAppTheme.colors.grey50
-                    }
-
                     Text(
                         modifier = Modifier
                             .padding(horizontal = 16.dp)

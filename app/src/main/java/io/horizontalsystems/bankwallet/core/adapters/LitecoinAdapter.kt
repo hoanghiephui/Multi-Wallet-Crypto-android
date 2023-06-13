@@ -22,10 +22,9 @@ class LitecoinAdapter(
         syncMode: BitcoinCore.SyncMode,
         backgroundManager: BackgroundManager,
         wallet: Wallet,
-        testMode: Boolean
-) : BitcoinBaseAdapter(kit, syncMode, backgroundManager, wallet, testMode), LitecoinKit.Listener, ISendBitcoinAdapter {
+) : BitcoinBaseAdapter(kit, syncMode, backgroundManager, wallet, confirmationsThreshold), LitecoinKit.Listener, ISendBitcoinAdapter {
 
-    constructor(wallet: Wallet, syncMode: BitcoinCore.SyncMode, testMode: Boolean, backgroundManager: BackgroundManager) : this(createKit(wallet, syncMode, testMode), syncMode, backgroundManager, wallet, testMode)
+    constructor(wallet: Wallet, syncMode: BitcoinCore.SyncMode, backgroundManager: BackgroundManager) : this(createKit(wallet, syncMode), syncMode, backgroundManager, wallet)
 
     init {
         kit.listener = this
@@ -45,8 +44,8 @@ class LitecoinAdapter(
         get() = "blockchair.com"
 
 
-    override fun getTransactionUrl(transactionHash: String): String? =
-        if (testMode) null else "https://blockchair.com/litecoin/transaction/$transactionHash"
+    override fun getTransactionUrl(transactionHash: String): String =
+        "https://blockchair.com/litecoin/transaction/$transactionHash"
 
     override fun onBalanceUpdate(balance: BalanceInfo) {
         balanceUpdatedSubject.onNext(Unit)
@@ -82,22 +81,21 @@ class LitecoinAdapter(
 
 
     companion object {
+        private const val confirmationsThreshold = 3
 
-        private fun getNetworkType(testMode: Boolean) =
-                if (testMode) NetworkType.TestNet else NetworkType.MainNet
-
-        private fun createKit(wallet: Wallet, syncMode: BitcoinCore.SyncMode, testMode: Boolean): LitecoinKit {
+        private fun createKit(wallet: Wallet, syncMode: BitcoinCore.SyncMode): LitecoinKit {
             val account = wallet.account
-            val networkType = getNetworkType(testMode)
 
             when (val accountType = account.type) {
                 is AccountType.HdExtendedKey -> {
+                    val derivation = wallet.coinSettings.derivation ?: throw AdapterErrorWrongParameters("Derivation not set")
                     return LitecoinKit(
                         context = App.instance,
                         extendedKey = accountType.hdExtendedKey,
+                        purpose = derivation.purpose,
                         walletId = account.id,
                         syncMode = syncMode,
-                        networkType = networkType,
+                        networkType = NetworkType.MainNet,
                         confirmationsThreshold = confirmationsThreshold,
                     )
                 }
@@ -109,17 +107,17 @@ class LitecoinAdapter(
                         passphrase = accountType.passphrase,
                         walletId = account.id,
                         syncMode = syncMode,
-                        networkType = networkType,
+                        networkType = NetworkType.MainNet,
                         confirmationsThreshold = confirmationsThreshold,
-                        purpose = getPurpose(derivation)
+                        purpose = derivation.purpose
                     )
                 }
                 else -> throw UnsupportedAccountException()
             }
         }
 
-        fun clear(walletId: String, testMode: Boolean) {
-            LitecoinKit.clear(App.instance, getNetworkType(testMode), walletId)
+        fun clear(walletId: String) {
+            LitecoinKit.clear(App.instance, NetworkType.MainNet, walletId)
         }
     }
 }

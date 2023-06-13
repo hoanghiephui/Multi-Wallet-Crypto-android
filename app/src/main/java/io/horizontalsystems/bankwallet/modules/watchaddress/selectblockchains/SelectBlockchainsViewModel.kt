@@ -6,7 +6,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.description
-import io.horizontalsystems.bankwallet.core.iconUrl
 import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.entities.AccountType
 import io.horizontalsystems.bankwallet.entities.ConfiguredToken
@@ -39,7 +38,8 @@ class SelectBlockchainsViewModel(
         when (accountType) {
             is AccountType.Mnemonic,
             is AccountType.EvmPrivateKey,
-            is AccountType.SolanaAddress -> Unit // N/A
+            is AccountType.SolanaAddress,
+            is AccountType.TronAddress -> Unit // N/A
             is AccountType.EvmAddress -> {
                 title = R.string.Watch_Select_Blockchains
                 coinViewItems = service.configuredTokens(accountType).map {
@@ -72,7 +72,7 @@ class SelectBlockchainsViewModel(
         val token = configuredToken.token
         return CoinViewItem(
             item = configuredToken,
-            imageSource = ImageSource.Remote(token.fullCoin.coin.iconUrl, R.drawable.coin_placeholder),
+            imageSource = ImageSource.Remote(token.fullCoin.coin.imageUrl, R.drawable.coin_placeholder),
             title = token.fullCoin.coin.code,
             subtitle = token.fullCoin.coin.name,
             enabled = false,

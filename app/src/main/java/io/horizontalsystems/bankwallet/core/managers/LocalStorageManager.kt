@@ -33,6 +33,7 @@ class LocalStorageManager(
     private val THIRD_KEYBOARD_WARNING_MSG = "third_keyboard_warning_msg"
     private val SEND_INPUT_TYPE = "send_input_type"
     private val BASE_CURRENCY_CODE = "base_currency_code"
+    private val AUTH_TOKEN = "auth_token"
     private val FAILED_ATTEMPTS = "failed_attempts"
     private val LOCKOUT_TIMESTAMP = "lockout_timestamp"
     private val BASE_BITCOIN_PROVIDER = "base_bitcoin_provider"
@@ -70,7 +71,7 @@ class LocalStorageManager(
     private val MARKET_FAVORITES_MARKET_FIELD = "market_favorites_market_field"
     private val RELAUNCH_BY_SETTING_CHANGE = "relaunch_by_setting_change"
     private val MARKETS_TAB_ENABLED = "markets_tab_enabled"
-    private val TESTNET_ENABLED = "testnet_enabled"
+    private val BALANCE_AUTO_HIDE_ENABLED = "balance_auto_hide_enabled"
     private val NON_RECOMMENDED_ACCOUNT_ALERT_DISMISSED_ACCOUNTS = "non_recommended_account_alert_dismissed_accounts"
 
     private val gson by lazy { Gson() }
@@ -95,6 +96,12 @@ class LocalStorageManager(
         get() = preferences.getString(BASE_CURRENCY_CODE, null)
         set(value) {
             preferences.edit().putString(BASE_CURRENCY_CODE, value).apply()
+        }
+
+    override var authToken: String?
+        get() = preferences.getString(AUTH_TOKEN, null)
+        set(value) {
+            preferences.edit().putString(AUTH_TOKEN, value).apply()
         }
 
     override var baseBitcoinProvider: String?
@@ -304,6 +311,12 @@ class LocalStorageManager(
             preferences.edit().putBoolean(BALANCE_HIDDEN, value).apply()
         }
 
+    override var balanceAutoHideEnabled: Boolean
+        get() = preferences.getBoolean(BALANCE_AUTO_HIDE_ENABLED, false)
+        set(value) {
+            preferences.edit().putBoolean(BALANCE_AUTO_HIDE_ENABLED, value).commit()
+        }
+
     override var balanceTotalCoinUid: String?
         get() = preferences.getString("balanceTotalCoinUid", null)
         set(value) {
@@ -370,9 +383,9 @@ class LocalStorageManager(
             preferences.edit().putString(APP_ICON, value?.name).apply()
         }
 
-    override var mainTab: MainModule.MainTab?
+    override var mainTab: MainModule.MainNavigation?
         get() = preferences.getString(MAIN_TAB, null)?.let {
-            MainModule.MainTab.fromString(it)
+            MainModule.MainNavigation.fromString(it)
         }
         set(value) {
             preferences.edit().putString(MAIN_TAB, value?.name).apply()
@@ -411,12 +424,6 @@ class LocalStorageManager(
 
     private val _marketsTabEnabledFlow = MutableStateFlow(marketsTabEnabled)
     override val marketsTabEnabledFlow = _marketsTabEnabledFlow.asStateFlow()
-
-    override var testnetEnabled: Boolean
-        get() = preferences.getBoolean(TESTNET_ENABLED, false)
-        set(enabled) {
-            preferences.edit().putBoolean(TESTNET_ENABLED, enabled).apply()
-        }
 
     override var nonRecommendedAccountAlertDismissedAccounts: Set<String>
         get() = preferences.getStringSet(NON_RECOMMENDED_ACCOUNT_ALERT_DISMISSED_ACCOUNTS, setOf()) ?: setOf()

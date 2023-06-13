@@ -7,7 +7,12 @@ import io.horizontalsystems.bankwallet.core.managers.MarketKitWrapper
 import io.horizontalsystems.bankwallet.core.managers.WalletActivator
 import io.horizontalsystems.bankwallet.core.order
 import io.horizontalsystems.bankwallet.core.supports
-import io.horizontalsystems.bankwallet.entities.*
+import io.horizontalsystems.bankwallet.entities.AccountType
+import io.horizontalsystems.bankwallet.entities.BitcoinCashCoinType
+import io.horizontalsystems.bankwallet.entities.CoinSettingType
+import io.horizontalsystems.bankwallet.entities.CoinSettings
+import io.horizontalsystems.bankwallet.entities.ConfiguredToken
+import io.horizontalsystems.bankwallet.entities.derivation
 import io.horizontalsystems.marketkit.models.BlockchainType
 import io.horizontalsystems.marketkit.models.Token
 import io.horizontalsystems.marketkit.models.TokenQuery
@@ -32,6 +37,11 @@ class WatchAddressService(
                     add(ConfiguredToken(it))
                 }
             }
+            is AccountType.TronAddress -> {
+                token(BlockchainType.Tron, accountType)?.let {
+                    add(ConfiguredToken(it))
+                }
+            }
             is AccountType.EvmAddress -> {
                 evmBlockchainManager.allMainNetBlockchains.forEach { blockchain ->
                     token(blockchain.type, accountType)?.let { token ->
@@ -41,12 +51,9 @@ class WatchAddressService(
             }
             is AccountType.HdExtendedKey -> {
                 token(BlockchainType.Bitcoin, accountType)?.let { token ->
-                    add(
-                        ConfiguredToken(
-                            token,
-                            CoinSettings(mapOf(CoinSettingType.derivation to accountType.hdExtendedKey.info.purpose.derivation.value))
-                        )
-                    )
+                    accountType.hdExtendedKey.purposes.forEach { purpose ->
+                        add(ConfiguredToken(token, CoinSettings(mapOf(CoinSettingType.derivation to purpose.derivation.value))))
+                    }
                 }
                 token(BlockchainType.Dash, accountType)?.let { token ->
                     add(ConfiguredToken(token))
@@ -57,12 +64,12 @@ class WatchAddressService(
                     }
                 }
                 token(BlockchainType.Litecoin, accountType)?.let { token ->
-                    add(
-                        ConfiguredToken(
-                            token,
-                            CoinSettings(mapOf(CoinSettingType.derivation to accountType.hdExtendedKey.info.purpose.derivation.value))
-                        )
-                    )
+                    accountType.hdExtendedKey.purposes.forEach { purpose ->
+                        add(ConfiguredToken(token, CoinSettings(mapOf(CoinSettingType.derivation to purpose.derivation.value))))
+                    }
+                }
+                token(BlockchainType.ECash, accountType)?.let { token ->
+                    add(ConfiguredToken(token))
                 }
             }
         }

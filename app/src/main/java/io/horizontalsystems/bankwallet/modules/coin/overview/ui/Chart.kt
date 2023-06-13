@@ -1,16 +1,18 @@
 package io.horizontalsystems.bankwallet.modules.coin.overview.ui
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Divider
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Icon
 import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Tab
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -18,185 +20,114 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.doOnLayout
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.entities.ViewState
+import io.horizontalsystems.bankwallet.modules.chart.ChartModule
 import io.horizontalsystems.bankwallet.modules.chart.ChartViewModel
-import io.horizontalsystems.bankwallet.modules.chart.SelectedPoint
 import io.horizontalsystems.bankwallet.modules.coin.ChartInfoData
-import io.horizontalsystems.bankwallet.modules.coin.details.CoinDetailsModule
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.*
 import io.horizontalsystems.chartview.Chart
-import io.horizontalsystems.chartview.ChartDataItemImmutable
-import io.horizontalsystems.chartview.models.ChartIndicator
+import io.horizontalsystems.chartview.ChartViewType
+import io.horizontalsystems.chartview.models.ChartPoint
 import io.horizontalsystems.core.helpers.HudHelper
 import io.horizontalsystems.marketkit.models.HsTimePeriod
 
 @Composable
-fun HsChartLineHeader(chartHeaderView: CoinDetailsModule.ChartHeaderView?) {
-    TabBalance(borderTop = true) {
-        Text(
-            modifier = Modifier.padding(end = 8.dp),
-            text = chartHeaderView?.value ?: "--",
-            style = ComposeAppTheme.typography.headline1,
-            color = ComposeAppTheme.colors.leah
-        )
-        (chartHeaderView as? CoinDetailsModule.ChartHeaderView.Latest)?.let { latest ->
-            Text(
-                text = formatValueAsDiff(latest.diff),
-                style = ComposeAppTheme.typography.subhead1,
-                color = diffColor(latest.diff.raw())
-            )
-        }
-    }
-}
-
-@Composable
-fun Chart(chartViewModel: ChartViewModel, onSelectChartInterval: ((HsTimePeriod?) -> Unit)? = null) {
-    val chartDataWrapper by chartViewModel.dataWrapperLiveData.observeAsState()
-    val chartTabs by chartViewModel.tabItemsLiveData.observeAsState(listOf())
-    val chartIndicators by chartViewModel.indicatorsLiveData.observeAsState(listOf())
-    val chartLoading by chartViewModel.loadingLiveData.observeAsState(false)
-    val chartViewState by chartViewModel.viewStateLiveData.observeAsState()
-
-    Column {
-        HsChartLineHeader(chartDataWrapper?.chartHeaderView)
-        Chart(
-            tabItems = chartTabs,
-            onSelectTab = {
-                chartViewModel.onSelectChartInterval(it)
-                onSelectChartInterval?.invoke(it)
-            },
-            indicators = chartIndicators,
-            onSelectIndicator = {
-                chartViewModel.onSelectIndicator(it)
-            },
-            chartInfoData = chartDataWrapper?.chartInfoData,
-            chartLoading = chartLoading,
-            viewState = chartViewState,
-            itemToPointConverter = chartViewModel::getSelectedPoint
-        )
-    }
-}
-
-@Composable
-fun <T> Chart(
-    tabItems: List<TabItem<T>>,
-    onSelectTab: (T) -> Unit,
-    indicators: List<TabItem<ChartIndicator>>,
-    onSelectIndicator: (ChartIndicator?) -> Unit,
-    chartInfoData: ChartInfoData?,
-    chartLoading: Boolean,
-    viewState: ViewState?,
-    itemToPointConverter: (ChartDataItemImmutable) -> SelectedPoint?
+fun HsChartLineHeader(
+    chartHeaderView: ChartModule.ChartHeaderView?,
 ) {
-    Column {
-        var selectedPoint by remember { mutableStateOf<SelectedPoint?>(null) }
-        HsChartLinePeriodsAndPoint(tabItems, selectedPoint, onSelectTab)
-        val chartIndicator = indicators.firstOrNull { it.selected && it.enabled }?.item
-        PriceVolChart(
-            chartInfoData = chartInfoData,
-            chartIndicator = chartIndicator,
-            loading = chartLoading,
-            viewState = viewState,
-            showIndicatorLine = indicators.isNotEmpty()
-        ) { item ->
-            selectedPoint = item?.let { itemToPointConverter.invoke(it) }
-        }
-        if (indicators.isNotEmpty()) {
-            HSIndicatorToggles(indicators) {
-                onSelectIndicator.invoke(it)
-            }
-        }
-    }
-}
+    val mainValue = chartHeaderView?.value ?: "--"
+    val mainValueHint = chartHeaderView?.valueHint
+    val diff = chartHeaderView?.diff
+    val date = chartHeaderView?.date
+    val extraData = chartHeaderView?.extraData
 
-@Composable
-private fun <T> HsChartLinePeriodsAndPoint(
-    tabItems: List<TabItem<T>>,
-    selectedPoint: SelectedPoint?,
-    onSelectTab: (T) -> Unit,
-) {
-    Box {
-        // Hide ChartTab if point is selected.
-        // Simply hiding and showing makes period tabs shows up with scrolling animation
-        // The desired behavior is to show without any animation
-        // Solved it with alpha property
-        val alpha = if (selectedPoint != null) 0f else 1f
-        ChartTab(
-            modifier = Modifier.alpha(alpha),
-            tabItems = tabItems,
-            onSelect = onSelectTab
-        )
-
-        if (selectedPoint != null) {
-            TabPeriod(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+    RowUniversal(
+        modifier = Modifier
+            .height(64.dp)
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+    ) {
+        Column(modifier = Modifier.fillMaxHeight()) {
+            Row(
+                modifier = Modifier.weight(1f),
             ) {
-                Column {
-                    captionSB_leah(text = selectedPoint.value)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    caption_grey(text = selectedPoint.date)
+                val style = if (date == null) {
+                    ComposeAppTheme.typography.title3
+                } else {
+                    ComposeAppTheme.typography.headline2
                 }
 
-                when (val extraData = selectedPoint.extraData) {
-                    is SelectedPoint.ExtraData.Macd -> {
-                        Column(modifier = Modifier.width(IntrinsicSize.Max)) {
-                            extraData.histogram?.let {
-                                caption_lucian(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    text = extraData.histogram,
-                                    textAlign = TextAlign.End
+                Text(
+                    modifier = Modifier.alignByBaseline(),
+                    text = mainValue,
+                    style = style,
+                    color = ComposeAppTheme.colors.leah,
+                )
+                mainValueHint?.let {
+                    HSpacer(width = 4.dp)
+                    subhead1_grey(
+                        text = it,
+                        modifier = Modifier.alignByBaseline()
+                    )
+                }
+                diff?.let {
+                    HSpacer(width = 4.dp)
+                    Text(
+                        modifier = Modifier.alignByBaseline(),
+                        text = formatValueAsDiff(diff),
+                        style = ComposeAppTheme.typography.subhead1,
+                        color = diffColor(diff.raw())
+                    )
+                }
+            }
+
+            date?.let {
+                VSpacer(height = 1.dp)
+                subhead2_grey(text = date)
+            }
+        }
+
+        extraData?.let {
+            Spacer(modifier = Modifier.weight(1f))
+            when (extraData) {
+                is ChartModule.ChartHeaderExtraData.Volume -> {
+                    Column(modifier = Modifier.width(IntrinsicSize.Max)) {
+                        subhead2_grey(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = stringResource(R.string.CoinPage_Volume),
+                            textAlign = TextAlign.End
+                        )
+                        subhead2_grey(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = extraData.volume,
+                            textAlign = TextAlign.End
+                        )
+                    }
+                }
+                is ChartModule.ChartHeaderExtraData.Dominance -> {
+                    Column(modifier = Modifier.width(IntrinsicSize.Max)) {
+                        subhead2_grey(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = stringResource(R.string.Market_BtcDominance),
+                            textAlign = TextAlign.End
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            subhead2_jacob(
+                                text = extraData.dominance
+                            )
+                            extraData.diff?.let { diff ->
+                                HSpacer(width = 4.dp)
+                                Text(
+                                    text = formatValueAsDiff(diff),
+                                    style = ComposeAppTheme.typography.subhead2,
+                                    color = diffColor(diff.raw())
                                 )
                             }
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Row(modifier = Modifier.fillMaxWidth()) {
-                                extraData.macd?.let {
-                                    caption_issykBlue(
-                                        text = it,
-                                        textAlign = TextAlign.End
-                                    )
-                                }
-                                Spacer(modifier = Modifier.width(4.dp))
-                                extraData.signal?.let {
-                                    caption_jacob(
-                                        text = it,
-                                        textAlign = TextAlign.End
-                                    )
-                                }
-                            }
                         }
                     }
-                    is SelectedPoint.ExtraData.Volume -> {
-                        Column(modifier = Modifier.width(IntrinsicSize.Max)) {
-                            caption_grey(
-                                modifier = Modifier.fillMaxWidth(),
-                                text = stringResource(R.string.CoinPage_Volume),
-                                textAlign = TextAlign.End
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            caption_grey(
-                                modifier = Modifier.fillMaxWidth(),
-                                text = extraData.volume,
-                                textAlign = TextAlign.End
-                            )
-                        }
-                    }
-                    is SelectedPoint.ExtraData.Dominance -> {
-                        Column(modifier = Modifier.width(IntrinsicSize.Max)) {
-                            caption_grey(
-                                modifier = Modifier.fillMaxWidth(),
-                                text = stringResource(R.string.Market_BtcDominance),
-                                textAlign = TextAlign.End
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            caption_jacob(
-                                modifier = Modifier.fillMaxWidth(),
-                                text = extraData.dominance,
-                                textAlign = TextAlign.End
-                            )
-                        }
-                    }
-                    null ->{}
                 }
             }
         }
@@ -204,28 +135,72 @@ private fun <T> HsChartLinePeriodsAndPoint(
 }
 
 @Composable
-fun HSIndicatorToggles(indicators: List<TabItem<ChartIndicator>>, onSelect: (ChartIndicator?) -> Unit) {
-    CellHeaderSorting(
-        borderTop = true,
-        borderBottom = true
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(start = 16.dp)
-                .fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            indicators.forEach { indicator ->
-                TabButtonSecondary(
-                    title = indicator.title,
-                    onSelect = {
-                        onSelect(if (indicator.selected) null else indicator.item)
-                    },
-                    selected = indicator.selected,
-                    enabled = indicator.enabled
-                )
+fun Chart(
+    chartViewModel: ChartViewModel,
+    onSelectChartInterval: ((HsTimePeriod?) -> Unit)? = null
+) {
+    val uiState = chartViewModel.uiState
+
+    Column {
+        var selectedPoint by remember { mutableStateOf<ChartModule.ChartHeaderView?>(null) }
+
+        Crossfade(targetState = uiState.viewState) {
+            when (it) {
+                is ViewState.Error -> {
+                    val height = if (uiState.hasVolumes) 268.dp else 224.dp
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(height),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(100.dp)
+                                .background(
+                                    color = ComposeAppTheme.colors.raina,
+                                    shape = CircleShape
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(48.dp),
+                                painter = painterResource(R.drawable.ic_sync_error),
+                                contentDescription = null,
+                                tint = ComposeAppTheme.colors.grey
+                            )
+                        }
+                        VSpacer(height = 32.dp)
+                        subhead2_grey(text = stringResource(id = R.string.SyncError))
+                    }
+                }
+                ViewState.Loading -> Unit
+                ViewState.Success -> {
+                    Column {
+                        HsChartLineHeader(selectedPoint ?: uiState.chartHeaderView)
+
+                        PriceVolChart(
+                            chartInfoData = uiState.chartInfoData,
+                            loading = uiState.loading,
+                            hasVolumes = uiState.hasVolumes,
+                            chartViewType = uiState.chartViewType,
+                        ) { item ->
+                            selectedPoint = item?.let {
+                                chartViewModel.getSelectedPoint(it)
+                            }
+                        }
+                    }
+                }
             }
+        }
+
+        VSpacer(height = 8.dp)
+        ChartTab(
+            tabItems = uiState.tabItems,
+        ) {
+            chartViewModel.onSelectChartInterval(it)
+            onSelectChartInterval?.invoke(it)
         }
     }
 }
@@ -233,70 +208,56 @@ fun HSIndicatorToggles(indicators: List<TabItem<ChartIndicator>>, onSelect: (Cha
 @Composable
 fun PriceVolChart(
     chartInfoData: ChartInfoData?,
-    chartIndicator: ChartIndicator?,
     loading: Boolean,
-    viewState: ViewState?,
-    showIndicatorLine: Boolean,
-    onSelectPoint: (ChartDataItemImmutable?) -> Unit,
+    hasVolumes: Boolean,
+    chartViewType: ChartViewType,
+    onSelectPoint: (ChartPoint?) -> Unit,
 ) {
-    val height = if (showIndicatorLine) 228.dp else 180.dp
-    Box(
+    val height = if (hasVolumes) 204.dp else 160.dp
+
+    AndroidView(
         modifier = Modifier
             .height(height)
-    ) {
-        Divider(thickness = 1.dp, color = ComposeAppTheme.colors.steel10)
+            .fillMaxWidth(),
+        factory = {
+            Chart(it).apply {
+                this.chartViewType = chartViewType
 
-        AndroidView(
-            modifier = Modifier.fillMaxSize(),
-            factory = {
-                Chart(it).apply {
-                    setListener(object : Chart.Listener {
-                        override fun onTouchDown() {
-                        }
-
-                        override fun onTouchUp() {
-                            onSelectPoint.invoke(null)
-                        }
-
-                        override fun onTouchSelect(item: ChartDataItemImmutable) {
-                            onSelectPoint.invoke(item)
-                            HudHelper.vibrate(context)
-                        }
-                    })
-                }
-            },
-            update = { chart ->
-                if (loading) {
-                    chart.showSpinner()
-                } else {
-                    chart.hideSpinner()
-                }
-
-                when (viewState) {
-                    is ViewState.Error -> {
-                        chart.showError(viewState.t.localizedMessage ?: "")
+                setListener(object : Chart.Listener {
+                    override fun onTouchDown() {
                     }
-                    ViewState.Success -> {
-                        chart.hideError()
-                        chart.setIndicatorLineVisible(showIndicatorLine)
 
-                        chartInfoData?.let { chartInfoData ->
-                            chart.doOnLayout {
-                                chart.setData(chartInfoData.chartData, chartInfoData.maxValue, chartInfoData.minValue)
-                                if (chartIndicator != null) {
-                                    chart.setIndicator(chartIndicator, true)
-                                } else {
-                                    chart.hideAllIndicators()
-                                }
-                            }
-                        }
+                    override fun onTouchUp() {
+                        onSelectPoint.invoke(null)
                     }
-                    ViewState.Loading,
-                    null -> {}
+
+                    override fun onTouchSelect(item: ChartPoint) {
+                        onSelectPoint.invoke(item)
+                        HudHelper.vibrate(context)
+                    }
+                })
+            }
+        },
+        update = { chart ->
+            if (loading) {
+                chart.showSpinner()
+            } else {
+                chart.hideSpinner()
+            }
+
+            chart.setIndicatorLineVisible(hasVolumes)
+
+            chartInfoData?.let { chartInfoData ->
+                chart.doOnLayout {
+                    chart.setData(
+                        chartInfoData.chartData,
+                        chartInfoData.maxValue,
+                        chartInfoData.minValue
+                    )
                 }
             }
-        )
-    }
+        }
+    )
 }
 
 @Composable

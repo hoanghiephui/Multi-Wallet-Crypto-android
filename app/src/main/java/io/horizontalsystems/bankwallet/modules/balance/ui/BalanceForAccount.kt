@@ -3,9 +3,11 @@ package io.horizontalsystems.bankwallet.modules.balance.ui
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Icon
-import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -25,7 +27,9 @@ import io.horizontalsystems.bankwallet.modules.balance.BalanceModule
 import io.horizontalsystems.bankwallet.modules.balance.BalanceViewModel
 import io.horizontalsystems.bankwallet.modules.manageaccounts.ManageAccountsModule
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
-import io.horizontalsystems.bankwallet.ui.compose.components.AppBarMenuButton
+import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
+import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
+import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.title3_leah
 
 @Composable
@@ -35,8 +39,7 @@ fun BalanceForAccount(navController: NavController, accountViewItem: AccountView
     BackupAlert(navController)
 
     Column {
-        TopAppBar(
-            modifier = Modifier.height(56.dp),
+        AppBar(
             title = {
                 Row(
                     modifier = Modifier
@@ -65,16 +68,15 @@ fun BalanceForAccount(navController: NavController, accountViewItem: AccountView
                     )
                 }
             },
-            actions = {
-                AppBarMenuButton(
+            menuItems = listOf(
+                MenuItem(
+                    title = TranslatableString.ResString(R.string.Nfts_Title),
                     icon = R.drawable.ic_nft_24,
                     onClick = {
                         navController.slideFromRight(R.id.nftsFragment)
                     }
                 )
-            },
-            backgroundColor = ComposeAppTheme.colors.tyler,
-            elevation = 0.dp
+            )
         )
 
         val uiState = viewModel.uiState

@@ -3,8 +3,21 @@ package io.horizontalsystems.bankwallet.core
 import com.google.gson.JsonObject
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.adapters.zcash.ZcashAdapter
-import io.horizontalsystems.bankwallet.core.managers.*
-import io.horizontalsystems.bankwallet.entities.*
+import io.horizontalsystems.bankwallet.core.managers.ActiveAccountState
+import io.horizontalsystems.bankwallet.core.managers.Bep2TokenInfoService
+import io.horizontalsystems.bankwallet.core.managers.EvmKitWrapper
+import io.horizontalsystems.bankwallet.entities.Account
+import io.horizontalsystems.bankwallet.entities.AccountOrigin
+import io.horizontalsystems.bankwallet.entities.AccountType
+import io.horizontalsystems.bankwallet.entities.AddressData
+import io.horizontalsystems.bankwallet.entities.AppVersion
+import io.horizontalsystems.bankwallet.entities.EnabledWallet
+import io.horizontalsystems.bankwallet.entities.LastBlockInfo
+import io.horizontalsystems.bankwallet.entities.LaunchPage
+import io.horizontalsystems.bankwallet.entities.RestoreSettingRecord
+import io.horizontalsystems.bankwallet.entities.SyncMode
+import io.horizontalsystems.bankwallet.entities.TransactionDataSortMode
+import io.horizontalsystems.bankwallet.entities.Wallet
 import io.horizontalsystems.bankwallet.entities.transactionrecords.TransactionRecord
 import io.horizontalsystems.bankwallet.modules.amount.AmountInputType
 import io.horizontalsystems.bankwallet.modules.balance.BalanceSortType
@@ -27,16 +40,18 @@ import io.horizontalsystems.marketkit.models.BlockchainType
 import io.horizontalsystems.marketkit.models.Token
 import io.horizontalsystems.marketkit.models.TokenQuery
 import io.horizontalsystems.solanakit.models.FullTransaction
+import io.horizontalsystems.tronkit.transaction.Fee
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.subjects.Subject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.util.*
+import java.util.Date
+import java.util.Optional
 import io.horizontalsystems.solanakit.models.Address as SolanaAddress
+import io.horizontalsystems.tronkit.models.Address as TronAddress
 
 interface IAdapterManager {
     val adaptersReadyObservable: Flowable<Map<Wallet, IAdapter>>
@@ -53,6 +68,7 @@ interface IAdapterManager {
 interface ILocalStorage {
     var amountInputType: AmountInputType?
     var baseCurrencyCode: String?
+    var authToken: String?
 
     var baseBitcoinProvider: String?
     var baseLitecoinProvider: String?
@@ -71,6 +87,7 @@ interface ILocalStorage {
     var appLaunchCount: Int
     var rateAppLastRequestTime: Long
     var balanceHidden: Boolean
+    var balanceAutoHideEnabled: Boolean
     var balanceTotalCoinUid: String?
     var termsAccepted: Boolean
     var mainShowedOnce: Boolean
@@ -82,13 +99,12 @@ interface ILocalStorage {
     var ignoreRootedDeviceWarning: Boolean
     var launchPage: LaunchPage?
     var appIcon: AppIcon?
-    var mainTab: MainModule.MainTab?
+    var mainTab: MainModule.MainNavigation?
     var marketFavoritesSortingField: SortingField?
     var marketFavoritesMarketField: MarketField?
     var relaunchBySettingChange: Boolean
     var marketsTabEnabled: Boolean
     val marketsTabEnabledFlow: StateFlow<Boolean>
-    var testnetEnabled: Boolean
     var nonRecommendedAccountAlertDismissedAccounts: Set<String>
 
     fun getSwapProviderId(blockchainType: BlockchainType): String?
@@ -136,7 +152,7 @@ interface IBackupManager {
 }
 
 interface IAccountFactory {
-    fun account(name: String, type: AccountType, origin: AccountOrigin, backedUp: Boolean): Account
+    fun account(name: String, type: AccountType, origin: AccountOrigin, backedUp: Boolean, fileBackup: Boolean): Account
     fun watchAccount(name: String, type: AccountType): Account
     fun getNextWatchAccountName(): String
     fun getNextAccountName(): String
@@ -221,12 +237,12 @@ interface ITransactionsAdapter {
         transactionType: FilterTransactionType
     ): Flowable<List<TransactionRecord>>
 
-    fun getTransactionUrl(transactionHash: String): String?
+    fun getTransactionUrl(transactionHash: String): String
 }
 
 class UnsupportedFilterException : Exception()
 
-interface IBalanceAdapter: IBaseAdapter {
+interface IBalanceAdapter {
     val balanceState: AdapterState
     val balanceStateUpdatedFlowable: Flowable<Unit>
 
@@ -238,8 +254,11 @@ data class BalanceData(val available: BigDecimal, val locked: BigDecimal = BigDe
     val total get() = available + locked
 }
 
-interface IReceiveAdapter: IBaseAdapter {
+interface IReceiveAdapter {
     val receiveAddress: String
+
+    val isAccountActive: Boolean
+        get() = true
 }
 
 interface ISendBitcoinAdapter {
@@ -252,7 +271,6 @@ interface ISendBitcoinAdapter {
     ): BigDecimal
 
     fun minimumSendAmount(address: String?): BigDecimal?
-    fun maximumSendAmount(pluginData: Map<Byte, IPluginData>): BigDecimal?
     fun fee(
         amount: BigDecimal,
         feeRate: Long,
@@ -303,13 +321,19 @@ interface IAdapter {
     val debugInfo: String
 }
 
-interface IBaseAdapter {
-    val isMainnet: Boolean
-}
-
 interface ISendSolanaAdapter {
     val availableBalance: BigDecimal
     suspend fun send(amount: BigDecimal, to: SolanaAddress): FullTransaction
+}
+
+interface ISendTronAdapter {
+    val balanceData: BalanceData
+    val trxBalanceData: BalanceData
+
+    suspend fun estimateFee(amount: BigInteger, to: TronAddress): List<Fee>
+    suspend fun send(amount: BigInteger, to: TronAddress, feeLimit: Long?)
+    suspend fun isAddressActive(address: TronAddress): Boolean
+    fun isOwnAddress(address: TronAddress): Boolean
 }
 
 interface IAccountsStorage {
@@ -407,19 +431,16 @@ interface ITorManager {
     fun stop(): Single<Boolean>
     fun setTorAsEnabled()
     fun setTorAsDisabled()
-    fun setListener(listener: TorManager.Listener)
     val isTorEnabled: Boolean
-    val torStatusFlow: Flow<TorStatus>
-    val torObservable: Subject<TorStatus>
+    val torStatusFlow: StateFlow<TorStatus>
 }
 
 interface IRateAppManager {
-    val showRateAppObservable: Observable<RateUsType>
+    val showRateAppFlow: Flow<Boolean>
 
     fun onBalancePageActive()
     fun onBalancePageInactive()
     fun onAppLaunch()
-    fun forceShow()
 }
 
 interface ICoinManager {

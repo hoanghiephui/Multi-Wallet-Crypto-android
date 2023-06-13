@@ -14,19 +14,21 @@ import io.reactivex.subjects.PublishSubject
 import java.math.BigDecimal
 
 class OneInchSettingsService(
-    swapSettings: OneInchSwapSettings
+    address: Address?,
+    slippage: BigDecimal?,
 ) : IRecipientAddressService, ISwapSlippageService {
+
+    val stateObservable = BehaviorSubject.createDefault<State>(State.Invalid)
+    var errors: List<Throwable> = listOf()
+
+    private var recipient: Address? = address
+    private val swapSettings = OneInchSwapSettings(recipient = address, slippage = slippage ?: OneInchSwapSettingsModule.defaultSlippage)
 
     var state: State = State.Valid(swapSettings)
         private set(value) {
             field = value
             stateObservable.onNext(value)
         }
-
-    val stateObservable = BehaviorSubject.createDefault<State>(State.Invalid)
-    var errors: List<Throwable> = listOf()
-
-    private var recipient: Address? = swapSettings.recipient
     private var recipientError: Throwable? = null
         set(value) {
             field = value

@@ -26,7 +26,7 @@ interface ISwapSlippageService {
 }
 
 class SwapSlippageViewModel(
-        private val service: ISwapSlippageService
+    private val service: ISwapSlippageService
 ) : ViewModel(), IVerifiedInputViewModel {
 
     private val disposable = CompositeDisposable()
@@ -47,10 +47,10 @@ class SwapSlippageViewModel(
 
     init {
         service.slippageChangeObservable
-                .subscribe { sync() }
-                .let {
-                    disposable.add(it)
-                }
+            .subscribe { sync() }
+            .let {
+                disposable.add(it)
+            }
         sync()
     }
 

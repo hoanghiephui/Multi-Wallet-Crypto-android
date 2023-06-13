@@ -57,8 +57,8 @@ fun SendZCashScreen(
         }
 
         SendScreen(
-            navController = navController,
-            fullCoin = fullCoin
+            fullCoin = fullCoin,
+            onCloseClick = { navController.popBackStack() }
         ) {
             AvailableBalance(
                 coinCode = wallet.coin.code,
@@ -95,7 +95,8 @@ fun SendZCashScreen(
                 tokenQuery = wallet.token.tokenQuery,
                 coinCode = wallet.coin.code,
                 error = addressError,
-                textPreprocessor = paymentAddressViewModel
+                textPreprocessor = paymentAddressViewModel,
+                navController = navController
             ) {
                 viewModel.onEnterAddress(it)
             }
@@ -113,10 +114,10 @@ fun SendZCashScreen(
             HSFeeInput(
                 coinCode = wallet.coin.code,
                 coinDecimal = viewModel.coinMaxAllowedDecimals,
-                fiatDecimal = viewModel.fiatMaxAllowedDecimals,
                 fee = fee,
                 amountInputType = amountInputType,
                 rate = viewModel.coinRate,
+                navController = navController
             )
 
             ButtonPrimaryYellow(

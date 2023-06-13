@@ -11,7 +11,7 @@ import io.horizontalsystems.bankwallet.entities.Wallet
 import io.horizontalsystems.bankwallet.modules.amount.AmountValidator
 import io.horizontalsystems.bankwallet.modules.send.SendAmountAdvancedService
 import io.horizontalsystems.bankwallet.modules.send.evm.confirmation.EvmKitWrapperHoldingViewModel
-import io.horizontalsystems.bankwallet.modules.swap.uniswap.UniswapModule
+import io.horizontalsystems.bankwallet.modules.swap.SwapMainModule.PriceImpactViewItem
 import io.horizontalsystems.bankwallet.modules.xrate.XRateService
 import io.horizontalsystems.ethereumkit.models.TransactionData
 import io.horizontalsystems.marketkit.models.Token
@@ -54,7 +54,6 @@ data class SendEvmData(
 
     @Parcelize
     data class SendInfo(
-        val domain: String?,
         val nftShortMeta: NftShortMeta? = null
     ) : Parcelable
 
@@ -77,7 +76,7 @@ data class SendEvmData(
         val deadline: String? = null,
         val recipientDomain: String? = null,
         val price: String? = null,
-        val priceImpact: UniswapModule.PriceImpactViewItem? = null,
+        val priceImpact: PriceImpactViewItem? = null,
         val gasPrice: String? = null,
     ) : Parcelable
 
@@ -105,22 +104,18 @@ object SendEvmModule {
     data class TransactionDataParcelable(
         val toAddress: String,
         val value: BigInteger,
-        val input: ByteArray,
-        val nonce: Long? = null
+        val input: ByteArray
     ) : Parcelable {
         constructor(transactionData: TransactionData) : this(
             transactionData.to.hex,
             transactionData.value,
-            transactionData.input,
-            transactionData.nonce
+            transactionData.input
         )
     }
 
 
     class Factory(private val wallet: Wallet) : ViewModelProvider.Factory {
-        val adapter by lazy {
-            App.adapterManager.getAdapterForWallet(wallet) as ISendEthereumAdapter
-        }
+        val adapter = (App.adapterManager.getAdapterForWallet(wallet) as? ISendEthereumAdapter) ?: throw IllegalArgumentException("SendEthereumAdapter is null")
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

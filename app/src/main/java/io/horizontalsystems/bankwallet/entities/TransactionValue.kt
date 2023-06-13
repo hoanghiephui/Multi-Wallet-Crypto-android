@@ -1,7 +1,7 @@
 package io.horizontalsystems.bankwallet.entities
 
 import io.horizontalsystems.bankwallet.core.iconPlaceholder
-import io.horizontalsystems.bankwallet.core.iconUrl
+import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.entities.nft.NftUid
 import io.horizontalsystems.marketkit.models.Coin
 import io.horizontalsystems.marketkit.models.Token
@@ -26,7 +26,7 @@ sealed class TransactionValue {
 
     data class CoinValue(val token: Token, val value: BigDecimal) : TransactionValue() {
         override val coin: Coin = token.coin
-        override val coinIconUrl = token.coin.iconUrl
+        override val coinIconUrl = token.coin.imageUrl
         override val coinIconPlaceholder = token.fullCoin.iconPlaceholder
         override val coinUid: String = coin.uid
         override val fullName: String = coin.name
@@ -44,7 +44,8 @@ sealed class TransactionValue {
 
     }
 
-    data class RawValue(override val coinUid: String = "", val value: BigInteger) : TransactionValue() {
+    data class RawValue(val value: BigInteger) : TransactionValue() {
+        override val coinUid: String = ""
         override val coin: Coin? = null
         override val coinIconUrl = null
         override val coinIconPlaceholder = null
@@ -63,13 +64,13 @@ sealed class TransactionValue {
     }
 
     data class TokenValue(
-        override val coinUid: String = "",
         val tokenName: String,
         val tokenCode: String,
         val tokenDecimals: Int,
         val value: BigDecimal,
         override val coinIconPlaceholder: Int? = null
     ) : TransactionValue() {
+        override val coinUid: String = ""
         override val coin: Coin? = null
         override val coinIconUrl = null
         override val fullName: String

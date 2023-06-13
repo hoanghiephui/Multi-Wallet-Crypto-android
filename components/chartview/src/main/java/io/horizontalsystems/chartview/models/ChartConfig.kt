@@ -13,10 +13,8 @@ class ChartConfig(private val context: Context, attrs: AttributeSet?) {
     //  colors
     val textFont: Typeface = Typeface.DEFAULT
     var timelineTextColor = context.getColor(R.color.nina)
-    var timelineTextSize = dp2px(10f)
-    var timelineTextPadding = dp2px(4f)
 
-    var gridTextColor = context.getColor(R.color.nina)
+    var gridTextColor = context.getColor(R.color.grey)
     var gridLineColor = context.getColor(R.color.steel_20)
     var gridDashColor = context.getColor(R.color.steel_10)
     var gridLabelColor = context.getColor(R.color.grey_50)
@@ -29,6 +27,8 @@ class ChartConfig(private val context: Context, attrs: AttributeSet?) {
     var trendUpColor = context.getColor(R.color.green_d)
     var trendDownColor = context.getColor(R.color.red_d)
     var neutralColor = context.getColor(R.color.jacob)
+    var barColor = context.getColor(R.color.jacob)
+    var barPressedColor = context.getColor(R.color.nina)
     var neutralGradientColor = GradientColor(Color.parseColor("#FFA800"), Color.parseColor("#FFA800"))
     var trendUpGradient = GradientColor(Color.parseColor("#416BFF"), Color.parseColor("#13D670"))
     var trendDownGradient = GradientColor(Color.parseColor("#7413D6"), Color.parseColor("#FF0303"))
@@ -39,7 +39,8 @@ class ChartConfig(private val context: Context, attrs: AttributeSet?) {
     var curveGradient = trendUpGradient
     var curvePressedColor = context.getColor(R.color.leah)
     var curveOutdatedColor = context.getColor(R.color.grey_50)
-    var curveVerticalOffset = dp2px(18f)
+    var curveDisabledColor = context.getColor(R.color.grey)
+    var curveVerticalOffset = dp2px(20f)
     var curveMinimalVerticalOffset = dp2px(10f)
     var curveFastColor = Color.parseColor("#801A60FF")
     var curveSlowColor = Color.parseColor("#80ffa800")
@@ -49,17 +50,14 @@ class ChartConfig(private val context: Context, attrs: AttributeSet?) {
     var cursorColor = context.getColor(R.color.leah)
 
     var volumeColor = context.getColor(R.color.steel_20)
-    var volumeWidth = dp2px(4f)
-    var volumeOffset = dp2px(8f)
-
-    var macdHistogramUpColor = Color.parseColor("#8013D670")
-    var macdHistogramDownColor = Color.parseColor("#80FF4820")
-    var macdLineOffset = dp2px(2f)
-    var macdHistogramOffset = dp2px(4f)
+    var volumeWidth = dp2px(2f)
+    var volumeMinHeight = dp2px(2f)
 
     var strokeWidth = dp2px(1f)
     var strokeDash = dp2px(2f)
     var strokeDashWidth = dp2px(0.5f)
+
+    var horizontalOffset = dp2px(8f)
 
     init {
         val ta = context.obtainStyledAttributes(attrs, R.styleable.Chart)
@@ -77,8 +75,8 @@ class ChartConfig(private val context: Context, attrs: AttributeSet?) {
 
     fun setTrendColor(chartData: ChartData) {
         when {
-            chartData.isExpired -> {
-                curveColor = curveOutdatedColor
+            chartData.disabled -> {
+                curveColor = curveDisabledColor
                 curveGradient = outdatedGradient
             }
             !chartData.isMovementChart -> {

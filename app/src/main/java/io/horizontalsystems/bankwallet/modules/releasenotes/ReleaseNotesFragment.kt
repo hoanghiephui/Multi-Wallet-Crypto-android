@@ -5,10 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
-import androidx.compose.material.Surface
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +30,7 @@ import io.horizontalsystems.bankwallet.modules.markdown.MarkdownContent
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
+import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.HsIconButton
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.caption_grey
@@ -68,8 +74,9 @@ fun ReleaseNotesScreen(
     viewModel: ReleaseNotesViewModel = viewModel(factory = ReleaseNotesModule.Factory())
 ) {
 
-    Surface(color = ComposeAppTheme.colors.tyler) {
-        Column {
+    Scaffold(
+        backgroundColor = ComposeAppTheme.colors.tyler,
+        topBar = {
             if (closeablePopup) {
                 AppBar(
                     menuItems = listOf(
@@ -83,17 +90,13 @@ fun ReleaseNotesScreen(
             } else {
                 AppBar(
                     navigationIcon = {
-                        HsIconButton(onClick = onCloseClick) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_back),
-                                contentDescription = "back button",
-                                tint = ComposeAppTheme.colors.jacob
-                            )
-                        }
+                        HsBackButton(onClick = onCloseClick)
                     }
                 )
             }
-
+        }
+    ) {
+        Column(Modifier.padding(it)) {
             MarkdownContent(
                 modifier = Modifier.weight(1f),
                 viewState = viewModel.viewState,
@@ -116,15 +119,18 @@ fun ReleaseNotesScreen(
                 Spacer(Modifier.padding(start = 16.dp))
                 IconButton(
                     R.drawable.ic_twitter_filled_24,
-                    viewModel.twitterUrl
+                    viewModel.twitterUrl,
+                    stringResource(R.string.CoinPage_Twitter)
                 )
                 IconButton(
                     R.drawable.ic_telegram_filled_24,
-                    viewModel.telegramUrl
+                    viewModel.telegramUrl,
+                    stringResource(R.string.CoinPage_Telegram)
                 )
                 IconButton(
                     R.drawable.ic_reddit_filled_24,
-                    viewModel.redditUrl
+                    viewModel.redditUrl,
+                    stringResource(R.string.CoinPage_Reddit)
                 )
 
                 Spacer(Modifier.weight(1f))
@@ -134,18 +140,17 @@ fun ReleaseNotesScreen(
                     text = stringResource(R.string.ReleaseNotes_FollowUs)
                 )
             }
-
         }
     }
 }
 
 @Composable
-private fun IconButton(icon: Int, twitterUrl: String) {
+private fun IconButton(icon: Int, url: String, description: String) {
     val context = LocalContext.current
-    HsIconButton(onClick = { LinkHelper.openLinkInAppBrowser(context, twitterUrl) }) {
+    HsIconButton(onClick = { LinkHelper.openLinkInAppBrowser(context, url) }) {
         Icon(
             painter = painterResource(id = icon),
-            contentDescription = null,
+            contentDescription = description,
             tint = ComposeAppTheme.colors.grey
         )
     }

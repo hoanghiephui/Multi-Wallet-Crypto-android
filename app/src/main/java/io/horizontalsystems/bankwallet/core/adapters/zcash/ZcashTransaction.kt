@@ -1,8 +1,9 @@
 package io.horizontalsystems.bankwallet.core.adapters.zcash
 
-import cash.z.ecc.android.sdk.db.entity.ConfirmedTransaction
-import cash.z.ecc.android.sdk.db.entity.PendingTransaction
-import cash.z.ecc.android.sdk.db.entity.isFailure
+import cash.z.ecc.android.sdk.model.PendingTransaction
+import cash.z.ecc.android.sdk.model.TransactionOverview
+import cash.z.ecc.android.sdk.model.TransactionRecipient
+import cash.z.ecc.android.sdk.model.isFailure
 
 class ZcashTransaction : Comparable<ZcashTransaction> {
     val id: Long
@@ -10,40 +11,40 @@ class ZcashTransaction : Comparable<ZcashTransaction> {
     val transactionIndex: Int
     val toAddress: String?
     val expiryHeight: Int?
-    val minedHeight: Long
+    val minedHeight: Long?
     val timestamp: Long
     val value: Long
     val memo: String?
     val failed: Boolean
     val isIncoming: Boolean
 
-    constructor(confirmedTransaction: ConfirmedTransaction, receiveAddress: String) {
+    constructor(confirmedTransaction: TransactionOverview, recipient: String?, memo: String?) {
         confirmedTransaction.let {
             id = it.id
-            transactionHash = it.rawTransactionId
-            transactionIndex = it.transactionIndex
-            toAddress = it.toAddress
-            expiryHeight = it.expiryHeight
-            minedHeight = it.minedHeight
-            timestamp = it.blockTimeInSeconds
-            value = it.value
-            memo = it.memo.toUtf8Memo()
+            transactionHash = it.rawId.byteArray
+            transactionIndex = it.index.toInt()
+            toAddress = recipient
+            expiryHeight = it.expiryHeight?.value?.toInt()
+            minedHeight = it.minedHeight?.value
+            timestamp = it.blockTimeEpochSeconds
+            value = it.netValue.value
+            this.memo = memo
             failed = false
+            isIncoming = !it.isSentTransaction
         }
-        isIncoming = toAddress.isNullOrBlank() || toAddress == receiveAddress
     }
 
     constructor(pendingTransaction: PendingTransaction, receiveAddress: String) {
         pendingTransaction.let {
             id = it.id
-            transactionHash = it.rawTransactionId ?: byteArrayOf()
+            transactionHash = it.rawTransactionId?.byteArray ?: byteArrayOf()
             transactionIndex = -1
-            toAddress = it.toAddress
-            expiryHeight = it.expiryHeight.toInt()
-            minedHeight = it.minedHeight
+            toAddress = (it.recipient as? TransactionRecipient.Address)?.addressValue
+            expiryHeight = it.expiryHeight?.value?.toInt()
+            minedHeight = it.minedHeight?.value
             timestamp = it.createTime / 1000
-            value = it.value
-            memo = it.memo.toUtf8Memo()
+            value = it.value.value
+            memo = it.memo?.byteArray?.toUtf8Memo()
             failed = it.isFailure()
         }
         isIncoming = toAddress.isNullOrBlank() || toAddress == receiveAddress

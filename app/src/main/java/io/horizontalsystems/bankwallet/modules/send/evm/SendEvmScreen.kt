@@ -53,8 +53,8 @@ fun SendEvmScreen(
         }
 
         SendScreen(
-            navController = navController,
-            fullCoin = fullCoin
+            fullCoin = fullCoin,
+            onCloseClick = { navController.popBackStack() }
         ) {
             AvailableBalance(
                 coinCode = wallet.coin.code,
@@ -91,7 +91,8 @@ fun SendEvmScreen(
                 tokenQuery = wallet.token.tokenQuery,
                 coinCode = wallet.coin.code,
                 error = addressError,
-                textPreprocessor = paymentAddressViewModel
+                textPreprocessor = paymentAddressViewModel,
+                navController = navController
             ) {
                 viewModel.onEnterAddress(it)
             }

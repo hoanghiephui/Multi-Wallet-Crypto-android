@@ -3,14 +3,15 @@ package io.horizontalsystems.bankwallet.modules.evmfee
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import io.horizontalsystems.bankwallet.core.Warning
-import io.horizontalsystems.bankwallet.core.ethereum.CautionViewItemFactory
 import io.horizontalsystems.bankwallet.core.ethereum.EvmCoinService
 import io.horizontalsystems.bankwallet.entities.DataState
 import io.horizontalsystems.bankwallet.entities.FeePriceScale
+import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.evmfee.eip1559.Eip1559FeeSettingsViewModel
 import io.horizontalsystems.bankwallet.modules.evmfee.eip1559.Eip1559GasPriceService
 import io.horizontalsystems.bankwallet.modules.evmfee.legacy.LegacyFeeSettingsViewModel
 import io.horizontalsystems.bankwallet.modules.evmfee.legacy.LegacyGasPriceService
+import io.horizontalsystems.bankwallet.modules.fee.FeeItem
 import io.horizontalsystems.ethereumkit.models.Address
 import io.horizontalsystems.ethereumkit.models.GasPrice
 import io.horizontalsystems.ethereumkit.models.TransactionData
@@ -21,13 +22,17 @@ import java.math.BigInteger
 import java.math.RoundingMode
 
 object EvmFeeModule {
+    private const val surchargePercent = 10
+
+    fun surcharged(gasLimit: Long) : Long {
+        return (gasLimit + gasLimit / 100.0 * surchargePercent).toLong()
+    }
+
     class Factory(
         private val feeService: IEvmFeeService,
         private val gasPriceService: IEvmGasPriceService,
         private val evmCoinService: EvmCoinService
     ) : ViewModelProvider.Factory {
-
-        private val cautionViewItemFactory by lazy { CautionViewItemFactory(evmCoinService) }
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -36,86 +41,91 @@ object EvmFeeModule {
                     LegacyFeeSettingsViewModel(
                         gasPriceService,
                         feeService,
-                        evmCoinService,
-                        cautionViewItemFactory
+                        evmCoinService
                     ) as T
                 is Eip1559GasPriceService ->
                     Eip1559FeeSettingsViewModel(
                         gasPriceService,
                         feeService,
-                        evmCoinService,
-                        cautionViewItemFactory
+                        evmCoinService
                     ) as T
                 else -> throw IllegalArgumentException()
             }
         }
     }
-
-    fun scaledString(wei: Long, scale: FeePriceScale): String {
-        val gwei = wei.toDouble() / scale.scaleValue
-
-        return "${gwei.toBigDecimal().toPlainString()} ${scale.unit}"
-    }
-
-    fun stepSize(weiValue: Long): Long {
-        var digitsCount = 0
-        var value = weiValue
-
-        while (value > 0) {
-            value /= 10
-            digitsCount += 1
-        }
-
-        return 1L * 10.toBigDecimal().pow(Integer.max(digitsCount - 2, 0)).toLong()
-    }
-
 }
 
 interface IEvmFeeService {
     val transactionStatus: DataState<Transaction>
     val transactionStatusObservable: Observable<DataState<Transaction>>
+
+    fun reset()
 }
 
 interface IEvmGasPriceService {
     val state: DataState<GasPriceInfo>
     val stateObservable: Observable<DataState<GasPriceInfo>>
-    val isRecommendedGasPriceSelected: Boolean
+
+    fun setRecommended()
 }
 
 abstract class FeeSettingsError : Throwable() {
     object InsufficientBalance : FeeSettingsError()
-    object LowMaxFee : FeeSettingsError()
+    object UsedNonce : FeeSettingsError()
     class InvalidGasPriceType(override val message: String) : FeeSettingsError()
 }
 
 abstract class FeeSettingsWarning : Warning() {
     object RiskOfGettingStuck : FeeSettingsWarning()
+    object RiskOfGettingStuckLegacy : FeeSettingsWarning()
     object Overpricing : FeeSettingsWarning()
 }
 
 data class GasPriceInfo(
     val gasPrice: GasPrice,
+    val gasPriceDefault: GasPrice,
+    val default: Boolean,
     val warnings: List<Warning>,
     val errors: List<Throwable>
 )
 
-open class GasData(val gasLimit: Long, val gasPrice: GasPrice) {
-
+open class GasData(
+    val gasLimit: Long,
+    val estimatedGasLimit: Long = gasLimit,
+    var gasPrice: GasPrice
+) {
     open val fee: BigInteger
         get() = gasLimit.toBigInteger() * gasPrice.max.toBigInteger()
 
+    open val estimatedFee: BigInteger
+        get() = estimatedGasLimit.toBigInteger() * gasPrice.max.toBigInteger()
+
+    val isSurcharged: Boolean
+        get() = gasLimit != estimatedGasLimit
 }
 
-class RollupGasData(gasLimit: Long, gasPrice: GasPrice, val l1Fee: BigInteger): GasData(gasLimit, gasPrice) {
-
+class RollupGasData(
+    gasLimit: Long,
+    estimatedGasLimit: Long = gasLimit,
+    gasPrice: GasPrice,
+    val l1Fee: BigInteger
+) : GasData(
+    gasLimit = gasLimit,
+    estimatedGasLimit = estimatedGasLimit,
+    gasPrice = gasPrice
+) {
     override val fee: BigInteger
         get() = super.fee + l1Fee
 
+    override val estimatedFee: BigInteger
+        get() = super.estimatedFee + l1Fee
 }
 
+//TODO rename to FeeData
 data class Transaction(
     val transactionData: TransactionData,
     val gasData: GasData,
+    val default: Boolean,
     val warnings: List<Warning> = listOf(),
     val errors: List<Throwable> = listOf()
 ) {
@@ -123,55 +133,38 @@ data class Transaction(
         get() = transactionData.value + gasData.fee
 }
 
-data class FeeRangeConfig(
-    val lowerBound: Bound,
-    val upperBound: Bound
-) {
-    sealed class Bound {
-        class Fixed(val value: Long) : Bound()
-        class Multiplied(val multiplier: BigDecimal) : Bound()
-        class Added(val addend: Long) : Bound()
+sealed class Bound {
+    class Fixed(val value: Long) : Bound()
+    class Multiplied(val multiplier: BigDecimal) : Bound()
+    class Added(val addend: Long) : Bound()
 
-        fun calculate(selectedValue: Long) = when (this) {
-            is Added -> selectedValue + addend
-            is Fixed -> value
-            is Multiplied -> {
-                (BigDecimal(selectedValue) * multiplier)
-                    .setScale(0, RoundingMode.HALF_UP)
-                    .toLong()
-            }
+    fun calculate(selectedValue: Long) = when (this) {
+        is Added -> selectedValue + addend
+        is Fixed -> value
+        is Multiplied -> {
+            (BigDecimal(selectedValue) * multiplier)
+                .setScale(0, RoundingMode.HALF_UP)
+                .toLong()
         }
     }
 }
 
 sealed class GasDataError : Error() {
     object NoTransactionData : GasDataError()
-    object InsufficientBalance : GasDataError()
 }
 
-data class FeeViewItem(val fee: String, val gasLimit: String)
+data class FeeSummaryViewItem(val fee: FeeItem?, val gasLimit: String, val viewState: ViewState)
 
-data class SliderViewItem(
-    private val initialWeiValue: Long,
-    private val weiRange: LongRange,
-    private val stepSize: Long,
-    private val scale: FeePriceScale
+data class FeeViewItem(
+    val weiValue: Long,
+    val scale: FeePriceScale,
+    val warnings: List<Warning>,
+    val errors: List<Throwable>
 ) {
 
-    val initialSliderValue: Long = sliderValue(initialWeiValue)
-    val range: LongRange = LongRange(sliderValue(weiRange.first), sliderValue(weiRange.last))
-    val initialValueScaledString = EvmFeeModule.scaledString(initialWeiValue, scale)
-
-    fun wei(sliderValue: Long): Long {
-        return sliderValue * stepSize
+    fun wei(scaledValue: BigDecimal): Long {
+        return (scaledValue * BigDecimal(scale.scaleValue)).toLong()
     }
-
-    fun sliderValue(wei: Long): Long {
-        return wei / stepSize
-    }
-
-    fun scaledString(sliderValue: Long): String = EvmFeeModule.scaledString(wei(sliderValue), scale)
-
 }
 
 internal val BlockchainType.l1GasFeeContractAddress: Address?

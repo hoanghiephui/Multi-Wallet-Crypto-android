@@ -1,12 +1,26 @@
 package io.horizontalsystems.bankwallet.modules.balance.ui
 
 import android.view.View
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -42,7 +56,16 @@ import io.horizontalsystems.bankwallet.modules.swap.SwapMainModule
 import io.horizontalsystems.bankwallet.modules.syncerror.SyncErrorDialog
 import io.horizontalsystems.bankwallet.modules.walletconnect.list.ui.DraggableCardSimple
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
-import io.horizontalsystems.bankwallet.ui.compose.components.*
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryCircle
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryDefault
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
+import io.horizontalsystems.bankwallet.ui.compose.components.CellMultilineClear
+import io.horizontalsystems.bankwallet.ui.compose.components.CoinImage
+import io.horizontalsystems.bankwallet.ui.compose.components.HsIconButton
+import io.horizontalsystems.bankwallet.ui.compose.components.RateColor
+import io.horizontalsystems.bankwallet.ui.compose.components.RateText
+import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.extensions.RotatingCircleProgressView
 import io.horizontalsystems.core.helpers.HudHelper
 
@@ -291,11 +314,13 @@ private fun ButtonsRow(viewItem: BalanceViewItem, navController: NavController, 
             if (viewItem.swapVisible) {
                 ButtonPrimaryCircle(
                     icon = R.drawable.ic_arrow_down_left_24,
+                    contentDescription = stringResource(R.string.Balance_Receive),
                     onClick = onClickReceive,
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 ButtonPrimaryCircle(
                     icon = R.drawable.ic_swap_24,
+                    contentDescription = stringResource(R.string.Swap),
                     onClick = {
                         navController.slideFromBottom(
                             R.id.swapFragment,
@@ -315,6 +340,7 @@ private fun ButtonsRow(viewItem: BalanceViewItem, navController: NavController, 
         Spacer(modifier = Modifier.width(8.dp))
         ButtonPrimaryCircle(
             icon = R.drawable.ic_chart_24,
+            contentDescription = stringResource(R.string.Coin_Info),
             enabled = !viewItem.wallet.token.isCustom,
             onClick = {
                 val coinUid = viewItem.wallet.coin.uid
@@ -376,13 +402,6 @@ private fun WalletIcon(viewItem: BalanceViewItem, viewModel: BalanceViewModel, n
             .fillMaxHeight(),
         contentAlignment = Alignment.Center
     ) {
-        if (!viewItem.mainNet) {
-            Image(
-                modifier = Modifier.align(Alignment.TopCenter),
-                painter = painterResource(R.drawable.testnet),
-                contentDescription = "Testnet"
-            )
-        }
         viewItem.syncingProgress.progress?.let { progress ->
             AndroidView(
                 modifier = Modifier
