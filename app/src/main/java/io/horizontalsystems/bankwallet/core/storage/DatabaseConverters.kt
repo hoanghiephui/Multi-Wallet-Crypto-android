@@ -146,7 +146,7 @@ class DatabaseConverters {
     }
 
     @TypeConverter
-    fun fromMap(v: Map<String, String>): String {
+    fun fromMap(v: Map<String, String?>): String {
         return gson.toJson(v)
     }
 

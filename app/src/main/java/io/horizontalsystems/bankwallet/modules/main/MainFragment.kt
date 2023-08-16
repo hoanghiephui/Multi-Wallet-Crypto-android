@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Badge
 import androidx.compose.material.BadgedBox
@@ -41,6 +39,9 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.navGraphViewModels
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.core.managers.RateAppManager
@@ -125,7 +126,9 @@ private fun MainScreenWithRootedDeviceCheck(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class,
+    ExperimentalPagerApi::class
+)
 @Composable
 private fun MainScreen(
     transactionsViewModel: TransactionsViewModel,
@@ -216,7 +219,7 @@ private fun MainScreen(
 
                     HorizontalPager(
                         modifier = Modifier.weight(1f),
-                        pageCount = uiState.mainNavItems.size,
+                        count = uiState.mainNavItems.size,
                         state = pagerState,
                         userScrollEnabled = false,
                         verticalAlignment = Alignment.Top
@@ -228,6 +231,7 @@ private fun MainScreen(
                                 fragmentNavController,
                                 transactionsViewModel
                             )
+
                             MainNavigation.Settings -> SettingsScreen(fragmentNavController)
                         }
                     }
@@ -263,10 +267,12 @@ private fun MainScreen(
             SupportState.Supported -> {
                 fragmentNavController.slideFromRight(R.id.wallet_connect_graph)
             }
+
             SupportState.NotSupportedDueToNoActiveAccount -> {
                 clearActivityData.invoke()
                 fragmentNavController.slideFromBottom(R.id.wcErrorNoAccountFragment)
             }
+
             is SupportState.NotSupportedDueToNonBackedUpAccount -> {
                 clearActivityData.invoke()
                 val text = stringResource(
@@ -278,6 +284,7 @@ private fun MainScreen(
                     BackupRequiredDialog.prepareParams(wcSupportState.account, text)
                 )
             }
+
             is SupportState.NotSupported -> {
                 clearActivityData.invoke()
                 fragmentNavController.slideFromBottom(
@@ -285,6 +292,7 @@ private fun MainScreen(
                     WCAccountTypeNotSupportedDialog.prepareParams(wcSupportState.accountTypeDescription)
                 )
             }
+
             null -> {}
         }
         viewModel.wcSupportStateHandled()

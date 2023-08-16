@@ -6,8 +6,40 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import io.horizontalsystems.bankwallet.core.providers.CexAssetRaw
-import io.horizontalsystems.bankwallet.core.storage.migrations.*
-import io.horizontalsystems.bankwallet.entities.*
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_31_32
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_32_33
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_33_34
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_34_35
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_35_36
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_36_37
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_37_38
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_38_39
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_39_40
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_40_41
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_41_42
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_42_43
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_43_44
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_44_45
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_45_46
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_46_47
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_47_48
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_48_49
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_49_50
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_50_51
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_51_52
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_52_53
+import io.horizontalsystems.bankwallet.core.storage.migrations.Migration_53_54
+import io.horizontalsystems.bankwallet.entities.ActiveAccount
+import io.horizontalsystems.bankwallet.entities.BlockchainSettingRecord
+import io.horizontalsystems.bankwallet.entities.EnabledWallet
+import io.horizontalsystems.bankwallet.entities.EnabledWalletCache
+import io.horizontalsystems.bankwallet.entities.EvmAddressLabel
+import io.horizontalsystems.bankwallet.entities.EvmMethodLabel
+import io.horizontalsystems.bankwallet.entities.EvmSyncSourceRecord
+import io.horizontalsystems.bankwallet.entities.LogEntry
+import io.horizontalsystems.bankwallet.entities.RestoreSettingRecord
+import io.horizontalsystems.bankwallet.entities.SyncerState
+import io.horizontalsystems.bankwallet.entities.TokenAutoEnabledBlockchain
 import io.horizontalsystems.bankwallet.entities.nft.NftAssetBriefMetadataRecord
 import io.horizontalsystems.bankwallet.entities.nft.NftAssetRecord
 import io.horizontalsystems.bankwallet.entities.nft.NftCollectionRecord
@@ -21,32 +53,36 @@ import io.horizontalsystems.bankwallet.modules.walletconnect.entity.WalletConnec
 import io.horizontalsystems.bankwallet.modules.walletconnect.storage.WC1SessionDao
 import io.horizontalsystems.bankwallet.modules.walletconnect.storage.WC2SessionDao
 
-@Database(version = 54, exportSchema = false, entities = [
-    EnabledWallet::class,
-    EnabledWalletCache::class,
-    AccountRecord::class,
-    BlockchainSettingRecord::class,
-    EvmSyncSourceRecord::class,
-    LogEntry::class,
-    FavoriteCoin::class,
-    WalletConnectSession::class,
-    WalletConnectV2Session::class,
-    RestoreSettingRecord::class,
-    ActiveAccount::class,
-    NftCollectionRecord::class,
-    NftAssetRecord::class,
-    NftMetadataSyncRecord::class,
-    NftAssetBriefMetadataRecord::class,
-    ProFeaturesSessionKey::class,
-    EvmAddressLabel::class,
-    EvmMethodLabel::class,
-    SyncerState::class,
-    TokenAutoEnabledBlockchain::class,
-    CexAssetRaw::class,
-    ChartIndicatorSetting::class,
-])
+@Database(
+    version = 54, exportSchema = false, entities = [
+        EnabledWallet::class,
+        EnabledWalletCache::class,
+        AccountRecord::class,
+        BlockchainSettingRecord::class,
+        EvmSyncSourceRecord::class,
+        LogEntry::class,
+        FavoriteCoin::class,
+        WalletConnectSession::class,
+        WalletConnectV2Session::class,
+        RestoreSettingRecord::class,
+        ActiveAccount::class,
+        NftCollectionRecord::class,
+        NftAssetRecord::class,
+        NftMetadataSyncRecord::class,
+        NftAssetBriefMetadataRecord::class,
+        ProFeaturesSessionKey::class,
+        EvmAddressLabel::class,
+        EvmMethodLabel::class,
+        SyncerState::class,
+        TokenAutoEnabledBlockchain::class,
+        CexAssetRaw::class,
+        ChartIndicatorSetting::class,
+    ]
+)
 
-@TypeConverters(DatabaseConverters::class)
+@TypeConverters(
+    DatabaseConverters::class,
+)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun chartIndicatorSettingsDao(): ChartIndicatorSettingsDao
@@ -81,34 +117,34 @@ abstract class AppDatabase : RoomDatabase() {
 
         private fun buildDatabase(context: Context): AppDatabase {
             return Room.databaseBuilder(context, AppDatabase::class.java, "dbBankWallet")
-                    .fallbackToDestructiveMigration()
-                    .allowMainThreadQueries()
-                    .addMigrations(
-                            Migration_31_32,
-                            Migration_32_33,
-                            Migration_33_34,
-                            Migration_34_35,
-                            Migration_35_36,
-                            Migration_36_37,
-                            Migration_37_38,
-                            Migration_38_39,
-                            Migration_39_40,
-                            Migration_40_41,
-                            Migration_41_42,
-                            Migration_42_43,
-                            Migration_43_44,
-                            Migration_44_45,
-                            Migration_45_46,
-                            Migration_46_47,
-                            Migration_47_48,
-                            Migration_48_49,
-                            Migration_49_50,
-                            Migration_50_51,
-                            Migration_51_52,
-                            Migration_52_53,
-                            Migration_53_54,
-                    )
-                    .build()
+                .fallbackToDestructiveMigration()
+                .allowMainThreadQueries()
+                .addMigrations(
+                    Migration_31_32,
+                    Migration_32_33,
+                    Migration_33_34,
+                    Migration_34_35,
+                    Migration_35_36,
+                    Migration_36_37,
+                    Migration_37_38,
+                    Migration_38_39,
+                    Migration_39_40,
+                    Migration_40_41,
+                    Migration_41_42,
+                    Migration_42_43,
+                    Migration_43_44,
+                    Migration_44_45,
+                    Migration_45_46,
+                    Migration_46_47,
+                    Migration_47_48,
+                    Migration_48_49,
+                    Migration_49_50,
+                    Migration_50_51,
+                    Migration_51_52,
+                    Migration_52_53,
+                    Migration_53_54,
+                )
+                .build()
         }
 
     }

@@ -1,0 +1,30 @@
+@file:Suppress("MissingPackageDeclaration")
+
+object Plugins {
+    const val ANDROID_APPLICATION = "com.android.application"
+    const val ANDROID_LIBRARY = "com.android.library"
+    const val KOTLIN_ANDROID = "org.jetbrains.kotlin.android"
+    const val KOTLIN = "kotlin"
+    const val KAPT = "org.jetbrains.kotlin.kapt"
+    const val KOTLIN_PARCELIZE = "kotlin-parcelize"
+    const val KSP = "com.google.devtools.ksp"
+    const val HILT = "dagger.hilt.android.plugin"
+    const val JACOCO = "org.gradle.jacoco"
+
+    const val COMPOSE_ANDROID_APPLICATION = "compose.android.application"
+    const val COMPOSE_ANDROID_LIBRARY = "compose.android.library"
+    const val COMPOSE_ANDROID_FEATURE = "compose.android.feature"
+    const val COMPOSE_ANDROID_COMPOSE = "compose.android.compose"
+    const val COMPOSE_ANDROID_HILT = "compose.android.hilt"
+    const val COMPOSE_KOTLIN_LIBRARY = "compose.kotlin.library"
+    const val COMPOSE_KOTLIN_LIBRARY_COMPOSE = "compose.kotlin.library.compose"
+    const val COMPOSE_JACOCO = "compose.jacoco"
+    const val COMPOSE_LIBRARY_JACOCO = "compose.library.jacoco"
+    const val COMPOSE_SPOTLESS = "compose.spotless"
+    const val COMPOSE_DETEKT = "compose.detekt"
+    const val COMPOSE_GRADLE_VERSIONS = "compose.gradleversions"
+    const val COMPOSE_FIREBASE = "compose.androidFirebase"
+    const val COMPOSE_ROOM = "compose.room"
+    const val COMPOSE_FLAVORS = "android.application.flavors"
+    const val COMPOSE_JVM = "compose.jvm.library"
+}

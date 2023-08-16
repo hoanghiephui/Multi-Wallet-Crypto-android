@@ -7,8 +7,6 @@ import android.view.ViewGroup
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -21,6 +19,9 @@ import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.navGraphViewModels
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.modules.nft.collection.assets.NftCollectionAssetsScreen
@@ -81,7 +82,7 @@ class NftCollectionFragment : BaseFragment() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalPagerApi::class)
 @Composable
 private fun NftCollectionScreen(navController: NavController, viewModel: NftCollectionOverviewViewModel) {
     ComposeAppTheme {
@@ -115,7 +116,7 @@ private fun NftCollectionScreen(navController: NavController, viewModel: NftColl
             })
 
             HorizontalPager(
-                pageCount = tabs.size,
+                count = tabs.size,
                 state = pagerState,
                 userScrollEnabled = false
             ) { page ->
@@ -132,11 +133,22 @@ private fun NftCollectionScreen(navController: NavController, viewModel: NftColl
                             }
                         )
                     }
+
                     NftCollectionModule.Tab.Items -> {
-                        NftCollectionAssetsScreen(navController, viewModel.blockchainType, viewModel.collectionUid)
+                        NftCollectionAssetsScreen(
+                            navController,
+                            viewModel.blockchainType,
+                            viewModel.collectionUid
+                        )
                     }
+
                     NftCollectionModule.Tab.Activity -> {
-                        NftCollectionEventsScreen(navController, viewModel.blockchainType, viewModel.collectionUid, viewModel.contracts)
+                        NftCollectionEventsScreen(
+                            navController,
+                            viewModel.blockchainType,
+                            viewModel.collectionUid,
+                            viewModel.contracts
+                        )
                     }
                 }
             }

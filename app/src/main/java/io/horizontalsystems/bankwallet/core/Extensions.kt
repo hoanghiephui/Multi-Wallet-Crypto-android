@@ -213,7 +213,7 @@ fun NavGraphBuilder.composablePage(
     composable(
         route = route,
         arguments = arguments,
-        enterTransition = {
+        /*enterTransition = {
             slideIntoContainer(
                 AnimatedContentScope.SlideDirection.Left,
                 animationSpec = tween(300)
@@ -224,8 +224,8 @@ fun NavGraphBuilder.composablePage(
                 AnimatedContentScope.SlideDirection.Right,
                 animationSpec = tween(300)
             )
-        },
-        popEnterTransition = { null },
+        },*/
+        //popEnterTransition = { null },
         content = content
     )
 }
@@ -237,7 +237,7 @@ fun NavGraphBuilder.composablePopup(
 ) {
     composable(
         route,
-        enterTransition = {
+        /*enterTransition = {
             slideIntoContainer(
                 AnimatedContentScope.SlideDirection.Up,
                 animationSpec = tween(250)
@@ -248,7 +248,7 @@ fun NavGraphBuilder.composablePopup(
                 AnimatedContentScope.SlideDirection.Down,
                 animationSpec = tween(250)
             )
-        },
+        },*/
         content = content
     )
 }

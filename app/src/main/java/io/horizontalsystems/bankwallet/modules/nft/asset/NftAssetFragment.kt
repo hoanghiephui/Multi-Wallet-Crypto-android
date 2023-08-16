@@ -17,8 +17,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
@@ -45,6 +43,9 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.core.shorten
@@ -127,7 +128,7 @@ fun NftAssetScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalPagerApi::class)
 @Composable
 private fun NftAsset(
     viewModel: NftAssetViewModel,
@@ -150,7 +151,7 @@ private fun NftAsset(
         })
 
         HorizontalPager(
-            pageCount = tabs.size,
+            count = tabs.size,
             state = pagerState,
             userScrollEnabled = false
         ) { page ->
@@ -158,6 +159,7 @@ private fun NftAsset(
                 NftAssetModule.Tab.Overview -> {
                     NftAssetInfo(viewModel, navController, coroutineScope)
                 }
+
                 NftAssetModule.Tab.Activity -> {
                     NftAssetEvents(viewModel)
                 }
