@@ -206,7 +206,7 @@ dependencies {
 
     //Compose Navigation
     implementation("androidx.navigation:navigation-compose:2.6.0")
-    implementation("com.google.accompanist:accompanist-navigation-animation:0.28.0")
+    implementation("com.google.accompanist:accompanist-navigation-animation:0.31.6-rc")
 
     api("com.journeyapps:zxing-android-embedded:4.3.0")
 
@@ -276,10 +276,10 @@ dependencies {
     implementation("io.coil-kt:coil-gif:2.3.0")
 
     // When using a AppCompat theme
-    implementation("com.google.accompanist:accompanist-appcompat-theme:0.28.0")
-    implementation("com.google.accompanist:accompanist-flowlayout:0.28.0")
-    implementation("com.google.accompanist:accompanist-permissions:0.28.0")
-    implementation("com.google.accompanist:accompanist-pager:0.28.0")
+    implementation("com.google.accompanist:accompanist-appcompat-theme:0.31.6-rc")
+    implementation("com.google.accompanist:accompanist-flowlayout:0.31.6-rc")
+    implementation("com.google.accompanist:accompanist-permissions:0.31.6-rc")
+    implementation("com.google.accompanist:accompanist-pager:0.31.6-rc")
 
     // UI Tests
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.3")

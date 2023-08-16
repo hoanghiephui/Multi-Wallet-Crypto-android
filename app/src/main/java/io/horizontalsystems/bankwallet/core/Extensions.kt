@@ -11,7 +11,7 @@ import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import coil.load
-import com.google.accompanist.navigation.animation.composable
+import androidx.navigation.compose.composable
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.modules.market.ImageSource
 import io.horizontalsystems.bankwallet.modules.market.topplatforms.Platform
@@ -213,19 +213,19 @@ fun NavGraphBuilder.composablePage(
     composable(
         route = route,
         arguments = arguments,
-        /*enterTransition = {
+        enterTransition = {
             slideIntoContainer(
-                AnimatedContentScope.SlideDirection.Left,
+                AnimatedContentTransitionScope.SlideDirection.Left,
                 animationSpec = tween(300)
             )
         },
         popExitTransition = {
             slideOutOfContainer(
-                AnimatedContentScope.SlideDirection.Right,
+                AnimatedContentTransitionScope.SlideDirection.Right,
                 animationSpec = tween(300)
             )
-        },*/
-        //popEnterTransition = { null },
+        },
+        popEnterTransition = { null },
         content = content
     )
 }
@@ -237,18 +237,18 @@ fun NavGraphBuilder.composablePopup(
 ) {
     composable(
         route,
-        /*enterTransition = {
+        enterTransition = {
             slideIntoContainer(
-                AnimatedContentScope.SlideDirection.Up,
+                AnimatedContentTransitionScope.SlideDirection.Up,
                 animationSpec = tween(250)
             )
         },
         popExitTransition = {
             slideOutOfContainer(
-                AnimatedContentScope.SlideDirection.Down,
+                AnimatedContentTransitionScope.SlideDirection.Down,
                 animationSpec = tween(250)
             )
-        },*/
+        },
         content = content
     )
 }
