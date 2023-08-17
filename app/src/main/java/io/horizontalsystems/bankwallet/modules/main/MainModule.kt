@@ -12,6 +12,7 @@ import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.entities.Account
 import io.horizontalsystems.bankwallet.modules.walletconnect.version1.WC1Manager
 import kotlinx.parcelize.Parcelize
+import io.horizontalsystems.bankwallet.material.MainActivity
 
 object MainModule {
 

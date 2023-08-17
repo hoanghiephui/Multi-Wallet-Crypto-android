@@ -51,4 +51,12 @@
         <item name="ColorGradientWhite">@color/white_20</item>
         <item name="ColorWindowBackground">@color/dark</item>
     </style>
+
+
+    <style name="NightAdjusted.Theme.Nia" parent="Theme.MaterialComponents.NoActionBar" />
+
+    <style name="NightAdjusted.Theme.Splash" parent="Theme.SplashScreen">
+        <item name="android:windowLightStatusBar" >false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
+    </style>
 </resources>

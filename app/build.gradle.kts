@@ -233,6 +233,7 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":components:icons"))
     implementation(project(":components:chartview"))
+    implementation(project(":designsystem"))
 
     // Integration with activities
     implementation(libs.androidx.activity.compose)
