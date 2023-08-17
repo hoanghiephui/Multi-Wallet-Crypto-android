@@ -62,7 +62,7 @@ import java.util.logging.Level
 import java.util.logging.Logger
 import androidx.work.Configuration as WorkConfiguration
 
-class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
+class App : CoreApp(), ImageLoaderFactory, WorkConfiguration.Provider {
 
     companion object : ICoreApp by CoreApp {
 
@@ -185,7 +185,8 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
 
         blockchainSettingsStorage = BlockchainSettingsStorage(appDatabase)
         evmSyncSourceStorage = EvmSyncSourceStorage(appDatabase)
-        evmSyncSourceManager = EvmSyncSourceManager(appConfigProvider, blockchainSettingsStorage, evmSyncSourceStorage)
+        evmSyncSourceManager =
+            EvmSyncSourceManager(appConfigProvider, blockchainSettingsStorage, evmSyncSourceStorage)
 
         btcBlockchainManager = BtcBlockchainManager(blockchainSettingsStorage, marketKit)
 
@@ -200,7 +201,8 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         accountManager = AccountManager(accountsStorage, accountCleaner)
 
         val proFeaturesStorage = ProFeaturesStorage(appDatabase)
-        proFeatureAuthorizationManager = ProFeaturesAuthorizationManager(proFeaturesStorage, accountManager, appConfigProvider)
+        proFeatureAuthorizationManager =
+            ProFeaturesAuthorizationManager(proFeaturesStorage, accountManager, appConfigProvider)
 
         enabledWalletsStorage = EnabledWalletsStorage(appDatabase)
         walletStorage = WalletStorage(marketKit, enabledWalletsStorage)
@@ -210,7 +212,12 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
 
         solanaRpcSourceManager = SolanaRpcSourceManager(blockchainSettingsStorage, marketKit)
         val solanaWalletManager = SolanaWalletManager(walletManager, accountManager, marketKit)
-        solanaKitManager = SolanaKitManager(appConfigProvider, solanaRpcSourceManager, solanaWalletManager, backgroundManager)
+        solanaKitManager = SolanaKitManager(
+            appConfigProvider,
+            solanaRpcSourceManager,
+            solanaWalletManager,
+            backgroundManager
+        )
 
         tronKitManager = TronKitManager(appConfigProvider, backgroundManager)
 
@@ -267,7 +274,8 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         connectivityManager = ConnectivityManager(backgroundManager)
 
         zcashBirthdayProvider = ZcashBirthdayProvider(this)
-        restoreSettingsManager = RestoreSettingsManager(restoreSettingsStorage, zcashBirthdayProvider)
+        restoreSettingsManager =
+            RestoreSettingsManager(restoreSettingsStorage, zcashBirthdayProvider)
 
         evmLabelManager = EvmLabelManager(
             EvmLabelProvider(),
@@ -276,8 +284,28 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
             appDatabase.syncerStateDao()
         )
 
-        val adapterFactory = AdapterFactory(instance, btcBlockchainManager, evmBlockchainManager, evmSyncSourceManager, binanceKitManager, solanaKitManager, tronKitManager, backgroundManager, restoreSettingsManager, coinManager, evmLabelManager)
-        adapterManager = AdapterManager(walletManager, adapterFactory, btcBlockchainManager, evmBlockchainManager, binanceKitManager, solanaKitManager, tronKitManager)
+        val adapterFactory = AdapterFactory(
+            instance,
+            btcBlockchainManager,
+            evmBlockchainManager,
+            evmSyncSourceManager,
+            binanceKitManager,
+            solanaKitManager,
+            tronKitManager,
+            backgroundManager,
+            restoreSettingsManager,
+            coinManager,
+            evmLabelManager
+        )
+        adapterManager = AdapterManager(
+            walletManager,
+            adapterFactory,
+            btcBlockchainManager,
+            evmBlockchainManager,
+            binanceKitManager,
+            solanaKitManager,
+            tronKitManager
+        )
         transactionAdapterManager = TransactionAdapterManager(adapterManager, adapterFactory)
 
         feeCoinProvider = FeeTokenProvider(marketKit)
@@ -285,23 +313,25 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         addressParserFactory = AddressParserFactory()
 
         pinComponent = PinComponent(
-                pinStorage = pinStorage,
-                encryptionManager = encryptionManager,
-                excludedActivityNames = listOf(
-                        KeyStoreActivity::class.java.name,
-                        LockScreenActivity::class.java.name,
-                        LauncherActivity::class.java.name,
-                )
+            pinStorage = pinStorage,
+            encryptionManager = encryptionManager,
+            excludedActivityNames = listOf(
+                KeyStoreActivity::class.java.name,
+                LockScreenActivity::class.java.name,
+                LauncherActivity::class.java.name,
+            )
         )
 
-        backgroundStateChangeListener = BackgroundStateChangeListener(systemInfoManager, keyStoreManager, pinComponent).apply {
-            backgroundManager.registerListener(this)
-        }
+        backgroundStateChangeListener =
+            BackgroundStateChangeListener(systemInfoManager, keyStoreManager, pinComponent).apply {
+                backgroundManager.registerListener(this)
+            }
 
         rateAppManager = RateAppManager(walletManager, adapterManager, localStorage)
 
         wc1SessionStorage = WC1SessionStorage(appDatabase)
-        wc1SessionManager = WC1SessionManager(wc1SessionStorage, accountManager, evmSyncSourceManager)
+        wc1SessionManager =
+            WC1SessionManager(wc1SessionStorage, accountManager, evmSyncSourceManager)
         wc1RequestManager = WC1RequestManager()
         wc1Manager = WC1Manager(accountManager, evmBlockchainManager)
         wc2Manager = WC2Manager(accountManager, evmBlockchainManager)
@@ -321,7 +351,8 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
             currencyManager
         )
 
-        releaseNotesManager = ReleaseNotesManager(systemInfoManager, localStorage, appConfigProvider)
+        releaseNotesManager =
+            ReleaseNotesManager(systemInfoManager, localStorage, appConfigProvider)
 
         setAppTheme()
 
@@ -333,7 +364,12 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         initializeWalletConnectV2(appConfig)
 
         wc2Service = WC2Service()
-        wc2SessionManager = WC2SessionManager(accountManager, WC2SessionStorage(appDatabase), wc2Service, wc2Manager)
+        wc2SessionManager = WC2SessionManager(
+            accountManager,
+            WC2SessionStorage(appDatabase),
+            wc2Service,
+            wc2Manager
+        )
 
         baseTokenManager = BaseTokenManager(coinManager, localStorage)
         balanceViewTypeManager = BalanceViewTypeManager(localStorage)
@@ -342,7 +378,8 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         contactsRepository = ContactsRepository(marketKit)
         cexProviderManager = CexProviderManager(accountManager)
         cexAssetManager = CexAssetManager(marketKit, appDatabase.cexAssetsDao())
-        chartIndicatorManager = ChartIndicatorManager(appDatabase.chartIndicatorSettingsDao(), localStorage)
+        chartIndicatorManager =
+            ChartIndicatorManager(appDatabase.chartIndicatorSettingsDao(), localStorage)
 
         startTasks()
     }
@@ -401,18 +438,6 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         }
     }
 
-    override fun getWorkManagerConfiguration(): WorkConfiguration {
-        return if (BuildConfig.DEBUG) {
-            WorkConfiguration.Builder()
-                .setMinimumLoggingLevel(Log.DEBUG)
-                .build()
-        } else {
-            WorkConfiguration.Builder()
-                .setMinimumLoggingLevel(Log.ERROR)
-                .build()
-        }
-    }
-
     override fun localizedContext(): Context {
         return localeAwareContext(this)
     }
@@ -448,4 +473,8 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
 
         }.start()
     }
+
+    override val workManagerConfiguration: androidx.work.Configuration =
+        androidx.work.Configuration.Builder()
+            .build()
 }

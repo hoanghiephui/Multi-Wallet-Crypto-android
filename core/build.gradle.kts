@@ -9,18 +9,18 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.core:core-ktx:1.10.1")
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.core.ktx)
 
-    implementation("androidx.fragment:fragment-ktx:1.6.0")
+    implementation(libs.androidx.fragment.ktx)
     // Navigation component
-    api("androidx.navigation:navigation-fragment-ktx:2.6.0")
-    api("androidx.navigation:navigation-ui-ktx:2.6.0")
+    api(libs.androidx.navigation.ktx)
+    api(libs.androidx.navigation.ui.ktx)
 
-    implementation("io.reactivex.rxjava2:rxjava:2.2.19")
-    implementation("androidx.biometric:biometric:1.1.0")
-    implementation("com.google.android.material:material:1.9.0")
+    implementation(libs.rxjava)
+    implementation(libs.androidx.biometric)
+    implementation(libs.android.material)
 
-    testImplementation("junit:junit:4.13.2")
+    testImplementation(libs.junit4)
 }

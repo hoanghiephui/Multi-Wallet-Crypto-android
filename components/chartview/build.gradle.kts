@@ -11,14 +11,14 @@ android {
     }
 
     buildFeatures {
-        viewBinding =  true
+        viewBinding = true
     }
     namespace = "io.horizontalsystems.chartview"
 }
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.core:core-ktx:1.10.1")
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.core.ktx)
 }

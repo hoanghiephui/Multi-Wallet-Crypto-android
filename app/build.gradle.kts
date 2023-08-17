@@ -145,112 +145,88 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.lifecycle:lifecycle-extensions:2.2.0")
-
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
-    // use -ktx for Kotlin
-    // alternatively - just LiveData
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
-    // alternatively - Lifecycles only (no ViewModel or LiveData).
-    //     Support library depends on this lightweight import
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
-    implementation("androidx.lifecycle:lifecycle-common-java8:2.5.1")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
-    implementation("androidx.fragment:fragment-ktx:1.6.0")
-    implementation("androidx.preference:preference-ktx:1.2.0")
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.lifecycle.livedata.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.preference.ktx)
     //Splash screen
-    implementation("androidx.core:core-splashscreen:1.0.1")
+    implementation(libs.androidx.core.splashscreen)
 
     //AppWidgets
-    implementation("androidx.glance:glance-appwidget:1.0.0-beta01")
-
-
-    // alternately - if using Java8, use the following instead of compiler
-    implementation("androidx.lifecycle:lifecycle-common-java8:2.5.1")
+    implementation(libs.androidx.glance.appwidget)
     // optional - ReactiveStreams support for LiveData
-    implementation("androidx.lifecycle:lifecycle-reactivestreams-ktx:2.5.1")
+    implementation(libs.androidx.lifecycle.reactivestreams.ktx)
 
-    implementation("androidx.recyclerview:recyclerview:1.3.0")
+    implementation(libs.android.material)
 
-    implementation("com.google.android.material:material:1.9.0")
+    implementation(libs.rxjava)
+    implementation(libs.rxandroid)
 
-    implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
-    // Because RxAndroid releases are few and far between, it is recommended you also
-    // explicitly depend on RxJava's latest version for bug fixes and new features.
-    // (see https://github.com/ReactiveX/RxJava/releases for latest 2.x.x version)
-    implementation("io.reactivex.rxjava2:rxjava:2.2.19")
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("com.squareup.retrofit2:adapter-rxjava2:2.9.0")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.0")
-    implementation("com.google.code.gson:gson:2.9.0")
-    implementation("androidx.biometric:biometric:1.1.0")
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.adapter.rxjava2)
+    implementation(libs.retrofit.adapter.converter.gson)
+    implementation(libs.retrofit.adapter.converter.scalars)
+    implementation(libs.okhttp.logging)
+    implementation(libs.gson)
+    implementation(libs.androidx.biometric)
 
-    implementation("com.atlassian.commonmark:commonmark:0.17.0")
-    implementation("io.noties.markwon:core:4.6.2")
-
-    // ViewPager circle indicator
-    implementation("me.relex:circleindicator:2.1.6")
-
+    implementation(libs.commonmark)
+    implementation(libs.core)
     //Custom tabs, chrome
-    implementation("androidx.browser:browser:1.5.0")
+    implementation(libs.androidx.browser)
 
     // Navigation component
-    implementation("androidx.navigation:navigation-fragment-ktx:2.6.0")
-    implementation("androidx.navigation:navigation-ui-ktx:2.6.0")
+    implementation(libs.androidx.navigation.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
 
     //Compose Navigation
-    implementation("androidx.navigation:navigation-compose:2.6.0")
-    implementation("com.google.accompanist:accompanist-navigation-animation:0.31.6-rc")
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.accompanist.navigation.animation)
 
-    api("com.journeyapps:zxing-android-embedded:4.3.0")
+    api(libs.zxing.android.embedded)
 
     // WorkManager Kotlin
-    implementation("androidx.work:work-runtime-ktx:2.8.1")
-    // WorkManager RxJava2 support
-    implementation("androidx.work:work-rxjava2:2.8.1")
+    implementation(libs.androidx.work.ktx)
+    implementation(libs.androidx.work.rxjava2)
 
 
 
     // Wallet kits
-    implementation("com.github.horizontalsystems:bitcoin-kit-android:f7a7142")
-    implementation("com.github.horizontalsystems:ethereum-kit-android:e714fea")
-    implementation("com.github.horizontalsystems:blockchain-fee-rate-kit-android:1d3bd49")
-    implementation("com.github.horizontalsystems:binance-chain-kit-android:7e4d7c0")
-    implementation("com.github.horizontalsystems:market-kit-android:d345edd")
-    implementation("com.github.horizontalsystems:solana-kit-android:f9d9f4a")
-    implementation("com.github.horizontalsystems:tron-kit-android:1cc0ebe")
+    implementation(libs.bitcoin.kit.android)
+    implementation(libs.ethereum.kit.android)
+    implementation(libs.blockchain.fee.rate.kit.android)
+    implementation(libs.binance.chain.kit.android)
+    implementation(libs.market.kit.android)
+    implementation(libs.solana.kit.android)
+    implementation(libs.tron.kit.android)
     // Zcash SDK
-    implementation("cash.z.ecc.android:zcash-android-sdk:1.14.0-beta01")
+    implementation(libs.zcash.android.sdk)
     implementation("io.github.binance:binance-connector-java:3.0.0rc2") {
         exclude(group = "org.bouncycastle", module = "bcprov-jdk18on")
     }
 
     // WalletConnect
-    implementation("com.github.horizontalsystems:wallet-connect-kotlin:b9a50b8")
-    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+    implementation(libs.wallet.connect.kotlin)
+    implementation(libs.okhttp)
     // WalletConnect V2
-    implementation(platform("com.walletconnect:android-bom:1.13.0"))
-    implementation("com.walletconnect:sign")
-    implementation("com.walletconnect:android-core")
+    implementation(platform(libs.walletconnect.bom))
+    implementation(libs.walletconnect.sign)
+    implementation(libs.walletconnect.android.core)
 
     // Unstoppable Domains
-    implementation("com.github.unstoppabledomains:resolution-java:v6.2.2")
+    implementation(libs.resolution.java)
 
     // Ethereum Name Service
-    implementation("org.web3j:core:4.9.0")
+    implementation(libs.web3j.core)
 
     // in case native file tor.so not loading, do full gradle clean and build.
-    implementation("com.github.horizontalsystems:tor-kit-android:13750c4")
-    implementation("com.twitter.twittertext:twitter-text:3.1.0")
+    implementation(libs.tor.kit.android)
+    implementation(libs.twitter.text)
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-rx2:1.6.4")
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.rx2)
 
     // UI modules
 
@@ -259,27 +235,26 @@ dependencies {
     implementation(project(":components:chartview"))
 
     // Integration with activities
-    implementation("androidx.activity:activity-compose:1.7.2")
+    implementation(libs.androidx.activity.compose)
     // Compose Material Design
-    implementation("androidx.compose.material:material:1.4.3")
+    implementation(libs.androidx.compose.material)
     // Animations
-    implementation("androidx.compose.animation:animation:1.4.3")
+    implementation(libs.androidx.compose.animation)
     // Tooling support (Previews, etc.)
-    implementation("androidx.compose.ui:ui-tooling:1.4.3")
+    implementation(libs.androidx.compose.ui.tooling)
     // Integration with ViewModels
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
+    implementation(libs.androidx.lifecycle.viewModelCompose)
 
-    implementation("androidx.compose.runtime:runtime-livedata:1.4.3")
+    implementation(libs.androidx.compose.runtime.livedata)
 
-    implementation("io.coil-kt:coil-compose:2.3.0")
-    implementation("io.coil-kt:coil-svg:2.3.0")
-    implementation("io.coil-kt:coil-gif:2.3.0")
+    implementation(libs.coil.kt.compose)
+    implementation(libs.coil.kt.svg)
+    implementation(libs.coil.kt.gif)
 
     // When using a AppCompat theme
-    implementation("com.google.accompanist:accompanist-appcompat-theme:0.31.6-rc")
-    implementation("com.google.accompanist:accompanist-flowlayout:0.31.6-rc")
-    implementation("com.google.accompanist:accompanist-permissions:0.31.6-rc")
-    implementation("com.google.accompanist:accompanist-pager:0.31.6-rc")
+    implementation(libs.accompanist.appcompat.theme)
+    implementation(libs.accompanist.flowlayout)
+    implementation(libs.accompanist.permissions)
 
     // UI Tests
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.3")
