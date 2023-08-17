@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Badge
 import androidx.compose.material.BadgedBox
@@ -39,9 +41,6 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.navGraphViewModels
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.core.managers.RateAppManager
@@ -126,9 +125,7 @@ private fun MainScreenWithRootedDeviceCheck(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class,
-    ExperimentalPagerApi::class
-)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 private fun MainScreen(
     transactionsViewModel: TransactionsViewModel,
@@ -140,7 +137,12 @@ private fun MainScreen(
 
     val uiState = viewModel.uiState
     val selectedPage = uiState.selectedPageIndex
-    val pagerState = rememberPagerState(initialPage = selectedPage)
+    val pagerState = rememberPagerState(
+        pageCount = {
+            uiState.mainNavItems.size
+        },
+        initialPage = selectedPage
+    )
 
     val coroutineScope = rememberCoroutineScope()
     val modalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
@@ -219,7 +221,6 @@ private fun MainScreen(
 
                     HorizontalPager(
                         modifier = Modifier.weight(1f),
-                        count = uiState.mainNavItems.size,
                         state = pagerState,
                         userScrollEnabled = false,
                         verticalAlignment = Alignment.Top
@@ -293,7 +294,7 @@ private fun MainScreen(
                 )
             }
 
-            null -> {}
+            else -> {}
         }
         viewModel.wcSupportStateHandled()
     }
@@ -310,7 +311,11 @@ private fun HideContentBox(contentHidden: Boolean) {
     } else {
         Modifier
     }
-    Box(Modifier.fillMaxSize().then(backgroundModifier))
+    Box(
+        Modifier
+            .fillMaxSize()
+            .then(backgroundModifier)
+    )
 }
 
 @Composable
@@ -334,6 +339,7 @@ private fun BadgedIcon(
                 },
                 content = icon
             )
+
         MainModule.BadgeType.BadgeDot ->
             BadgedBox(
                 badge = {
@@ -348,6 +354,7 @@ private fun BadgedIcon(
                 },
                 content = icon
             )
+
         else -> {
             Box {
                 icon()

@@ -3,15 +3,14 @@ package io.horizontalsystems.bankwallet.modules.market
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.modules.market.favorites.MarketFavoritesScreen
@@ -24,15 +23,15 @@ import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.TabItem
 import io.horizontalsystems.bankwallet.ui.compose.components.Tabs
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MarketScreen(navController: NavController) {
     val marketViewModel = viewModel<MarketViewModel>(factory = MarketModule.Factory())
     val tabs = marketViewModel.tabs
     val selectedTab = marketViewModel.selectedTab
-
-    val pagerState = rememberPagerState(initialPage = selectedTab.ordinal)
-
+    val pagerState = rememberPagerState(pageCount = {
+        tabs.size
+    })
     Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
         AppBar(
             title = TranslatableString.ResString(R.string.Market_Title),
@@ -58,7 +57,6 @@ fun MarketScreen(navController: NavController) {
         })
 
         HorizontalPager(
-            count = tabs.size,
             state = pagerState,
             userScrollEnabled = false
         ) { page ->

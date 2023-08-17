@@ -15,19 +15,38 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.*
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -43,9 +62,6 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.core.shorten
@@ -65,7 +81,28 @@ import io.horizontalsystems.bankwallet.modules.nft.send.SendNftModule
 import io.horizontalsystems.bankwallet.modules.nft.ui.CellLink
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
-import io.horizontalsystems.bankwallet.ui.compose.components.*
+import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryCircle
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryDefault
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryCircle
+import io.horizontalsystems.bankwallet.ui.compose.components.CellFooter
+import io.horizontalsystems.bankwallet.ui.compose.components.CellMultilineLawrenceSection
+import io.horizontalsystems.bankwallet.ui.compose.components.CellSingleLine
+import io.horizontalsystems.bankwallet.ui.compose.components.CellSingleLineClear
+import io.horizontalsystems.bankwallet.ui.compose.components.CellSingleLineLawrenceSection
+import io.horizontalsystems.bankwallet.ui.compose.components.InfoText
+import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
+import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
+import io.horizontalsystems.bankwallet.ui.compose.components.SelectorDialogCompose
+import io.horizontalsystems.bankwallet.ui.compose.components.SnackbarError
+import io.horizontalsystems.bankwallet.ui.compose.components.TabItem
+import io.horizontalsystems.bankwallet.ui.compose.components.Tabs
+import io.horizontalsystems.bankwallet.ui.compose.components.body_jacob
+import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_grey
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_jacob
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
 import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.helpers.HudHelper
@@ -83,7 +120,8 @@ class NftAssetFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View {
         val collectionUid = requireArguments().getString(NftAssetModule.collectionUidKey)
-        val nftUid = requireArguments().getString(NftAssetModule.nftUidKey)?.let { NftUid.fromUid(it) }
+        val nftUid =
+            requireArguments().getString(NftAssetModule.nftUidKey)?.let { NftUid.fromUid(it) }
 
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(
@@ -104,7 +142,8 @@ fun NftAssetScreen(
 ) {
     if (collectionUid == null || nftUid == null) return
 
-    val viewModel = viewModel<NftAssetViewModel>(factory = NftAssetModule.Factory(collectionUid, nftUid))
+    val viewModel =
+        viewModel<NftAssetViewModel>(factory = NftAssetModule.Factory(collectionUid, nftUid))
     val errorMessage = viewModel.errorMessage
 
     ComposeAppTheme {
@@ -128,16 +167,18 @@ fun NftAssetScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun NftAsset(
     viewModel: NftAssetViewModel,
     navController: NavController
 ) {
-    val pagerState = rememberPagerState(initialPage = 0)
+    val tabs = viewModel.tabs
+    val pagerState = rememberPagerState(pageCount = {
+        tabs.size
+    })
     val coroutineScope = viewModel.viewModelScope
 
-    val tabs = viewModel.tabs
     val selectedTab = tabs[pagerState.currentPage]
     val tabItems = tabs.map {
         TabItem(stringResource(id = it.titleResId), it == selectedTab, it)
@@ -151,7 +192,6 @@ private fun NftAsset(
         })
 
         HorizontalPager(
-            count = tabs.size,
             state = pagerState,
             userScrollEnabled = false
         ) { page ->
@@ -189,16 +229,24 @@ private fun NftAssetInfo(
         }
     }
 
-    Crossfade(combinedState) { state ->
+    Crossfade(combinedState, label = "") { state ->
         when (state) {
             is ViewState.Loading -> {
                 Loading()
             }
+
             is ViewState.Error -> {
                 ListErrorView(stringResource(R.string.SyncError), viewModel::refresh)
             }
+
             else -> {
-                AssetContent(painter, viewModel.viewItem, viewModel.nftUid, navController, coroutineScope)
+                AssetContent(
+                    painter,
+                    viewModel.viewItem,
+                    viewModel.nftUid,
+                    navController,
+                    coroutineScope
+                )
             }
         }
     }
@@ -260,7 +308,10 @@ private fun AssetContent(
                             .clickable {
                                 navController.slideFromRight(
                                     R.id.nftCollectionFragment,
-                                    NftCollectionFragment.prepareParams(asset.providerCollectionUid, asset.nftUid.blockchainType)
+                                    NftCollectionFragment.prepareParams(
+                                        asset.providerCollectionUid,
+                                        asset.nftUid.blockchainType
+                                    )
                                 )
                             },
                         verticalAlignment = Alignment.CenterVertically
@@ -460,14 +511,17 @@ private fun AssetContent(
                                 icon = painterResource(id = R.drawable.ic_globe_20)
                                 title = stringResource(id = R.string.NftAsset_Links_Website)
                             }
+
                             is NftAssetViewModel.LinkType.Provider -> {
                                 icon = painterResource(id = link.type.icon)
                                 title = link.type.title
                             }
+
                             NftAssetViewModel.LinkType.Discord -> {
                                 icon = painterResource(id = R.drawable.ic_discord_20)
                                 title = stringResource(id = R.string.NftAsset_Links_Discord)
                             }
+
                             NftAssetViewModel.LinkType.Twitter -> {
                                 icon = painterResource(id = R.drawable.ic_twitter_20)
                                 title = stringResource(id = R.string.NftAsset_Links_Twitter)
@@ -494,7 +548,8 @@ private fun AssetContent(
 
     if (showActionSelectorDialog) {
         SelectorDialogCompose(
-            items = NftAssetModule.NftAssetAction.values().map { (TabItem(stringResource(it.title), false, it)) },
+            items = NftAssetModule.NftAssetAction.values()
+                .map { (TabItem(stringResource(it.title), false, it)) },
             onDismissRequest = {
                 showActionSelectorDialog = false
             },
@@ -508,6 +563,7 @@ private fun AssetContent(
                                 .startChooser()
                         }
                     }
+
                     NftAssetModule.NftAssetAction.Save -> {
                         coroutineScope.launch(Dispatchers.IO) {
                             try {
@@ -526,7 +582,10 @@ private fun AssetContent(
                                     val headerFileName = if (disposition != null) {
                                         val index = disposition.indexOf("filename=")
                                         if (index > 0) {
-                                            disposition.substring(index + 10, disposition.length - 1)
+                                            disposition.substring(
+                                                index + 10,
+                                                disposition.length - 1
+                                            )
                                         } else {
                                             null
                                         }
@@ -548,7 +607,10 @@ private fun AssetContent(
 
                                 pickerLauncher.launch(intent)
                             } catch (e: Exception) {
-                                HudHelper.showErrorMessage(view, e.message ?: e.javaClass.simpleName)
+                                HudHelper.showErrorMessage(
+                                    view,
+                                    e.message ?: e.javaClass.simpleName
+                                )
                             }
                         }
                     }
@@ -565,6 +627,7 @@ private fun NftAssetEvents(nftAssetViewModel: NftAssetViewModel) {
             is ViewState.Error -> {
                 ListErrorView(stringResource(R.string.SyncError), nftAssetViewModel::refresh)
             }
+
             else -> {
                 val nftUid = nftAssetViewModel.viewItem?.nftUid ?: return@Crossfade
                 val viewModel = viewModel<NftCollectionEventsViewModel>(
@@ -598,7 +661,8 @@ private fun ChipVerticalGrid(
 
             if (currentOrigin.x > 0f && currentOrigin.x + placeable.width > constraints.maxWidth) {
                 currentRow += 1
-                currentOrigin = currentOrigin.copy(x = 0, y = currentOrigin.y + placeable.height + spacingValue)
+                currentOrigin =
+                    currentOrigin.copy(x = 0, y = currentOrigin.y + placeable.height + spacingValue)
             }
 
             placeable to currentOrigin.also {
@@ -676,7 +740,7 @@ private fun NftAssetSale(sale: NftAssetViewModel.SaleViewItem) {
         ) {
             val title = when (sale.type) {
                 NftAssetMetadata.SaleType.OnSale -> stringResource(R.string.Nfts_Asset_OnSale)
-                NftAssetMetadata.SaleType.OnAuction ->  stringResource(R.string.Nfts_Asset_OnAuction)
+                NftAssetMetadata.SaleType.OnAuction -> stringResource(R.string.Nfts_Asset_OnAuction)
             }
 
             body_leah(text = title)
@@ -691,7 +755,7 @@ private fun NftAssetSale(sale: NftAssetViewModel.SaleViewItem) {
     saleComposables.add {
         val title = when (sale.type) {
             NftAssetMetadata.SaleType.OnSale -> stringResource(R.string.NftAsset_Price_BuyNow)
-            NftAssetMetadata.SaleType.OnAuction ->  stringResource(R.string.NftAsset_Price_MinimumBid)
+            NftAssetMetadata.SaleType.OnAuction -> stringResource(R.string.NftAsset_Price_MinimumBid)
         }
         NftAssetPriceCell(title, sale.price)
     }

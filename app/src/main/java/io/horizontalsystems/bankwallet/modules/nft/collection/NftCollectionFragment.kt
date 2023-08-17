@@ -7,6 +7,9 @@ import android.view.ViewGroup
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -19,9 +22,6 @@ import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.navGraphViewModels
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.modules.nft.collection.assets.NftCollectionAssetsScreen
@@ -82,11 +82,10 @@ class NftCollectionFragment : BaseFragment() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun NftCollectionScreen(navController: NavController, viewModel: NftCollectionOverviewViewModel) {
     ComposeAppTheme {
-        val pagerState = rememberPagerState(initialPage = 0)
         val coroutineScope = rememberCoroutineScope()
         val view = LocalView.current
         val context = LocalContext.current
@@ -105,6 +104,9 @@ private fun NftCollectionScreen(navController: NavController, viewModel: NftColl
             )
 
             val tabs = viewModel.tabs
+            val pagerState = rememberPagerState(pageCount = {
+                tabs.size
+            })
             val selectedTab = tabs[pagerState.currentPage]
             val tabItems = tabs.map {
                 TabItem(stringResource(id = it.titleResId), it == selectedTab, it)
@@ -115,8 +117,8 @@ private fun NftCollectionScreen(navController: NavController, viewModel: NftColl
                 }
             })
 
+
             HorizontalPager(
-                count = tabs.size,
                 state = pagerState,
                 userScrollEnabled = false
             ) { page ->

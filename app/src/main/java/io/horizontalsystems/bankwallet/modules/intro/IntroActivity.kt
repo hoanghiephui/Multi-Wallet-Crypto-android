@@ -20,6 +20,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -32,10 +35,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.BaseActivity
@@ -74,10 +73,13 @@ class IntroActivity : BaseActivity() {
 
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun IntroScreen(viewModel: IntroViewModel, nightMode: Boolean, closeActivity: () -> Unit) {
-    val pagerState = rememberPagerState(initialPage = 0)
+    val pageCount = 3
+    val pagerState = rememberPagerState(pageCount = {
+        pageCount
+    })
     ComposeAppTheme {
         Box {
             Image(
@@ -87,10 +89,8 @@ private fun IntroScreen(viewModel: IntroViewModel, nightMode: Boolean, closeActi
                 contentScale = ContentScale.Crop
             )
         }
-        val pageCount = 3
         HorizontalPager(
             modifier = Modifier.fillMaxSize(),
-            count = pageCount,
             state = pagerState,
             verticalAlignment = Alignment.Top,
         ) { index ->
@@ -101,7 +101,7 @@ private fun IntroScreen(viewModel: IntroViewModel, nightMode: Boolean, closeActi
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun StaticContent(
     viewModel: IntroViewModel,
@@ -127,7 +127,7 @@ private fun StaticContent(
                 .fillMaxWidth(),
         ) {
             val title = viewModel.slides[pagerState.currentPage].title
-            Crossfade(targetState = title) { titleRes ->
+            Crossfade(targetState = title, label = "") { titleRes ->
                 title3_leah(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -138,7 +138,7 @@ private fun StaticContent(
             }
             Spacer(Modifier.height(16.dp))
             val subtitle = viewModel.slides[pagerState.currentPage].subtitle
-            Crossfade(targetState = subtitle) { subtitleRes ->
+            Crossfade(targetState = subtitle, label = "") { subtitleRes ->
                 body_grey(
                     text = stringResource(subtitleRes),
                     modifier = Modifier
