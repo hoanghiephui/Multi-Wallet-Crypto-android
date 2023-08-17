@@ -234,6 +234,11 @@ dependencies {
     implementation(project(":components:icons"))
     implementation(project(":components:chartview"))
     implementation(project(":designsystem"))
+    implementation(project(":core:common"))
+    implementation(project(":core:data"))
+    implementation(project(":core:datastore"))
+    implementation(project(":core:model"))
+    implementation(project(":core:ui"))
 
     // Integration with activities
     implementation(libs.androidx.activity.compose)
@@ -251,11 +256,20 @@ dependencies {
     implementation(libs.coil.kt.compose)
     implementation(libs.coil.kt.svg)
     implementation(libs.coil.kt.gif)
-
+    implementation(libs.coil.kt)
     // When using a AppCompat theme
     implementation(libs.accompanist.appcompat.theme)
     implementation(libs.accompanist.flowlayout)
     implementation(libs.accompanist.permissions)
+
+    implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.lifecycle.runtimeCompose)
+    implementation(libs.androidx.compose.runtime.tracing)
+    implementation(libs.androidx.compose.material3.windowSizeClass)
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.window.manager)
+    implementation(libs.androidx.profileinstaller)
+    implementation(libs.kotlinx.coroutines.guava)
 
     // UI Tests
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.4.3")

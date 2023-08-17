@@ -2,6 +2,7 @@ package io.horizontalsystems.bankwallet.ui.extensions
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
@@ -10,7 +11,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.entities.Account
-import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.*
 
 @Composable
@@ -25,7 +25,7 @@ fun WalletSwitchBottomSheet(
 
     BottomSheetHeader(
         iconPainter = painterResource(R.drawable.icon_24_lock),
-        iconTint = ColorFilter.tint(ComposeAppTheme.colors.jacob),
+        iconTint = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
         title = stringResource(R.string.ManageAccount_SwitchWallet_Title),
         onCloseClick = onCancelClick,
     ) {
@@ -90,7 +90,7 @@ private fun Section(
                     modifier = Modifier.padding(start = 16.dp),
                     painter = painterResource(id = R.drawable.ic_eye_20),
                     contentDescription = null,
-                    tint = ComposeAppTheme.colors.grey
+                    tint = MaterialTheme.colorScheme.onPrimary.copy(0.7f)
                 )
             }
         }

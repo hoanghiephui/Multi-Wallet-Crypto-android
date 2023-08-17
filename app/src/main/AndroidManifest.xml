@@ -52,6 +52,13 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
         </activity>
+
+        <activity
+            android:name=".modules.main.MainActivity"
+            android:theme="@style/Theme.AppTheme.DayNight"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
+        </activity>
         <activity
             android:name=".modules.qrscanner.QRScannerActivity"
             android:screenOrientation="portrait" />

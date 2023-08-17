@@ -16,6 +16,10 @@
 
 package coin.chain.crypto.core.designsystem.component
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material3.MaterialTheme
@@ -26,8 +30,11 @@ import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 
 /**
@@ -45,6 +52,7 @@ import androidx.compose.ui.unit.dp
  * @param alwaysShowLabel Whether to always show the label for this item. If false, the label will
  * only be shown when this item is selected.
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RowScope.NiaNavigationBarItem(
     selected: Boolean,
@@ -55,6 +63,7 @@ fun RowScope.NiaNavigationBarItem(
     enabled: Boolean = true,
     label: @Composable (() -> Unit)? = null,
     alwaysShowLabel: Boolean = true,
+    onLongClick: (() -> Unit)?,
 ) {
     NavigationBarItem(
         selected = selected,

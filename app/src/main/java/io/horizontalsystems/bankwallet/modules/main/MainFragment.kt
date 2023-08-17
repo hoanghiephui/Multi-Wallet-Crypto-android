@@ -26,6 +26,7 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -305,9 +306,9 @@ private fun MainScreen(
 }
 
 @Composable
-private fun HideContentBox(contentHidden: Boolean) {
+fun HideContentBox(contentHidden: Boolean) {
     val backgroundModifier = if (contentHidden) {
-        Modifier.background(ComposeAppTheme.colors.tyler)
+        Modifier.background(MaterialTheme.colorScheme.onBackground)
     } else {
         Modifier
     }

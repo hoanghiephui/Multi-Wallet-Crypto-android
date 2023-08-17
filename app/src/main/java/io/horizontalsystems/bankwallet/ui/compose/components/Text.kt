@@ -1,8 +1,10 @@
 package io.horizontalsystems.bankwallet.ui.compose.components
 
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -183,8 +185,8 @@ fun A2(
         overflow = overflow,
         maxLines = maxLines,
         onTextLayout = onTextLayout,
-        style = ComposeAppTheme.typography.headline2,
-        color = ComposeAppTheme.colors.leah,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.onSurface,
     )
 }
 @Composable
@@ -573,8 +575,8 @@ fun B2(
         overflow = overflow,
         maxLines = maxLines,
         onTextLayout = onTextLayout,
-        style = ComposeAppTheme.typography.body,
-        color = ComposeAppTheme.colors.leah,
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurface,
     )
 }
 @Composable
@@ -1314,8 +1316,8 @@ fun D1(
         overflow = overflow,
         maxLines = maxLines,
         onTextLayout = onTextLayout,
-        style = ComposeAppTheme.typography.subhead2,
-        color = ComposeAppTheme.colors.grey,
+        style = MaterialTheme.typography.labelLarge,
+        color = Color(0xFF808085),
     )
 }
 @Composable

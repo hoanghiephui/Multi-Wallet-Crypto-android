@@ -7,14 +7,16 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Divider
 import androidx.compose.material.Text
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
@@ -22,7 +24,6 @@ import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import io.horizontalsystems.bankwallet.R
-import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryTransparent
 import io.horizontalsystems.core.helpers.HudHelper
 import kotlinx.coroutines.delay
@@ -34,14 +35,10 @@ fun TorStatusView(
 
     val animatedSize by animateDpAsState(
         targetValue = if (viewModel.torViewState.torIsActive) 20.dp else 50.dp,
-        animationSpec = tween(durationMillis = 250, easing = LinearOutSlowInEasing)
+        animationSpec = tween(durationMillis = 250, easing = LinearOutSlowInEasing), label = ""
     )
 
-    Divider(
-        thickness = 1.dp,
-        color = ComposeAppTheme.colors.steel10,
-        modifier = Modifier.fillMaxWidth()
-    )
+    Divider()
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -49,11 +46,11 @@ fun TorStatusView(
         contentAlignment = Alignment.Center
     ) {
         if (viewModel.torViewState.torIsActive) {
-            val startColor = ComposeAppTheme.colors.remus
-            val endColor = ComposeAppTheme.colors.lawrence
+            val startColor = MaterialTheme.colorScheme.primary
+            val endColor = MaterialTheme.colorScheme.onPrimary
             val color = remember { Animatable(startColor) }
-            val startTextColor = ComposeAppTheme.colors.white
-            val endTextColor = ComposeAppTheme.colors.leah
+            val startTextColor = Color.White
+            val endTextColor = MaterialTheme.colorScheme.onSurface
             val textColor = remember { Animatable(startTextColor) }
             LaunchedEffect(Unit) {
                 delay(1000)
@@ -68,7 +65,7 @@ fun TorStatusView(
             ) {
                 Text(
                     text = stringResource(R.string.Tor_TorIsActive),
-                    style = ComposeAppTheme.typography.micro,
+                    style = MaterialTheme.typography.labelSmall,
                     color = textColor.value,
                 )
             }
@@ -76,7 +73,7 @@ fun TorStatusView(
             Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(ComposeAppTheme.colors.lawrence)
+                    .background(MaterialTheme.colorScheme.onPrimary)
                     .padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -84,8 +81,8 @@ fun TorStatusView(
                     text = stringResource(viewModel.torViewState.stateText),
                     maxLines = 1,
                     modifier = Modifier.weight(1f),
-                    style = ComposeAppTheme.typography.subhead2,
-                    color = if (viewModel.torViewState.showRetryButton) ComposeAppTheme.colors.lucian else ComposeAppTheme.colors.leah,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (viewModel.torViewState.showRetryButton) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
                 )
                 if (viewModel.torViewState.showRetryButton) {
                     ButtonSecondaryTransparent(

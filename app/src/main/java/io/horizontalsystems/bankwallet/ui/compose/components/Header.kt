@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,7 +46,7 @@ fun HeaderText(
                         indication = null,
                     ),
                 painter = painterResource(R.drawable.ic_info_20),
-                tint = ComposeAppTheme.colors.grey,
+                tint = Color(0xFF808085),
                 contentDescription = stringResource(R.string.Info_Title),
             )
         }

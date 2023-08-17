@@ -10,10 +10,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
@@ -127,7 +129,7 @@ private fun BottomSheetHeader(
             .fillMaxWidth()
             .clip(RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp))
             .verticalScroll(rememberScrollState())
-            .background(color = ComposeAppTheme.colors.lawrence)
+            .background(color = MaterialTheme.colorScheme.onPrimary)
     ) {
         Row(
             modifier = Modifier
@@ -147,7 +149,7 @@ private fun BottomSheetHeader(
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_close),
-                    tint = ComposeAppTheme.colors.grey,
+                    tint = Color(0xFF808085),
                     contentDescription = null,
                 )
             }
