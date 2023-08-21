@@ -35,7 +35,7 @@ enum class TopLevelDestination(
         selectedIcon = NiaIcons.Upcoming,
         unselectedIcon = NiaIcons.UpcomingBorder,
         iconTextId = R.string.Market_Title,
-        titleTextId = R.string.app_name,
+        titleTextId = R.string.App_Name,
     ),
     BALANCE(
         selectedIcon = NiaIcons.Bookmarks,

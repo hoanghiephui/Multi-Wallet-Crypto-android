@@ -1,5 +1,6 @@
 package io.horizontalsystems.bankwallet.material.main
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -168,6 +169,7 @@ fun MainApp(
                                     }
                                     if (appState.shouldShowBottomBar) {
                                         NiaBottomBar(
+                                            uiState.mainNavItems,
                                             destinations = appState.topLevelDestinations,
                                             destinationsWithUnreadResources = setOf(),
                                             onNavigateToDestination = appState::navigateToTopLevelDestination,
@@ -186,6 +188,11 @@ fun MainApp(
                                 }
                             },
                         ) { padding ->
+                            BackHandler(enabled = modalBottomSheetState.isVisible) {
+                                coroutineScope.launch {
+                                    modalBottomSheetState.hide()
+                                }
+                            }
                             Row(
                                 Modifier
                                     .fillMaxSize()
@@ -294,6 +301,7 @@ private fun NiaNavRail(
 
 @Composable
 private fun NiaBottomBar(
+    item: List<MainModule.NavigationViewItem>,
     destinations: List<TopLevelDestination>,
     destinationsWithUnreadResources: Set<TopLevelDestination>,
     onNavigateToDestination: (TopLevelDestination) -> Unit,
@@ -304,10 +312,12 @@ private fun NiaBottomBar(
     NiaNavigationBar(
         modifier = modifier,
     ) {
-        destinations.forEach { destination ->
+        destinations.forEachIndexed { index, destination ->
             val hasUnread = destinationsWithUnreadResources.contains(destination)
             val selected = currentDestination.isTopLevelDestinationInHierarchy(destination)
+            val enabled = item[index].enabled
             NiaNavigationBarItem(
+                enabled = enabled,
                 selected = selected,
                 onClick = { onNavigateToDestination(destination) },
                 icon = {

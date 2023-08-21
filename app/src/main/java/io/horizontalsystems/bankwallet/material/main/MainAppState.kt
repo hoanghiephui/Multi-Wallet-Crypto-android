@@ -37,8 +37,14 @@ import io.horizontalsystems.bankwallet.material.navigation.TopLevelDestination.B
 import io.horizontalsystems.bankwallet.material.navigation.TopLevelDestination.MARKETS
 import io.horizontalsystems.bankwallet.material.navigation.TopLevelDestination.SETTINGS
 import io.horizontalsystems.bankwallet.material.navigation.TopLevelDestination.TRANSACTIONS
+import io.horizontalsystems.bankwallet.material.navigation.balanceRoute
 import io.horizontalsystems.bankwallet.material.navigation.marketNavigationRoute
+import io.horizontalsystems.bankwallet.material.navigation.navigateToBalance
 import io.horizontalsystems.bankwallet.material.navigation.navigateToMarket
+import io.horizontalsystems.bankwallet.material.navigation.navigateToSettingsGraph
+import io.horizontalsystems.bankwallet.material.navigation.navigateToTransaction
+import io.horizontalsystems.bankwallet.material.navigation.settingsRoute
+import io.horizontalsystems.bankwallet.material.navigation.transactionRoute
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -81,9 +87,9 @@ class NiaAppState(
     val currentTopLevelDestination: TopLevelDestination?
         @Composable get() = when (currentDestination?.route) {
             marketNavigationRoute -> MARKETS
-            marketNavigationRoute -> BALANCE
-            marketNavigationRoute -> TRANSACTIONS
-            marketNavigationRoute -> SETTINGS
+            balanceRoute -> BALANCE
+            transactionRoute -> TRANSACTIONS
+            settingsRoute -> SETTINGS
             else -> null
         }
 
@@ -133,9 +139,9 @@ class NiaAppState(
 
             when (topLevelDestination) {
                 MARKETS -> navController.navigateToMarket(topLevelNavOptions)
-                BALANCE -> navController.navigateToMarket(topLevelNavOptions)
-                TRANSACTIONS -> navController.navigateToMarket(topLevelNavOptions)
-                SETTINGS -> navController.navigateToMarket(topLevelNavOptions)
+                BALANCE -> navController.navigateToBalance(topLevelNavOptions)
+                TRANSACTIONS -> navController.navigateToTransaction(topLevelNavOptions)
+                SETTINGS -> navController.navigateToSettingsGraph(topLevelNavOptions)
             }
         }
     }

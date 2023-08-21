@@ -26,7 +26,7 @@ import androidx.navigation.navDeepLink
 import io.horizontalsystems.bankwallet.material.module.market.MarketRoute
 
 const val LINKED_NEWS_RESOURCE_ID = "linkedNewsResourceId"
-const val marketNavigationRoute = "market_route/{$LINKED_NEWS_RESOURCE_ID}"
+const val marketNavigationRoute = "markets_route/{$LINKED_NEWS_RESOURCE_ID}"
 private const val DEEP_LINK_URI_PATTERN =
     "https://www.nowinandroid.apps.samples.google.com/foryou/{$LINKED_NEWS_RESOURCE_ID}"
 

@@ -46,10 +46,11 @@
 
         <activity
             android:name=".modules.launcher.LauncherActivity"
-            android:theme="@style/Theme.App.Starting" />
+            android:theme="@style/Theme.Nia.Splash" />
         <activity
             android:name=".material.MainActivity"
             android:screenOrientation="portrait"
+            android:theme="@style/Theme.Nia"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
         </activity>
 
@@ -61,16 +62,20 @@
         </activity>
         <activity
             android:name=".modules.qrscanner.QRScannerActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppTheme.DayNight"/>
         <activity
             android:name=".modules.lockscreen.LockScreenActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppTheme.DayNight"/>
         <activity
             android:name=".modules.intro.IntroActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppTheme.DayNight"/>
         <activity
             android:name=".modules.keystore.KeyStoreActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppTheme.DayNight"/>
 
         <provider
             android:name="androidx.startup.InitializationProvider"

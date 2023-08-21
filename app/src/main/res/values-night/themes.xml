@@ -53,10 +53,10 @@
     </style>
 
 
-    <style name="NightAdjusted.Theme.Nia" parent="Theme.MaterialComponents.NoActionBar" />
+    <style name="NightAdjusted.Theme.Nia" parent="android:Theme.Material.NoActionBar" />
 
     <style name="NightAdjusted.Theme.Splash" parent="Theme.SplashScreen">
         <item name="android:windowLightStatusBar" >false</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
+        <item name="android:windowLightNavigationBar" >false</item>
     </style>
 </resources>

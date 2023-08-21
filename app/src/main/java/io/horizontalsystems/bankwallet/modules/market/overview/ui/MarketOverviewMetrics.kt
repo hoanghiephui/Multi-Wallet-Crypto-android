@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,7 +49,7 @@ fun MetricChartsView(marketMetrics: MarketOverviewModule.MarketMetrics, navContr
 
 @Composable
 private fun RowScope.ChartView(metricsData: MetricData, navController: NavController) {
-    Card(
+    OutlinedCard(
         modifier = Modifier
             .height(105.dp)
             .weight(1f)
@@ -56,13 +58,11 @@ private fun RowScope.ChartView(metricsData: MetricData, navController: NavContro
                 openMetricsPage(metricsData.type, navController)
             },
         shape = RoundedCornerShape(12.dp),
-        elevation = 0.dp,
-        backgroundColor = ComposeAppTheme.colors.lawrence
     ) {
         Column(
             modifier = Modifier.padding(12.dp)
         ) {
-            caption_grey(text = stringResource(metricsData.type.title))
+            /*caption_grey(text = stringResource(metricsData.type.title))
             Spacer(modifier = Modifier.height(10.dp))
             if (metricsData.value != null) {
                 Text(
@@ -110,7 +110,7 @@ private fun RowScope.ChartView(metricsData: MetricData, navController: NavContro
                         }
                     )
                 }
-            }
+            }*/
             Spacer(modifier = Modifier.height(4.dp))
         }
     }

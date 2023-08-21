@@ -48,7 +48,7 @@ fun MarketOverviewScreen(
             viewModel.refresh()
         }
     ) {
-        Crossfade(viewState) { viewState ->
+        Crossfade(viewState, label = "") { viewState ->
             when (viewState) {
                 ViewState.Loading -> {
                     Loading()
@@ -68,7 +68,7 @@ fun MarketOverviewScreen(
                             ) {
                                 MetricChartsView(viewItem.marketMetrics, navController)
                             }
-                            BoardsView(
+                            /*BoardsView(
                                 boards = viewItem.boards,
                                 navController = navController,
                                 onClickSeeAll = { listType ->
@@ -133,7 +133,7 @@ fun MarketOverviewScreen(
 
                                     navController.slideFromBottom(R.id.marketTopPlatformsFragment, args)
                                 }
-                            )
+                            )*/
                         }
                     }
                 }

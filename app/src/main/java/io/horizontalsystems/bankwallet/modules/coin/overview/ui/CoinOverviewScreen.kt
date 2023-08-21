@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -302,7 +303,7 @@ fun Loading() {
     ) {
         CircularProgressIndicator(
             modifier = Modifier.size(24.dp),
-            color = ComposeAppTheme.colors.grey,
+            color = MaterialTheme.colorScheme.onPrimary,
             strokeWidth = 2.dp
         )
     }

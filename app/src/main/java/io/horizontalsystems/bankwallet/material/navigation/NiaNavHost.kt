@@ -42,25 +42,23 @@ fun NiaNavHost(
         modifier = modifier,
     ) {
         marketScreen(onTopicClick = {})
-        /*bookmarksScreen(
-            onTopicClick = navController::navigateToTopic,
-            onShowSnackbar = onShowSnackbar,
+        balanceScreen(
+            onTopicClick = { _ -> },
+            onShowSnackbar = onShowSnackbar
         )
-        searchScreen(
-            onBackClick = navController::popBackStack,
-            onInterestsClick = { appState.navigateToTopLevelDestination(INTERESTS) },
-            onTopicClick = navController::navigateToTopic,
+        transactionScreen(
+            onShowSnackbar = onShowSnackbar
         )
-        interestsGraph(
-            onTopicClick = { topicId ->
-                navController.navigateToTopic(topicId)
+        settingsGraph(
+            onSettingClick = { topicId ->
+
             },
             nestedGraphs = {
-                topicScreen(
+                /*topicScreen(
                     onBackClick = navController::popBackStack,
                     onTopicClick = {},
-                )
+                )*/
             },
-        )*/
+        )
     }
 }

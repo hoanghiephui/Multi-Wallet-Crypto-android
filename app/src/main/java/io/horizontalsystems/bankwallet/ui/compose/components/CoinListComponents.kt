@@ -13,9 +13,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -180,7 +182,7 @@ fun ScreenMessageWithAction(
             modifier = Modifier
                 .size(100.dp)
                 .background(
-                    color = ComposeAppTheme.colors.raina,
+                    color = MaterialTheme.colorScheme.onPrimary,
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
@@ -189,7 +191,7 @@ fun ScreenMessageWithAction(
                 modifier = Modifier.size(48.dp),
                 painter = painterResource(icon),
                 contentDescription = text,
-                tint = ComposeAppTheme.colors.grey
+                tint = Color.Gray
             )
         }
         Spacer(Modifier.height(32.dp))
