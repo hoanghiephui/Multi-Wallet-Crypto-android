@@ -1,4 +1,4 @@
-# Unstoppable Wallet
+# CoinHub Wallet
 
 We dream of a world… A world where private property is untouchable and market access is unconditional.
 
@@ -11,7 +11,6 @@ Unstoppable is a powerful non-custodial multi-wallet for Bitcoin, Ethereum, Bina
 
 Such approach enables the wallet to operate anywhere and remain censorship-resistant. Only the user is in control of the money.
 
-More at [https://unstoppable.money](https://unstoppable.money)
 
 ## Supported Android Versions
 
@@ -19,16 +18,14 @@ Devices with Android versions 8.1 and above
 
 ## Download
 
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-     alt="Get it on F-Droid"
-     height="80">](https://f-droid.org/packages/io.horizontalsystems.bankwallet/)
+
 [<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
      alt="Get it on Google Play"
-     height="80">](https://play.google.com/store/apps/details?id=io.horizontalsystems.bankwallet)
+     height="80">](https://bit.ly/3orSiko)
 
 ## Source Code
 
-[https://github.com/horizontalsystems/unstoppable-wallet-android](https://github.com/horizontalsystems/unstoppable-wallet-android)
+[https://github.com/hoanghiephui/unstoppable-wallet-android](https://github.com/hoanghiephui/unstoppable-wallet-android)
 
 ## License
 
