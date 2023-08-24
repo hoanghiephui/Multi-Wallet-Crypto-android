@@ -1,18 +1,71 @@
 package io.horizontalsystems.chartview
 
-import android.util.Range
 import androidx.compose.runtime.Immutable
+import io.horizontalsystems.chartview.models.ChartIndicator
 import io.horizontalsystems.chartview.models.ChartPoint
+import java.lang.Float.max
+import java.lang.Float.min
 import java.math.BigDecimal
 
 @Immutable
 data class ChartData(
     val items: List<ChartPoint>,
     val isMovementChart: Boolean,
-    val disabled: Boolean = false
+    val disabled: Boolean = false,
+    val indicators: Map<String, ChartIndicator> = mapOf(),
 ) {
-    val valueRange: Range<Float> by lazy {
-        Range(items.minOf { it.value }, items.maxOf { it.value })
+    var macd: ChartIndicator.Macd? = null
+    var rsi: ChartIndicator.Rsi? = null
+
+    val movingAverages by lazy {
+        buildMap {
+            indicators.forEach { (id, indicator) ->
+                if (indicator is ChartIndicator.MovingAverage) {
+                    put(id, indicator)
+                }
+            }
+        }
+    }
+
+    init {
+        for (indicator in indicators.values) {
+            when (indicator) {
+                is ChartIndicator.Macd -> {
+                    macd = indicator
+                }
+
+                is ChartIndicator.Rsi -> {
+                    rsi = indicator
+                }
+
+                is ChartIndicator.MovingAverage -> {
+
+                }
+            }
+        }
+    }
+
+    val minValue: Float by lazy {
+        var valuesMin = items.minOf { it.value }
+        movingAverages
+            .mapNotNull { it.value.line.minOfOrNull { it.value } }
+            .minOrNull()
+            ?.let { indicatorsMin ->
+                valuesMin = min(valuesMin, indicatorsMin)
+            }
+
+        valuesMin
+    }
+
+    val maxValue: Float by lazy {
+        var valuesMax = items.maxOf { it.value }
+        movingAverages
+            .mapNotNull { it.value.line.maxOfOrNull { it.value } }
+            .maxOrNull()
+            ?.let { indicatorsMax ->
+                valuesMax = max(valuesMax, indicatorsMax)
+            }
+        valuesMax
     }
 
     val startTimestamp: Long by lazy {

@@ -2,13 +2,16 @@ package io.horizontalsystems.bankwallet.core.storage
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.trustwallet.walletconnect.models.WCPeerMeta
 import com.trustwallet.walletconnect.models.session.WCSession
 import io.horizontalsystems.bankwallet.core.App
+import io.horizontalsystems.bankwallet.core.providers.CexDepositNetworkRaw
+import io.horizontalsystems.bankwallet.core.providers.CexWithdrawNetworkRaw
 import io.horizontalsystems.bankwallet.entities.nft.NftUid
 import io.horizontalsystems.marketkit.models.BlockchainType
 import java.math.BigDecimal
-import java.util.*
+import java.util.Date
 
 class DatabaseConverters {
 
@@ -116,4 +119,39 @@ class DatabaseConverters {
         return NftUid.fromUid(string)
     }
 
+    @TypeConverter
+    fun fromCexDepositNetworkList(networks: List<CexDepositNetworkRaw>): String {
+        return gson.toJson(networks)
+    }
+
+    @TypeConverter
+    fun toCexDepositNetworkList(json: String): List<CexDepositNetworkRaw>? {
+        return gson.fromJson(
+            json,
+            object : TypeToken<List<CexDepositNetworkRaw>>() {}.type
+        )
+    }
+
+    @TypeConverter
+    fun fromCexWithdrawNetworkList(networks: List<CexWithdrawNetworkRaw>): String {
+        return gson.toJson(networks)
+    }
+
+    @TypeConverter
+    fun toCexWithdrawNetworkList(json: String): List<CexWithdrawNetworkRaw>? {
+        return gson.fromJson(
+            json,
+            object : TypeToken<List<CexWithdrawNetworkRaw>>() {}.type
+        )
+    }
+
+    @TypeConverter
+    fun fromMap(v: Map<String, String>): String {
+        return gson.toJson(v)
+    }
+
+    @TypeConverter
+    fun toMap(v: String): Map<String, String> {
+        return gson.fromJson(v, object : TypeToken<Map<String, String>>() {}.type)
+    }
 }

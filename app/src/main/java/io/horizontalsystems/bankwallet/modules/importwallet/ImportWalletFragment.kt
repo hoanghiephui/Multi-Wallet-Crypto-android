@@ -5,6 +5,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.provider.OpenableColumns
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,12 +15,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Scaffold
-import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -45,18 +41,12 @@ import io.horizontalsystems.bankwallet.modules.restorelocal.RestoreLocalFragment
 import io.horizontalsystems.bankwallet.modules.swap.settings.Caution
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
-import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
-import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
-import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
-import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
-import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
-import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
-import io.horizontalsystems.bankwallet.ui.compose.components.headline2_leah
-import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
+import io.horizontalsystems.bankwallet.ui.compose.components.*
 import io.horizontalsystems.core.findNavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
+
 
 class ImportWalletFragment : BaseFragment() {
 
@@ -101,6 +91,10 @@ private fun ImportWalletScreen(
                         val jsonString = br.readText()
                         //validate json format
                         val json = Gson().fromJson(jsonString, BackupLocalModule.WalletBackup::class.java)
+                        //Gson will set field as null if the json file doesn't have the matching field
+                        if (json.version == null || json.crypto == null){
+                            throw Exception("Invalid json format")
+                        }
                         navController.navigateWithTermsAccepted {
                             val fileName = context.getFileName(uriNonNull)
                             navController.slideFromBottom(
@@ -115,6 +109,7 @@ private fun ImportWalletScreen(
                         }
                     }
                 } catch (e: Throwable) {
+                    Log.e("TAG", "ImportWalletScreen: ", e)
                     //show json parsing error
                     coroutineScope.launch {
                         delay(300)
@@ -191,6 +186,21 @@ private fun ImportWalletScreen(
                         icon = R.drawable.ic_download_24,
                         onClick = {
                             restoreLauncher.launch(arrayOf("application/json"))
+                        }
+                    )
+                    VSpacer(12.dp)
+                    ImportOption(
+                        title = stringResource(R.string.ImportWallet_ExchangeWallet),
+                        description = stringResource(R.string.ImportWallet_ExchangeWallet_Description),
+                        icon = R.drawable.icon_link_24,
+                        onClick = {
+                            navController.slideFromBottom(
+                                R.id.importCexAccountFragment,
+                                bundleOf(
+                                    ManageAccountsModule.popOffOnSuccessKey to popUpToInclusiveId,
+                                    ManageAccountsModule.popOffInclusiveKey to inclusive,
+                                )
+                            )
                         }
                     )
                     VSpacer(12.dp)

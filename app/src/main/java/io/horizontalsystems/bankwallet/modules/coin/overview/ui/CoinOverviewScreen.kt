@@ -2,7 +2,14 @@ package io.horizontalsystems.bankwallet.modules.coin.overview.ui
 
 import android.content.Context
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
@@ -30,6 +37,7 @@ import io.horizontalsystems.bankwallet.modules.chart.ChartViewModel
 import io.horizontalsystems.bankwallet.modules.coin.CoinLink
 import io.horizontalsystems.bankwallet.modules.coin.overview.CoinOverviewModule
 import io.horizontalsystems.bankwallet.modules.coin.overview.CoinOverviewViewModel
+import io.horizontalsystems.bankwallet.modules.coin.overview.HudMessageType
 import io.horizontalsystems.bankwallet.modules.coin.ui.CoinScreenTitle
 import io.horizontalsystems.bankwallet.modules.enablecoin.restoresettings.RestoreSettingsViewModel
 import io.horizontalsystems.bankwallet.modules.enablecoin.restoresettings.ZCashConfig
@@ -39,13 +47,19 @@ import io.horizontalsystems.bankwallet.modules.markdown.MarkdownFragment
 import io.horizontalsystems.bankwallet.modules.zcashconfigure.ZcashConfigure
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryCircle
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryDefault
 import io.horizontalsystems.bankwallet.ui.compose.components.CellFooter
+import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
+import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
+import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
 import io.horizontalsystems.bankwallet.ui.helpers.TextHelper
 import io.horizontalsystems.core.getNavigationResult
 import io.horizontalsystems.core.helpers.HudHelper
+import io.horizontalsystems.core.parcelable
 import io.horizontalsystems.marketkit.models.FullCoin
 import io.horizontalsystems.marketkit.models.LinkType
 
@@ -61,14 +75,29 @@ fun CoinOverviewScreen(
     val refreshing by viewModel.isRefreshingLiveData.observeAsState(false)
     val overview by viewModel.overviewLiveData.observeAsState()
     val viewState by viewModel.viewStateLiveData.observeAsState()
+    val chartIndicatorsState = viewModel.chartIndicatorsState
 
     val view = LocalView.current
     val context = LocalContext.current
 
-    viewModel.successMessage?.let {
-        HudHelper.showSuccessMessage(view, it)
+    viewModel.showHudMessage?.let {
+        when (it.type) {
+            HudMessageType.Error -> HudHelper.showErrorMessage(
+                contenView = view,
+                resId = it.text,
+                icon = it.iconRes,
+                iconTint = R.color.white
+            )
 
-        viewModel.onSuccessMessageShown()
+            HudMessageType.Success -> HudHelper.showSuccessMessage(
+                contenView = view,
+                resId = it.text,
+                icon = it.iconRes,
+                iconTint = R.color.white
+            )
+        }
+
+        viewModel.onHudMessageShown()
     }
 
     val vmFactory1 = remember { ManageWalletsModule.Factory() }
@@ -82,7 +111,7 @@ fun CoinOverviewScreen(
             val requestResult = bundle.getInt(ZcashConfigure.requestResultKey)
 
             if (requestResult == ZcashConfigure.RESULT_OK) {
-                val zcashConfig = bundle.getParcelable<ZCashConfig>(ZcashConfigure.zcashConfigKey)
+                val zcashConfig = bundle.parcelable<ZCashConfig>(ZcashConfigure.zcashConfigKey)
                 zcashConfig?.let { config ->
                     restoreSettingsViewModel.onEnter(config)
                 }
@@ -119,6 +148,46 @@ fun CoinOverviewScreen(
 
                                 Chart(chartViewModel = chartViewModel)
 
+                                Spacer(modifier = Modifier.height(12.dp))
+
+                                CellUniversalLawrenceSection {
+                                    RowUniversal(
+                                        modifier = Modifier
+                                            .height(52.dp)
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp),
+                                    ) {
+                                        subhead2_grey(text = stringResource(R.string.CoinPage_Indicators))
+                                        Spacer(modifier = Modifier.weight(1f))
+
+                                        if (chartIndicatorsState.hasActiveSubscription) {
+                                            if (chartIndicatorsState.enabled) {
+                                                ButtonSecondaryDefault(
+                                                    title = stringResource(id = R.string.Button_Hide),
+                                                    onClick = {
+                                                        viewModel.disableChartIndicators()
+                                                    }
+                                                )
+                                            } else {
+                                                ButtonSecondaryDefault(
+                                                    title = stringResource(id = R.string.Button_Show),
+                                                    onClick = {
+                                                        viewModel.enableChartIndicators()
+                                                    }
+                                                )
+                                            }
+                                            HSpacer(width = 8.dp)
+                                            ButtonSecondaryCircle(
+                                                icon = R.drawable.ic_setting_20
+                                            ) {
+                                                navController.slideFromRight(R.id.indicatorsFragment)
+                                            }
+                                        }
+                                    }
+                                }
+
+
+
                                 if (overview.marketData.isNotEmpty()) {
                                     Spacer(modifier = Modifier.height(12.dp))
                                     MarketData(overview.marketData)
@@ -135,6 +204,9 @@ fun CoinOverviewScreen(
                                         tokenVariants = tokenVariants,
                                         onClickAddToWallet = {
                                             manageWalletsViewModel.enable(it)
+                                        },
+                                        onClickRemoveWallet = {
+                                            manageWalletsViewModel.disable(it)
                                         },
                                         onClickCopy = {
                                             TextHelper.copyText(it)

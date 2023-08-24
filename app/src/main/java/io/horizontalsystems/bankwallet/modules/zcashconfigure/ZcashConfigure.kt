@@ -151,7 +151,7 @@ fun ZcashConfigureScreen(
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(
         ModalBottomSheetValue.Hidden,
-        confirmStateChange = {
+        confirmValueChange = {
             if (it == ModalBottomSheetValue.Hidden) {
                 showSlowSyncWarning = false
             }
@@ -269,7 +269,7 @@ fun ZcashConfigureScreen(
                         ButtonPrimaryYellow(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(start = 16.dp, end = 16.dp, bottom = 32.dp),
+                                .padding(start = 16.dp, end = 16.dp),
                             title = stringResource(R.string.Button_Done),
                             onClick = { viewModel.onDoneClick() },
                             enabled = viewModel.uiState.doneButtonEnabled

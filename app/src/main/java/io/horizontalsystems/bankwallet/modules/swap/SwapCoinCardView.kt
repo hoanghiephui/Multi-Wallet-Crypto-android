@@ -57,6 +57,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.CoinImage
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_jacob
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_leah
 import io.horizontalsystems.core.getNavigationResult
+import io.horizontalsystems.core.parcelable
 import io.horizontalsystems.marketkit.models.Token
 import java.math.BigDecimal
 
@@ -98,7 +99,7 @@ fun SwapCoinCardView(
                     onClick = {
                         navController.getNavigationResult(SelectSwapCoinFragment.resultBundleKey) { bundle ->
                             val requestId = bundle.getLong(SelectSwapCoinFragment.requestIdKey)
-                            val coinBalanceItem = bundle.getParcelable<CoinBalanceItem>(
+                            val coinBalanceItem = bundle.parcelable<CoinBalanceItem>(
                                 SelectSwapCoinFragment.coinBalanceItemResultKey
                             )
                             if (requestId == cardState.uuid && coinBalanceItem != null) {
@@ -222,27 +223,8 @@ private fun SwapAmountInput(
                             style = ComposeAppTheme.typography.headline1,
                             textAlign = TextAlign.Start
                         )
-                        innerTextField()
-                    } else if (!focused) {
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = "${state.primaryPrefix ?: ""}${textState.text}",
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1,
-                            color = if (state.dimAmount) ComposeAppTheme.colors.grey50 else ComposeAppTheme.colors.leah,
-                            style = ComposeAppTheme.typography.headline1,
-                            textAlign = TextAlign.Start
-                        )
-                        Box(
-                            modifier = Modifier
-                                .height(0.dp)
-                                .fillMaxWidth()
-                        ) {
-                            innerTextField()
-                        }
-                    } else {
-                        innerTextField()
                     }
+                    innerTextField()
                 }
             }
         )

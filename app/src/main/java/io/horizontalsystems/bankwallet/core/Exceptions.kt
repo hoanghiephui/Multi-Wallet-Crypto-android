@@ -41,6 +41,7 @@ class NoDataException() : Exception() {
 }
 
 class NoAuthTokenException(override val message: String = "Auth Token is not set or empty") : Exception()
+class InvalidAuthTokenException(override val message: String = "Auth Token is expired or invalid") : Exception()
 
 sealed class EvmError(message: String? = null) : Throwable(message) {
     object InsufficientBalanceWithFee : EvmError()
@@ -71,7 +72,9 @@ val Throwable.convertedError: Throwable
                 )
             ) {
                 EvmError.InsufficientBalanceWithFee
-            } else if (error.message.contains("max fee per gas less than block base fee")) {
+            } else if (error.message.contains("max fee per gas less than block base fee") ||
+                error.message.contains("fee cap less than block base fee")
+            ) {
                 EvmError.LowerThanBaseGasLimit
             } else if (error.message.contains("execution reverted")) {
                 EvmError.ExecutionReverted(error.message)

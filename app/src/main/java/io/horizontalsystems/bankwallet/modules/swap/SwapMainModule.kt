@@ -18,6 +18,7 @@ import io.horizontalsystems.bankwallet.modules.swap.allowance.SwapPendingAllowan
 import io.horizontalsystems.bankwallet.ui.compose.Select
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.WithTranslatableTitle
+import io.horizontalsystems.core.parcelable
 import io.horizontalsystems.ethereumkit.core.EthereumKit
 import io.horizontalsystems.marketkit.models.Blockchain
 import io.horizontalsystems.marketkit.models.BlockchainType
@@ -45,11 +46,12 @@ object SwapMainModule {
     )
 
     class Factory(arguments: Bundle) : ViewModelProvider.Factory {
-        private val tokenFrom: Token? = arguments.getParcelable(tokenFromKey)
+        private val tokenFrom: Token? = arguments.parcelable(tokenFromKey)
         private val swapProviders: List<ISwapProvider> = listOf(
             UniswapProvider,
             UniswapV3Provider,
             PancakeSwapProvider,
+            PancakeSwapV3Provider,
             OneInchProvider,
             QuickSwapProvider
         )
@@ -269,8 +271,8 @@ object SwapMainModule {
             BlockchainType.Ethereum,
             BlockchainType.ArbitrumOne,
 //            BlockchainType.Optimism,
-            BlockchainType.Polygon -> true
-
+            BlockchainType.Polygon,
+            BlockchainType.BinanceSmartChain -> true
             else -> false
         }
     }
@@ -284,6 +286,20 @@ object SwapMainModule {
 
         override fun supports(blockchainType: BlockchainType): Boolean {
             return blockchainType == BlockchainType.BinanceSmartChain
+        }
+    }
+
+    @Parcelize
+    object PancakeSwapV3Provider : ISwapProvider {
+        override val id get() = "pancake_v3"
+        override val title get() = "PancakeSwap V3"
+        override val url get() = "https://pancakeswap.finance/"
+        override val supportsExactOut get() = true
+
+        override fun supports(blockchainType: BlockchainType) = when (blockchainType) {
+            BlockchainType.BinanceSmartChain,
+            BlockchainType.Ethereum -> true
+            else -> false
         }
     }
 

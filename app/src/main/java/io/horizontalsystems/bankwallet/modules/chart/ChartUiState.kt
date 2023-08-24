@@ -13,5 +13,5 @@ data class ChartUiState(
     val loading: Boolean,
     val viewState: ViewState,
     val hasVolumes: Boolean,
-    val chartViewType: ChartViewType
+    val chartViewType: ChartViewType,
 )
