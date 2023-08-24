@@ -6,7 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -48,7 +49,7 @@ fun BoardsView(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
                 .clip(RoundedCornerShape(12.dp))
-                .background(ComposeAppTheme.colors.lawrence)
+                .background(MaterialTheme.colorScheme.surface)
         ){
             boardItem.marketViewItems.forEach { coin ->
                 MarketCoinWithBackground(coin, navController)
@@ -70,10 +71,6 @@ fun <T : WithTranslatableTitle> TopBoardHeader(
     onClickSeeAll: () -> Unit
 ) {
     Column {
-        Divider(
-            thickness = 1.dp,
-            color = ComposeAppTheme.colors.steel10
-        )
         Row(modifier = Modifier.height(42.dp)) {
             Row(
                     modifier = Modifier

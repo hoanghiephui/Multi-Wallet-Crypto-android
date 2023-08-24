@@ -30,10 +30,6 @@ fun TopSectorsBoardView(
     onClickSeeAll: () -> Unit,
     onItemClick: (CoinCategory) -> Unit
 ) {
-    Divider(
-        thickness = 1.dp,
-        color = ComposeAppTheme.colors.steel10
-    )
     Row(modifier = Modifier.height(42.dp)) {
         Row(
             modifier = Modifier

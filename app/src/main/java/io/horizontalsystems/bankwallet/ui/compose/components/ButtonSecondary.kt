@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,7 +35,7 @@ fun ButtonSecondaryDefault(
         onClick = onClick,
         content = {
             if (enabled) {
-                subhead1_leah(text = title, maxLines = 1)
+                subhead1(text = title, maxLines = 1)
             } else {
                 subhead1_grey50(text = title, maxLines = 1)
             }
@@ -154,7 +155,7 @@ fun <T : WithTranslatableTitle> ButtonSecondaryToggle(
                             modifier = Modifier
                                 .size(3.dp)
                                 .clip(CircleShape)
-                                .background(if (select.selected == it) ComposeAppTheme.colors.jacob else ComposeAppTheme.colors.grey)
+                                .background(if (select.selected == it) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface)
                         )
                     }
                 }
@@ -187,7 +188,7 @@ fun ButtonSecondary(
         enabled = enabled,
     ) {
         ProvideTextStyle(
-            value = ComposeAppTheme.typography.subhead1
+            value = MaterialTheme.typography.bodyLarge
         ) {
             Row(
                 Modifier
@@ -227,10 +228,10 @@ object SecondaryButtonDefaults {
 
     @Composable
     fun buttonColors(
-        backgroundColor: Color = ComposeAppTheme.colors.steel20,
-        contentColor: Color = ComposeAppTheme.colors.leah,
-        disabledBackgroundColor: Color = ComposeAppTheme.colors.steel20,
-        disabledContentColor: Color = ComposeAppTheme.colors.grey50,
+        backgroundColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+        contentColor: Color = MaterialTheme.colorScheme.surface,
+        disabledBackgroundColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+        disabledContentColor: Color = MaterialTheme.colorScheme.onSurface.copy(0.7f),
     ): ButtonColors = HsButtonColors(
         backgroundColor = backgroundColor,
         contentColor = contentColor,

@@ -13,7 +13,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -290,20 +292,18 @@ fun DescriptionCard(title: String, description: String, image: ImageSource) {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RowScope.CategoryCard(
     type: DiscoveryItem,
     onClick: () -> Unit
 ) {
-    Card(
+    OutlinedCard(
         modifier = Modifier
             .padding(6.dp)
             .height(128.dp)
             .weight(1f),
         shape = RoundedCornerShape(12.dp),
-        elevation = 0.dp,
-        backgroundColor = ComposeAppTheme.colors.lawrence,
         onClick = onClick
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -334,7 +334,8 @@ fun RowScope.CategoryCard(
                         modifier = Modifier
                             .height(108.dp)
                             .width(76.dp)
-                            .align(Alignment.TopEnd)) { imageRes ->
+                            .align(Alignment.TopEnd), label = ""
+                    ) { imageRes ->
                         Image(
                             painter = rememberAsyncImagePainter(imageRes),
                             contentDescription = "category image",
@@ -367,7 +368,7 @@ fun RowScope.CategoryCard(
                                             Text(
                                                 text = RateText(diff),
                                                 color = RateColor(diff),
-                                                style = ComposeAppTheme.typography.caption,
+                                                style = MaterialTheme.typography.labelSmall,
                                                 maxLines = 1,
                                                 modifier = Modifier.padding(start = 6.dp)
                                             )

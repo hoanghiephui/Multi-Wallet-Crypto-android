@@ -23,6 +23,9 @@ import io.horizontalsystems.bankwallet.modules.market.metricspage.MetricsPageFra
 import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewModule
 import io.horizontalsystems.bankwallet.modules.metricchart.MetricsType
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
+import io.horizontalsystems.bankwallet.ui.compose.GreenL
+import io.horizontalsystems.bankwallet.ui.compose.Grey50
+import io.horizontalsystems.bankwallet.ui.compose.RedD
 import io.horizontalsystems.bankwallet.ui.compose.components.caption_grey
 import io.horizontalsystems.bankwallet.ui.extensions.MetricData
 import io.horizontalsystems.chartview.ChartMinimal
@@ -62,19 +65,19 @@ private fun RowScope.ChartView(metricsData: MetricData, navController: NavContro
         Column(
             modifier = Modifier.padding(12.dp)
         ) {
-            /*caption_grey(text = stringResource(metricsData.type.title))
+            caption_grey(text = stringResource(metricsData.type.title))
             Spacer(modifier = Modifier.height(10.dp))
             if (metricsData.value != null) {
                 Text(
                     text = metricsData.value,
-                    style = ComposeAppTheme.typography.headline1,
-                    color = ComposeAppTheme.colors.bran,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             } else {
                 Text(
                     text = stringResource(R.string.NotAvailable),
-                    style = ComposeAppTheme.typography.headline1,
-                    color = ComposeAppTheme.colors.grey50,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Grey50,
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
@@ -83,14 +86,14 @@ private fun RowScope.ChartView(metricsData: MetricData, navController: NavContro
                     val sign = if (metricsData.diff >= BigDecimal.ZERO) "+" else "-"
                     Text(
                         text = App.numberFormatter.format(metricsData.diff.abs(), 0, 2, sign, "%"),
-                        style = ComposeAppTheme.typography.subhead1,
-                        color = if (metricsData.diff >= BigDecimal.ZERO) ComposeAppTheme.colors.remus else ComposeAppTheme.colors.lucian,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = if (metricsData.diff >= BigDecimal.ZERO) GreenL else RedD,
                     )
                 } else {
                     Text(
                         text = "----",
-                        style = ComposeAppTheme.typography.subhead1,
-                        color = ComposeAppTheme.colors.grey50,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = Grey50,
                     )
                 }
                 Spacer(modifier = Modifier.width(12.dp))
@@ -110,7 +113,7 @@ private fun RowScope.ChartView(metricsData: MetricData, navController: NavContro
                         }
                     )
                 }
-            }*/
+            }
             Spacer(modifier = Modifier.height(4.dp))
         }
     }

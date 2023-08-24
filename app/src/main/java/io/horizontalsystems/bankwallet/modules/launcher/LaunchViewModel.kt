@@ -32,6 +32,27 @@ class LaunchViewModel(
         }
     }
 
+    fun getPageStart() =
+        if (accountManager.isAccountsEmpty) {
+            when {
+                accountManager.isAccountsEmpty && !mainShowedOnce -> Page.Welcome
+                pinComponent.isLocked -> Page.Unlock
+                else -> Page.Main
+            }
+        } else when {
+            systemInfoManager.isSystemLockOff -> Page.NoSystemLock
+            else -> when (keyStoreManager.validateKeyStore()) {
+                KeyStoreValidationResult.UserNotAuthenticated -> Page.UserAuthentication
+                KeyStoreValidationResult.KeyIsInvalid -> Page.KeyInvalidated
+                KeyStoreValidationResult.KeyIsValid -> when {
+                    accountManager.isAccountsEmpty && !mainShowedOnce -> Page.Welcome
+                    pinComponent.isLocked -> Page.Unlock
+                    else -> Page.Main
+                }
+            }
+        }
+
+
     enum class Page {
         Welcome,
         Main,

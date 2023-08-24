@@ -15,18 +15,20 @@ import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.modules.market.Value
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
+import io.horizontalsystems.bankwallet.ui.compose.GreenL
+import io.horizontalsystems.bankwallet.ui.compose.RedD
 import java.math.BigDecimal
 
 @Composable
 fun RateColor(diff: BigDecimal?) =
-    if ((diff ?: BigDecimal.ZERO) >= BigDecimal.ZERO) ComposeAppTheme.colors.remus else ComposeAppTheme.colors.lucian
+    if ((diff ?: BigDecimal.ZERO) >= BigDecimal.ZERO) GreenL else RedD
 
 @Composable
 fun diffColor(value: BigDecimal) =
     if (value.signum() >= 0) {
-        ComposeAppTheme.colors.remus
+        GreenL
     } else {
-        ComposeAppTheme.colors.lucian
+        RedD
     }
 
 @Composable

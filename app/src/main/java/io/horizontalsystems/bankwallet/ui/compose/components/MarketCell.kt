@@ -3,6 +3,7 @@ package io.horizontalsystems.bankwallet.ui.compose.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -150,7 +151,7 @@ fun MarketDataValueComponent(marketDataValue: MarketDataValue) {
             Text(
                 text = RateText(marketDataValue.value),
                 color = RateColor(marketDataValue.value),
-                style = ComposeAppTheme.typography.subhead2,
+                style = MaterialTheme.typography.labelSmall,
                 maxLines = 1,
             )
         }
@@ -158,7 +159,7 @@ fun MarketDataValueComponent(marketDataValue: MarketDataValue) {
             Text(
                 text = formatValueAsDiff(marketDataValue.value),
                 color = diffColor(marketDataValue.value.raw()),
-                style = ComposeAppTheme.typography.subhead2,
+                style = MaterialTheme.typography.labelSmall,
                 maxLines = 1,
             )
         }

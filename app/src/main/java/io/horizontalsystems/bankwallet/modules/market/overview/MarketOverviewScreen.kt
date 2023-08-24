@@ -68,7 +68,7 @@ fun MarketOverviewScreen(
                             ) {
                                 MetricChartsView(viewItem.marketMetrics, navController)
                             }
-                            /*BoardsView(
+                            BoardsView(
                                 boards = viewItem.boards,
                                 navController = navController,
                                 onClickSeeAll = { listType ->
@@ -101,7 +101,7 @@ fun MarketOverviewScreen(
                                 }
                             )
 
-                            TopNftCollectionsBoardView(
+                            /*TopNftCollectionsBoardView(
                                 viewItem.topNftCollectionsBoard,
                                 onSelectTimeDuration = { timeDuration ->
                                     viewModel.onSelectTopNftsTimeDuration(timeDuration)

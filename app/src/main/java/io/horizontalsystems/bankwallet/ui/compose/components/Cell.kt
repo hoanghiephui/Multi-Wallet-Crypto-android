@@ -581,10 +581,7 @@ fun SectionItemBorderedRowUniversalClear(
 ) {
     Column {
         if (borderTop) {
-            Divider(
-                thickness = 1.dp,
-                color = ComposeAppTheme.colors.steel10,
-            )
+            Divider()
         }
         RowUniversal(
             modifier = Modifier.padding(horizontal = 16.dp),
@@ -592,10 +589,7 @@ fun SectionItemBorderedRowUniversalClear(
             content = content
         )
         if (borderBottom) {
-            Divider(
-                thickness = 1.dp,
-                color = ComposeAppTheme.colors.steel10,
-            )
+            Divider()
         }
     }
 }

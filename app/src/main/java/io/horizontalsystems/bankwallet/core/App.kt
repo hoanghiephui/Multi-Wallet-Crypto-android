@@ -380,7 +380,7 @@ class App : CoreApp(), ImageLoaderFactory, WorkConfiguration.Provider {
         )
 
         backgroundStateChangeListener =
-            BackgroundStateChangeListener(systemInfoManager, keyStoreManager, pinComponent).apply {
+            BackgroundStateChangeListener(systemInfoManager, keyStoreManager, pinComponent, accountManager).apply {
                 backgroundManager.registerListener(this)
             }
 

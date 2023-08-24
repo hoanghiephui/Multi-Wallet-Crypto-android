@@ -575,7 +575,7 @@ fun B2(
         overflow = overflow,
         maxLines = maxLines,
         onTextLayout = onTextLayout,
-        style = MaterialTheme.typography.bodySmall,
+        style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.colorScheme.onSurface,
     )
 }
@@ -965,8 +965,29 @@ fun C2(
         overflow = overflow,
         maxLines = maxLines,
         onTextLayout = onTextLayout,
-        style = ComposeAppTheme.typography.subhead1,
-        color = ComposeAppTheme.colors.leah,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurface,
+    )
+}
+
+@Composable
+fun C22(
+    text: String,
+    modifier: Modifier = Modifier,
+    textAlign: TextAlign? = null,
+    overflow: TextOverflow = TextOverflow.Clip,
+    maxLines: Int = Int.MAX_VALUE,
+    onTextLayout: (TextLayoutResult) -> Unit = {}
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        textAlign = textAlign,
+        overflow = overflow,
+        maxLines = maxLines,
+        onTextLayout = onTextLayout,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.surface,
     )
 }
 @Composable
@@ -979,6 +1000,25 @@ fun subhead1_leah(
     onTextLayout: (TextLayoutResult) -> Unit = {}
 ) {
     C2(
+        text = text,
+        modifier = modifier,
+        textAlign = textAlign,
+        overflow = overflow,
+        maxLines = maxLines,
+        onTextLayout = onTextLayout,
+    )
+}
+
+@Composable
+fun subhead1(
+    text: String,
+    modifier: Modifier = Modifier,
+    textAlign: TextAlign? = null,
+    overflow: TextOverflow = TextOverflow.Clip,
+    maxLines: Int = Int.MAX_VALUE,
+    onTextLayout: (TextLayoutResult) -> Unit = {}
+) {
+    C22(
         text = text,
         modifier = modifier,
         textAlign = textAlign,
@@ -2138,8 +2178,8 @@ fun F1(
         overflow = overflow,
         maxLines = maxLines,
         onTextLayout = onTextLayout,
-        style = ComposeAppTheme.typography.caption,
-        color = ComposeAppTheme.colors.grey,
+        style = MaterialTheme.typography.labelSmall,
+        color = Color.Gray,
     )
 }
 @Composable
