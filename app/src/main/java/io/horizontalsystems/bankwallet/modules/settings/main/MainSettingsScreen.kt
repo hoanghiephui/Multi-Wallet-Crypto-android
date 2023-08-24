@@ -13,9 +13,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Divider
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -33,6 +34,7 @@ import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.material.module.setting.navigations.navigateToDonate
 import io.horizontalsystems.bankwallet.modules.contacts.ContactsFragment
 import io.horizontalsystems.bankwallet.modules.contacts.Mode
 import io.horizontalsystems.bankwallet.modules.manageaccount.dialogs.BackupRequiredDialog
@@ -41,6 +43,7 @@ import io.horizontalsystems.bankwallet.modules.settings.main.MainSettingsModule.
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCAccountTypeNotSupportedDialog
 import io.horizontalsystems.bankwallet.modules.walletconnect.version1.WC1Manager
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
+import io.horizontalsystems.bankwallet.ui.compose.Grey
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.BadgeCount
@@ -75,7 +78,7 @@ fun SettingsScreen(
 }
 
 @Composable
-private fun SettingSections(
+fun SettingSections(
     viewModel: MainSettingsViewModel,
     navController: NavController
 ) {
@@ -93,7 +96,7 @@ private fun SettingSections(
                 R.string.Settings_Donate,
                 R.drawable.ic_heart_jacob_48,
                 onClick = {
-                    navController.slideFromRight(R.id.donateFragment)
+                    navController.navigateToDonate()
                 }
             )
         }
@@ -325,7 +328,7 @@ fun HsSettingCell(
 }
 
 @Composable
-private fun SettingsFooter(appVersion: String, companyWebPage: String) {
+fun SettingsFooter(appVersion: String, companyWebPage: String) {
     val context = LocalContext.current
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -336,13 +339,12 @@ private fun SettingsFooter(appVersion: String, companyWebPage: String) {
             modifier = Modifier
                 .width(100.dp)
                 .padding(top = 8.dp, bottom = 4.5.dp),
-            thickness = 0.5.dp,
-            color = ComposeAppTheme.colors.steel20
+            thickness = 0.5.dp
         )
         Text(
             text = stringResource(R.string.Settings_InfoSubtitle),
-            style = ComposeAppTheme.typography.micro,
-            color = ComposeAppTheme.colors.grey,
+            style = MaterialTheme.typography.labelSmall,
+            color = Grey,
         )
         Image(
             modifier = Modifier

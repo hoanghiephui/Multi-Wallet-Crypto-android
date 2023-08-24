@@ -8,17 +8,27 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -29,6 +39,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import coin.chain.crypto.core.designsystem.component.TopAppBar
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
@@ -69,49 +80,48 @@ class DonateFragment : BaseFragment() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DonateScreen(
     onBackPress: () -> Unit
 ) {
-    Scaffold(
-        backgroundColor = ComposeAppTheme.colors.tyler,
-        topBar = {
-            AppBar(
-                title = TranslatableString.ResString(R.string.Settings_Donate),
-                navigationIcon = {
-                    HsBackButton(onClick = onBackPress)
-                },
+    Column {
+        Spacer(Modifier.windowInsetsTopHeight(WindowInsets.safeDrawing))
+        TopAppBar(
+            titleRes = R.string.Settings_Donate,
+            navigationIcon = Icons.Rounded.ArrowBack,
+            navigationIconContentDescription = "ArrowBack",
+            onNavigationClick = onBackPress,
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = Color.Transparent,
             )
-        }
-    ) {
-        Column(Modifier.padding(it)) {
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                VSpacer(12.dp)
-                HeartBlock()
-                VSpacer(24.dp)
-                DonateAddress(
-                    coinImageUrl = "https://cdn.blocksdecoded.com/blockchain-icons/32px/bitcoin@3x.png",
-                    coinName = "Bitcoin",
-                    address = "bc1qw5tw4cnyt0vxts70ntdzxesn2zzz97t6r29pjj"
-                )
-                VSpacer(24.dp)
-                DonateAddress(
-                    coinImageUrl = "https://cdn.blocksdecoded.com/blockchain-icons/32px/ethereum@3x.png",
-                    coinName = "Ethereum",
-                    address = "0x8a2Bec907827F496752c3F24F960B3cddc5D311B"
-                )
-                VSpacer(24.dp)
-                DonateAddress(
-                    coinImageUrl = "https://cdn.blocksdecoded.com/blockchain-icons/32px/binance-smart-chain@3x.png",
-                    coinName = "BNB Smart Chain",
-                    address = "0x8a2Bec907827F496752c3F24F960B3cddc5D311B"
-                )
-                VSpacer(32.dp)
-            }
+        )
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+        ) {
+            VSpacer(12.dp)
+            HeartBlock()
+            VSpacer(24.dp)
+            DonateAddress(
+                coinImageUrl = "https://cdn.blocksdecoded.com/blockchain-icons/32px/bitcoin@3x.png",
+                coinName = "Bitcoin",
+                address = "bc1qw5tw4cnyt0vxts70ntdzxesn2zzz97t6r29pjj"
+            )
+            VSpacer(24.dp)
+            DonateAddress(
+                coinImageUrl = "https://cdn.blocksdecoded.com/blockchain-icons/32px/ethereum@3x.png",
+                coinName = "Ethereum",
+                address = "0x8a2Bec907827F496752c3F24F960B3cddc5D311B"
+            )
+            VSpacer(24.dp)
+            DonateAddress(
+                coinImageUrl = "https://cdn.blocksdecoded.com/blockchain-icons/32px/binance-smart-chain@3x.png",
+                coinName = "BNB Smart Chain",
+                address = "0x8a2Bec907827F496752c3F24F960B3cddc5D311B"
+            )
+            VSpacer(32.dp)
         }
     }
 }
@@ -125,7 +135,7 @@ private fun DonateAddress(
     val localView = LocalView.current
 
     InfoText(text = stringResource(R.string.Settings_Donate_CoinAddress, coinName).uppercase())
-    CellUniversalLawrenceSection() {
+    CellUniversalLawrenceSection {
         RowUniversal(
             modifier = Modifier.padding(horizontal = 16.dp),
             onClick = {
@@ -173,7 +183,7 @@ private fun HeartBlock() {
                     modifier = Modifier
                         .size(100.dp)
                         .background(
-                            color = ComposeAppTheme.colors.steel10,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             shape = CircleShape,
                         ),
                     contentAlignment = Alignment.Center
@@ -182,7 +192,7 @@ private fun HeartBlock() {
                         modifier = Modifier.size(48.dp),
                         painter = painterResource(R.drawable.ic_heart_48),
                         contentDescription = null,
-                        tint = ComposeAppTheme.colors.jacob
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
                 VSpacer(32.dp)

@@ -2,6 +2,7 @@ package io.horizontalsystems.bankwallet.ui.compose.components
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -20,7 +21,7 @@ fun InfoTextBody(text: String) {
     Text(
         modifier = Modifier.padding(horizontal = 32.dp, vertical = 12.dp),
         text = text,
-        style = ComposeAppTheme.typography.body,
-        color = ComposeAppTheme.colors.bran
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.surface
     )
 }

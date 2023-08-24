@@ -103,6 +103,32 @@ fun NiaTopAppBar(
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopAppBar(
+    @StringRes titleRes: Int,
+    navigationIcon: ImageVector,
+    navigationIconContentDescription: String?,
+    modifier: Modifier = Modifier,
+    colors: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
+    onNavigationClick: () -> Unit = {},
+) {
+    CenterAlignedTopAppBar(
+        title = { Text(text = stringResource(id = titleRes)) },
+        navigationIcon = {
+            IconButton(onClick = onNavigationClick) {
+                Icon(
+                    imageVector = navigationIcon,
+                    contentDescription = navigationIconContentDescription,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+        },
+        colors = colors,
+        modifier = modifier.testTag("niaTopAppBar"),
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview("Top App Bar")
 @Composable
 private fun NiaTopAppBarPreview() {

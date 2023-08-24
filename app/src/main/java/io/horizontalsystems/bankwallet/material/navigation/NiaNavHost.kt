@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import io.horizontalsystems.bankwallet.material.main.NiaAppState
+import io.horizontalsystems.bankwallet.material.module.setting.navigations.donateScreen
 
 /**
  * Top-level navigation graph. Navigation is organized as explained at
@@ -50,14 +51,9 @@ fun NiaNavHost(
             onShowSnackbar = onShowSnackbar
         )
         settingsGraph(
-            onSettingClick = { topicId ->
-
-            },
+            navController = navController,
             nestedGraphs = {
-                /*topicScreen(
-                    onBackClick = navController::popBackStack,
-                    onTopicClick = {},
-                )*/
+                donateScreen(onBackPress = navController::popBackStack)
             },
         )
     }

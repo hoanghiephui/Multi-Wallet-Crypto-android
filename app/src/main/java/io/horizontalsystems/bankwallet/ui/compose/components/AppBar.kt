@@ -9,6 +9,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -55,7 +56,7 @@ fun AppBar(
     navigationIcon: @Composable (() -> Unit)? = null,
     menuItems: List<MenuItem> = listOf(),
     showSpinner: Boolean = false,
-    backgroundColor: Color = ComposeAppTheme.colors.tyler
+    backgroundColor: Color = Color.Unspecified
 ) {
     val titleComposable: @Composable () -> Unit = {
         title?.let {
@@ -82,7 +83,7 @@ fun AppBar(
     navigationIcon: @Composable (() -> Unit)? = null,
     menuItems: List<MenuItem> = listOf(),
     showSpinner: Boolean = false,
-    backgroundColor: Color = ComposeAppTheme.colors.tyler
+    backgroundColor: Color = Color.Unspecified
 ) {
     TopAppBar(
         modifier = Modifier.height(64.dp),
@@ -99,18 +100,18 @@ fun AppBar(
                     modifier = Modifier
                         .padding(start = 24.dp, end = 16.dp)
                         .size(24.dp),
-                    color = ComposeAppTheme.colors.grey,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.7f),
                     strokeWidth = 2.dp
                 )
             }
             menuItems.forEach { menuItem ->
                 val color = if (menuItem.enabled) {
                     if (menuItem.tint == Color.Unspecified)
-                        ComposeAppTheme.colors.jacob
+                        MaterialTheme.colorScheme.onSurface
                     else
                         menuItem.tint
                 } else {
-                    ComposeAppTheme.colors.grey50
+                    MaterialTheme.colorScheme.onSurfaceVariant.copy(0.7f)
                 }
 
                 if (menuItem.icon != null) {
@@ -130,7 +131,7 @@ fun AppBar(
                                 onClick = menuItem.onClick
                             ),
                         text = menuItem.title.getString().toUpperCase(Locale.current),
-                        style = ComposeAppTheme.typography.headline2,
+                        style = MaterialTheme.typography.titleSmall,
                         color = color
                     )
                 }

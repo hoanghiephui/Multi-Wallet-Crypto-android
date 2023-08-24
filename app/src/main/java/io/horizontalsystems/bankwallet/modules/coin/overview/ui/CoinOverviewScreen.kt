@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coin.chain.crypto.core.designsystem.component.NiaOverlayLoadingWheel
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.iconPlaceholder
 import io.horizontalsystems.bankwallet.core.imageUrl
@@ -301,10 +302,8 @@ fun Loading() {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        CircularProgressIndicator(
-            modifier = Modifier.size(24.dp),
-            color = MaterialTheme.colorScheme.onPrimary,
-            strokeWidth = 2.dp
+        NiaOverlayLoadingWheel(
+            contentDesc = "LoadingWheel"
         )
     }
 }

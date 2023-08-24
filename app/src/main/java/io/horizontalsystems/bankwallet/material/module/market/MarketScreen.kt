@@ -9,8 +9,3 @@ fun MarketRoute() {
     val navController = rememberNavController()
     MarketOverviewScreen(navController)
 }
-
-@Composable
-fun MarketScreen() {
-
-}

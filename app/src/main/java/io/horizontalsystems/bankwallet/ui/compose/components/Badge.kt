@@ -44,14 +44,14 @@ fun BadgeWithDiff(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(4.dp))
-            .background(ComposeAppTheme.colors.jeremy)
+            .background(MaterialTheme.colorScheme.onSurfaceVariant)
             .padding(horizontal = 4.dp, vertical = 2.dp)
     ) {
         Row {
             Text(
                 text = text,
-                color = ComposeAppTheme.colors.bran,
-                style = ComposeAppTheme.typography.microSB,
+                color = MaterialTheme.colorScheme.surface,
+                style = MaterialTheme.typography.labelSmall,
                 maxLines = 1,
             )
             diff?.let { diffValue ->
@@ -59,7 +59,7 @@ fun BadgeWithDiff(
                     modifier = Modifier.padding(start = 4.dp),
                     text = "${sign(diffValue)}${diff.abs()}",
                     color = diffColor(diffValue),
-                    style = ComposeAppTheme.typography.microSB,
+                    style = MaterialTheme.typography.labelSmall,
                     maxLines = 1,
                 )
             }
@@ -84,8 +84,8 @@ fun BadgeRatingD(modifier: Modifier = Modifier, text: String) {
 fun BadgeCount(
     modifier: Modifier = Modifier,
     text: String,
-    background: Color = ComposeAppTheme.colors.lucian,
-    textColor: Color = ComposeAppTheme.colors.white,
+    background: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    textColor: Color = MaterialTheme.colorScheme.surface,
 ) {
     Text(
         modifier = modifier
@@ -95,7 +95,7 @@ fun BadgeCount(
             .defaultMinSize(minWidth = 14.dp),
         text = text,
         color = textColor,
-        style = ComposeAppTheme.typography.captionSB,
+        style = MaterialTheme.typography.labelSmall,
         textAlign = TextAlign.Center,
     )
 }

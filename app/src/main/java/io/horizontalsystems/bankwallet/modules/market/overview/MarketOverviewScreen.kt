@@ -101,7 +101,7 @@ fun MarketOverviewScreen(
                                 }
                             )
 
-                            /*TopNftCollectionsBoardView(
+                            TopNftCollectionsBoardView(
                                 viewItem.topNftCollectionsBoard,
                                 onSelectTimeDuration = { timeDuration ->
                                     viewModel.onSelectTopNftsTimeDuration(timeDuration)
@@ -133,7 +133,7 @@ fun MarketOverviewScreen(
 
                                     navController.slideFromBottom(R.id.marketTopPlatformsFragment, args)
                                 }
-                            )*/
+                            )
                         }
                     }
                 }

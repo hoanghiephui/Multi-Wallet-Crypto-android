@@ -414,7 +414,7 @@ fun CellUniversalLawrenceSection(
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(ComposeAppTheme.colors.lawrence)
+            .background(MaterialTheme.colorScheme.surface)
     ) {
         composableItems.forEachIndexed { index, composable ->
             SectionUniversalItem(
