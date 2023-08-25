@@ -133,7 +133,7 @@ fun CoinOverviewScreen(
             chartViewModel.refresh()
         },
         content = {
-            Crossfade(viewState) { viewState ->
+            Crossfade(viewState, label = "") { viewState ->
                 when (viewState) {
                     ViewState.Loading -> {
                         Loading()
