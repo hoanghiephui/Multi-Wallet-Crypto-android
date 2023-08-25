@@ -138,12 +138,7 @@ private fun MainScreen(
 
     val uiState = viewModel.uiState
     val selectedPage = uiState.selectedPageIndex
-    val pagerState = rememberPagerState(
-        pageCount = {
-            uiState.mainNavItems.size
-        },
-        initialPage = selectedPage
-    )
+    val pagerState = rememberPagerState(initialPage = selectedPage) { uiState.mainNavItems.size }
 
     val coroutineScope = rememberCoroutineScope()
     val modalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
@@ -233,7 +228,6 @@ private fun MainScreen(
                                 fragmentNavController,
                                 transactionsViewModel
                             )
-
                             MainNavigation.Settings -> SettingsScreen(fragmentNavController)
                         }
                     }
@@ -269,12 +263,10 @@ private fun MainScreen(
             SupportState.Supported -> {
                 fragmentNavController.slideFromRight(R.id.wallet_connect_graph)
             }
-
             SupportState.NotSupportedDueToNoActiveAccount -> {
                 clearActivityData.invoke()
                 fragmentNavController.slideFromBottom(R.id.wcErrorNoAccountFragment)
             }
-
             is SupportState.NotSupportedDueToNonBackedUpAccount -> {
                 clearActivityData.invoke()
                 val text = stringResource(
@@ -286,7 +278,6 @@ private fun MainScreen(
                     BackupRequiredDialog.prepareParams(wcSupportState.account, text)
                 )
             }
-
             is SupportState.NotSupported -> {
                 clearActivityData.invoke()
                 fragmentNavController.slideFromBottom(
@@ -294,8 +285,7 @@ private fun MainScreen(
                     WCAccountTypeNotSupportedDialog.prepareParams(wcSupportState.accountTypeDescription)
                 )
             }
-
-            else -> {}
+            null -> {}
         }
         viewModel.wcSupportStateHandled()
     }
@@ -340,7 +330,6 @@ private fun BadgedIcon(
                 },
                 content = icon
             )
-
         MainModule.BadgeType.BadgeDot ->
             BadgedBox(
                 badge = {
@@ -355,7 +344,6 @@ private fun BadgedIcon(
                 },
                 content = icon
             )
-
         else -> {
             Box {
                 icon()

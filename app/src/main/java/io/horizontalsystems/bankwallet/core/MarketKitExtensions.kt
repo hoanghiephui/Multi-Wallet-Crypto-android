@@ -6,10 +6,8 @@ import io.horizontalsystems.bankwallet.core.managers.RestoreSettingType
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.entities.AccountType
 import io.horizontalsystems.bankwallet.entities.BitcoinCashCoinType
-import io.horizontalsystems.bankwallet.entities.CoinSettingType
-import io.horizontalsystems.bankwallet.entities.CoinSettings
 import io.horizontalsystems.bankwallet.entities.FeePriceScale
-import io.horizontalsystems.bankwallet.entities.derivation
+import io.horizontalsystems.bitcoincash.MainNetBitcoinCash
 import io.horizontalsystems.hdwalletkit.ExtendedKeyCoinType
 import io.horizontalsystems.hdwalletkit.HDWallet
 import io.horizontalsystems.marketkit.models.Blockchain
@@ -75,6 +73,8 @@ val Token.protocolInfo: String
 
 val Token.typeInfo: String
     get() = when (val type = type) {
+        is TokenType.Derived,
+        is TokenType.AddressTyped,
         TokenType.Native -> Translator.getString(R.string.CoinPlatforms_Native)
         is TokenType.Eip20 -> type.address.shorten()
         is TokenType.Bep2 -> type.symbol
@@ -131,9 +131,13 @@ val TokenQuery.customCoinUid: String
 val TokenQuery.isSupported: Boolean
     get() = when (blockchainType) {
         BlockchainType.Bitcoin,
-        BlockchainType.BitcoinCash,
+        BlockchainType.Litecoin -> {
+            tokenType is TokenType.Derived
+        }
+        BlockchainType.BitcoinCash -> {
+            tokenType is TokenType.AddressTyped
+        }
         BlockchainType.ECash,
-        BlockchainType.Litecoin,
         BlockchainType.Dash,
         BlockchainType.Zcash -> {
             tokenType is TokenType.Native
@@ -188,31 +192,6 @@ fun Blockchain.bep2TokenUrl(symbol: String) = "https://explorer.binance.org/asse
 
 val BlockchainType.imageUrl: String
     get() = "https://cdn.blocksdecoded.com/blockchain-icons/32px/$uid@3x.png"
-
-val BlockchainType.coinSettingType: CoinSettingType?
-    get() = when (this) {
-        BlockchainType.Bitcoin,
-        BlockchainType.Litecoin -> CoinSettingType.derivation
-        BlockchainType.BitcoinCash -> CoinSettingType.bitcoinCashCoinType
-        else -> null
-    }
-
-fun BlockchainType.defaultSettingsArray(accountType: AccountType): List<CoinSettings> = when (this) {
-    BlockchainType.Bitcoin,
-    BlockchainType.Litecoin -> {
-        when (accountType) {
-            is AccountType.Mnemonic -> listOf(CoinSettings(mapOf(CoinSettingType.derivation to AccountType.Derivation.bip84.value)))
-            is AccountType.HdExtendedKey -> {
-                accountType.hdExtendedKey.purposes.firstOrNull()?.let { purpose ->
-                    listOf(CoinSettings(mapOf(CoinSettingType.derivation to purpose.derivation.value)))
-                } ?: listOf()
-            }
-            else -> listOf()
-        }
-    }
-    BlockchainType.BitcoinCash -> listOf(CoinSettings(mapOf(CoinSettingType.bitcoinCashCoinType to BitcoinCashCoinType.type145.value)))
-    else -> listOf()
-}
 
 val BlockchainType.restoreSettingTypes: List<RestoreSettingType>
     get() = when (this) {
@@ -335,9 +314,13 @@ fun BlockchainType.supports(accountType: AccountType): Boolean {
 }
 
 val TokenType.order: Int
-    get() = when (this) {
-        TokenType.Native -> 0
-        else -> Int.MAX_VALUE
+    get() {
+        return when (this) {
+            TokenType.Native -> 0
+            is TokenType.Derived -> derivation.accountTypeDerivation.ordinal
+            is TokenType.AddressTyped -> type.bitcoinCashCoinType.ordinal
+            else -> Int.MAX_VALUE
+        }
     }
 
 
@@ -375,3 +358,86 @@ val HsPointTimePeriod.title: Int
         HsPointTimePeriod.Day1 -> R.string.Coin_Analytics_Period_1d
         HsPointTimePeriod.Week1 -> R.string.Coin_Analytics_Period_1w
     }
+
+val TokenType.Derivation.purpose: HDWallet.Purpose
+    get() = when (this) {
+        TokenType.Derivation.Bip44 -> HDWallet.Purpose.BIP44
+        TokenType.Derivation.Bip49 -> HDWallet.Purpose.BIP49
+        TokenType.Derivation.Bip84 -> HDWallet.Purpose.BIP84
+        TokenType.Derivation.Bip86 -> HDWallet.Purpose.BIP86
+    }
+
+val TokenType.Derivation.accountTypeDerivation: AccountType.Derivation
+    get() = when (this) {
+        TokenType.Derivation.Bip44 -> AccountType.Derivation.bip44
+        TokenType.Derivation.Bip49 -> AccountType.Derivation.bip49
+        TokenType.Derivation.Bip84 -> AccountType.Derivation.bip84
+        TokenType.Derivation.Bip86 -> AccountType.Derivation.bip86
+    }
+
+val TokenType.AddressType.kitCoinType: MainNetBitcoinCash.CoinType
+    get() = when (this) {
+        TokenType.AddressType.Type0 -> MainNetBitcoinCash.CoinType.Type0
+        TokenType.AddressType.Type145 -> MainNetBitcoinCash.CoinType.Type145
+    }
+
+val TokenType.AddressType.bitcoinCashCoinType: BitcoinCashCoinType
+    get() = when (this) {
+        TokenType.AddressType.Type0 -> BitcoinCashCoinType.type0
+        TokenType.AddressType.Type145 -> BitcoinCashCoinType.type145
+    }
+
+val Token.badge: String?
+    get() = when (val tokenType = type) {
+        is TokenType.Derived -> {
+            tokenType.derivation.accountTypeDerivation.value.uppercase()
+        }
+        is TokenType.AddressTyped -> {
+            tokenType.type.bitcoinCashCoinType.value.uppercase()
+        }
+        else -> {
+            protocolType?.uppercase()
+        }
+    }
+
+val BlockchainType.nativeTokenQueries: List<TokenQuery>
+    get() = when (this) {
+        BlockchainType.Bitcoin,
+        BlockchainType.Litecoin -> {
+            TokenType.Derivation.values().map {
+                TokenQuery(this, TokenType.Derived(it))
+            }
+        }
+        BlockchainType.BitcoinCash -> {
+            TokenType.AddressType.values().map {
+                TokenQuery(this, TokenType.AddressTyped(it))
+            }
+        }
+        else -> {
+            listOf(TokenQuery(this, TokenType.Native))
+        }
+    }
+
+val TokenType.title: String
+    get() = when (this) {
+        is TokenType.Derived -> derivation.accountTypeDerivation.rawName
+        is TokenType.AddressTyped -> Translator.getString(type.bitcoinCashCoinType.title)
+        else -> ""
+    }
+
+val TokenType.description: String
+    get() = when (this) {
+        is TokenType.Derived -> derivation.accountTypeDerivation.addressType
+        is TokenType.AddressTyped -> Translator.getString(type.bitcoinCashCoinType.description)
+        else -> ""
+    }
+
+val TokenType.isDefault
+    get() = when (this) {
+        is TokenType.Derived -> derivation.accountTypeDerivation == AccountType.Derivation.default
+        is TokenType.AddressTyped -> type.bitcoinCashCoinType == BitcoinCashCoinType.default
+        else -> false
+    }
+
+val TokenType.isNative: Boolean
+    get() = this is TokenType.Native || this is TokenType.Derived || this is TokenType.AddressTyped

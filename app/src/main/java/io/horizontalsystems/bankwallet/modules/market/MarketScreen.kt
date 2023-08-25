@@ -29,9 +29,9 @@ fun MarketScreen(navController: NavController) {
     val marketViewModel = viewModel<MarketViewModel>(factory = MarketModule.Factory())
     val tabs = marketViewModel.tabs
     val selectedTab = marketViewModel.selectedTab
-    val pagerState = rememberPagerState(pageCount = {
-        tabs.size
-    })
+
+    val pagerState = rememberPagerState(initialPage = selectedTab.ordinal) { tabs.size }
+
     Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
         AppBar(
             title = TranslatableString.ResString(R.string.Market_Title),

@@ -1,9 +1,18 @@
 package io.horizontalsystems.bankwallet.modules.managewallets
 
-import io.horizontalsystems.bankwallet.core.*
+import io.horizontalsystems.bankwallet.core.Clearable
+import io.horizontalsystems.bankwallet.core.IAccountManager
+import io.horizontalsystems.bankwallet.core.IWalletManager
+import io.horizontalsystems.bankwallet.core.eligibleTokens
+import io.horizontalsystems.bankwallet.core.isCustom
 import io.horizontalsystems.bankwallet.core.managers.MarketKitWrapper
 import io.horizontalsystems.bankwallet.core.managers.RestoreSettings
-import io.horizontalsystems.bankwallet.entities.*
+import io.horizontalsystems.bankwallet.core.restoreSettingTypes
+import io.horizontalsystems.bankwallet.core.sortedByFilter
+import io.horizontalsystems.bankwallet.core.subscribeIO
+import io.horizontalsystems.bankwallet.entities.Account
+import io.horizontalsystems.bankwallet.entities.AccountType
+import io.horizontalsystems.bankwallet.entities.Wallet
 import io.horizontalsystems.bankwallet.modules.enablecoin.restoresettings.RestoreSettingsService
 import io.horizontalsystems.ethereumkit.core.AddressValidator
 import io.horizontalsystems.marketkit.models.BlockchainType
@@ -50,7 +59,7 @@ class ManageWalletsService(
 
         restoreSettingsService.approveSettingsObservable
             .subscribeIO {
-                enable(ConfiguredToken(it.token), it.settings)
+                enable(it.token, it.settings)
             }.let {
                 disposables.add(it)
             }
@@ -61,8 +70,8 @@ class ManageWalletsService(
         syncState()
     }
 
-    private fun isEnabled(configuredToken: ConfiguredToken): Boolean {
-        return wallets.any { it.configuredToken == configuredToken }
+    private fun isEnabled(token: Token): Boolean {
+        return wallets.any { it.token == token }
     }
 
     private fun sync(walletList: List<Wallet>) {
@@ -115,57 +124,30 @@ class ManageWalletsService(
 
         val items = mutableListOf<Item>()
         fullCoin.eligibleTokens(accountType).forEach { token ->
-            items.addAll(getItemsForToken(token, accountType))
+            items.add(getItemForToken(token))
         }
 
         return items
     }
 
-    private fun getItemsForToken(token: Token, accountType: AccountType): List<Item> {
-        val items = mutableListOf<Item>()
-        when (token.blockchainType.coinSettingType) {
-            CoinSettingType.derivation -> {
-                accountType.supportedDerivations.forEach {
-                    val coinSettings = CoinSettings(mapOf(CoinSettingType.derivation to it.value))
-                    items.add(getItemForConfiguredToken(ConfiguredToken(token, coinSettings)))
-                }
-            }
-            CoinSettingType.bitcoinCashCoinType -> {
-                BitcoinCashCoinType.values().forEach {
-                    val coinSettings = CoinSettings(mapOf(CoinSettingType.bitcoinCashCoinType to it.value))
-                    items.add(getItemForConfiguredToken(ConfiguredToken(token, coinSettings)))
-                }
-            }
-            else -> {
-                items.add(getItemForConfiguredToken(ConfiguredToken(token)))
-            }
-        }
-
-        return items
-    }
-
-    private fun getItemForConfiguredToken(configuredToken: ConfiguredToken): Item {
-        val enabled = isEnabled(configuredToken)
-
-        val hasInfo = when (configuredToken.token.type) {
-            is TokenType.Eip20,
-            is TokenType.Bep2,
-            is TokenType.Spl -> true
-            is TokenType.Native -> when (configuredToken.token.blockchainType) {
-                is BlockchainType.Bitcoin,
-                is BlockchainType.Litecoin,
-                is BlockchainType.BitcoinCash -> true
-                is BlockchainType.Zcash -> enabled
-                else -> false
-            }
-            else -> false
-        }
+    private fun getItemForToken(token: Token): Item {
+        val enabled = isEnabled(token)
 
         return Item(
-            configuredToken = configuredToken,
-            enabled = enabled,
-            hasInfo = hasInfo
+                token = token,
+                enabled = enabled,
+                hasInfo = hasInfo(token, enabled)
         )
+    }
+
+    private fun hasInfo(token: Token, enabled: Boolean) = when (token.type) {
+        is TokenType.Native -> token.blockchainType is BlockchainType.Zcash && enabled
+        is TokenType.Derived,
+        is TokenType.AddressTyped,
+        is TokenType.Eip20,
+        is TokenType.Bep2,
+        is TokenType.Spl -> true
+        else -> false
     }
 
     private fun syncState() {
@@ -184,9 +166,9 @@ class ManageWalletsService(
         syncState()
     }
 
-    private fun updateSortedItems(configuredToken: ConfiguredToken, enable: Boolean) {
+    private fun updateSortedItems(token: Token, enable: Boolean) {
         sortedItems = sortedItems.map { item ->
-            if (item.configuredToken == configuredToken) {
+            if (item.token == token) {
                 item.copy(enabled = enable)
             } else {
                 item
@@ -194,16 +176,16 @@ class ManageWalletsService(
         }
     }
 
-    private fun enable(configuredToken: ConfiguredToken, restoreSettings: RestoreSettings) {
+    private fun enable(token: Token, restoreSettings: RestoreSettings) {
         val account = this.account ?: return
 
         if (restoreSettings.isNotEmpty()) {
-            restoreSettingsService.save(restoreSettings, account, configuredToken.token.blockchainType)
+            restoreSettingsService.save(restoreSettings, account, token.blockchainType)
         }
 
-        walletManager.save(listOf(Wallet(configuredToken, account)))
+        walletManager.save(listOf(Wallet(token, account)))
 
-        updateSortedItems(configuredToken, true)
+        updateSortedItems(token, true)
     }
 
     fun setFilter(filter: String) {
@@ -214,20 +196,20 @@ class ManageWalletsService(
         syncState()
     }
 
-    fun enable(configuredToken: ConfiguredToken) {
+    fun enable(token: Token) {
         val account = this.account ?: return
 
-        if (configuredToken.token.blockchainType.restoreSettingTypes.isNotEmpty()) {
-            restoreSettingsService.approveSettings(configuredToken.token, account)
+        if (token.blockchainType.restoreSettingTypes.isNotEmpty()) {
+            restoreSettingsService.approveSettings(token, account)
         } else {
-            enable(configuredToken, RestoreSettings())
+            enable(token, RestoreSettings())
         }
     }
 
-    fun disable(configuredToken: ConfiguredToken) {
-        wallets.firstOrNull { it.configuredToken == configuredToken }?.let {
+    fun disable(token: Token) {
+        wallets.firstOrNull { it.token == token }?.let {
             walletManager.delete(listOf(it))
-            updateSortedItems(configuredToken, false)
+            updateSortedItems(token, false)
         }
     }
 
@@ -236,7 +218,7 @@ class ManageWalletsService(
     }
 
     data class Item(
-        val configuredToken: ConfiguredToken,
+        val token: Token,
         val enabled: Boolean,
         val hasInfo: Boolean
     )

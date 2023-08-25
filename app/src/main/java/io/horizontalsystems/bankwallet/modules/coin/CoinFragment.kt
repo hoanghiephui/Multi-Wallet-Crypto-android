@@ -107,9 +107,7 @@ fun CoinTabs(
     fragmentManager: FragmentManager
 ) {
     val tabs = viewModel.tabs
-    val pagerState = rememberPagerState(pageCount = {
-        tabs.size
-    })
+    val pagerState = rememberPagerState(initialPage = 0) { tabs.size }
     val coroutineScope = rememberCoroutineScope()
     val view = LocalView.current
 
@@ -171,11 +169,9 @@ fun CoinTabs(
                         navController = navController
                     )
                 }
-
                 CoinModule.Tab.Market -> {
                     CoinMarketsScreen(fullCoin = viewModel.fullCoin)
                 }
-
                 CoinModule.Tab.Details -> {
                     CoinAnalyticsScreen(
                         fullCoin = viewModel.fullCoin,

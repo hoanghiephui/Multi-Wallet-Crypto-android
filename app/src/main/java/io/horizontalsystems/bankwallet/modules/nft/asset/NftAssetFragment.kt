@@ -15,38 +15,21 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.platform.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -81,28 +64,7 @@ import io.horizontalsystems.bankwallet.modules.nft.send.SendNftModule
 import io.horizontalsystems.bankwallet.modules.nft.ui.CellLink
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
-import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
-import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryCircle
-import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryDefault
-import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
-import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryCircle
-import io.horizontalsystems.bankwallet.ui.compose.components.CellFooter
-import io.horizontalsystems.bankwallet.ui.compose.components.CellMultilineLawrenceSection
-import io.horizontalsystems.bankwallet.ui.compose.components.CellSingleLine
-import io.horizontalsystems.bankwallet.ui.compose.components.CellSingleLineClear
-import io.horizontalsystems.bankwallet.ui.compose.components.CellSingleLineLawrenceSection
-import io.horizontalsystems.bankwallet.ui.compose.components.InfoText
-import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
-import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
-import io.horizontalsystems.bankwallet.ui.compose.components.SelectorDialogCompose
-import io.horizontalsystems.bankwallet.ui.compose.components.SnackbarError
-import io.horizontalsystems.bankwallet.ui.compose.components.TabItem
-import io.horizontalsystems.bankwallet.ui.compose.components.Tabs
-import io.horizontalsystems.bankwallet.ui.compose.components.body_jacob
-import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
-import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_grey
-import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_jacob
-import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
+import io.horizontalsystems.bankwallet.ui.compose.components.*
 import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
 import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.helpers.HudHelper
@@ -120,8 +82,7 @@ class NftAssetFragment : BaseFragment() {
         savedInstanceState: Bundle?
     ): View {
         val collectionUid = requireArguments().getString(NftAssetModule.collectionUidKey)
-        val nftUid =
-            requireArguments().getString(NftAssetModule.nftUidKey)?.let { NftUid.fromUid(it) }
+        val nftUid = requireArguments().getString(NftAssetModule.nftUidKey)?.let { NftUid.fromUid(it) }
 
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(
@@ -174,9 +135,7 @@ private fun NftAsset(
     navController: NavController
 ) {
     val tabs = viewModel.tabs
-    val pagerState = rememberPagerState(pageCount = {
-        tabs.size
-    })
+    val pagerState = rememberPagerState(initialPage = 0) { tabs.size }
     val coroutineScope = viewModel.viewModelScope
 
     val selectedTab = tabs[pagerState.currentPage]
@@ -199,7 +158,6 @@ private fun NftAsset(
                 NftAssetModule.Tab.Overview -> {
                     NftAssetInfo(viewModel, navController, coroutineScope)
                 }
-
                 NftAssetModule.Tab.Activity -> {
                     NftAssetEvents(viewModel)
                 }

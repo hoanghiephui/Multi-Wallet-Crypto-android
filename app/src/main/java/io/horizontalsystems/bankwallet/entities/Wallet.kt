@@ -1,21 +1,17 @@
 package io.horizontalsystems.bankwallet.entities
 
 import android.os.Parcelable
+import io.horizontalsystems.bankwallet.core.badge
 import io.horizontalsystems.bankwallet.modules.transactions.TransactionSource
 import io.horizontalsystems.marketkit.models.Token
 import kotlinx.parcelize.Parcelize
-import java.util.*
+import java.util.Objects
 
 @Parcelize
 data class Wallet(
-    val configuredToken: ConfiguredToken,
+    val token: Token,
     val account: Account
 ) : Parcelable {
-    val token
-        get() = configuredToken.token
-
-    val coinSettings
-        get() = configuredToken.coinSettings
 
     val coin
         get() = token.coin
@@ -24,21 +20,19 @@ data class Wallet(
         get() = token.decimals
 
     val badge
-        get() = configuredToken.badge
+        get() = token.badge
 
-    val transactionSource get() = TransactionSource(token.blockchain, account, coinSettings)
-
-    constructor(token: Token, account: Account) : this(ConfiguredToken(token), account)
+    val transactionSource get() = TransactionSource(token.blockchain, account, token.type)
 
     override fun equals(other: Any?): Boolean {
         if (other is Wallet) {
-            return configuredToken == other.configuredToken && account == other.account
+            return token == other.token && account == other.account
         }
 
         return super.equals(other)
     }
 
     override fun hashCode(): Int {
-        return Objects.hash(configuredToken, account)
+        return Objects.hash(token, account)
     }
 }

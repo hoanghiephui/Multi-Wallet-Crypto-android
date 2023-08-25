@@ -4,27 +4,33 @@ import android.content.Intent
 import android.os.Parcelable
 import android.widget.ImageView
 import androidx.annotation.CheckResult
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
-import coil.load
 import androidx.navigation.compose.composable
+import coil.load
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.modules.market.ImageSource
 import io.horizontalsystems.bankwallet.modules.market.topplatforms.Platform
 import io.horizontalsystems.ethereumkit.core.toRawHexString
 import io.horizontalsystems.hdwalletkit.Language
 import io.horizontalsystems.hodler.LockTimeInterval
-import io.horizontalsystems.marketkit.models.*
+import io.horizontalsystems.marketkit.models.Auditor
+import io.horizontalsystems.marketkit.models.CoinCategory
+import io.horizontalsystems.marketkit.models.CoinInvestment
+import io.horizontalsystems.marketkit.models.CoinTreasury
+import io.horizontalsystems.marketkit.models.FullCoin
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import java.util.*
+import java.util.Locale
+import java.util.Optional
 
 val <T> Optional<T>.orNull: T?
     get() = when {
@@ -204,7 +210,6 @@ fun String.shorten(): String {
 
 //Compose Animated Navigation
 
-@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.composablePage(
     route: String,
     arguments: List<NamedNavArgument> = emptyList(),
@@ -230,7 +235,6 @@ fun NavGraphBuilder.composablePage(
     )
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.composablePopup(
     route: String,
     content: @Composable AnimatedVisibilityScope.(NavBackStackEntry) -> Unit
