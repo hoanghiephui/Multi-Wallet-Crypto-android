@@ -16,6 +16,11 @@
 
 package io.horizontalsystems.bankwallet.material.navigation
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountBalanceWallet
+import androidx.compose.material.icons.outlined.ConnectWithoutContact
+import androidx.compose.material.icons.rounded.AccountBalanceWallet
+import androidx.compose.material.icons.rounded.ConnectWithoutContact
 import androidx.compose.ui.graphics.vector.ImageVector
 import coin.chain.crypto.core.designsystem.icon.NiaIcons
 import io.horizontalsystems.bankwallet.R
@@ -38,20 +43,20 @@ enum class TopLevelDestination(
         titleTextId = R.string.App_Name,
     ),
     BALANCE(
-        selectedIcon = NiaIcons.Bookmarks,
-        unselectedIcon = NiaIcons.BookmarksBorder,
+        selectedIcon = Icons.Rounded.AccountBalanceWallet,
+        unselectedIcon = Icons.Outlined.AccountBalanceWallet,
         iconTextId = R.string.Balance_Title,
         titleTextId = R.string.Balance_Title,
     ),
     TRANSACTIONS(
-        selectedIcon = NiaIcons.Grid3x3,
-        unselectedIcon = NiaIcons.Grid3x3,
+        selectedIcon = Icons.Rounded.ConnectWithoutContact,
+        unselectedIcon = Icons.Outlined.ConnectWithoutContact,
         iconTextId = R.string.Transactions_Title,
         titleTextId = R.string.Transactions_Title,
     ),
     SETTINGS(
-        selectedIcon = NiaIcons.Grid3x3,
-        unselectedIcon = NiaIcons.Grid3x3,
+        selectedIcon = NiaIcons.Settings,
+        unselectedIcon = NiaIcons.Settings,
         iconTextId = R.string.Settings_Title,
         titleTextId = R.string.Settings_Title,
     ),

@@ -86,7 +86,6 @@ fun DonateScreen(
     onBackPress: () -> Unit
 ) {
     Column {
-        Spacer(Modifier.windowInsetsTopHeight(WindowInsets.safeDrawing))
         TopAppBar(
             titleRes = R.string.Settings_Donate,
             navigationIcon = Icons.Rounded.ArrowBack,
