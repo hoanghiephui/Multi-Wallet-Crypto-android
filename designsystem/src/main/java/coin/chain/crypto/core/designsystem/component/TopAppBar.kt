@@ -73,6 +73,32 @@ fun NiaTopAppBar(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopAppBar(
+    titleRes: String,
+    navigationIcon: @Composable (() -> Unit),
+    actionIcon: ImageVector,
+    actionIconContentDescription: String?,
+    colors: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
+    onActionClick: () -> Unit = {},
+) {
+    CenterAlignedTopAppBar(
+        title = { Text(text = titleRes) },
+        navigationIcon = navigationIcon,
+        actions = {
+            IconButton(onClick = onActionClick) {
+                Icon(
+                    imageVector = actionIcon,
+                    contentDescription = actionIconContentDescription,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+        },
+        colors = colors,
+    )
+}
+
 /**
  * Top app bar with action, displayed on the right
  */
@@ -119,6 +145,31 @@ fun TopAppBar(
                 Icon(
                     imageVector = navigationIcon,
                     contentDescription = navigationIconContentDescription,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+        },
+        colors = colors,
+        modifier = modifier.testTag("niaTopAppBar"),
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopAppBarClose(
+    actionIcon: ImageVector,
+    actionIconContentDescription: String?,
+    modifier: Modifier = Modifier,
+    colors: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors(),
+    onActionClick: () -> Unit = {},
+) {
+    CenterAlignedTopAppBar(
+        title = {  },
+        actions = {
+            IconButton(onClick = onActionClick) {
+                Icon(
+                    imageVector = actionIcon,
+                    contentDescription = actionIconContentDescription,
                     tint = MaterialTheme.colorScheme.onSurface,
                 )
             }

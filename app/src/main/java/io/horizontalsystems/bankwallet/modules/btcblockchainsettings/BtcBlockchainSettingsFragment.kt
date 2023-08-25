@@ -1,39 +1,51 @@
 package io.horizontalsystems.bankwallet.modules.btcblockchainsettings
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
-import androidx.compose.material.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import coin.chain.crypto.core.designsystem.component.TopAppBar
+import coin.chain.crypto.core.designsystem.theme.NiaTheme
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseFragment
-import io.horizontalsystems.bankwallet.core.slideFromBottom
-import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
-import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
-import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
-import io.horizontalsystems.bankwallet.ui.compose.components.*
-import io.horizontalsystems.core.findNavController
+import io.horizontalsystems.bankwallet.material.module.info.navigateToBtcBlockchainRestoreSourceInfo
+import io.horizontalsystems.bankwallet.material.module.setting.navigations.blockchainSettingsRoute
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
+import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
+import io.horizontalsystems.bankwallet.ui.compose.components.HeaderText
+import io.horizontalsystems.bankwallet.ui.compose.components.InfoText
+import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
+import io.horizontalsystems.bankwallet.ui.compose.components.TextImportantWarning
+import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 
 class BtcBlockchainSettingsFragment : BaseFragment() {
 
-    private val viewModel by viewModels<BtcBlockchainSettingsViewModel> {
+    /*private val viewModel by viewModels<BtcBlockchainSettingsViewModel> {
         BtcBlockchainSettingsModule.Factory(requireArguments())
     }
 
@@ -56,24 +68,25 @@ class BtcBlockchainSettingsFragment : BaseFragment() {
                 }
             }
         }
-    }
+    }*/
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun BtcBlockchainSettingsScreen(
+fun BtcBlockchainSettingsScreen(
     viewModel: BtcBlockchainSettingsViewModel,
     navController: NavController
 ) {
 
     if (viewModel.closeScreen) {
-        navController.popBackStack()
+        navController.popBackStack(route = blockchainSettingsRoute, inclusive = false)
     }
 
-    Surface(color = ComposeAppTheme.colors.tyler) {
+    NiaTheme {
         Column {
-            AppBar(
-                TranslatableString.PlainString(viewModel.title),
+            TopAppBar(
+                titleRes = viewModel.title,
                 navigationIcon = {
                     Image(
                         painter = rememberAsyncImagePainter(
@@ -86,16 +99,16 @@ private fun BtcBlockchainSettingsScreen(
                             .size(24.dp)
                     )
                 },
-                menuItems = listOf(
-                    MenuItem(
-                        title = TranslatableString.ResString(R.string.Button_Close),
-                        icon = R.drawable.ic_close,
-                        onClick = {
-                            navController.popBackStack()
-                        }
-                    )
-                )
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Transparent,
+                ),
+                actionIcon = Icons.Rounded.Close,
+                onActionClick = {
+                    navController.popBackStack()
+                },
+                actionIconContentDescription = "Button_Close"
             )
+
 
             Column(
                 modifier = Modifier
@@ -114,8 +127,7 @@ private fun BtcBlockchainSettingsScreen(
                 RestoreSourceSettings(viewModel, navController)
                 Spacer(Modifier.height(32.dp))
             }
-
-            ButtonsGroupWithShade {
+            if (viewModel.saveButtonEnabled) {
                 ButtonPrimaryYellow(
                     modifier = Modifier
                         .padding(start = 16.dp, end = 16.dp)
@@ -124,6 +136,7 @@ private fun BtcBlockchainSettingsScreen(
                     enabled = viewModel.saveButtonEnabled,
                     onClick = { viewModel.onSaveClick() }
                 )
+                Spacer(Modifier.height(16.dp))
             }
         }
 
@@ -137,7 +150,6 @@ private fun RestoreSourceSettings(
 ) {
     BlockchainSettingSection(
         viewModel.restoreSources,
-        R.id.btcBlockchainRestoreSourceInfoFragment,
         R.string.BtcBlockchainSettings_RestoreSource,
         R.string.BtcBlockchainSettings_RestoreSourceSettingsDescription,
         { viewItem -> viewModel.onSelectRestoreMode(viewItem) },
@@ -148,7 +160,6 @@ private fun RestoreSourceSettings(
 @Composable
 private fun BlockchainSettingSection(
     restoreSources: List<BtcBlockchainSettingsModule.ViewItem>,
-    infoScreenId: Int,
     settingTitleTextRes: Int,
     settingDescriptionTextRes: Int,
     onItemClick: (BtcBlockchainSettingsModule.ViewItem) -> Unit,
@@ -157,7 +168,7 @@ private fun BlockchainSettingSection(
     HeaderText(
         text = stringResource(settingTitleTextRes),
         onInfoClick = {
-            navController.slideFromBottom(infoScreenId)
+            navController.navigateToBtcBlockchainRestoreSourceInfo()
         })
     CellUniversalLawrenceSection(restoreSources) { item ->
         BlockchainSettingCell(item.title, item.subtitle, item.selected) {
@@ -179,7 +190,11 @@ fun BlockchainSettingCell(
     RowUniversal(
         onClick = onClick
     ) {
-        Column(modifier = Modifier.padding(start = 16.dp).weight(1f)) {
+        Column(
+            modifier = Modifier
+                .padding(start = 16.dp)
+                .weight(1f)
+        ) {
             body_leah(
                 text = title,
                 maxLines = 1,
@@ -201,7 +216,7 @@ fun BlockchainSettingCell(
             if (checked) {
                 Icon(
                     painter = painterResource(R.drawable.ic_checkmark_20),
-                    tint = ComposeAppTheme.colors.jacob,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     contentDescription = null,
                 )
             }

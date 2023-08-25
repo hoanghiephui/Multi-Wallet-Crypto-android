@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -297,13 +298,13 @@ fun ButtonsGroupWithShade(
                 .height(24.dp)
                 .background(
                     brush = Brush.verticalGradient(
-                        listOf(ComposeAppTheme.colors.transparent, ComposeAppTheme.colors.tyler)
+                        listOf(Color.Transparent, MaterialTheme.colorScheme.onBackground)
                     )
                 )
         )
         Box(
             modifier = Modifier
-                .background(ComposeAppTheme.colors.tyler)
+                .background(MaterialTheme.colorScheme.primary)
                 .padding(bottom = 8.dp) // With 24dp offset actual padding will be 32dp
         ) {
             ButtonsContent()

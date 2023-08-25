@@ -10,21 +10,23 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coin.chain.crypto.core.designsystem.component.TopAppBarClose
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.modules.info.ui.InfoBody
 import io.horizontalsystems.bankwallet.modules.info.ui.InfoHeader
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
-import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
-import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
-import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.core.findNavController
 
 class BtcBlockchainRestoreSourceInfoFragment : BaseFragment() {
@@ -42,7 +44,7 @@ class BtcBlockchainRestoreSourceInfoFragment : BaseFragment() {
 
             setContent {
                 ComposeAppTheme {
-                    InfoScreen(
+                    InfoSourceScreen(
                         findNavController()
                     )
                 }
@@ -52,32 +54,30 @@ class BtcBlockchainRestoreSourceInfoFragment : BaseFragment() {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun InfoScreen(
+fun InfoSourceScreen(
     navController: NavController
 ) {
 
-    Surface(color = ComposeAppTheme.colors.tyler) {
-        Column {
-            AppBar(
-                menuItems = listOf(
-                    MenuItem(
-                        title = TranslatableString.ResString(R.string.Button_Close),
-                        icon = R.drawable.ic_close,
-                        onClick = { navController.popBackStack() }
-                    )
-                )
+    Column {
+        TopAppBarClose(
+            actionIcon = Icons.Rounded.Close,
+            actionIconContentDescription = "ArrowBack",
+            onActionClick = { navController.popBackStack() },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = Color.Transparent,
             )
+        )
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
-            ) {
-                InfoHeader(R.string.BtcBlockchainSettings_RestoreSource)
-                InfoBody(R.string.BtcBlockchainSettings_RestoreSourceDescription)
-                Spacer(Modifier.height(20.dp))
-            }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+        ) {
+            InfoHeader(R.string.BtcBlockchainSettings_RestoreSource)
+            InfoBody(R.string.BtcBlockchainSettings_RestoreSourceDescription)
+            Spacer(Modifier.height(20.dp))
         }
     }
 }

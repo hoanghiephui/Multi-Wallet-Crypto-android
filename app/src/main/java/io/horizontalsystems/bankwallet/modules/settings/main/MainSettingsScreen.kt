@@ -34,7 +34,9 @@ import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.material.module.setting.navigations.navigateToBlockchainSettings
 import io.horizontalsystems.bankwallet.material.module.setting.navigations.navigateToDonate
+import io.horizontalsystems.bankwallet.material.module.setting.navigations.navigateToManageAccounts
 import io.horizontalsystems.bankwallet.modules.contacts.ContactsFragment
 import io.horizontalsystems.bankwallet.modules.contacts.Mode
 import io.horizontalsystems.bankwallet.modules.manageaccount.dialogs.BackupRequiredDialog
@@ -111,10 +113,7 @@ fun SettingSections(
                 R.drawable.ic_wallet_20,
                 showAlert = showAlertManageWallet,
                 onClick = {
-                    navController.slideFromRight(
-                        R.id.manageAccountsFragment,
-                        bundleOf(ManageAccountsModule.MODE to ManageAccountsModule.Mode.Manage)
-                    )
+                    navController.navigateToManageAccounts(bundle = bundleOf(ManageAccountsModule.MODE to ManageAccountsModule.Mode.Manage))
                 }
             )
         }, {
@@ -122,7 +121,7 @@ fun SettingSections(
                 R.string.BlockchainSettings_Title,
                 R.drawable.ic_blocks_20,
                 onClick = {
-                    navController.slideFromRight(R.id.blockchainSettingsFragment)
+                    navController.navigateToBlockchainSettings()
                 }
             )
         })

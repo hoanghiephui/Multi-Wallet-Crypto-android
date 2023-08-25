@@ -16,11 +16,24 @@
 
 package io.horizontalsystems.bankwallet.material.navigation
 
+import android.annotation.SuppressLint
+import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.core.net.toUri
+import androidx.navigation.NavController
+import androidx.navigation.NavDeepLinkRequest
+import androidx.navigation.NavDestination
+import androidx.navigation.NavOptions
+import androidx.navigation.Navigator
 import androidx.navigation.compose.NavHost
+import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.material.main.NiaAppState
+import io.horizontalsystems.bankwallet.material.module.info.btcBlockchainRestoreSourceInfoScreen
+import io.horizontalsystems.bankwallet.material.module.setting.navigations.blockchainSettingsScreen
+import io.horizontalsystems.bankwallet.material.module.setting.navigations.btcBlockchainSettingsScreen
 import io.horizontalsystems.bankwallet.material.module.setting.navigations.donateScreen
+import io.horizontalsystems.bankwallet.material.module.setting.navigations.manageAccountsScreen
 
 /**
  * Top-level navigation graph. Navigation is organized as explained at
@@ -54,7 +67,41 @@ fun NiaNavHost(
             navController = navController,
             nestedGraphs = {
                 donateScreen(onBackPress = navController::popBackStack)
+                manageAccountsScreen(
+                    onBackPress = navController::popBackStack,
+                    navController = navController
+                )
+                blockchainSettingsScreen(navController)
+                btcBlockchainSettingsScreen(navController)
+                btcBlockchainRestoreSourceInfoScreen(navController)
             },
         )
+    }
+}
+
+val navOptionsSlideFromRight = NavOptions.Builder()
+    .setEnterAnim(R.anim.slide_from_right)
+    .setExitAnim(android.R.anim.fade_out)
+    .setPopEnterAnim(android.R.anim.fade_in)
+    .setPopExitAnim(R.anim.slide_to_right)
+    .build()
+
+@SuppressLint("RestrictedApi")
+fun NavController.navigate(
+    route: String,
+    args: Bundle,
+    navOptions: NavOptions? = null,
+    navigatorExtras: Navigator.Extras? = null
+) {
+    val routeLink =
+        NavDeepLinkRequest.Builder.fromUri(NavDestination.createRoute(route).toUri()).build()
+
+    val deepLinkMatch = graph.matchDeepLink(routeLink)
+    if (deepLinkMatch != null) {
+        val destination = deepLinkMatch.destination
+        val id = destination.id
+        navigate(id, args, navOptions, navigatorExtras)
+    } else {
+        navigate(route, navOptions, navigatorExtras)
     }
 }

@@ -433,7 +433,7 @@ fun <T> CellUniversalLawrenceSection(
     itemContent: @Composable (T) -> Unit
 ) {
     val frameModifier = if (showFrame) {
-        Modifier.border(1.dp, ComposeAppTheme.colors.steel20, RoundedCornerShape(12.dp))
+        Modifier.border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
     } else {
         Modifier
     }
@@ -442,7 +442,7 @@ fun <T> CellUniversalLawrenceSection(
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.onPrimary)
+            .background(MaterialTheme.colorScheme.surface)
             .then(frameModifier)
     ) {
         items.forEachIndexed { index, itemData ->

@@ -25,7 +25,7 @@ class BtcBlockchainSettingsService(
     }
 
     fun setRestoreMode(id: String) {
-        restoreMode = BtcRestoreMode.values().first { it.raw == id }
+        restoreMode = BtcRestoreMode.entries.first { it.raw == id }
         syncHasChanges()
     }
 

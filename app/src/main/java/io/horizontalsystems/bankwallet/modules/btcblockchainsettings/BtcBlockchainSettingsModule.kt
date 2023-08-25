@@ -17,7 +17,7 @@ object BtcBlockchainSettingsModule {
     class Factory(arguments: Bundle) : ViewModelProvider.Factory {
         private val blockchain = arguments.parcelable<Blockchain>("blockchain")!!
 
-        @Suppress("UNCHECKED_CAST")
+        /*@Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
 
             val service = BtcBlockchainSettingsService(
@@ -26,7 +26,7 @@ object BtcBlockchainSettingsModule {
             )
 
             return BtcBlockchainSettingsViewModel(service) as T
-        }
+        }*/
     }
 
     data class ViewItem(

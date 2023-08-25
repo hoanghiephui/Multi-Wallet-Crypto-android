@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,10 +28,10 @@ fun TextImportantWarning(
         text = text,
         title = title,
         icon = icon,
-        borderColor = ComposeAppTheme.colors.jacob,
-        backgroundColor = ComposeAppTheme.colors.yellow20,
-        textColor = ComposeAppTheme.colors.jacob,
-        iconColor = ComposeAppTheme.colors.jacob
+        borderColor = MaterialTheme.colorScheme.primary,
+        backgroundColor = MaterialTheme.colorScheme.onPrimary,
+        textColor = MaterialTheme.colorScheme.onSurface,
+        iconColor = MaterialTheme.colorScheme.onSurface
     )
 }
 
@@ -88,7 +89,7 @@ fun TextImportant(
                     Text(
                         text = it,
                         color = textColor,
-                        style = ComposeAppTheme.typography.subhead1
+                        style = MaterialTheme.typography.titleSmall
                     )
                 }
             }

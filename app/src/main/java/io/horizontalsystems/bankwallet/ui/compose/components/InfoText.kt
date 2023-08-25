@@ -21,7 +21,7 @@ fun InfoTextBody(text: String) {
     Text(
         modifier = Modifier.padding(horizontal = 32.dp, vertical = 12.dp),
         text = text,
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.surface
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onSurface
     )
 }

@@ -10,6 +10,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.Grey
+import io.horizontalsystems.bankwallet.ui.compose.RedL
 
 @Composable
 fun headline1_bran(
@@ -225,8 +226,8 @@ fun A3(
         overflow = overflow,
         maxLines = maxLines,
         onTextLayout = onTextLayout,
-        style = ComposeAppTheme.typography.headline2,
-        color = ComposeAppTheme.colors.jacob,
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.onPrimary,
     )
 }
 @Composable
@@ -615,8 +616,8 @@ fun B3(
         overflow = overflow,
         maxLines = maxLines,
         onTextLayout = onTextLayout,
-        style = ComposeAppTheme.typography.body,
-        color = ComposeAppTheme.colors.jacob,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.primary,
     )
 }
 @Composable
@@ -1513,8 +1514,8 @@ fun D5(
         overflow = overflow,
         maxLines = maxLines,
         onTextLayout = onTextLayout,
-        style = ComposeAppTheme.typography.subhead2,
-        color = ComposeAppTheme.colors.lucian,
+        style = MaterialTheme.typography.bodyLarge,
+        color = RedL,
     )
 }
 @Composable

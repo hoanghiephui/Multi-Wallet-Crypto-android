@@ -3,17 +3,27 @@ package io.horizontalsystems.bankwallet.modules.btcblockchainsettings
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.entities.BtcRestoreMode
 import io.horizontalsystems.bankwallet.modules.btcblockchainsettings.BtcBlockchainSettingsModule.ViewItem
+import io.horizontalsystems.marketkit.models.Blockchain
 import io.reactivex.disposables.CompositeDisposable
+import javax.inject.Inject
 
-class BtcBlockchainSettingsViewModel(
-    private val service: BtcBlockchainSettingsService
+@HiltViewModel
+class BtcBlockchainSettingsViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-
+    private val blockchain: Blockchain = checkNotNull(savedStateHandle["blockchain"])
+    private val service: BtcBlockchainSettingsService = BtcBlockchainSettingsService(
+        blockchain,
+        App.btcBlockchainManager
+    )
     private val disposables = CompositeDisposable()
 
     var closeScreen by mutableStateOf(false)
@@ -54,7 +64,7 @@ class BtcBlockchainSettingsViewModel(
     }
 
     private fun syncRestoreModeState() {
-        val viewItems = BtcRestoreMode.values().map { mode ->
+        val viewItems = BtcRestoreMode.entries.map { mode ->
             ViewItem(
                 id = mode.raw,
                 title = Translator.getString(mode.title),

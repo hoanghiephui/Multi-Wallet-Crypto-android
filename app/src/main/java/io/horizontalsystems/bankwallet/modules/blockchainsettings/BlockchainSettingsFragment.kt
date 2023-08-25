@@ -9,9 +9,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
-import androidx.compose.material.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
@@ -20,13 +25,14 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import coin.chain.crypto.core.designsystem.component.TopAppBar
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.core.slideFromBottom
+import io.horizontalsystems.bankwallet.material.module.setting.navigations.navigateToBtcBlockchainSettings
 import io.horizontalsystems.bankwallet.modules.btcblockchainsettings.BtcBlockchainSettingsModule
 import io.horizontalsystems.bankwallet.modules.evmnetwork.EvmNetworkModule
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
-import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.*
 import io.horizontalsystems.core.findNavController
 
@@ -53,34 +59,36 @@ class BlockchainSettingsFragment : BaseFragment() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun BlockchainSettingsScreen(
+fun BlockchainSettingsScreen(
     navController: NavController,
     viewModel: BlockchainSettingsViewModel = viewModel(factory = BlockchainSettingsModule.Factory()),
 ) {
 
-    Surface(color = ComposeAppTheme.colors.tyler) {
-        Column {
-            AppBar(
-                TranslatableString.ResString(R.string.BlockchainSettings_Title),
-                navigationIcon = {
-                    HsBackButton(onClick = { navController.popBackStack() })
-                },
+    Column {
+        TopAppBar(
+            titleRes = R.string.BlockchainSettings_Title,
+            navigationIcon = Icons.Rounded.ArrowBack,
+            navigationIconContentDescription = "ArrowBack",
+            onNavigationClick = { navController.popBackStack() },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = Color.Transparent,
             )
+        )
 
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
-            ) {
-                Spacer(Modifier.height(12.dp))
-                BlockchainSettingsBlock(
-                    btcLikeChains = viewModel.btcLikeChains,
-                    otherChains = viewModel.otherChains,
-                    navController = navController
-                )
-                Spacer(Modifier.height(44.dp))
-            }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
+        ) {
+            Spacer(Modifier.height(12.dp))
+            BlockchainSettingsBlock(
+                btcLikeChains = viewModel.btcLikeChains,
+                otherChains = viewModel.otherChains,
+                navController = navController
+            )
+            Spacer(Modifier.height(44.dp))
         }
     }
 
@@ -112,7 +120,7 @@ private fun onClick(
     when (item.blockchainItem) {
         is BlockchainSettingsModule.BlockchainItem.Btc -> {
             val params = BtcBlockchainSettingsModule.args(item.blockchainItem.blockchain)
-            navController.slideFromBottom(R.id.btcBlockchainSettingsFragment, params)
+            navController.navigateToBtcBlockchainSettings(params)
         }
         is BlockchainSettingsModule.BlockchainItem.Evm -> {
             val params = EvmNetworkModule.args(item.blockchainItem.blockchain)
@@ -150,7 +158,7 @@ private fun BlockchainSettingCell(
             modifier = Modifier.padding(horizontal = 16.dp),
             painter = painterResource(id = R.drawable.ic_arrow_right),
             contentDescription = null,
-            tint = ComposeAppTheme.colors.grey
+            tint = MaterialTheme.colorScheme.primary
         )
     }
 }

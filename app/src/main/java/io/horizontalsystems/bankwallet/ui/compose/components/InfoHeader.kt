@@ -4,12 +4,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Divider
 import androidx.compose.material.Text
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 
 @Composable
 fun InfoH3(text: String) {
@@ -26,13 +26,10 @@ fun InfoH1(text: String) {
     ){
         Text(
             text = text,
-            style = ComposeAppTheme.typography.title2,
-            color = ComposeAppTheme.colors.leah
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(Modifier.height(8.dp))
-        Divider(
-            thickness = 1.dp,
-            color = ComposeAppTheme.colors.grey50
-        )
+        Divider()
     }
 }
