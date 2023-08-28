@@ -3,9 +3,12 @@ package io.horizontalsystems.bankwallet.modules.evmnetwork
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.horizontalsystems.bankwallet.R
+import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.managers.EvmSyncSourceManager
 import io.horizontalsystems.bankwallet.core.managers.urls
 import io.horizontalsystems.bankwallet.core.providers.Translator
@@ -13,11 +16,14 @@ import io.horizontalsystems.bankwallet.entities.EvmSyncSource
 import io.horizontalsystems.marketkit.models.Blockchain
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
-class EvmNetworkViewModel(
-    val blockchain: Blockchain,
-    private val evmSyncSourceManager: EvmSyncSourceManager
+@HiltViewModel
+class EvmNetworkViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
+    private val evmSyncSourceManager: EvmSyncSourceManager = App.evmSyncSourceManager
+    val blockchain: Blockchain = checkNotNull(savedStateHandle["blockchain"])
 
     private var currentSyncSource = evmSyncSourceManager.getSyncSource(blockchain.type)
 

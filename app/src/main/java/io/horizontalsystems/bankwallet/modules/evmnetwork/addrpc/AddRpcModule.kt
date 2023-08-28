@@ -17,10 +17,10 @@ object AddRpcModule {
     class Factory(arguments: Bundle) : ViewModelProvider.Factory {
         private val blockchain = arguments.parcelable<Blockchain>("blockchain")!!
 
-        @Suppress("UNCHECKED_CAST")
+        /*@Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return AddRpcViewModel(blockchain, App.evmSyncSourceManager) as T
-        }
+        }*/
     }
 
 }

@@ -1,9 +1,12 @@
 package io.horizontalsystems.bankwallet.modules.keystore
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
@@ -12,6 +15,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
+import coin.chain.crypto.core.designsystem.component.NiaButton
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseActivity
 import io.horizontalsystems.bankwallet.modules.launcher.LaunchModule
@@ -158,7 +163,8 @@ private fun KeyStoreScreen(
 }
 
 @Composable
-private fun NoSystemLockWarning() {
+fun NoSystemLockWarning() {
+    val context = LocalContext.current
     Column() {
         Spacer(Modifier.height(12.dp))
         Image(
@@ -173,6 +179,25 @@ private fun NoSystemLockWarning() {
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(12.dp))
+        NiaButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    start = 24.dp, end = 24.dp, bottom = 10.dp
+                ),
+            onClick = {
+                try {
+                    context.startActivity(Intent(Settings.ACTION_SECURITY_SETTINGS))
+                } catch (ex: Exception) {
+                    context.startActivity(Intent(Settings.ACTION_SETTINGS))
+                }
+
+            }) {
+            Text(
+                text = stringResource(R.string.PinSet_Title),
+            )
+        }
+
     }
 }
 

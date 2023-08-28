@@ -6,6 +6,7 @@ import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.modules.blockchainsettings.BlockchainSettingsScreen
 import io.horizontalsystems.bankwallet.modules.btcblockchainsettings.BtcBlockchainSettingsScreen
 import io.horizontalsystems.bankwallet.modules.btcblockchainsettings.BtcBlockchainSettingsViewModel
+import io.horizontalsystems.bankwallet.modules.evmnetwork.EvmNetworkScreen
 
 /**
  * BlockchainSettingsRouter
@@ -28,5 +29,17 @@ fun BtcBlockchainSettingsRouter(
     BtcBlockchainSettingsScreen(
         viewModel = viewModel,
         navController = navController,
+    )
+}
+
+@Composable
+fun EvmSettingsRouter(
+    navController: NavController,
+    onShowSnackbar: suspend (String, String?) -> Boolean,
+) {
+    EvmNetworkScreen(
+        navController = navController,
+        onBackPress = { navController.popBackStack() },
+        onShowSnackbar = onShowSnackbar
     )
 }

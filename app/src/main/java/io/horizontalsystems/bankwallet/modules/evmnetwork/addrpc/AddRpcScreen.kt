@@ -1,16 +1,23 @@
 package io.horizontalsystems.bankwallet.modules.evmnetwork.addrpc
 
-import android.os.Bundle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coin.chain.crypto.core.designsystem.component.TopAppBarClose
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.entities.DataState
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
@@ -19,11 +26,11 @@ import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddRpcScreen(
     navController: NavController,
-    arguments: Bundle,
-    viewModel: AddRpcViewModel = viewModel(factory = AddRpcModule.Factory(arguments))
+    viewModel: AddRpcViewModel = hiltViewModel()
 ) {
     if (viewModel.viewState.closeScreen) {
         navController.popBackStack()
@@ -33,20 +40,17 @@ fun AddRpcScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(ComposeAppTheme.colors.tyler)
     ) {
-        AppBar(
-            title = TranslatableString.ResString(R.string.AddEvmSyncSource_AddRPCSource),
-            menuItems = listOf(
-                MenuItem(
-                    title = TranslatableString.ResString(R.string.Button_Close),
-                    icon = R.drawable.ic_close,
-                    onClick = {
-                        navController.popBackStack()
-                    }
-                )
+        TopAppBarClose(
+            titleRes = R.string.AddEvmSyncSource_AddRPCSource,
+            actionIcon = Icons.Rounded.Close,
+            actionIconContentDescription = "ArrowBack",
+            onActionClick = { navController.popBackStack() },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = Color.Transparent,
             )
         )
+
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -61,7 +65,8 @@ fun AddRpcScreen(
                 qrScannerEnabled = true,
                 onValueChange = viewModel::onEnterRpcUrl,
                 hint = "",
-                state = getState(viewModel.viewState.urlCaution)
+                state = getState(viewModel.viewState.urlCaution),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
             )
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -70,20 +75,20 @@ fun AddRpcScreen(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 qrScannerEnabled = true,
                 onValueChange = viewModel::onEnterBasicAuth,
-                hint = ""
+                hint = "",
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
             )
             Spacer(Modifier.height(60.dp))
         }
 
-        ButtonsGroupWithShade {
-            ButtonPrimaryYellow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                title = stringResource(R.string.Button_Add),
-                onClick = { viewModel.onAddClick() },
-            )
-        }
+        ButtonPrimaryYellow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            title = stringResource(R.string.Button_Add),
+            onClick = { viewModel.onAddClick() },
+        )
+        Spacer(modifier = Modifier.height(12.dp))
     }
 }
 

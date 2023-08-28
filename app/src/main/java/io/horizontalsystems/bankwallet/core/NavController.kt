@@ -64,6 +64,21 @@ fun NavController.navigateWithTermsAccepted(action: () -> Unit) {
     }
 }
 
+fun NavController.navigateWithTermsAcceptedCompose(action: () -> Unit) {
+    if (!App.termsManager.allTermsAccepted) {
+        getNavigationResult(TermsFragment.resultBundleKey) { bundle ->
+            val agreedToTerms = bundle.getInt(TermsFragment.requestResultKey)
+
+            if (agreedToTerms == TermsFragment.RESULT_OK) {
+                action.invoke()
+            }
+        }
+        slideFromBottom(R.id.termsFragment)
+    } else {
+        action.invoke()
+    }
+}
+
 fun NavController.navigateToSetPin(onSuccess: () -> Unit) {
     getNavigationResult(PinModule.requestKey) { bundle ->
         val resultType = bundle.parcelable<PinInteractionType>(PinModule.requestType)

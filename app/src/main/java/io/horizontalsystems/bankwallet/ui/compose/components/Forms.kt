@@ -23,6 +23,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,6 +55,10 @@ import io.horizontalsystems.bankwallet.entities.DataState
 import io.horizontalsystems.bankwallet.modules.qrscanner.QRScannerActivity
 import io.horizontalsystems.bankwallet.ui.compose.ColoredTextStyle
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
+import io.horizontalsystems.bankwallet.ui.compose.GreenL
+import io.horizontalsystems.bankwallet.ui.compose.Grey50
+import io.horizontalsystems.bankwallet.ui.compose.Red50
+import io.horizontalsystems.bankwallet.ui.compose.Yellow50
 
 @Composable
 fun FormsInput(
@@ -62,10 +67,10 @@ fun FormsInput(
     initial: String? = null,
     hint: String,
     prefix: String? = null,
-    textColor: Color = ComposeAppTheme.colors.leah,
-    textStyle: TextStyle = ComposeAppTheme.typography.body,
-    hintColor: Color = ComposeAppTheme.colors.grey50,
-    hintStyle: TextStyle = ComposeAppTheme.typography.body,
+    textColor: Color = MaterialTheme.colorScheme.onSurface,
+    textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
+    hintColor: Color = Grey50,
+    hintStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     singleLine: Boolean = false,
     state: DataState<Any>? = null,
     qrScannerEnabled: Boolean = false,
@@ -83,18 +88,18 @@ fun FormsInput(
     val borderColor = when (state) {
         is DataState.Error -> {
             if (state.error is FormsInputStateWarning) {
-                ComposeAppTheme.colors.yellow50
+                Yellow50
             } else {
-                ComposeAppTheme.colors.red50
+                Red50
             }
         }
-        else -> ComposeAppTheme.colors.steel20
+        else -> MaterialTheme.colorScheme.onSurface
     }
 
     val cautionColor = if (state?.errorOrNull is FormsInputStateWarning) {
-        ComposeAppTheme.colors.jacob
+        MaterialTheme.colorScheme.onPrimary
     } else {
-        ComposeAppTheme.colors.lucian
+        MaterialTheme.colorScheme.primary
     }
 
     Column(modifier) {
@@ -104,7 +109,7 @@ fun FormsInput(
                 .defaultMinSize(minHeight = 44.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .border(1.dp, borderColor, RoundedCornerShape(8.dp))
-                .background(ComposeAppTheme.colors.lawrence),
+                .background(MaterialTheme.colorScheme.surface),
             verticalAlignment = Alignment.CenterVertically
         ) {
             var textState by rememberSaveable(initial, stateSaver = TextFieldValue.Saver) {
@@ -146,7 +151,7 @@ fun FormsInput(
                     textStyle = textStyle
                 ),
                 singleLine = singleLine,
-                cursorBrush = SolidColor(ComposeAppTheme.colors.jacob),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                 decorationBox = { innerTextField ->
                     if (textState.text.isEmpty()) {
                         Text(
@@ -180,7 +185,7 @@ fun FormsInput(
                         modifier = Modifier.padding(end = 8.dp),
                         painter = painterResource(id = R.drawable.ic_check_20),
                         contentDescription = null,
-                        tint = ComposeAppTheme.colors.remus
+                        tint = GreenL
                     )
                 }
                 else -> {
@@ -242,7 +247,7 @@ fun FormsInput(
                 modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp),
                 text = it,
                 color = cautionColor,
-                style = ComposeAppTheme.typography.caption
+                style = MaterialTheme.typography.labelSmall
             )
         }
     }
@@ -252,10 +257,10 @@ fun FormsInput(
 fun FormsInputPassword(
     modifier: Modifier = Modifier,
     hint: String,
-    textColor: Color = ComposeAppTheme.colors.leah,
-    textStyle: TextStyle = ComposeAppTheme.typography.body,
-    hintColor: Color = ComposeAppTheme.colors.grey50,
-    hintStyle: TextStyle = ComposeAppTheme.typography.body,
+    textColor: Color = MaterialTheme.colorScheme.onSurface,
+    textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
+    hintColor: Color = Grey50,
+    hintStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     singleLine: Boolean = true,
     state: DataState<Any>? = null,
     maxLength: Int? = null,
@@ -268,18 +273,18 @@ fun FormsInputPassword(
     val borderColor = when (state) {
         is DataState.Error -> {
             if (state.error is FormsInputStateWarning) {
-                ComposeAppTheme.colors.yellow50
+                Yellow50
             } else {
-                ComposeAppTheme.colors.red50
+                MaterialTheme.colorScheme.onError
             }
         }
-        else -> ComposeAppTheme.colors.steel20
+        else -> MaterialTheme.colorScheme.onSurface
     }
 
     val cautionColor = if (state?.errorOrNull is FormsInputStateWarning) {
-        ComposeAppTheme.colors.jacob
+        Yellow50
     } else {
-        ComposeAppTheme.colors.lucian
+        MaterialTheme.colorScheme.primary
     }
 
     Column(modifier) {
@@ -289,7 +294,7 @@ fun FormsInputPassword(
                 .defaultMinSize(minHeight = 44.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .border(1.dp, borderColor, RoundedCornerShape(8.dp))
-                .background(ComposeAppTheme.colors.lawrence),
+                .background(MaterialTheme.colorScheme.surface),
             verticalAlignment = Alignment.CenterVertically
         ) {
             var textState by rememberSaveable(stateSaver = TextFieldValue.Saver) {
@@ -318,7 +323,7 @@ fun FormsInputPassword(
                     textStyle = textStyle
                 ),
                 singleLine = singleLine,
-                cursorBrush = SolidColor(ComposeAppTheme.colors.jacob),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                 decorationBox = { innerTextField ->
                     if (textState.text.isEmpty()) {
                         Text(
@@ -356,7 +361,7 @@ fun FormsInputPassword(
                     .clickable(onClick = onToggleHide, interactionSource = MutableInteractionSource(), indication = null),
                 painter = painterResource(id = if (hide) R.drawable.ic_eye_off_20 else R.drawable.ic_eye_20),
                 contentDescription = null,
-                tint = ComposeAppTheme.colors.grey
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.width(16.dp))
         }
@@ -366,7 +371,7 @@ fun FormsInputPassword(
                 modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp),
                 text = it,
                 color = cautionColor,
-                style = ComposeAppTheme.typography.caption
+                style = MaterialTheme.typography.labelSmall
             )
         }
     }
@@ -378,10 +383,10 @@ fun FormsInputMultiline(
     initial: String? = null,
     enabled: Boolean = true,
     hint: String,
-    textColor: Color = ComposeAppTheme.colors.leah,
-    textStyle: TextStyle = ComposeAppTheme.typography.body,
-    hintColor: Color = ComposeAppTheme.colors.grey50,
-    hintStyle: TextStyle = ComposeAppTheme.typography.body,
+    textColor: Color = MaterialTheme.colorScheme.onSurface,
+    textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
+    hintColor: Color = Grey50,
+    hintStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     state: DataState<Any>? = null,
     pasteEnabled: Boolean = true,
     qrScannerEnabled: Boolean = false,
@@ -397,18 +402,18 @@ fun FormsInputMultiline(
     val borderColor = when (state) {
         is DataState.Error -> {
             if (state.error is FormsInputStateWarning) {
-                ComposeAppTheme.colors.yellow50
+                Yellow50
             } else {
-                ComposeAppTheme.colors.red50
+                Red50
             }
         }
-        else -> ComposeAppTheme.colors.steel20
+        else -> MaterialTheme.colorScheme.onSurface
     }
 
     val cautionColor = if (state?.errorOrNull is FormsInputStateWarning) {
         ComposeAppTheme.colors.jacob
     } else {
-        ComposeAppTheme.colors.lucian
+        MaterialTheme.colorScheme.primary
     }
 
     Column(modifier) {
@@ -417,7 +422,7 @@ fun FormsInputMultiline(
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
                 .border(1.dp, borderColor, RoundedCornerShape(8.dp))
-                .background(ComposeAppTheme.colors.lawrence),
+                .background(MaterialTheme.colorScheme.surface),
         ) {
             var textState by rememberSaveable(initial, stateSaver = TextFieldValue.Saver) {
                 mutableStateOf(TextFieldValue(initial ?: ""))
@@ -452,7 +457,7 @@ fun FormsInputMultiline(
                     color = textColor,
                     textStyle = textStyle
                 ),
-                cursorBrush = SolidColor(ComposeAppTheme.colors.jacob),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                 decorationBox = { innerTextField ->
                     if (textState.text.isEmpty()) {
                         Text(
@@ -492,7 +497,7 @@ fun FormsInputMultiline(
                             modifier = Modifier.padding(end = 8.dp),
                             painter = painterResource(id = R.drawable.ic_check_20),
                             contentDescription = null,
-                            tint = ComposeAppTheme.colors.remus
+                            tint = GreenL
                         )
                     }
                     else -> {
@@ -556,7 +561,7 @@ fun FormsInputMultiline(
                 modifier = Modifier.padding(start = 8.dp, top = 8.dp, end = 8.dp),
                 text = it,
                 color = cautionColor,
-                style = ComposeAppTheme.typography.caption
+                style = MaterialTheme.typography.labelSmall
             )
         }
     }

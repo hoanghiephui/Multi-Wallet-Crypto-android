@@ -616,7 +616,7 @@ fun B3(
         overflow = overflow,
         maxLines = maxLines,
         onTextLayout = onTextLayout,
-        style = MaterialTheme.typography.titleSmall,
+        style = MaterialTheme.typography.bodyMedium,
         color = MaterialTheme.colorScheme.primary,
     )
 }

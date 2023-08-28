@@ -2,6 +2,7 @@ package io.horizontalsystems.bankwallet.material.navigation
 
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import io.horizontalsystems.bankwallet.material.module.balance.BalanceRouter
@@ -13,10 +14,13 @@ fun NavController.navigateToBalance(navOptions: NavOptions? = null) {
 }
 
 fun NavGraphBuilder.balanceScreen(
-    onTopicClick: (String) -> Unit,
+    navController: NavHostController,
     onShowSnackbar: suspend (String, String?) -> Boolean,
 ) {
     composable(route = balanceRoute) {
-        BalanceRouter()
+        BalanceRouter(
+            navController,
+            onShowSnackbar
+        )
     }
 }

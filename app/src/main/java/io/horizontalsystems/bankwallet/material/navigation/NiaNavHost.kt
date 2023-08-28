@@ -33,6 +33,7 @@ import io.horizontalsystems.bankwallet.material.module.info.btcBlockchainRestore
 import io.horizontalsystems.bankwallet.material.module.setting.navigations.blockchainSettingsScreen
 import io.horizontalsystems.bankwallet.material.module.setting.navigations.btcBlockchainSettingsScreen
 import io.horizontalsystems.bankwallet.material.module.setting.navigations.donateScreen
+import io.horizontalsystems.bankwallet.material.module.setting.navigations.evmSettingsScreen
 import io.horizontalsystems.bankwallet.material.module.setting.navigations.manageAccountsScreen
 
 /**
@@ -57,7 +58,7 @@ fun NiaNavHost(
     ) {
         marketScreen(onTopicClick = {})
         balanceScreen(
-            onTopicClick = { _ -> },
+            navController = navController,
             onShowSnackbar = onShowSnackbar
         )
         transactionScreen(
@@ -74,6 +75,7 @@ fun NiaNavHost(
                 blockchainSettingsScreen(navController)
                 btcBlockchainSettingsScreen(navController)
                 btcBlockchainRestoreSourceInfoScreen(navController)
+                evmSettingsScreen(navController, onShowSnackbar)
             },
         )
     }

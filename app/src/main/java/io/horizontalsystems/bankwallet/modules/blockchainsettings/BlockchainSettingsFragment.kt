@@ -30,6 +30,7 @@ import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.material.module.setting.navigations.navigateToBtcBlockchainSettings
+import io.horizontalsystems.bankwallet.material.module.setting.navigations.navigateToEvmSettings
 import io.horizontalsystems.bankwallet.modules.btcblockchainsettings.BtcBlockchainSettingsModule
 import io.horizontalsystems.bankwallet.modules.evmnetwork.EvmNetworkModule
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
@@ -124,7 +125,7 @@ private fun onClick(
         }
         is BlockchainSettingsModule.BlockchainItem.Evm -> {
             val params = EvmNetworkModule.args(item.blockchainItem.blockchain)
-            navController.slideFromBottom(R.id.evmNetworkFragment, params)
+            navController.navigateToEvmSettings(params)
         }
         is BlockchainSettingsModule.BlockchainItem.Solana -> {
             navController.slideFromBottom(R.id.solanaNetworkFragment, bundleOf())

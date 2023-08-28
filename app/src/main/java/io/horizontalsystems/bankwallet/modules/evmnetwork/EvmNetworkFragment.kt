@@ -23,10 +23,16 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,18 +46,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
+import coin.chain.crypto.core.designsystem.component.TopAppBar
+import coin.chain.crypto.core.designsystem.theme.NiaTheme
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.core.composablePopup
 import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.entities.EvmSyncSource
+import io.horizontalsystems.bankwallet.material.module.setting.navigations.navigateToAddRpcPage
+import io.horizontalsystems.bankwallet.material.module.setting.navigations.navigateToEvmNetworkInfoPage
 import io.horizontalsystems.bankwallet.modules.btcblockchainsettings.BlockchainSettingCell
+import io.horizontalsystems.bankwallet.modules.evmnetwork.addrpc.AddRpcModule
 import io.horizontalsystems.bankwallet.modules.evmnetwork.addrpc.AddRpcScreen
 import io.horizontalsystems.bankwallet.modules.info.EvmNetworkInfoScreen
 import io.horizontalsystems.bankwallet.modules.walletconnect.list.ui.ActionsRow
@@ -71,6 +83,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.helpers.HudHelper
+import kotlinx.coroutines.launch
 
 class EvmNetworkFragment : BaseFragment() {
 
@@ -86,10 +99,10 @@ class EvmNetworkFragment : BaseFragment() {
             )
             setContent {
                 ComposeAppTheme {
-                    EvmNetworkNavHost(
+                    /*EvmNetworkNavHost(
                         requireArguments(),
                         findNavController()
-                    )
+                    )*/
                 }
             }
         }
@@ -98,8 +111,8 @@ class EvmNetworkFragment : BaseFragment() {
 }
 
 private const val EvmNetworkPage = "evm_network"
-private const val EvmNetworkInfoPage = "evm_network_info"
-private const val AddRpcPage = "add_rpc"
+const val EvmNetworkInfoPage = "evm_network_info"
+const val AddRpcPage = "add_rpc"
 
 @Composable
 private fun EvmNetworkNavHost(
@@ -112,32 +125,32 @@ private fun EvmNetworkNavHost(
         startDestination = EvmNetworkPage,
     ) {
         composable(EvmNetworkPage) {
-            EvmNetworkScreen(
-                arguments = arguments,
+            /*EvmNetworkScreen(
                 navController = navController,
                 onBackPress = { fragmentNavController.popBackStack() }
-            )
+            )*/
         }
-        composablePopup(AddRpcPage) { AddRpcScreen(navController, arguments) }
+        composablePopup(AddRpcPage) { AddRpcScreen(navController) }
         composablePopup(EvmNetworkInfoPage) { EvmNetworkInfoScreen(navController) }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun EvmNetworkScreen(
-    arguments: Bundle,
+fun EvmNetworkScreen(
     navController: NavController,
     onBackPress: () -> Unit,
-    viewModel: EvmNetworkViewModel = viewModel(factory = EvmNetworkModule.Factory(arguments))
+    viewModel: EvmNetworkViewModel = hiltViewModel(),
+    onShowSnackbar: suspend (String, String?) -> Boolean,
 ) {
 
     var revealedCardId by remember { mutableStateOf<String?>(null) }
-    val view = LocalView.current
-
-    Surface(color = ComposeAppTheme.colors.tyler) {
+    val rememberCoroutineScope = rememberCoroutineScope()
+    val message = stringResource(id = R.string.Hud_Removed)
+    NiaTheme {
         Column {
-            AppBar(
-                TranslatableString.PlainString(viewModel.title),
+            TopAppBar(
+                titleRes = viewModel.title,
                 navigationIcon = {
                     Image(
                         painter = rememberAsyncImagePainter(
@@ -150,15 +163,14 @@ private fun EvmNetworkScreen(
                             .size(24.dp)
                     )
                 },
-                menuItems = listOf(
-                    MenuItem(
-                        title = TranslatableString.ResString(R.string.Button_Close),
-                        icon = R.drawable.ic_close,
-                        onClick = {
-                            onBackPress.invoke()
-                        }
-                    )
-                )
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Transparent,
+                ),
+                actionIcon = Icons.Rounded.Close,
+                onActionClick = {
+                    onBackPress.invoke()
+                },
+                actionIconContentDescription = "Button_Close"
             )
 
             LazyColumn(
@@ -167,7 +179,7 @@ private fun EvmNetworkScreen(
 
                 item {
                     HeaderText(stringResource(R.string.AddEvmSyncSource_RpcSource)) {
-                        navController.navigate(EvmNetworkInfoPage)
+                        navController.navigateToEvmNetworkInfoPage()
                     }
                 }
 
@@ -180,6 +192,7 @@ private fun EvmNetworkScreen(
                 }
 
                 if (viewModel.viewState.customItems.isNotEmpty()) {
+
                     CustomRpcListSection(
                         viewModel.viewState.customItems,
                         revealedCardId,
@@ -196,14 +209,16 @@ private fun EvmNetworkScreen(
                         }
                     ) {
                         viewModel.onRemoveCustomRpc(it)
-                        HudHelper.showErrorMessage(view, R.string.Hud_Removed)
+                        rememberCoroutineScope.launch {
+                            onShowSnackbar.invoke(message, null)
+                        }
                     }
                 }
 
                 item {
                     Spacer(Modifier.height(32.dp))
                     AddButton {
-                        navController.navigate(AddRpcPage)
+                        navController.navigateToAddRpcPage(AddRpcModule.args(viewModel.blockchain))
                     }
                 }
             }
@@ -280,7 +295,7 @@ private fun AddButton(
                 Icon(
                     painter = painterResource(R.drawable.ic_plus),
                     modifier = Modifier.size(24.dp),
-                    tint = ComposeAppTheme.colors.jacob,
+                    tint = MaterialTheme.colorScheme.primary,
                     contentDescription = null
                 )
                 Spacer(Modifier.width(16.dp))
@@ -304,7 +319,7 @@ fun RpcCell(
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .clip(shape)
-            .background(ComposeAppTheme.colors.lawrence)
+            .background(MaterialTheme.colorScheme.onPrimary)
             .clickable {
                 onItemClick.invoke(item.syncSource)
             },
@@ -312,8 +327,6 @@ fun RpcCell(
     ) {
         if (showDivider) {
             Divider(
-                thickness = 1.dp,
-                color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.align(Alignment.TopCenter)
             )
         }
@@ -337,7 +350,7 @@ fun RpcCell(
             if (item.selected) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_checkmark_20),
-                    tint = ComposeAppTheme.colors.jacob,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     contentDescription = null
                 )
             }

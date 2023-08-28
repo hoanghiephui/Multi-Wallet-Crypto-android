@@ -3,20 +3,25 @@ package io.horizontalsystems.bankwallet.modules.evmnetwork.addrpc
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.horizontalsystems.bankwallet.R
+import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.managers.EvmSyncSourceManager
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.modules.swap.settings.Caution
 import io.horizontalsystems.marketkit.models.Blockchain
 import java.net.MalformedURLException
 import java.net.URL
+import javax.inject.Inject
 
-class AddRpcViewModel(
-    private val blockchain: Blockchain,
-    private val evmSyncSourceManager: EvmSyncSourceManager
+@HiltViewModel
+class AddRpcViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-
+    private val blockchain: Blockchain = checkNotNull(savedStateHandle["blockchain"])
+    private val evmSyncSourceManager: EvmSyncSourceManager = App.evmSyncSourceManager
     private var url = ""
     private var auth: String? = null
     private var urlCaution: Caution? = null
@@ -48,15 +53,21 @@ class AddRpcViewModel(
                 throw MalformedURLException()
             }
         } catch (e: MalformedURLException) {
-            urlCaution = Caution(Translator.getString(R.string.AddEvmSyncSource_Error_InvalidUrl), Caution.Type.Error)
+            urlCaution = Caution(
+                Translator.getString(R.string.AddEvmSyncSource_Error_InvalidUrl),
+                Caution.Type.Error
+            )
             syncState()
             return
         }
 
         val existingSources = evmSyncSourceManager.allSyncSources(blockchain.type)
 
-        if (existingSources.any { it.url == sourceUrl}) {
-            urlCaution = Caution(Translator.getString(R.string.AddEvmSyncSource_Warning_UrlExists), Caution.Type.Warning)
+        if (existingSources.any { it.url == sourceUrl }) {
+            urlCaution = Caution(
+                Translator.getString(R.string.AddEvmSyncSource_Warning_UrlExists),
+                Caution.Type.Warning
+            )
             syncState()
             return
         }

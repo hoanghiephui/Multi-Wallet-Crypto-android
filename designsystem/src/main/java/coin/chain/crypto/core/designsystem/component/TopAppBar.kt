@@ -157,6 +157,7 @@ fun TopAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopAppBarClose(
+    @StringRes titleRes: Int ?= null,
     actionIcon: ImageVector,
     actionIconContentDescription: String?,
     modifier: Modifier = Modifier,
@@ -164,7 +165,9 @@ fun TopAppBarClose(
     onActionClick: () -> Unit = {},
 ) {
     CenterAlignedTopAppBar(
-        title = {  },
+        title = { titleRes?.let {
+            Text(text = stringResource(id = titleRes))
+        } },
         actions = {
             IconButton(onClick = onActionClick) {
                 Icon(
