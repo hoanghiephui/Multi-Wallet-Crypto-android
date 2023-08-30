@@ -19,6 +19,8 @@ import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.slideFromBottom
+import io.horizontalsystems.bankwallet.material.module.market.navigateToMetricsPageScreen
+import io.horizontalsystems.bankwallet.material.module.market.navigateToTvlScreen
 import io.horizontalsystems.bankwallet.modules.market.metricspage.MetricsPageFragment
 import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewModule
 import io.horizontalsystems.bankwallet.modules.metricchart.MetricsType
@@ -121,11 +123,8 @@ private fun RowScope.ChartView(metricsData: MetricData, navController: NavContro
 
 private fun openMetricsPage(metricsType: MetricsType, navController: NavController) {
     if (metricsType == MetricsType.TvlInDefi) {
-        navController.slideFromBottom(R.id.tvlFragment)
+        navController.navigateToTvlScreen()
     } else {
-        navController.slideFromBottom(
-            R.id.metricsPageFragment,
-            MetricsPageFragment.prepareParams(metricsType)
-        )
+        navController.navigateToMetricsPageScreen(bundle = MetricsPageFragment.prepareParams(metricsType))
     }
 }

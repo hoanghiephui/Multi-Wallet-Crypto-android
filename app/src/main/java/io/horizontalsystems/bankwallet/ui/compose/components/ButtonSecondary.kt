@@ -93,10 +93,10 @@ fun ButtonSecondaryTransparent(
         modifier = modifier,
         onClick = onClick,
         buttonColors = buttonColors(
-            backgroundColor = ComposeAppTheme.colors.transparent,
-            contentColor = ComposeAppTheme.colors.leah,
-            disabledBackgroundColor = ComposeAppTheme.colors.transparent,
-            disabledContentColor = ComposeAppTheme.colors.grey50,
+            backgroundColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            disabledBackgroundColor = Color.Transparent,
+            disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.7f),
         ),
         content = {
             if (iconRight != null) {
@@ -111,7 +111,7 @@ fun ButtonSecondaryTransparent(
                         modifier = Modifier.padding(start = 4.dp),
                         painter = painterResource(id = iconRight),
                         contentDescription = null,
-                        tint = ComposeAppTheme.colors.grey
+                        tint = Color.Gray
                     )
                 }
             } else {

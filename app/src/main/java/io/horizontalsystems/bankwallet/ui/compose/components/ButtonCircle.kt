@@ -46,7 +46,7 @@ fun ButtonSecondaryCircle(
     enabled: Boolean = true,
     @DrawableRes icon: Int = R.drawable.ic_arrow_down_20,
     contentDescription: String? = null,
-    tint: Color = MaterialTheme.colorScheme.onSurface,
+    tint: Color = MaterialTheme.colorScheme.surface,
     onClick: () -> Unit,
 ) {
     HsIconButton(

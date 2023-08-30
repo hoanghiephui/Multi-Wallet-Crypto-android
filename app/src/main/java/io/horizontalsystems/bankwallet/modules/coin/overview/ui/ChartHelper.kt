@@ -1,10 +1,14 @@
 package io.horizontalsystems.bankwallet.modules.coin.overview.ui
 
+import androidx.compose.material3.ColorScheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import io.horizontalsystems.bankwallet.ui.compose.Colors
+import io.horizontalsystems.bankwallet.ui.compose.GreenD
+import io.horizontalsystems.bankwallet.ui.compose.Grey50
+import io.horizontalsystems.bankwallet.ui.compose.RedD
 import io.horizontalsystems.chartview.ChartData
 import io.horizontalsystems.chartview.CurveAnimator2
 import io.horizontalsystems.chartview.CurveAnimatorBars
@@ -13,7 +17,7 @@ import java.math.BigDecimal
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 
-class ChartHelper(private var target: ChartData, var hasVolumes: Boolean, private val colors: Colors) {
+class ChartHelper(private var target: ChartData, var hasVolumes: Boolean, private val colors: ColorScheme) {
 
     private var minValue: Float = 0.0f
     private var maxValue: Float = 0.0f
@@ -29,12 +33,12 @@ class ChartHelper(private var target: ChartData, var hasVolumes: Boolean, privat
     private var macdSignalCurve: CurveAnimator2? = null
     private var macdHistogramBars: CurveAnimatorBars? = null
 
-    var mainCurveColor = colors.greenD
+    var mainCurveColor = GreenD
     var mainCurveGradientColors = Pair(Color(0x00416BFF), Color(0x8013D670))
-    var mainCurvePressedColor = colors.leah
-    var mainCurveGradientPressedColors = Pair(colors.leah.copy(alpha = 0f), colors.leah.copy(alpha = 0.5f))
-    var mainBarsColor = colors.jacob
-    var mainBarsPressedColor = colors.grey50
+    var mainCurvePressedColor = colors.onSurface
+    var mainCurveGradientPressedColors = Pair(colors.onSurface.copy(alpha = 0f), colors.onSurface.copy(alpha = 0.5f))
+    var mainBarsColor = colors.onPrimary
+    var mainBarsPressedColor = Grey50
 
     init {
         setExtremum()
@@ -88,22 +92,22 @@ class ChartHelper(private var target: ChartData, var hasVolumes: Boolean, privat
 
         when {
             chartData.disabled -> {
-                mainCurveColor = colors.grey
-                mainCurveGradientColors = Pair(colors.grey50.copy(alpha = 0f), colors.grey50.copy(alpha = 0.5f))
+                mainCurveColor = Color.Gray
+                mainCurveGradientColors = Pair(Grey50.copy(alpha = 0f), Grey50.copy(alpha = 0.5f))
             }
 
             !chartData.isMovementChart -> {
-                mainCurveColor = colors.jacob
+                mainCurveColor = colors.onPrimary
                 mainCurveGradientColors = Pair(Color(0x00FFA800), Color(0x80FFA800))
             }
 
             chartData.diff() < BigDecimal.ZERO -> {
-                mainCurveColor = colors.redD
+                mainCurveColor = RedD
                 mainCurveGradientColors = Pair(Color(0x007413D6), Color(0x80FF0303))
             }
 
             else -> {
-                mainCurveColor = colors.greenD
+                mainCurveColor = GreenD
                 mainCurveGradientColors = Pair(Color(0x00416BFF), Color(0x8013D670))
             }
         }

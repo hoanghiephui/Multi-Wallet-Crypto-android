@@ -1436,8 +1436,8 @@ fun D3(
         overflow = overflow,
         maxLines = maxLines,
         onTextLayout = onTextLayout,
-        style = ComposeAppTheme.typography.subhead2,
-        color = ComposeAppTheme.colors.jacob,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.primary   ,
     )
 }
 @Composable
@@ -1769,8 +1769,8 @@ fun micro_grey(
         overflow = overflow,
         maxLines = maxLines,
         onTextLayout = onTextLayout,
-        style = ComposeAppTheme.typography.micro,
-        color = ComposeAppTheme.colors.grey,
+        style = MaterialTheme.typography.labelLarge,
+        color = Grey,
     )
 }
 

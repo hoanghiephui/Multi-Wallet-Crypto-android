@@ -13,19 +13,26 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import coin.chain.crypto.core.designsystem.component.TopAppBarClose
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.core.slideFromRight
@@ -63,7 +70,7 @@ class TvlFragment : BaseFragment() {
             )
             setContent {
                 ComposeAppTheme {
-                    TvlScreen(viewModel, tvlChartViewModel) { onCoinClick(it) }
+                    //TvlScreen(viewModel, tvlChartViewModel) { onCoinClick(it) }
                 }
             }
         }
@@ -77,13 +84,15 @@ class TvlFragment : BaseFragment() {
             HudHelper.showWarningMessage(requireView(), R.string.MarketGlobalMetrics_NoCoin)
         }
     }
+}
 
-    @OptIn(ExperimentalFoundationApi::class)
+    @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
     @Composable
-    private fun TvlScreen(
+    fun TvlScreen(
         tvlViewModel: TvlViewModel,
         chartViewModel: TvlChartViewModel,
-        onCoinClick: (String?) -> Unit
+        onCoinClick: (String?) -> Unit,
+        navController: NavController
     ) {
         val itemsViewState by tvlViewModel.viewStateLiveData.observeAsState()
         val viewState = itemsViewState?.merge(chartViewModel.uiState.viewState)
@@ -92,16 +101,13 @@ class TvlFragment : BaseFragment() {
         val isRefreshing by tvlViewModel.isRefreshingLiveData.observeAsState(false)
         val chainSelectorDialogState by tvlViewModel.chainSelectorDialogStateLiveData.observeAsState(SelectorDialogState.Closed)
 
-        Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
-            AppBar(
-                menuItems = listOf(
-                    MenuItem(
-                        title = TranslatableString.ResString(R.string.Button_Close),
-                        icon = R.drawable.ic_close,
-                        onClick = {
-                            findNavController().popBackStack()
-                        }
-                    )
+        Column {
+            TopAppBarClose(
+                actionIcon = Icons.Rounded.Close,
+                actionIconContentDescription = "ArrowBack",
+                onActionClick = { navController.popBackStack() },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Transparent,
                 )
             )
 
@@ -111,7 +117,7 @@ class TvlFragment : BaseFragment() {
                     tvlViewModel.refresh()
                 }
             ) {
-                Crossfade(viewState) { viewState ->
+                Crossfade(viewState, label = "") { viewState ->
                     when (viewState) {
                         ViewState.Loading -> {
                             Loading()
@@ -268,4 +274,4 @@ class TvlFragment : BaseFragment() {
         }
     }
 
-}
+

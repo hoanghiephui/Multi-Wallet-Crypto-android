@@ -262,7 +262,6 @@ fun DescriptionCard(title: String, description: String, image: ImageSource) {
         Row(
             modifier = Modifier
                 .height(108.dp)
-                .background(ComposeAppTheme.colors.tyler)
         ) {
             Column(
                 modifier = Modifier
@@ -271,8 +270,8 @@ fun DescriptionCard(title: String, description: String, image: ImageSource) {
             ) {
                 Text(
                     text = title,
-                    style = ComposeAppTheme.typography.headline1,
-                    color = ComposeAppTheme.colors.leah,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 subhead2_grey(
                     text = description,

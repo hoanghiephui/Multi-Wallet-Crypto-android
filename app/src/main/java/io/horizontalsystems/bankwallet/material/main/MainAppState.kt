@@ -40,7 +40,7 @@ import io.horizontalsystems.bankwallet.material.navigation.TopLevelDestination.T
 import io.horizontalsystems.bankwallet.material.navigation.balanceRoute
 import io.horizontalsystems.bankwallet.material.navigation.marketNavigationRoute
 import io.horizontalsystems.bankwallet.material.navigation.navigateToBalance
-import io.horizontalsystems.bankwallet.material.navigation.navigateToMarket
+import io.horizontalsystems.bankwallet.material.navigation.navigateToMarketGraph
 import io.horizontalsystems.bankwallet.material.navigation.navigateToSettingsGraph
 import io.horizontalsystems.bankwallet.material.navigation.navigateToTransaction
 import io.horizontalsystems.bankwallet.material.navigation.settingsRoute
@@ -138,7 +138,7 @@ class NiaAppState(
             }
 
             when (topLevelDestination) {
-                MARKETS -> navController.navigateToMarket(topLevelNavOptions)
+                MARKETS -> navController.navigateToMarketGraph(topLevelNavOptions)
                 BALANCE -> navController.navigateToBalance(topLevelNavOptions)
                 TRANSACTIONS -> navController.navigateToTransaction(topLevelNavOptions)
                 SETTINGS -> navController.navigateToSettingsGraph(topLevelNavOptions)

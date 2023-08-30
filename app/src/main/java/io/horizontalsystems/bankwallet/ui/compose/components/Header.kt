@@ -4,8 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Divider
 import androidx.compose.material.Icon
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -63,20 +64,16 @@ fun HeaderSorting(
         modifier = Modifier
             .fillMaxWidth()
             .height(44.dp)
-            .background(ComposeAppTheme.colors.tyler)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         if (borderTop) {
             Divider(
-                thickness = 1.dp,
-                color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.align(Alignment.TopCenter)
             )
         }
 
         if (borderBottom) {
             Divider(
-                thickness = 1.dp,
-                color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
         }

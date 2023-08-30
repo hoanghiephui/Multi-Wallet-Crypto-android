@@ -30,6 +30,8 @@ import androidx.navigation.compose.NavHost
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.material.main.NiaAppState
 import io.horizontalsystems.bankwallet.material.module.info.btcBlockchainRestoreSourceInfoScreen
+import io.horizontalsystems.bankwallet.material.module.market.metricsPageScreen
+import io.horizontalsystems.bankwallet.material.module.market.tvlScreen
 import io.horizontalsystems.bankwallet.material.module.setting.navigations.blockchainSettingsScreen
 import io.horizontalsystems.bankwallet.material.module.setting.navigations.btcBlockchainSettingsScreen
 import io.horizontalsystems.bankwallet.material.module.setting.navigations.donateScreen
@@ -48,7 +50,7 @@ fun NiaNavHost(
     appState: NiaAppState,
     onShowSnackbar: suspend (String, String?) -> Boolean,
     modifier: Modifier = Modifier,
-    startDestination: String = marketNavigationRoute,
+    startDestination: String = MARKET_GRAPH_ROUTE_PATTERN,
 ) {
     val navController = appState.navController
     NavHost(
@@ -56,7 +58,14 @@ fun NiaNavHost(
         startDestination = startDestination,
         modifier = modifier,
     ) {
-        marketScreen(onTopicClick = {})
+        marketGraph(
+            navController = navController,
+            onShowSnackbar = onShowSnackbar,
+            nestedGraphs = {
+                tvlScreen(navController, onShowSnackbar)
+                metricsPageScreen(navController, onShowSnackbar)
+            }
+        )
         balanceScreen(
             navController = navController,
             onShowSnackbar = onShowSnackbar

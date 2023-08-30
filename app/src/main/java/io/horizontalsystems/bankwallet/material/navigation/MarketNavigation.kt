@@ -23,27 +23,41 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import androidx.navigation.navigation
 import io.horizontalsystems.bankwallet.material.module.market.MarketRoute
 
 const val LINKED_NEWS_RESOURCE_ID = "linkedNewsResourceId"
 const val marketNavigationRoute = "markets_route/{$LINKED_NEWS_RESOURCE_ID}"
 private const val DEEP_LINK_URI_PATTERN =
     "https://www.nowinandroid.apps.samples.google.com/foryou/{$LINKED_NEWS_RESOURCE_ID}"
+const val MARKET_GRAPH_ROUTE_PATTERN = "markets_graph"
 
-fun NavController.navigateToMarket(navOptions: NavOptions? = null) {
-    this.navigate(marketNavigationRoute, navOptions)
+
+fun NavController.navigateToMarketGraph(navOptions: NavOptions? = null) {
+    this.navigate(MARKET_GRAPH_ROUTE_PATTERN, navOptions)
 }
 
-fun NavGraphBuilder.marketScreen(onTopicClick: (String) -> Unit) {
-    composable(
-        route = marketNavigationRoute,
-        deepLinks = listOf(
-            navDeepLink { uriPattern = DEEP_LINK_URI_PATTERN },
-        ),
-        arguments = listOf(
-            navArgument(LINKED_NEWS_RESOURCE_ID) { type = NavType.StringType },
-        ),
+fun NavGraphBuilder.marketGraph(
+    navController: NavController,
+    onShowSnackbar: suspend (String, String?) -> Boolean,
+    nestedGraphs: NavGraphBuilder.() -> Unit,
+) {
+    navigation(
+        route = MARKET_GRAPH_ROUTE_PATTERN,
+        startDestination = marketNavigationRoute,
     ) {
-        MarketRoute()
+        composable(
+            route = marketNavigationRoute,
+            deepLinks = listOf(
+                navDeepLink { uriPattern = DEEP_LINK_URI_PATTERN },
+            ),
+            arguments = listOf(
+                navArgument(LINKED_NEWS_RESOURCE_ID) { type = NavType.StringType },
+            ),
+        ) {
+            MarketRoute(navController)
+        }
+        nestedGraphs()
     }
+
 }

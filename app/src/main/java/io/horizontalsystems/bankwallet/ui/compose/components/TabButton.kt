@@ -3,6 +3,7 @@ package io.horizontalsystems.bankwallet.ui.compose.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -10,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
+import io.horizontalsystems.bankwallet.ui.compose.Grey50
 
 @Composable
 fun TabButtonSecondary(
@@ -114,11 +116,11 @@ object TabDefaults {
 
     @Composable
     fun textButtonColors(
-        backgroundColor: Color = ComposeAppTheme.colors.transparent,
-        contentColor: Color = ComposeAppTheme.colors.leah,
-        selectedBackgroundColor: Color = ComposeAppTheme.colors.yellowD,
-        selectedContentColor: Color = ComposeAppTheme.colors.dark,
-        disabledContentColor: Color = ComposeAppTheme.colors.grey50,
+        backgroundColor: Color = Color.Transparent,
+        contentColor: Color = MaterialTheme.colorScheme.onSurface,
+        selectedBackgroundColor: Color = MaterialTheme.colorScheme.onPrimary,
+        selectedContentColor: Color = MaterialTheme.colorScheme.primary,
+        disabledContentColor: Color = Grey50,
     ): DefaultTabColors = DefaultTabColors(
         backgroundColor = backgroundColor,
         contentColor = contentColor,

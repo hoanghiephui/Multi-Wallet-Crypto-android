@@ -5,8 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
 import androidx.compose.material.Text
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -14,7 +15,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.Select
 import io.horizontalsystems.bankwallet.ui.compose.WithTranslatableTitle
 
@@ -38,8 +38,8 @@ fun <T : WithTranslatableTitle> AlertGroup(
                 ) {
                     Text(
                         option.title.getString(),
-                        color = if (option == select.selected) ComposeAppTheme.colors.jacob else ComposeAppTheme.colors.leah,
-                        style = ComposeAppTheme.typography.body,
+                        color = if (option == select.selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.bodyLarge,
                     )
                 }
             }
@@ -53,7 +53,7 @@ fun AlertHeader(@StringRes title: Int) {
         modifier = Modifier
             .height(40.dp)
             .fillMaxWidth()
-            .background(ComposeAppTheme.colors.lawrence),
+            .background(MaterialTheme.colorScheme.surface),
         contentAlignment = Alignment.Center
     ) {
         subhead1_grey(stringResource(title))
@@ -69,13 +69,12 @@ fun AlertItem(
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp)
-            .background(ComposeAppTheme.colors.lawrence)
+            .background(MaterialTheme.colorScheme.surface)
             .clickable { onClick.invoke() },
         contentAlignment = Alignment.Center
     ) {
         Divider(
             thickness = 1.dp,
-            color = ComposeAppTheme.colors.steel10,
             modifier = Modifier.align(Alignment.TopCenter)
         )
 

@@ -3,6 +3,7 @@ package io.horizontalsystems.bankwallet.modules.coin.overview.ui
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -70,7 +71,7 @@ fun GraphicLineWithGradient(
     gradientColors: Pair<Color, Color>,
     selectedItemKey: Long?
 ) {
-    val dotColor = ComposeAppTheme.colors.leah
+    val dotColor = MaterialTheme.colorScheme.onSurface
     Canvas(
         modifier = Modifier
             .height(120.dp)

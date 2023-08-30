@@ -84,6 +84,7 @@ class GlobalMarketRepository(
                 emitter.onSuccess(marketTvlItems)
             } catch (error: Throwable) {
                 emitter.onError(error)
+                error.printStackTrace()
             }
         }
 

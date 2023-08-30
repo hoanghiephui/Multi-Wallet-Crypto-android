@@ -27,6 +27,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.ScrollableTabRow
 import androidx.compose.material.Tab
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -60,7 +61,14 @@ import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.chart.ChartModule
 import io.horizontalsystems.bankwallet.modules.chart.ChartViewModel
 import io.horizontalsystems.bankwallet.modules.coin.ChartInfoData
-import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
+import io.horizontalsystems.bankwallet.ui.compose.Green50
+import io.horizontalsystems.bankwallet.ui.compose.GreenL
+import io.horizontalsystems.bankwallet.ui.compose.Grey
+import io.horizontalsystems.bankwallet.ui.compose.Red50
+import io.horizontalsystems.bankwallet.ui.compose.RedL
+import io.horizontalsystems.bankwallet.ui.compose.Steel10
+import io.horizontalsystems.bankwallet.ui.compose.Steel20
+import io.horizontalsystems.bankwallet.ui.compose.Yellow50
 import io.horizontalsystems.bankwallet.ui.compose.components.GraphicBars
 import io.horizontalsystems.bankwallet.ui.compose.components.GraphicBarsWithNegative
 import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
@@ -103,16 +111,16 @@ fun HsChartLineHeader(
                 modifier = Modifier.weight(1f),
             ) {
                 val style = if (date == null) {
-                    ComposeAppTheme.typography.title3
+                    MaterialTheme.typography.titleLarge
                 } else {
-                    ComposeAppTheme.typography.headline2
+                    MaterialTheme.typography.titleSmall
                 }
 
                 Text(
                     modifier = Modifier.alignByBaseline(),
                     text = mainValue,
                     style = style,
-                    color = ComposeAppTheme.colors.leah,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 mainValueHint?.let {
                     HSpacer(width = 4.dp)
@@ -126,7 +134,7 @@ fun HsChartLineHeader(
                     Text(
                         modifier = Modifier.alignByBaseline(),
                         text = formatValueAsDiff(diff),
-                        style = ComposeAppTheme.typography.subhead1,
+                        style = MaterialTheme.typography.bodyLarge,
                         color = diffColor(diff.raw())
                     )
                 }
@@ -174,7 +182,7 @@ fun HsChartLineHeader(
                                 HSpacer(width = 4.dp)
                                 Text(
                                     text = formatValueAsDiff(diff),
-                                    style = ComposeAppTheme.typography.subhead2,
+                                    style = MaterialTheme.typography.labelLarge,
                                     color = diffColor(diff.raw())
                                 )
                             }
@@ -183,7 +191,7 @@ fun HsChartLineHeader(
                 }
 
                 is ChartModule.ChartHeaderExtraData.Indicators -> {
-                    val styleSubhead = ComposeAppTheme.typography.subhead2
+                    val styleSubhead = MaterialTheme.typography.labelLarge
                     Column(
                         modifier = Modifier.width(IntrinsicSize.Max),
                         horizontalAlignment = Alignment.End
@@ -231,19 +239,19 @@ fun HsChartLineHeader(
                                 Text(
                                     text = buildAnnotatedString {
                                         macd.histogramValue?.let { value ->
-                                            val color = if (value >= 0) ComposeAppTheme.colors.remus else ComposeAppTheme.colors.lucian
+                                            val color = if (value >= 0) GreenL else RedL
                                             withStyle(style = SpanStyle(color = color)) {
                                                 append(value.plainString())
                                                 append(" ")
                                             }
                                         }
                                         macd.signalValue?.let { value ->
-                                            withStyle(style = SpanStyle(color = ComposeAppTheme.colors.issykBlue)) {
+                                            withStyle(style = SpanStyle(color = Color(0xFF3372FF))) {
                                                 append(value.plainString())
                                                 append(" ")
                                             }
                                         }
-                                        withStyle(style = SpanStyle(color = ComposeAppTheme.colors.jacob)) {
+                                        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.onPrimary)) {
                                             append(macd.macdValue.plainString())
                                         }
                                     },
@@ -285,7 +293,7 @@ fun Chart(
     Column {
         var selectedPoint by remember { mutableStateOf<ChartModule.ChartHeaderView?>(null) }
 
-        Crossfade(targetState = uiState.viewState) {
+        Crossfade(targetState = uiState.viewState, label = "") {
             when (it) {
                 is ViewState.Error -> {
                     val height = if (uiState.hasVolumes) 268.dp else 224.dp
@@ -300,7 +308,7 @@ fun Chart(
                             modifier = Modifier
                                 .size(100.dp)
                                 .background(
-                                    color = ComposeAppTheme.colors.raina,
+                                    color = MaterialTheme.colorScheme.surface,
                                     shape = CircleShape
                                 ),
                             contentAlignment = Alignment.Center
@@ -309,7 +317,7 @@ fun Chart(
                                 modifier = Modifier.size(48.dp),
                                 painter = painterResource(R.drawable.ic_sync_error),
                                 contentDescription = null,
-                                tint = ComposeAppTheme.colors.grey
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
                         VSpacer(height = 32.dp)
@@ -341,7 +349,7 @@ fun Chart(
                                     modifier = Modifier
                                         .size(24.dp)
                                         .align(Alignment.Center),
-                                    color = ComposeAppTheme.colors.grey,
+                                    color = Grey,
                                     strokeWidth = 2.dp
                                 )
                             }
@@ -377,7 +385,7 @@ fun PriceVolChart(
 
     val chartData = chartInfoData.chartData
 
-    val colors = ComposeAppTheme.colors
+    val colors = MaterialTheme.colorScheme
 
     val chartHelper = remember { ChartHelper(chartData, hasVolumes, colors) }
     chartHelper.setTarget(chartData, hasVolumes)
@@ -425,7 +433,7 @@ fun PriceVolChart(
                 .drawBehind {
                     val pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
                     drawLine(
-                        color = colors.steel10,
+                        color = Steel10,
                         start = Offset(0f, size.height),
                         end = Offset(size.width, size.height),
                         pathEffect = pathEffect
@@ -497,7 +505,7 @@ fun PriceVolChart(
                             dominanceCurveState.endTimestamp,
                             dominanceCurveState.minValue,
                             dominanceCurveState.maxValue,
-                            ComposeAppTheme.colors.yellow50
+                            Yellow50
                         )
                     }
 
@@ -522,7 +530,7 @@ fun PriceVolChart(
                         .drawBehind {
                             val pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
                             drawLine(
-                                color = colors.steel10,
+                                color = Steel10,
                                 start = Offset(0f, 0f),
                                 end = Offset(size.width, 0f),
                                 pathEffect = pathEffect
@@ -551,7 +559,7 @@ fun PriceVolChart(
                                         val pathEffect =
                                             PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
                                         drawLine(
-                                            color = colors.steel10,
+                                            color = Steel10,
                                             start = Offset(0f, size.height),
                                             end = Offset(size.width, size.height),
                                             pathEffect = pathEffect
@@ -574,7 +582,7 @@ fun PriceVolChart(
                                 maxKey = rsiCurveState.endTimestamp,
                                 minValue = 0f,
                                 maxValue = 100f,
-                                color = ComposeAppTheme.colors.yellow50
+                                color = Yellow50
                             )
 
                             Box(
@@ -586,7 +594,7 @@ fun PriceVolChart(
                                         val pathEffect =
                                             PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
                                         drawLine(
-                                            color = colors.steel10,
+                                            color = Steel10,
                                             start = Offset(0f, 0f),
                                             end = Offset(size.width, 0f),
                                             pathEffect = pathEffect
@@ -609,8 +617,8 @@ fun PriceVolChart(
                                 maxKey = macdHistogramBarsState.endTimestamp,
                                 minValue = macdHistogramBarsState.minValue,
                                 maxValue = macdHistogramBarsState.maxValue,
-                                color = ComposeAppTheme.colors.green50,
-                                colorNegative = ComposeAppTheme.colors.red50
+                                color = Green50,
+                                colorNegative = Red50
                             )
                             GraphicLine(
                                 modifier = Modifier
@@ -621,7 +629,7 @@ fun PriceVolChart(
                                 maxKey = macdLineCurveState.endTimestamp,
                                 minValue = macdLineCurveState.minValue,
                                 maxValue = macdLineCurveState.maxValue,
-                                color = ComposeAppTheme.colors.yellow50
+                                color = Yellow50
                             )
                             GraphicLine(
                                 modifier = Modifier
@@ -632,7 +640,7 @@ fun PriceVolChart(
                                 maxKey = macdSignalCurveState.endTimestamp,
                                 minValue = macdSignalCurveState.minValue,
                                 maxValue = macdSignalCurveState.maxValue,
-                                color = ComposeAppTheme.colors.issykBlue
+                                color = Color(0xFF3372FF)
                             )
                         } else if (volumeBarsState != null) {
                             GraphicBars(
@@ -644,7 +652,7 @@ fun PriceVolChart(
                                 maxKey = volumeBarsState.endTimestamp,
                                 minValue = volumeBarsState.minValue,
                                 maxValue = volumeBarsState.maxValue,
-                                color = ComposeAppTheme.colors.steel20,
+                                color = Steel20,
                                 selectedItemKey = null
                             )
                         }
@@ -656,7 +664,7 @@ fun PriceVolChart(
                 mutableStateOf<Float?>(null)
             }
 
-            val dotColor = ComposeAppTheme.colors.leah
+            val dotColor = MaterialTheme.colorScheme.onSurface
 
             Canvas(
                 modifier = Modifier
