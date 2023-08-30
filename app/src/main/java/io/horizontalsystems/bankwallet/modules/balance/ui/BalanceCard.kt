@@ -129,118 +129,130 @@ fun BalanceCard(
                 viewModel.onItem(viewItem)
             }
     ) {
-        CellMultilineClear(height = 64.dp) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                WalletIcon(viewItem, viewModel, navController)
-                Column(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .weight(1f),
-                    verticalArrangement = Arrangement.Center
+        val view = LocalView.current
+
+        BalanceCardInner(viewItem) {
+            onSyncErrorClicked(viewItem, viewModel, navController, view)
+        }
+
+        ExpandableContent(viewItem, navController, viewModel)
+    }
+}
+
+@Composable
+fun BalanceCardInner(
+    viewItem: BalanceViewItem,
+    onClickSyncError: (() -> Unit)? = null
+) {
+    CellMultilineClear(height = 64.dp) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            WalletIcon(viewItem, onClickSyncError)
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .weight(1f),
+                verticalArrangement = Arrangement.Center
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.weight(weight = 1f),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Row(
-                            modifier = Modifier.weight(weight = 1f),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            body_leah(
-                                text = viewItem.coinCode,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            if (!viewItem.badge.isNullOrBlank()) {
-                                Box(
-                                    modifier = Modifier
-                                        .padding(start = 8.dp)
-                                        .clip(RoundedCornerShape(4.dp))
-                                        .background(ComposeAppTheme.colors.jeremy)
-                                ) {
-                                    Text(
-                                        modifier = Modifier.padding(
-                                            start = 4.dp,
-                                            end = 4.dp,
-                                            bottom = 1.dp
-                                        ),
-                                        text = viewItem.badge,
-                                        color = ComposeAppTheme.colors.bran,
-                                        style = ComposeAppTheme.typography.microSB,
-                                        maxLines = 1,
-                                    )
-                                }
+                        body_leah(
+                            text = viewItem.coinCode,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        if (!viewItem.badge.isNullOrBlank()) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(start = 8.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(ComposeAppTheme.colors.jeremy)
+                            ) {
+                                Text(
+                                    modifier = Modifier.padding(
+                                        start = 4.dp,
+                                        end = 4.dp,
+                                        bottom = 1.dp
+                                    ),
+                                    text = viewItem.badge,
+                                    color = ComposeAppTheme.colors.bran,
+                                    style = ComposeAppTheme.typography.microSB,
+                                    maxLines = 1,
+                                )
                             }
-                        }
-                        Spacer(Modifier.width(24.dp))
-                        if (viewItem.primaryValue.visible) {
-                            Text(
-                                text = viewItem.primaryValue.value,
-                                color = if (viewItem.primaryValue.dimmed) ComposeAppTheme.colors.grey else ComposeAppTheme.colors.leah,
-                                style = ComposeAppTheme.typography.headline2,
-                                maxLines = 1,
-                            )
                         }
                     }
+                    Spacer(Modifier.width(24.dp))
+                    if (viewItem.primaryValue.visible) {
+                        Text(
+                            text = viewItem.primaryValue.value,
+                            color = if (viewItem.primaryValue.dimmed) ComposeAppTheme.colors.grey else ComposeAppTheme.colors.leah,
+                            style = ComposeAppTheme.typography.headline2,
+                            maxLines = 1,
+                        )
+                    }
+                }
 
-                    Spacer(modifier = Modifier.height(3.dp))
+                Spacer(modifier = Modifier.height(3.dp))
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Box(
+                        modifier = Modifier.weight(1f),
                     ) {
-                        Box(
-                            modifier = Modifier.weight(1f),
-                        ) {
-                            if (viewItem.syncingTextValue.visible) {
-                                subhead2_grey(
-                                    text = viewItem.syncingTextValue.value ?: "",
-                                    maxLines = 1,
-                                )
-                            }
-                            if (viewItem.exchangeValue.visible) {
-                                Row {
-                                    Text(
-                                        text = viewItem.exchangeValue.value,
-                                        color = if (viewItem.exchangeValue.dimmed) ComposeAppTheme.colors.grey50 else ComposeAppTheme.colors.grey,
-                                        style = ComposeAppTheme.typography.subhead2,
-                                        maxLines = 1,
-                                    )
-                                    Text(
-                                        modifier = Modifier.padding(start = 4.dp),
-                                        text = RateText(viewItem.diff),
-                                        color = RateColor(viewItem.diff),
-                                        style = ComposeAppTheme.typography.subhead2,
-                                        maxLines = 1,
-                                    )
-                                }
-                            }
+                        if (viewItem.syncingTextValue.visible) {
+                            subhead2_grey(
+                                text = viewItem.syncingTextValue.value ?: "",
+                                maxLines = 1,
+                            )
                         }
-                        Box(
-                            modifier = Modifier.padding(start = 16.dp),
-                        ) {
-                            if (viewItem.syncedUntilTextValue.visible) {
-                                subhead2_grey(
-                                    text = viewItem.syncedUntilTextValue.value ?: "",
+                        if (viewItem.exchangeValue.visible) {
+                            Row {
+                                Text(
+                                    text = viewItem.exchangeValue.value,
+                                    color = if (viewItem.exchangeValue.dimmed) ComposeAppTheme.colors.grey50 else ComposeAppTheme.colors.grey,
+                                    style = ComposeAppTheme.typography.subhead2,
                                     maxLines = 1,
                                 )
-                            }
-                            if (viewItem.secondaryValue.visible) {
                                 Text(
-                                    text = viewItem.secondaryValue.value,
-                                    color = if (viewItem.secondaryValue.dimmed) ComposeAppTheme.colors.grey50 else ComposeAppTheme.colors.grey,
+                                    modifier = Modifier.padding(start = 4.dp),
+                                    text = RateText(viewItem.diff),
+                                    color = RateColor(viewItem.diff),
                                     style = ComposeAppTheme.typography.subhead2,
                                     maxLines = 1,
                                 )
                             }
                         }
                     }
+                    Box(
+                        modifier = Modifier.padding(start = 16.dp),
+                    ) {
+                        if (viewItem.syncedUntilTextValue.visible) {
+                            subhead2_grey(
+                                text = viewItem.syncedUntilTextValue.value ?: "",
+                                maxLines = 1,
+                            )
+                        }
+                        if (viewItem.secondaryValue.visible) {
+                            Text(
+                                text = viewItem.secondaryValue.value,
+                                color = if (viewItem.secondaryValue.dimmed) ComposeAppTheme.colors.grey50 else ComposeAppTheme.colors.grey,
+                                style = ComposeAppTheme.typography.subhead2,
+                                maxLines = 1,
+                            )
+                        }
+                    }
                 }
-
-                Spacer(modifier = Modifier.width(16.dp))
             }
-        }
 
-        ExpandableContent(viewItem, navController, viewModel)
+            Spacer(modifier = Modifier.width(16.dp))
+        }
     }
 }
 
@@ -395,7 +407,10 @@ private fun LockedValueRow(viewItem: BalanceViewItem) {
 }
 
 @Composable
-private fun WalletIcon(viewItem: BalanceViewItem, viewModel: BalanceViewModel, navController: NavController) {
+private fun WalletIcon(
+    viewItem: BalanceViewItem,
+    onClickSyncError: (() -> Unit)?
+) {
     Box(
         modifier = Modifier
             .width(64.dp)
@@ -419,13 +434,16 @@ private fun WalletIcon(viewItem: BalanceViewItem, viewModel: BalanceViewModel, n
             )
         }
         if (viewItem.failedIconVisible) {
-            val view = LocalView.current
+            val clickableModifier = if (onClickSyncError != null) {
+                Modifier.clickable(onClick = onClickSyncError)
+            } else {
+                Modifier
+            }
+
             Image(
                 modifier = Modifier
                     .size(32.dp)
-                    .clickable {
-                        onSyncErrorClicked(viewItem, viewModel, navController, view)
-                    },
+                    .then(clickableModifier),
                 painter = painterResource(id = R.drawable.ic_attention_24),
                 contentDescription = "coin icon",
                 colorFilter = ColorFilter.tint(ComposeAppTheme.colors.lucian)
