@@ -8,6 +8,7 @@
     <string name="Alert_Loading">درحال بارگذاری...</string>
     <string name="Alert_Restart">راه اندازی مجدد</string>
     <string name="Action_Undo">بازگرد</string>
+    <string name="Button_Show">نمایش</string>
     <string name="Button_Cancel">کنسل</string>
     <string name="Button_Next">بعدي</string>
     <string name="Button_Enable">فعال کردن</string>
@@ -128,7 +129,7 @@
     <string name="Balance_Send">ارسال</string>
     <string name="Balance_Receive">دريافت</string>
     <string name="Balance_Address">آدرس</string>
-    <string name="Balance_RatePerCoin">%sدر هر%s</string>
+    <string name="Balance_RatePerCoin">%1$sدر هر%2$s</string>
     <string name="Balance_SyncedUntil">تا %s</string>
     <string name="Balance_Syncing">همزمانی…</string>
     <string name="Balance_SearchingTransactions">در جستجوی تراکنش ها…</string>
@@ -442,6 +443,7 @@
     <string name="Settings_RateUs">به ما امتیاز بدهید</string>
     <string name="Settings_LaunchScreen">صفحه شروع</string>
     <string name="Settings_Appearance">ظاهر</string>
+    <string name="Settings_PersonalSupport_Request">درخواست</string>
     <string name="Appearance_Theme">موضوع</string>
     <string name="Appearance_LaunchScreen">صفحه راه اندازی</string>
     <string name="Appearance_AppIcon">نماد برنامه</string>
@@ -539,13 +541,6 @@
     <string name="ManageCoins_title">مدیر سكه</string>
     <string name="ManageCoins_AddToken">اضافه کردن نشان</string>
     <string name="ManageCoins_NoResults">نتیجه ای پیدا نشد. اگر آدرس قرارداد هوشمند آن را می‌دانید، سعی کنید توکن را به صورت دستی اضافه کنید.</string>
-    <string name="ManageCoins_BipsDescription">There are 3 common address formats %s wallets can use to receive incoming payments:
-\n
-\n- BIP-44 (older)
-\n- BIP-49 (newer)
-\n- BIP-84 (newest)
-\n
-\nWhile Unstoppable wallet supports all 3 of them it recommends to use a %s wallet operating in BIP-84 format. The wallets operating in this format get to pay lowest fees when sending %s transactions.</string>
     <!-- Experimental Feature -->
     <string name="ExperimentalFeatures_Title">تجربی</string>
     <string name="ExperimentalFeatures_Description">ویژگی های زیر تجربی است و باید با احتیاط استفاده شود. در حالی که ما این ویژگی ها را با استفاده از وجوه رمزنگاری شده خودمان به طور آزمایشی آزمایش کرده ایم ، اما نمی توانیم تضمین کنیم که آنها مطابق آنچه انتظار می رود عمل کنند.</string>
@@ -690,7 +685,8 @@
     <string name="CoinPage_AddToWallet">Added To Wallet</string>
     <string name="CoinPage_Performance_Week">1Week</string>
     <string name="CoinPage_Performance_Month"> 1Month </string>
-    <string name="CoinPage_MajorHolders_Description">Chart above shows the % of all tokens in circulation held by top 10 wallets. The lower the % the more distributed the coin is.</string>
+    <string name="Coin_Analytics_Details">جزئیات</string>
+    <string name="Coin_Analytics_Period_1h">۱ ساعت</string>
     <string name="ActivateSubscription_Address">آدرس</string>
     <string name="Nfts_Title">NFTها</string>
     <string name="Nfts_PriceType_Days_7">7 دی اوت</string>
@@ -793,4 +789,13 @@
     <!--Contacts-->
     <string name="Contacts_NameHint">نام</string>
     <string name="Contacts_AddressHint">آدرس یا دامنه</string>
+    <string name="Hud_Text_Connected">ارتباط برقرار شد</string>
+    <!--Cex Deposit Module-->
+    <string name="Cex_ChooseCoin">سکه را انتخاب کنید</string>
+    <string name="CexDeposit_Network">خالص</string>
+    <!--Cex Withdraw Module-->
+    <string name="CexWithdraw_Title">ارسال %s</string>
+    <string name="CexWithdraw_Network">خالص</string>
+    <string name="CexWithdraw_Fee">هزينه</string>
+    <string name="CexWithdraw_GetCode">ارسال مجدد</string>
 </resources>

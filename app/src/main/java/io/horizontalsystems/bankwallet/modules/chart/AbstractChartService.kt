@@ -10,7 +10,7 @@ import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.BehaviorSubject
-import java.util.*
+import java.util.Optional
 
 abstract class AbstractChartService {
     open val hasVolumes = false
@@ -88,6 +88,5 @@ abstract class AbstractChartService {
                 chartPointsWrapperObservable.onNext(Result.failure(it))
             })
     }
-
 }
 

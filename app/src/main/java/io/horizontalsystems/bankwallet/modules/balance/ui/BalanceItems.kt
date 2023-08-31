@@ -1,15 +1,19 @@
 package io.horizontalsystems.bankwallet.modules.balance.ui
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -126,6 +130,7 @@ fun Note(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BalanceItems(
     balanceViewItems: List<BalanceViewItem>,
@@ -143,155 +148,114 @@ fun BalanceItems(
         }
     }
 
-    Column {
-        val context = LocalContext.current
-
-        when (totalState) {
-            TotalUIState.Hidden -> {
-                DoubleText(
-                    title = "*****",
-                    body = "*****",
-                    dimmed = false,
-                    onClickTitle = {
-                        viewModel.toggleBalanceVisibility()
-                        HudHelper.vibrate(context)
-                    },
-                    onClickSubtitle = {
-                        viewModel.toggleTotalType()
-                        HudHelper.vibrate(context)
-                    }
-                )
-            }
-            is TotalUIState.Visible -> {
-                DoubleText(
-                    title = totalState.primaryAmountStr,
-                    body = totalState.secondaryAmountStr,
-                    dimmed = totalState.dimmed,
-                    onClickTitle = {
-                        viewModel.toggleBalanceVisibility()
-                        HudHelper.vibrate(context)
-                    },
-                    onClickSubtitle = {
-                        viewModel.toggleTotalType()
-                        HudHelper.vibrate(context)
-                    },
-                )
-            }
-        }
-
-        HeaderSorting(borderTop = true) {
-            var showSortTypeSelectorDialog by remember { mutableStateOf(false) }
-
-            ButtonSecondaryTransparent(
-                title = stringResource(viewModel.sortType.getTitleRes()),
-                iconRight = R.drawable.ic_down_arrow_20,
-                onClick = {
-                    showSortTypeSelectorDialog = true
-                }
-            )
-
-            if (showSortTypeSelectorDialog) {
-                SelectorDialogCompose(
-                    title = stringResource(R.string.Balance_Sort_PopupTitle),
-                    items = viewModel.sortTypes.map {
-                        TabItem(stringResource(it.getTitleRes()), it == viewModel.sortType, it)
-                    },
-                    onDismissRequest = {
-                        showSortTypeSelectorDialog = false
-                    },
-                    onSelectItem = {
-                        viewModel.sortType = it
-                    }
-                )
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            if (accountViewItem.isWatchAccount) {
-                Image(
-                    painter = painterResource(R.drawable.icon_binocule_24),
-                    contentDescription = "binoculars icon"
-                )
-            } else {
-                ButtonSecondaryCircle(
-                    icon = R.drawable.ic_manage_2,
-                    contentDescription = stringResource(R.string.ManageCoins_title),
-                    onClick = {
-                        navController.slideFromRight(R.id.manageWalletsFragment)
-                    }
-                )
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-        }
-
-        when (uiState.headerNote) {
-            HeaderNote.None -> Unit
-            HeaderNote.NonStandardAccount -> {
-                NoteError(
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp),
-                    text = stringResource(R.string.AccountRecovery_MigrationRequired),
-                    onClick = {
-                        FaqManager.showFaqPage(
-                            navController,
-                            FaqManager.faqPathMigrationRequired
-                        )
-                    }
-                )
-            }
-            HeaderNote.NonRecommendedAccount -> {
-                NoteWarning(
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp),
-                    text = stringResource(R.string.AccountRecovery_MigrationRecommended),
-                    onClick = {
-                        FaqManager.showFaqPage(
-                            navController,
-                            FaqManager.faqPathMigrationRecommended
-                        )
-                    },
-                    onClose = {
-                        viewModel.onCloseHeaderNote(HeaderNote.NonRecommendedAccount)
-                    }
-                )
-            }
-        }
-
-        Wallets(balanceViewItems, viewModel, navController, accountViewItem.id, viewModel.sortType, uiState)
-    }
-}
-
-@Composable
-fun Wallets(
-    balanceViewItems: List<BalanceViewItem>,
-    viewModel: BalanceViewModel,
-    navController: NavController,
-    accountId: String,
-    sortType: BalanceSortType,
-    uiState: BalanceUiState
-) {
+    val context = LocalContext.current
     var revealedCardId by remember { mutableStateOf<Int?>(null) }
-
-    val listState = rememberSaveable(
-        accountId,
-        sortType,
-        saver = LazyListState.Saver
-    ) {
-        LazyListState()
-    }
 
     HSSwipeRefresh(
         refreshing = uiState.isRefreshing,
-        onRefresh = {
-            viewModel.onRefresh()
-        }
+        onRefresh = viewModel::onRefresh
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            state = listState,
-            contentPadding = PaddingValues(top = 8.dp, bottom = 18.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            state = rememberSaveable(
+                accountViewItem.id,
+                viewModel.sortType,
+                saver = LazyListState.Saver
+            ) {
+                LazyListState()
+            }
         ) {
-            items(balanceViewItems, key = { item -> item.wallet.hashCode() }) { item ->
+            item {
+                TotalBalanceRow(
+                    totalState = totalState,
+                    onClickTitle = {
+                        viewModel.toggleBalanceVisibility()
+                        HudHelper.vibrate(context)
+                    },
+                    onClickSubtitle = {
+                        viewModel.toggleTotalType()
+                        HudHelper.vibrate(context)
+                    }
+                )
+            }
+
+            item {
+                Divider(
+                    thickness = 1.dp,
+                    color = ComposeAppTheme.colors.steel10,
+                )
+            }
+
+            stickyHeader {
+                HeaderSorting {
+                    BalanceSortingSelector(
+                        sortType = viewModel.sortType,
+                        sortTypes = viewModel.sortTypes
+                    ) {
+                        viewModel.sortType = it
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    if (accountViewItem.isWatchAccount) {
+                        Image(
+                            painter = painterResource(R.drawable.icon_binocule_24),
+                            contentDescription = "binoculars icon"
+                        )
+                    } else {
+                        ButtonSecondaryCircle(
+                            icon = R.drawable.ic_manage_2,
+                            contentDescription = stringResource(R.string.ManageCoins_title),
+                            onClick = {
+                                navController.slideFromRight(R.id.manageWalletsFragment)
+                            }
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+                }
+            }
+
+            item {
+                when (uiState.headerNote) {
+                    HeaderNote.None -> Unit
+                    HeaderNote.NonStandardAccount -> {
+                        NoteError(
+                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp),
+                            text = stringResource(R.string.AccountRecovery_MigrationRequired),
+                            onClick = {
+                                FaqManager.showFaqPage(
+                                    navController,
+                                    FaqManager.faqPathMigrationRequired
+                                )
+                            }
+                        )
+                    }
+
+                    HeaderNote.NonRecommendedAccount -> {
+                        NoteWarning(
+                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp),
+                            text = stringResource(R.string.AccountRecovery_MigrationRecommended),
+                            onClick = {
+                                FaqManager.showFaqPage(
+                                    navController,
+                                    FaqManager.faqPathMigrationRecommended
+                                )
+                            },
+                            onClose = {
+                                viewModel.onCloseHeaderNote(HeaderNote.NonRecommendedAccount)
+                            }
+                        )
+                    }
+                }
+            }
+
+            wallets(
+                items = balanceViewItems,
+                key = {
+                    it.wallet.hashCode()
+                }
+            ) { item ->
                 if (item.isWatchAccount) {
                     BalanceCard(item, viewModel, navController)
                 } else {
@@ -307,11 +271,88 @@ fun Wallets(
                         },
                         onConceal = {
                             revealedCardId = null
-                        },
+                        }
                     )
                 }
             }
         }
+    }
+}
+
+@Composable
+fun BalanceSortingSelector(
+    sortType: BalanceSortType,
+    sortTypes: List<BalanceSortType>,
+    onSelectSortType: (BalanceSortType) -> Unit
+) {
+    var showSortTypeSelectorDialog by remember { mutableStateOf(false) }
+
+    ButtonSecondaryTransparent(
+        title = stringResource(sortType.getTitleRes()),
+        iconRight = R.drawable.ic_down_arrow_20,
+        onClick = {
+            showSortTypeSelectorDialog = true
+        }
+    )
+
+    if (showSortTypeSelectorDialog) {
+        SelectorDialogCompose(
+            title = stringResource(R.string.Balance_Sort_PopupTitle),
+            items = sortTypes.map {
+                TabItem(stringResource(it.getTitleRes()), it == sortType, it)
+            },
+            onDismissRequest = {
+                showSortTypeSelectorDialog = false
+            },
+            onSelectItem = onSelectSortType
+        )
+    }
+}
+
+@Composable
+fun TotalBalanceRow(
+    totalState: TotalUIState,
+    onClickTitle: () -> Unit,
+    onClickSubtitle: () -> Unit
+) {
+    when (totalState) {
+        TotalUIState.Hidden -> {
+            DoubleText(
+                title = "*****",
+                body = "*****",
+                dimmed = false,
+                onClickTitle = onClickTitle,
+                onClickSubtitle = onClickSubtitle
+            )
+        }
+
+        is TotalUIState.Visible -> {
+            DoubleText(
+                title = totalState.primaryAmountStr,
+                body = totalState.secondaryAmountStr,
+                dimmed = totalState.dimmed,
+                onClickTitle = onClickTitle,
+                onClickSubtitle = onClickSubtitle,
+            )
+        }
+    }
+}
+
+fun <T> LazyListScope.wallets(
+    items: List<T>,
+    key: ((item: T) -> Any)? = null,
+    itemContent: @Composable (LazyItemScope.(item: T) -> Unit),
+) {
+    item {
+        VSpacer(height = 8.dp)
+    }
+    items(items = items, key = key, itemContent = {
+        Row(modifier = Modifier.padding(bottom = 8.dp)) {
+            itemContent(it)
+        }
+    })
+    item {
+        VSpacer(height = 10.dp)
     }
 }
 

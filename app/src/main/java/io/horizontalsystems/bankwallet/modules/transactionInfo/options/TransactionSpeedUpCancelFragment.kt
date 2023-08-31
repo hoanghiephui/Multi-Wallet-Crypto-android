@@ -44,13 +44,14 @@ import io.horizontalsystems.core.CustomSnackbar
 import io.horizontalsystems.core.SnackbarDuration
 import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.helpers.HudHelper
+import io.horizontalsystems.core.parcelable
 
 class TransactionSpeedUpCancelFragment : BaseFragment() {
 
     private val logger = AppLogger("tx-speedUp-cancel")
     private val transactionInfoViewModel by navGraphViewModels<TransactionInfoViewModel>(R.id.transactionInfoFragment)
     private val optionType by lazy {
-        arguments?.getParcelable<TransactionInfoOptionsModule.Type>(
+        arguments?.parcelable<TransactionInfoOptionsModule.Type>(
             OPTION_TYPE_KEY
         )!!
     }
@@ -212,7 +213,7 @@ private fun TransactionSpeedUpCancelScreen(
                     ButtonPrimaryYellow(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp, bottom = 32.dp),
+                            .padding(start = 16.dp, end = 16.dp),
                         title = speedUpCancelViewModel.buttonTitle,
                         onClick = onSendClick,
                         enabled =  if(speedUpCancelViewModel.isTransactionPending) enabled else false

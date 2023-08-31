@@ -32,11 +32,17 @@ object CoinOverviewModule {
                         service,
                         CoinViewFactory(currency, App.numberFormatter),
                         App.walletManager,
-                        App.accountManager
+                        App.accountManager,
+                        App.chartIndicatorManager
                     ) as T
                 }
                 ChartViewModel::class.java -> {
-                    val chartService = CoinOverviewChartService(App.marketKit, App.currencyManager, fullCoin.coin.uid)
+                    val chartService = CoinOverviewChartService(
+                        App.marketKit,
+                        App.currencyManager,
+                        fullCoin.coin.uid,
+                        App.chartIndicatorManager
+                    )
                     val chartNumberFormatter = ChartCurrencyValueFormatterSignificant()
                     ChartModule.createViewModel(chartService, chartNumberFormatter) as T
                 }
@@ -63,6 +69,16 @@ data class TokenVariant(
     val canAddToWallet: Boolean,
     val inWallet: Boolean,
 ) {
+}
+
+data class HudMessage(
+    val text: Int,
+    val type: HudMessageType,
+    val iconRes: Int? = null
+)
+
+enum class HudMessageType{
+    Success, Error
 }
 
 data class CoinOverviewViewItem(

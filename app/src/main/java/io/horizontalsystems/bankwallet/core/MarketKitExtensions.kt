@@ -16,6 +16,7 @@ import io.horizontalsystems.marketkit.models.Blockchain
 import io.horizontalsystems.marketkit.models.BlockchainType
 import io.horizontalsystems.marketkit.models.Coin
 import io.horizontalsystems.marketkit.models.FullCoin
+import io.horizontalsystems.marketkit.models.HsPointTimePeriod
 import io.horizontalsystems.marketkit.models.Token
 import io.horizontalsystems.marketkit.models.TokenQuery
 import io.horizontalsystems.marketkit.models.TokenType
@@ -27,6 +28,9 @@ val Token.protocolType: String?
 
 val Token.isCustom: Boolean
     get() = coin.uid == tokenQuery.customCoinUid
+
+val Coin.isCustom: Boolean
+    get() = uid.startsWith(TokenQuery.customCoinPrefix)
 
 val Token.isSupported: Boolean
     get() = tokenQuery.isSupported
@@ -178,13 +182,7 @@ val Blockchain.description: String
         else -> ""
     }
 
-fun Blockchain.eip20TokenUrl(address: String): String? {
-    return when (uid) {
-        "ethereum" -> "https://etherscan.io/token/$address"
-        "binance-smart-chain" -> "https://bscscan.com/token/$address"
-        else -> eip3091url?.let { "$it/token/$address" }
-    }
-}
+fun Blockchain.eip20TokenUrl(address: String) = eip3091url?.replace("\$ref", address)
 
 fun Blockchain.bep2TokenUrl(symbol: String) = "https://explorer.binance.org/asset/$symbol"
 
@@ -331,6 +329,8 @@ fun BlockchainType.supports(accountType: AccountType): Boolean {
 
         is AccountType.TronAddress ->
             this == BlockchainType.Tron
+
+        is AccountType.Cex -> false
     }
 }
 
@@ -365,3 +365,13 @@ val FullCoin.iconPlaceholder: Int
 fun FullCoin.eligibleTokens(accountType: AccountType): List<Token> {
     return supportedTokens.filter { it.blockchainType.supports(accountType) }
 }
+
+val HsPointTimePeriod.title: Int
+    get() = when(this){
+        HsPointTimePeriod.Minute30 -> R.string.Coin_Analytics_Period_30m
+        HsPointTimePeriod.Hour1 -> R.string.Coin_Analytics_Period_1h
+        HsPointTimePeriod.Hour4 -> R.string.Coin_Analytics_Period_4h
+        HsPointTimePeriod.Hour8 ->R.string.Coin_Analytics_Period_8h
+        HsPointTimePeriod.Day1 -> R.string.Coin_Analytics_Period_1d
+        HsPointTimePeriod.Week1 -> R.string.Coin_Analytics_Period_1w
+    }

@@ -19,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -66,6 +67,7 @@ import io.horizontalsystems.bankwallet.ui.compose.observeKeyboardState
 import io.horizontalsystems.bankwallet.ui.extensions.BottomSheetHeader
 import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.getNavigationResult
+import io.horizontalsystems.core.parcelable
 import io.horizontalsystems.marketkit.models.*
 import kotlinx.coroutines.launch
 
@@ -128,6 +130,7 @@ private fun SwapMainScreen(
     val coroutineScope = rememberCoroutineScope()
     val modalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val providerViewItems = viewModel.swapState.providerViewItems
+    val focusManager = LocalFocusManager.current
 
     ComposeAppTheme {
         ModalBottomSheetLayout(
@@ -161,12 +164,18 @@ private fun SwapMainScreen(
                     TopMenu(
                         viewModel = viewModel,
                         navController = navController,
-                        showProviderSelector = { coroutineScope.launch { modalBottomSheetState.show() } },
+                        showProviderSelector = {
+                            focusManager.clearFocus(true)
+                            coroutineScope.launch {
+                                modalBottomSheetState.show()
+                            }
+                        }
                     )
                     SwapCards(
                         navController = navController,
                         viewModel = viewModel,
                         allowanceViewModel = allowanceViewModel,
+                        focusManager = focusManager
                     )
                 }
             }
@@ -178,9 +187,10 @@ private fun SwapMainScreen(
 fun SwapCards(
     navController: NavController,
     viewModel: SwapMainViewModel,
-    allowanceViewModel: SwapAllowanceViewModel
+    allowanceViewModel: SwapAllowanceViewModel,
+    focusManager: FocusManager
 ) {
-    val focusManager = LocalFocusManager.current
+
     val focusRequester = remember { FocusRequester() }
     val keyboardState by observeKeyboardState()
     var showSuggestions by remember { mutableStateOf(false) }
@@ -400,7 +410,7 @@ private fun TopMenu(
             icon = R.drawable.ic_manage_2,
             onClick = {
                 navController.getNavigationResult(SwapMainModule.resultKey) {
-                    val recipient = it.getParcelable<Address>(SwapMainModule.swapSettingsRecipientKey)
+                    val recipient = it.parcelable<Address>(SwapMainModule.swapSettingsRecipientKey)
                     val slippage = it.getString(SwapMainModule.swapSettingsSlippageKey)
                     val ttl = it.getLong(SwapMainModule.swapSettingsTtlKey)
                     viewModel.onUpdateSwapSettings(recipient, slippage?.toBigDecimal(), ttl)
@@ -418,6 +428,17 @@ private fun TopMenu(
                     }
 
                     SwapMainModule.UniswapV3Provider -> {
+                        navController.slideFromBottom(
+                            R.id.uniswapSettingsFragment,
+                            UniswapSettingsFragment.prepareParams(
+                                dex = state.dex,
+                                address = state.recipient,
+                                slippage = state.slippage,
+                                ttlEnabled = false,
+                            )
+                        )
+                    }
+                    SwapMainModule.PancakeSwapV3Provider -> {
                         navController.slideFromBottom(
                             R.id.uniswapSettingsFragment,
                             UniswapSettingsFragment.prepareParams(

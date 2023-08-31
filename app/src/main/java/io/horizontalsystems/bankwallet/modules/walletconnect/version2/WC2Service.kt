@@ -100,8 +100,9 @@ class WC2Service : SignClient.WalletDelegate {
     }
 
     fun approve(proposal: Sign.Model.SessionProposal, blockchains: List<WCBlockchain>) {
-        val methods = proposal.requiredNamespaces.values.flatMap { it.methods }
-        val events = proposal.requiredNamespaces.values.flatMap { it.events }
+        val namespaces = proposal.requiredNamespaces + proposal.optionalNamespaces
+        val methods = namespaces.values.flatMap { it.methods }.distinct()
+        val events = namespaces.values.flatMap { it.events }.distinct()
 
         val sessionNamespaces = blockchains
             .groupBy { it.chainNamespace }
@@ -109,8 +110,7 @@ class WC2Service : SignClient.WalletDelegate {
                 Sign.Model.Namespace.Session(
                     accounts = blockchains.map(WCBlockchain::getAccount),
                     methods = methods,
-                    events = events,
-                    extensions = null
+                    events = events
                 )
             }
             .toMap()
@@ -209,12 +209,12 @@ class WC2Service : SignClient.WalletDelegate {
         return sessionProposals.removeFirstOrNull()
     }
 
-    override fun onSessionProposal(sessionProposal: Sign.Model.SessionProposal) {
+    override fun onSessionProposal(sessionProposal: Sign.Model.SessionProposal, verifyContext: Sign.Model.VerifyContext) {
         sessionProposals.add(sessionProposal)
         event = Event.WaitingForApproveSession
     }
 
-    override fun onSessionRequest(sessionRequest: Sign.Model.SessionRequest) {
+    override fun onSessionRequest(sessionRequest: Sign.Model.SessionRequest, verifyContext: Sign.Model.VerifyContext) {
         sessionsRequestReceivedSubject.onNext(sessionRequest)
         pendingRequestUpdatedSubject.onNext(Unit)
     }

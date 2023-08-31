@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 class MainSettingsViewModel(
     private val service: MainSettingsService,
-    val companyWebPage: String,
+    val companyWebPage: String
 ) : ViewModel() {
 
     private var disposables: CompositeDisposable = CompositeDisposable()
@@ -62,6 +62,7 @@ class MainSettingsViewModel(
         syncCounter()
         service.start()
     }
+
     private fun shouldShowAlertForManageWallet(allBackedUp: Boolean, hasNonStandardAccount: Boolean): Boolean {
         return !allBackedUp || hasNonStandardAccount
     }
@@ -72,7 +73,7 @@ class MainSettingsViewModel(
         disposables.clear()
     }
 
-    fun getWalletConnectSupportState() : WC1Manager.SupportState {
+    fun getWalletConnectSupportState(): WC1Manager.SupportState {
         return service.getWalletConnectSupportState()
     }
 

@@ -18,6 +18,12 @@
         <argument android:name="key" app:argType="string"/>
     </fragment>
     <fragment
+        android:id="@+id/depositCexFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.depositcex.DepositCexFragment"/>
+    <fragment
+        android:id="@+id/depositCexChooseAssetFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.depositcex.DepositCexChooseAssetFragment"/>
+    <fragment
         android:id="@+id/wc2SessionFragment"
         android:name="io.horizontalsystems.bankwallet.modules.walletconnect.session.v2.WC2SessionFragment"/>
     <fragment
@@ -107,6 +113,9 @@
         android:id="@+id/baseCurrencySettingsFragment"
         android:name="io.horizontalsystems.bankwallet.modules.basecurrency.BaseCurrencySettingsFragment" />
     <fragment
+        android:id="@+id/personalSupportFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.settings.support.PersonalSupportFragment" />
+    <fragment
         android:id="@+id/languageSettingsFragment"
         android:name="io.horizontalsystems.bankwallet.modules.settings.language.LanguageSettingsFragment" />
     <fragment
@@ -122,6 +131,9 @@
         android:id="@+id/timeLockFragment"
         android:name="io.horizontalsystems.bankwallet.modules.settings.experimental.timelock.TimeLockFragment"/>
     <fragment
+        android:id="@+id/donateFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.settings.donate.DonateFragment"/>
+    <fragment
         android:id="@+id/metricsPageFragment"
         android:name="io.horizontalsystems.bankwallet.modules.market.metricspage.MetricsPageFragment" />
     <fragment
@@ -132,11 +144,26 @@
             app:uri="unstoppable://coin-page?uid={coinUid}" />
     </fragment>
     <fragment
+        android:id="@+id/technicalIndicatorsDetailsFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.coin.technicalindicators.TechnicalIndicatorsDetailsFragment" />
+    <fragment
+        android:id="@+id/indicatorsFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.coin.indicators.IndicatorsFragment" />
+    <fragment
+        android:id="@+id/indicatorSettingsFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.coin.indicators.IndicatorSettingsFragment" />
+    <fragment
         android:id="@+id/activateSubscription"
         android:name="io.horizontalsystems.bankwallet.modules.subscription.ActivateSubscriptionFragment" />
     <fragment
+        android:id="@+id/subscriptionInfoFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.subscription.SubscriptionInfoFragment" />
+    <fragment
         android:id="@+id/coinAnalyticsInfoFragment"
         android:name="io.horizontalsystems.bankwallet.modules.info.CoinAnalyticsInfoFragment" />
+    <fragment
+        android:id="@+id/overallScoreInfoFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.info.OverallScoreInfoFragment" />
     <fragment
         android:id="@+id/coinMajorHoldersFragment"
         android:name="io.horizontalsystems.bankwallet.modules.coin.majorholders.CoinMajorHoldersFragment" />
@@ -229,6 +256,9 @@
         android:id="@+id/restoreAccountFragment"
         android:name="io.horizontalsystems.bankwallet.modules.restoreaccount.RestoreAccountFragment" />
     <fragment
+        android:id="@+id/importCexAccountFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.importcexaccount.ImportCexAccountFragment" />
+    <fragment
         android:id="@+id/importWalletFragment"
         android:name="io.horizontalsystems.bankwallet.modules.importwallet.ImportWalletFragment" />
     <fragment
@@ -305,11 +335,20 @@
         android:id="@+id/wcAccountTypeNotSupportedDialog"
         android:name="io.horizontalsystems.bankwallet.modules.walletconnect.WCAccountTypeNotSupportedDialog" />
     <dialog
+        android:id="@+id/contactOptionsDialog"
+        android:name="io.horizontalsystems.bankwallet.modules.settings.about.ContactOptionsDialog" />
+    <dialog
         android:id="@+id/backupRequiredDialog"
         android:name="io.horizontalsystems.bankwallet.modules.manageaccount.dialogs.BackupRequiredDialog" />
     <dialog
         android:id="@+id/backupRecoveryPhraseDialog"
         android:name="io.horizontalsystems.bankwallet.modules.backupalert.BackupRecoveryPhraseDialog" />
+    <dialog
+        android:id="@+id/errorDisplayDialogFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.info.ErrorDisplayDialogFragment" />
+    <dialog
+        android:id="@+id/indicatorsAlertDialog"
+        android:name="io.horizontalsystems.bankwallet.modules.coin.indicators.IndicatorsAlertDialog" />
     <dialog
         android:id="@+id/syncErrorDialog"
         android:name="io.horizontalsystems.bankwallet.modules.syncerror.SyncErrorDialog" />
@@ -331,4 +370,7 @@
     <dialog
         android:id="@+id/configuredTokenInfo"
         android:name="io.horizontalsystems.bankwallet.modules.configuredtoken.ConfiguredTokenInfoDialog" />
+    <dialog
+        android:id="@+id/periodSelectDialog"
+        android:name="io.horizontalsystems.bankwallet.ui.compose.components.PeriodSelectDialog" />
 </navigation>

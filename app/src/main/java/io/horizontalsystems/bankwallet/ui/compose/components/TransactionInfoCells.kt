@@ -167,7 +167,7 @@ fun TitleAndValueCell(
 }
 
 @Composable
-fun TransactionInfoAddressCell(title: String, value: String, showAdd: Boolean, blockchainType: BlockchainType, navController: NavController? = null) {
+fun TransactionInfoAddressCell(title: String, value: String, showAdd: Boolean, blockchainType: BlockchainType?, navController: NavController? = null) {
     val view = LocalView.current
     var showSaveAddressDialog by remember { mutableStateOf(false) }
     RowUniversal(
@@ -208,16 +208,18 @@ fun TransactionInfoAddressCell(title: String, value: String, showAdd: Boolean, b
                 showSaveAddressDialog = false
             },
             onSelectItem = { action ->
-                val args = when (action) {
-                    ContactsModule.AddAddressAction.AddToNewContact -> {
-                        ContactsFragment.prepareParams(mode = Mode.AddAddressToNewContact(blockchainType, value))
+                blockchainType?.let {
+                    val args = when (action) {
+                        ContactsModule.AddAddressAction.AddToNewContact -> {
+                            ContactsFragment.prepareParams(mode = Mode.AddAddressToNewContact(blockchainType, value))
 
+                        }
+                        ContactsModule.AddAddressAction.AddToExistingContact -> {
+                            ContactsFragment.prepareParams(mode = Mode.AddAddressToExistingContact(blockchainType, value))
+                        }
                     }
-                    ContactsModule.AddAddressAction.AddToExistingContact -> {
-                        ContactsFragment.prepareParams(mode = Mode.AddAddressToExistingContact(blockchainType, value))
-                    }
+                    navController?.slideFromRight(R.id.contactsFragment, args)
                 }
-                navController?.slideFromRight(R.id.contactsFragment, args)
             })
     }
 }
@@ -525,6 +527,21 @@ fun TransactionInfoSentToSelfCell() {
             contentDescription = null,
         )
         subhead2_grey(text = stringResource(R.string.TransactionInfo_SentToSelfNote))
+    }
+}
+
+@Composable
+fun TransactionInfoCell(title: String, value: String) {
+    RowUniversal(
+        modifier = Modifier.padding(horizontal = 16.dp),
+    ) {
+        subhead2_grey(text = title)
+        HSpacer(16.dp)
+        subhead1_leah(
+            modifier = Modifier.weight(1f),
+            text = value,
+            textAlign = TextAlign.Right
+        )
     }
 }
 
