@@ -59,7 +59,7 @@ fun MarketCoin(
 ) {
     RowUniversal(
         modifier = Modifier
-            .background(ComposeAppTheme.colors.tyler)
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 16.dp),
         onClick = onClick
     ) {

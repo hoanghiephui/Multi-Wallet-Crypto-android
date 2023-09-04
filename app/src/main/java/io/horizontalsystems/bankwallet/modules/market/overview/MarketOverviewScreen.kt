@@ -20,6 +20,7 @@ import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.ViewState
+import io.horizontalsystems.bankwallet.material.module.market.navigateToMarketTopCoinsScreen
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.market.category.MarketCategoryFragment
 import io.horizontalsystems.bankwallet.modules.market.overview.ui.*
@@ -81,7 +82,7 @@ fun MarketOverviewScreen(
                                         marketField
                                     )
 
-                                    navController.slideFromBottom(R.id.marketTopCoinsFragment, args)
+                                    navController.navigateToMarketTopCoinsScreen(bundle = args)
                                 },
                                 onSelectTopMarket = { topMarket, listType ->
                                     viewModel.onSelectTopMarket(topMarket, listType)

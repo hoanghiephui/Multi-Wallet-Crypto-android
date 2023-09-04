@@ -10,7 +10,7 @@ plugins {
 
 android {
     defaultConfig {
-        applicationId = "io.horizontalsystems.bankwallet"
+        applicationId = "io.horizontalsystems"
         versionCode = 85
         versionName = "0.34.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

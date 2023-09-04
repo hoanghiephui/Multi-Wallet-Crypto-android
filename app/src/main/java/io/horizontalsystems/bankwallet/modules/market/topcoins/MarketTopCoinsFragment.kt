@@ -9,17 +9,23 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
+import coin.chain.crypto.core.designsystem.component.TopAppBarClose
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.core.slideFromRight
@@ -79,9 +85,9 @@ class MarketTopCoinsFragment : BaseFragment() {
     }
 
     companion object {
-        private const val sortingFieldKey = "sorting_field"
-        private const val topMarketKey = "top_market"
-        private const val marketFieldKey = "market_field"
+        const val sortingFieldKey = "sorting_field"
+        const val topMarketKey = "top_market"
+        const val marketFieldKey = "market_field"
 
         fun prepareParams(
             sortingField: SortingField,
@@ -98,7 +104,7 @@ class MarketTopCoinsFragment : BaseFragment() {
 
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun TopCoinsScreen(
     viewModel: MarketTopCoinsViewModel,
@@ -113,113 +119,118 @@ fun TopCoinsScreen(
     val isRefreshing by viewModel.isRefreshingLiveData.observeAsState(false)
     val selectorDialogState by viewModel.selectorDialogStateLiveData.observeAsState()
 
-    val interactionSource = remember { MutableInteractionSource() }
+    //val interactionSource = remember { MutableInteractionSource() }
 
-    Surface(color = ComposeAppTheme.colors.tyler) {
-        Column {
-            TopCloseButton(interactionSource, onCloseButtonClick)
-
-            HSSwipeRefresh(
-                refreshing = isRefreshing,
-                onRefresh = {
-                    viewModel.refresh()
-                }
-            ) {
-                Crossfade(viewState) { state ->
-                    when (state) {
-                        ViewState.Loading -> {
-                            Loading()
-                        }
-                        is ViewState.Error -> {
-                            ListErrorView(stringResource(R.string.SyncError), viewModel::onErrorClick)
-                        }
-                        ViewState.Success -> {
-                            viewItems?.let {
-                                CoinList(
-                                    items = it,
-                                    scrollToTop = scrollToTopAfterUpdate,
-                                    onAddFavorite = { uid -> viewModel.onAddFavorite(uid) },
-                                    onRemoveFavorite = { uid -> viewModel.onRemoveFavorite(uid) },
-                                    onCoinClick = onCoinClick,
-                                    preItems = {
-                                        header?.let { header ->
-                                            item {
-                                                DescriptionCard(header.title, header.description, header.icon)
-                                            }
+    Column {
+        //TopCloseButton(interactionSource, onCloseButtonClick)
+        TopAppBarClose(
+            actionIcon = Icons.Rounded.Close,
+            actionIconContentDescription = "ArrowBack",
+            onActionClick = onCloseButtonClick,
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = Color.Transparent,
+            )
+        )
+        HSSwipeRefresh(
+            refreshing = isRefreshing,
+            onRefresh = {
+                viewModel.refresh()
+            }
+        ) {
+            Crossfade(viewState, label = "") { state ->
+                when (state) {
+                    ViewState.Loading -> {
+                        Loading()
+                    }
+                    is ViewState.Error -> {
+                        ListErrorView(stringResource(R.string.SyncError), viewModel::onErrorClick)
+                    }
+                    ViewState.Success -> {
+                        viewItems?.let {
+                            CoinList(
+                                items = it,
+                                scrollToTop = scrollToTopAfterUpdate,
+                                onAddFavorite = { uid -> viewModel.onAddFavorite(uid) },
+                                onRemoveFavorite = { uid -> viewModel.onRemoveFavorite(uid) },
+                                onCoinClick = onCoinClick,
+                                preItems = {
+                                    header?.let { header ->
+                                        item {
+                                            DescriptionCard(header.title, header.description, header.icon)
                                         }
+                                    }
 
-                                        menu?.let { menu ->
-                                            stickyHeader {
-                                                HeaderSorting(
-                                                    borderTop = true,
-                                                    borderBottom = true
+                                    menu?.let { menu ->
+                                        stickyHeader {
+                                            HeaderSorting(
+                                                borderTop = true,
+                                                borderBottom = true
+                                            ) {
+                                                Row(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(end = 16.dp)
+                                                        .height(44.dp),
+                                                    verticalAlignment = Alignment.CenterVertically
                                                 ) {
-                                                    Row(
-                                                        modifier = Modifier
-                                                            .fillMaxWidth()
-                                                            .padding(end = 16.dp)
-                                                            .height(44.dp),
-                                                        verticalAlignment = Alignment.CenterVertically
-                                                    ) {
-                                                        Box(modifier = Modifier.weight(1f)) {
-                                                            SortMenu(
-                                                                titleRes = menu.sortingFieldSelect.selected.titleResId,
-                                                                onClick = viewModel::showSelectorMenu
-                                                            )
-                                                        }
+                                                    Box(modifier = Modifier.weight(1f)) {
+                                                        SortMenu(
+                                                            titleRes = menu.sortingFieldSelect.selected.titleResId,
+                                                            onClick = viewModel::showSelectorMenu
+                                                        )
+                                                    }
 
-                                                        menu.topMarketSelect?.let {
-                                                            Box(modifier = Modifier.padding(start = 8.dp)) {
-                                                                ButtonSecondaryToggle(
-                                                                    select = menu.topMarketSelect,
-                                                                    onSelect = { topMarket ->
-                                                                        scrollToTopAfterUpdate =
-                                                                            true
-                                                                        viewModel.onSelectTopMarket(
-                                                                            topMarket
-                                                                        )
-                                                                    }
-                                                                )
-                                                            }
-                                                        }
-
+                                                    menu.topMarketSelect?.let {
                                                         Box(modifier = Modifier.padding(start = 8.dp)) {
                                                             ButtonSecondaryToggle(
-                                                                select = menu.marketFieldSelect,
-                                                                onSelect = viewModel::onSelectMarketField
+                                                                select = menu.topMarketSelect,
+                                                                onSelect = { topMarket ->
+                                                                    scrollToTopAfterUpdate =
+                                                                        true
+                                                                    viewModel.onSelectTopMarket(
+                                                                        topMarket
+                                                                    )
+                                                                }
                                                             )
                                                         }
+                                                    }
+
+                                                    Box(modifier = Modifier.padding(start = 8.dp)) {
+                                                        ButtonSecondaryToggle(
+                                                            select = menu.marketFieldSelect,
+                                                            onSelect = viewModel::onSelectMarketField
+                                                        )
                                                     }
                                                 }
                                             }
                                         }
                                     }
-                                )
-                                if (scrollToTopAfterUpdate) {
-                                    scrollToTopAfterUpdate = false
                                 }
+                            )
+                            if (scrollToTopAfterUpdate) {
+                                scrollToTopAfterUpdate = false
                             }
                         }
-                        null -> {}
                     }
+                    null -> {}
                 }
             }
         }
-        //Dialog
-        when (val option = selectorDialogState) {
-            is SelectorDialogState.Opened -> {
-                AlertGroup(
-                    R.string.Market_Sort_PopupTitle,
-                    option.select,
-                    { selected ->
-                        scrollToTopAfterUpdate = true
-                        viewModel.onSelectSortingField(selected)
-                    },
-                    { viewModel.onSelectorDialogDismiss() }
-                )
-            }
-            SelectorDialogState.Closed,
-            null -> {}
+    }
+    //Dialog
+    when (val option = selectorDialogState) {
+        is SelectorDialogState.Opened -> {
+            AlertGroup(
+                R.string.Market_Sort_PopupTitle,
+                option.select,
+                { selected ->
+                    scrollToTopAfterUpdate = true
+                    viewModel.onSelectSortingField(selected)
+                },
+                { viewModel.onSelectorDialogDismiss() }
+            )
         }
+        SelectorDialogState.Closed,
+        null -> {}
     }
 }

@@ -30,6 +30,7 @@ import androidx.navigation.compose.NavHost
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.material.main.NiaAppState
 import io.horizontalsystems.bankwallet.material.module.info.btcBlockchainRestoreSourceInfoScreen
+import io.horizontalsystems.bankwallet.material.module.market.marketTopCoinsScreen
 import io.horizontalsystems.bankwallet.material.module.market.metricsPageScreen
 import io.horizontalsystems.bankwallet.material.module.market.tvlScreen
 import io.horizontalsystems.bankwallet.material.module.setting.navigations.blockchainSettingsScreen
@@ -64,6 +65,7 @@ fun NiaNavHost(
             nestedGraphs = {
                 tvlScreen(navController, onShowSnackbar)
                 metricsPageScreen(navController, onShowSnackbar)
+                marketTopCoinsScreen(navController, onShowSnackbar)
             }
         )
         balanceScreen(

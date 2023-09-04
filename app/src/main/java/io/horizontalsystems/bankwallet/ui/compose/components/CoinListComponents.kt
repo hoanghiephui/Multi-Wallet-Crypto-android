@@ -35,6 +35,7 @@ import io.horizontalsystems.bankwallet.modules.market.MarketViewItem
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchModule.DiscoveryItem
 import io.horizontalsystems.bankwallet.modules.walletconnect.list.ui.DraggableCardSimple
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
+import io.horizontalsystems.bankwallet.ui.compose.RedL
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -64,7 +65,7 @@ fun CoinList(
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .background(if (item.favorited) ComposeAppTheme.colors.lucian else ComposeAppTheme.colors.jacob)
+                        .background(if (item.favorited) RedL else Color.Transparent)
                         .align(Alignment.CenterEnd)
                         .width(100.dp)
                         .clickable {
@@ -82,7 +83,7 @@ fun CoinList(
                 ) {
                     Icon(
                         painter = painterResource(id = if (item.favorited) R.drawable.ic_star_off_24 else R.drawable.ic_star_24),
-                        tint = ComposeAppTheme.colors.claude,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         contentDescription = stringResource(if (item.favorited) R.string.CoinPage_Unfavorite else R.string.CoinPage_Favorite),
                     )
                 }
@@ -110,15 +111,13 @@ fun CoinList(
                     }
                 )
                 Divider(
-                    thickness = 1.dp,
-                    color = ComposeAppTheme.colors.steel10,
                     modifier = Modifier.align(Alignment.BottomCenter)
                 )
             }
         }
-        item {
+        /*item {
             Spacer(modifier = Modifier.height(32.dp))
-        }
+        }*/
         if (scrollToTop) {
             coroutineScope.launch {
                 listState.scrollToItem(0)
@@ -250,7 +249,7 @@ fun TopCloseButton(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .size(24.dp),
-                tint = ComposeAppTheme.colors.jacob
+                tint = MaterialTheme.colorScheme.surfaceTint
             )
         }
     }
