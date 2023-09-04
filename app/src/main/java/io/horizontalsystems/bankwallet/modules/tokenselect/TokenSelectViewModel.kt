@@ -1,4 +1,4 @@
-package io.horizontalsystems.bankwallet.modules.sendtokenselect
+package io.horizontalsystems.bankwallet.modules.tokenselect
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.horizontalsystems.bankwallet.core.App
+import io.horizontalsystems.bankwallet.core.swappable
 import io.horizontalsystems.bankwallet.modules.balance.BalanceModule
 import io.horizontalsystems.bankwallet.modules.balance.BalanceService
 import io.horizontalsystems.bankwallet.modules.balance.BalanceViewItem
@@ -16,18 +17,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class SendTokenSelectViewModel(
+class TokenSelectViewModel(
     private val service: BalanceService,
     private val balanceViewItemFactory: BalanceViewItemFactory,
     private val balanceViewTypeManager: BalanceViewTypeManager,
+    private val itemsFilter: ((BalanceModule.BalanceItem) -> Boolean)?
 ) : ViewModel() {
 
+    private var query: String? = null
     private var balanceViewItems = listOf<BalanceViewItem>()
-    private var filteringEnabled = true
     var uiState by mutableStateOf(
-        SendTokenSelectUiState(
+        TokenSelectUiState(
             items = balanceViewItems,
-            filteringEnabled = filteringEnabled,
         )
     )
         private set
@@ -37,8 +38,6 @@ class SendTokenSelectViewModel(
 
         viewModelScope.launch {
             service.balanceItemsFlow.collect { items ->
-                filteringEnabled = !items.isNullOrEmpty()
-
                 refreshViewItems(items)
             }
         }
@@ -47,7 +46,27 @@ class SendTokenSelectViewModel(
     private suspend fun refreshViewItems(balanceItems: List<BalanceModule.BalanceItem>?) {
         withContext(Dispatchers.IO) {
             if (balanceItems != null) {
-                balanceViewItems = balanceItems.map { balanceItem ->
+                val filters: List<(BalanceModule.BalanceItem) -> Boolean> = buildList {
+                    itemsFilter?.let { add(it) }
+
+                    val tmpQuery = query
+                    if (!tmpQuery.isNullOrBlank()) {
+                        add {
+                            val coin = it.wallet.coin
+                            coin.code.contains(tmpQuery, true) || coin.name.contains(tmpQuery, true)
+                        }
+                    }
+                }
+
+                val filteredItems = if (filters.isNotEmpty()) {
+                    balanceItems.filter { item ->
+                        filters.all { it.invoke(item) }
+                    }
+                } else {
+                    balanceItems
+                }
+
+                balanceViewItems = filteredItems.map { balanceItem ->
                     balanceViewItemFactory.viewItem(
                         item = balanceItem,
                         currency = service.baseCurrency,
@@ -65,22 +84,17 @@ class SendTokenSelectViewModel(
         }
     }
 
-    fun updateFilter(filter: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val filteredItems = service.balanceItemsFlow.value?.filter {
-                val coin = it.wallet.coin
-                coin.code.contains(filter, true) || coin.name.contains(filter, true)
-            }
-
-            refreshViewItems(filteredItems)
+    fun updateFilter(q: String) {
+        viewModelScope.launch {
+            query = q
+            refreshViewItems(service.balanceItemsFlow.value)
         }
     }
 
     private fun emitState() {
         viewModelScope.launch {
-            uiState = SendTokenSelectUiState(
+            uiState = TokenSelectUiState(
                 items = balanceViewItems,
-                filteringEnabled = filteringEnabled,
             )
         }
     }
@@ -89,19 +103,33 @@ class SendTokenSelectViewModel(
         service.clear()
     }
 
-    class Factory : ViewModelProvider.Factory {
+    class FactoryForSend : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return SendTokenSelectViewModel(
-                BalanceService.getInstance(),
-                BalanceViewItemFactory(),
-                App.balanceViewTypeManager
+            return TokenSelectViewModel(
+                service = BalanceService.getInstance(),
+                balanceViewItemFactory = BalanceViewItemFactory(),
+                balanceViewTypeManager = App.balanceViewTypeManager,
+                itemsFilter = null
+            ) as T
+        }
+    }
+
+    class FactoryForSwap : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            return TokenSelectViewModel(
+                service = BalanceService.getInstance(),
+                balanceViewItemFactory = BalanceViewItemFactory(),
+                balanceViewTypeManager = App.balanceViewTypeManager,
+                itemsFilter = {
+                    it.wallet.token.swappable
+                }
             ) as T
         }
     }
 }
 
-data class SendTokenSelectUiState(
+data class TokenSelectUiState(
     val items: List<BalanceViewItem>,
-    val filteringEnabled: Boolean
 )

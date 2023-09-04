@@ -275,8 +275,7 @@
         android:name="io.horizontalsystems.bankwallet.modules.zcashconfigure.ZcashConfigure"/>
     <fragment
         android:id="@+id/receiveFragment"
-        android:name="io.horizontalsystems.bankwallet.modules.receive.ReceiveFragment"
-        android:label="ReceiveFragment" />
+        android:name="io.horizontalsystems.bankwallet.modules.receive.address.ReceiveAddressFragment"/>
     <fragment
         android:id="@+id/receiveTokenSelectFragment"
         android:name="io.horizontalsystems.bankwallet.modules.receivemain.ReceiveTokenSelectFragment" />
@@ -284,11 +283,11 @@
         android:id="@+id/receiveNetworkSelectFragment"
         android:name="io.horizontalsystems.bankwallet.modules.receivemain.NetworkSelectFragment"/>
     <fragment
-        android:id="@+id/receiveAddressFormatFragment"
-        android:name="io.horizontalsystems.bankwallet.modules.receivemain.AddressFormatFragment"/>
+        android:id="@+id/receiveBchAddressTypeSelectFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.receivemain.BchAddressTypeSelectFragment"/>
     <fragment
-        android:id="@+id/receiveMainFragment"
-        android:name="io.horizontalsystems.bankwallet.modules.receivemain.ReceiveMainFragment"/>
+        android:id="@+id/receiveDerivationSelectFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.receivemain.DerivationSelectFragment"/>
     <fragment
         android:id="@+id/evmNetworkFragment"
         android:name="io.horizontalsystems.bankwallet.modules.evmnetwork.EvmNetworkFragment"
@@ -325,6 +324,9 @@
     <fragment
         android:id="@+id/sendTokenSelectFragment"
         android:name="io.horizontalsystems.bankwallet.modules.sendtokenselect.SendTokenSelectFragment" />
+    <fragment
+        android:id="@+id/swapTokenSelectFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.swaptokenselect.SwapTokenSelectFragment" />
     <fragment
         android:id="@+id/sendConfirmation"
         android:name="io.horizontalsystems.bankwallet.modules.send.SendConfirmationFragment" />
@@ -388,4 +390,7 @@
     <dialog
         android:id="@+id/periodSelectDialog"
         android:name="io.horizontalsystems.bankwallet.ui.compose.components.PeriodSelectDialog" />
+    <dialog
+        android:id="@+id/notActiveAccountDialog"
+        android:name="io.horizontalsystems.bankwallet.modules.receive.address.NotActiveWarningDialog" />
 </navigation>
