@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
-import io.horizontalsystems.bankwallet.core.slideFromBottom
+import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.Wallet
 import io.horizontalsystems.bankwallet.modules.receive.address.ReceiveAddressFragment
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
@@ -23,7 +23,6 @@ import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.InfoText
-import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.SectionUniversalItem
 import io.horizontalsystems.bankwallet.ui.compose.components.TextImportantWarning
@@ -36,6 +35,7 @@ fun AddressFormatSelectScreen(
     navController: NavController,
     addressFormatItems: List<AddressFormatItem>,
     description: String,
+    popupDestinationId: Int?,
 ) {
     ComposeAppTheme {
         Scaffold(
@@ -46,15 +46,7 @@ fun AddressFormatSelectScreen(
                     navigationIcon = {
                         HsBackButton(onClick = { navController.popBackStack() })
                     },
-                    menuItems = listOf(
-                        MenuItem(
-                            title = TranslatableString.ResString(R.string.Button_Close),
-                            icon = R.drawable.ic_close,
-                            onClick = {
-                                navController.popBackStack(R.id.receiveTokenSelectFragment, true)
-                            }
-                        )
-                    )
+                    menuItems = listOf()
                 )
             }
         ) {
@@ -73,9 +65,12 @@ fun AddressFormatSelectScreen(
                             title = item.title,
                             subtitle = item.subtitle,
                             onClick = {
-                                navController.slideFromBottom(
+                                navController.slideFromRight(
                                     R.id.receiveFragment,
-                                    bundleOf(ReceiveAddressFragment.WALLET_KEY to item.wallet)
+                                    bundleOf(
+                                        ReceiveAddressFragment.WALLET_KEY to item.wallet,
+                                        ReceiveAddressFragment.POPUP_DESTINATION_ID_KEY to popupDestinationId,
+                                    )
                                 )
                             }
                         )

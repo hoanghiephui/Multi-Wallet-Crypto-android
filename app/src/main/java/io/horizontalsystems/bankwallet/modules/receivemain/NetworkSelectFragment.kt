@@ -28,7 +28,7 @@ import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.core.description
 import io.horizontalsystems.bankwallet.core.imageUrl
-import io.horizontalsystems.bankwallet.core.slideFromBottom
+import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.modules.receive.address.ReceiveAddressFragment
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
@@ -36,7 +36,6 @@ import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.InfoText
-import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.SectionUniversalItem
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
@@ -60,12 +59,15 @@ class NetworkSelectFragment : BaseFragment() {
             setContent {
                 val navController = findNavController()
                 val coinUid = arguments?.getString("coinUid")
+                val popupDestinationId = arguments?.getInt(
+                    ReceiveAddressFragment.POPUP_DESTINATION_ID_KEY
+                )
 
                 if (coinUid == null) {
                     HudHelper.showErrorMessage(LocalView.current, R.string.Error_ParameterNotSet)
                     navController.popBackStack()
                 } else {
-                    NetworkSelectScreen(navController, coinUid)
+                    NetworkSelectScreen(navController, coinUid, popupDestinationId)
                 }
 
             }
@@ -73,7 +75,12 @@ class NetworkSelectFragment : BaseFragment() {
     }
 
     companion object {
-        fun prepareParams(coinUid: String) = bundleOf("coinUid" to coinUid)
+        fun prepareParams(coinUid: String, popupDestinationId: Int?): Bundle {
+            return bundleOf(
+                "coinUid" to coinUid,
+                ReceiveAddressFragment.POPUP_DESTINATION_ID_KEY to popupDestinationId
+            )
+        }
     }
 }
 
@@ -81,6 +88,7 @@ class NetworkSelectFragment : BaseFragment() {
 fun NetworkSelectScreen(
     navController: NavController,
     coinUid: String,
+    popupDestinationId: Int?,
 ) {
     val viewModel = viewModel<NetworkSelectViewModel>(factory = NetworkSelectViewModel.Factory(coinUid))
 
@@ -93,15 +101,7 @@ fun NetworkSelectScreen(
                     navigationIcon = {
                         HsBackButton(onClick = { navController.popBackStack() })
                     },
-                    menuItems = listOf(
-                        MenuItem(
-                            title = TranslatableString.ResString(R.string.Button_Close),
-                            icon = R.drawable.ic_close,
-                            onClick = {
-                                navController.popBackStack(R.id.receiveTokenSelectFragment, true)
-                            }
-                        )
-                    )
+                    menuItems = listOf()
                 )
             }
         ) {
@@ -123,9 +123,12 @@ fun NetworkSelectScreen(
                                 subtitle = blockchain.description,
                                 imageUrl = blockchain.type.imageUrl,
                                 onClick = {
-                                    navController.slideFromBottom(
+                                    navController.slideFromRight(
                                         R.id.receiveFragment,
-                                        bundleOf(ReceiveAddressFragment.WALLET_KEY to wallet)
+                                        bundleOf(
+                                            ReceiveAddressFragment.WALLET_KEY to wallet,
+                                            ReceiveAddressFragment.POPUP_DESTINATION_ID_KEY to popupDestinationId,
+                                        )
                                     )
                                 }
                             )
