@@ -109,11 +109,11 @@ private fun EvmNetworkNavHost(
         startDestination = EvmNetworkPage,
     ) {
         composable(EvmNetworkPage) {
-            EvmNetworkScreen(
-                arguments = arguments,
+            /*EvmNetworkScreen(
                 navController = navController,
-                onBackPress = { fragmentNavController.popBackStack() }
-            )
+                onBackPress = { navController.popBackStack() },
+                onShowSnackbar = onShowSnackbar
+            )*/
         }
         composablePopup(AddRpcPage) { AddRpcScreen(navController) }
         composablePopup(EvmNetworkInfoPage) { EvmNetworkInfoScreen(navController) }

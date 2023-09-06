@@ -2,7 +2,6 @@ package io.horizontalsystems.bankwallet.modules.market.category
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -11,13 +10,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
@@ -33,7 +33,13 @@ import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.market.topcoins.SelectorDialogState
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
-import io.horizontalsystems.bankwallet.ui.compose.components.*
+import io.horizontalsystems.bankwallet.ui.compose.components.AlertGroup
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryToggle
+import io.horizontalsystems.bankwallet.ui.compose.components.CoinList
+import io.horizontalsystems.bankwallet.ui.compose.components.DescriptionCard
+import io.horizontalsystems.bankwallet.ui.compose.components.HeaderSorting
+import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
+import io.horizontalsystems.bankwallet.ui.compose.components.SortMenu
 import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.parcelable
 
@@ -85,9 +91,8 @@ fun CategoryScreen(
     val isRefreshing by viewModel.isRefreshingLiveData.observeAsState(false)
     val selectorDialogState by viewModel.selectorDialogStateLiveData.observeAsState()
 
-    val interactionSource = remember { MutableInteractionSource() }
 
-    Surface {
+    Surface(color = Color.Transparent) {
         Column {
             TopAppBarClose(
                 actionIcon = Icons.Rounded.Close,
@@ -111,7 +116,10 @@ fun CategoryScreen(
                         }
 
                         is ViewState.Error -> {
-                            ListErrorView(stringResource(R.string.SyncError), viewModel::onErrorClick)
+                            ListErrorView(
+                                stringResource(R.string.SyncError),
+                                viewModel::onErrorClick
+                            )
                         }
 
                         ViewState.Success -> {
@@ -136,7 +144,10 @@ fun CategoryScreen(
                                         }
                                         menu?.let {
                                             stickyHeader {
-                                                HeaderSorting(borderTop = true, borderBottom = true) {
+                                                HeaderSorting(
+                                                    borderTop = true,
+                                                    borderBottom = true
+                                                ) {
                                                     Box(modifier = Modifier.weight(1f)) {
                                                         SortMenu(
                                                             it.sortingFieldSelect.selected.titleResId,

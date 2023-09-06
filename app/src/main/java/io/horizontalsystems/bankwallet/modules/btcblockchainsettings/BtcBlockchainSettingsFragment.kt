@@ -31,6 +31,7 @@ import coil.compose.rememberAsyncImagePainter
 import coin.chain.crypto.core.designsystem.component.TopAppBar
 import coin.chain.crypto.core.designsystem.theme.NiaTheme
 import io.horizontalsystems.bankwallet.R
+import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.material.module.info.navigateToBtcBlockchainRestoreSourceInfo
 import io.horizontalsystems.bankwallet.material.module.setting.navigations.blockchainSettingsRoute
@@ -51,12 +52,12 @@ class BtcBlockchainSettingsFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent() {
-        ComposeAppTheme {
-            /*BtcBlockchainSettingsScreen(
+        /*ComposeAppTheme {
+            BtcBlockchainSettingsScreen(
                 viewModel,
                 findNavController()
-            )*/
-        }
+            )
+        }*/
     }
 
 }

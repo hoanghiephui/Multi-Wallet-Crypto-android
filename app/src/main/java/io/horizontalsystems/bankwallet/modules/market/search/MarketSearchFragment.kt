@@ -1,17 +1,19 @@
 package io.horizontalsystems.bankwallet.modules.market.search
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
@@ -40,7 +42,6 @@ import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.iconPlaceholder
 import io.horizontalsystems.bankwallet.core.imageUrl
-import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.material.module.market.SearchToolbar
@@ -109,9 +110,11 @@ fun MarketSearchScreen(
                     ViewState.Loading -> {
                         Loading()
                     }
+
                     is ViewState.Error -> {
                         ListErrorView(stringResource(R.string.SyncError), viewModel::refresh)
                     }
+
                     ViewState.Success -> {
                         when (val itemsData = viewModel.itemsData) {
                             is MarketSearchModule.Data.DiscoveryItems -> {
@@ -127,6 +130,7 @@ fun MarketSearchScreen(
                                             MarketSearchModule.DiscoveryItem.TopCoins -> {
                                                 navController.navigateToMarketTopCoinsScreen()
                                             }
+
                                             is MarketSearchModule.DiscoveryItem.Category -> {
                                                 navController.navigateToMarketCategoryScreen(
                                                     bundle =
@@ -137,6 +141,7 @@ fun MarketSearchScreen(
                                     }
                                 ) { viewModel.toggleTimePeriod(it) }
                             }
+
                             is MarketSearchModule.Data.SearchResult -> {
                                 if (itemsData.coinItems.isEmpty()) {
                                     ListEmptyView(
@@ -158,6 +163,7 @@ fun MarketSearchScreen(
                                     }
                                 }
                             }
+
                             null -> {}
                         }
                     }
@@ -289,7 +295,8 @@ fun CardsGrid(
 
     LazyColumn {
         item {
-            HeaderSorting(borderTop = true,
+            HeaderSorting(
+                borderTop = true,
                 color = Color.Transparent
             ) {
                 ButtonSecondaryCircle(
