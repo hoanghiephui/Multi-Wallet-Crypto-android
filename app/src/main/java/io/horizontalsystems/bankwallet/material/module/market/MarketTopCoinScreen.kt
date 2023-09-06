@@ -8,12 +8,16 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import coin.chain.crypto.core.designsystem.theme.NiaTheme
 import io.horizontalsystems.bankwallet.material.navigation.navigate
 import io.horizontalsystems.bankwallet.modules.market.topcoins.MarketTopCoinsViewModel
 import io.horizontalsystems.bankwallet.modules.market.topcoins.TopCoinsScreen
 
 const val marketTopCoinsNavigationRoute = "marketTopCoins_route"
 
+fun NavController.navigateToMarketTopCoinsScreen(navOptions: NavOptions? = null) {
+    this.navigate(marketTopCoinsNavigationRoute, navOptions)
+}
 fun NavController.navigateToMarketTopCoinsScreen(navOptions: NavOptions? = null, bundle: Bundle) {
     this.navigate(marketTopCoinsNavigationRoute, bundle, navOptions)
 }
@@ -36,11 +40,14 @@ fun MarketTopCoinsRouter(
     onShowSnackbar: suspend (String, String?) -> Boolean,
     viewModel: MarketTopCoinsViewModel = hiltViewModel()
 ) {
-    TopCoinsScreen(
-        viewModel,
-        { navController.popBackStack() },
-        { coinUid ->
+    NiaTheme {
+        TopCoinsScreen(
+            viewModel,
+            { navController.popBackStack() },
+            { coinUid ->
 
-        }
-    )
+            }
+        )
+    }
+
 }

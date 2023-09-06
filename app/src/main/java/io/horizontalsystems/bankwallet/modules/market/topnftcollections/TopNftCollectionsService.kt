@@ -26,7 +26,7 @@ class TopNftCollectionsService(
     var sortingField: SortingField = sortingField
         private set
 
-    val timeDurations = TimeDuration.values().toList()
+    val timeDurations = TimeDuration.entries
     var timeDuration: TimeDuration = timeDuration
         private set
 

@@ -11,7 +11,7 @@ import javax.annotation.concurrent.Immutable
 object MarketSearchModule {
 
     class Factory : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
+        /*@Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             val service = MarketSearchService(
                 App.marketKit,
@@ -19,7 +19,7 @@ object MarketSearchModule {
                 App.currencyManager.baseCurrency
             )
             return MarketSearchViewModel(service) as T
-        }
+        }*/
     }
 
     sealed class Data {

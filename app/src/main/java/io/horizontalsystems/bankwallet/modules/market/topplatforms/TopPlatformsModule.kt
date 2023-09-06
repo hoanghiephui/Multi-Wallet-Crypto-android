@@ -17,12 +17,12 @@ import java.math.BigDecimal
 object TopPlatformsModule {
 
     class Factory(private val timeDuration: TimeDuration?) : ViewModelProvider.Factory {
-        @Suppress("UNCHECKED_CAST")
+        /*@Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             val repository = TopPlatformsRepository(App.marketKit, App.currencyManager)
             val service = TopPlatformsService(repository, App.currencyManager)
             return TopPlatformsViewModel(service, timeDuration) as T
-        }
+        }*/
     }
 
     data class Menu(

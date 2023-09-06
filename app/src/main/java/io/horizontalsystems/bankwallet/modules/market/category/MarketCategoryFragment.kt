@@ -11,15 +11,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
+import coin.chain.crypto.core.designsystem.component.TopAppBarClose
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.core.slideFromRight
@@ -80,7 +86,7 @@ class MarketCategoryFragment : BaseFragment() {
 
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryScreen(
     viewModel: MarketCategoryViewModel,
@@ -96,9 +102,16 @@ fun CategoryScreen(
 
     val interactionSource = remember { MutableInteractionSource() }
 
-    Surface(color = ComposeAppTheme.colors.tyler) {
+    Surface {
         Column {
-            TopCloseButton(interactionSource, onCloseButtonClick)
+            TopAppBarClose(
+                actionIcon = Icons.Rounded.Close,
+                actionIconContentDescription = "ArrowBack",
+                onActionClick = onCloseButtonClick,
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Transparent,
+                )
+            )
 
             HSSwipeRefresh(
                 refreshing = isRefreshing,
@@ -106,7 +119,7 @@ fun CategoryScreen(
                     viewModel.refresh()
                 }
             ) {
-                Crossfade(viewItemState) { state ->
+                Crossfade(viewItemState, label = "") { state ->
                     when (state) {
                         ViewState.Loading -> {
                             Loading()

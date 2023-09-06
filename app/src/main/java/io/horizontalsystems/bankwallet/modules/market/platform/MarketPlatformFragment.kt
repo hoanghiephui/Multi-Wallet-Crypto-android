@@ -9,14 +9,29 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
@@ -26,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import coin.chain.crypto.core.designsystem.component.TopAppBarClose
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.core.slideFromRight
@@ -39,7 +55,14 @@ import io.horizontalsystems.bankwallet.modules.market.topcoins.SelectorDialogSta
 import io.horizontalsystems.bankwallet.modules.market.topplatforms.Platform
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
-import io.horizontalsystems.bankwallet.ui.compose.components.*
+import io.horizontalsystems.bankwallet.ui.compose.components.AlertGroup
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryToggle
+import io.horizontalsystems.bankwallet.ui.compose.components.CoinList
+import io.horizontalsystems.bankwallet.ui.compose.components.HeaderSorting
+import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
+import io.horizontalsystems.bankwallet.ui.compose.components.SortMenu
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
+import io.horizontalsystems.bankwallet.ui.compose.components.title3_leah
 import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.parcelable
 
@@ -86,7 +109,7 @@ class MarketPlatformFragment : BaseFragment() {
     }
 
     companion object {
-        private const val platformKey = "platform_key"
+        const val platformKey = "platform_key"
 
         fun prepareParams(platform: Platform): Bundle {
             return bundleOf(platformKey to platform)
@@ -95,9 +118,9 @@ class MarketPlatformFragment : BaseFragment() {
 
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-private fun PlatformScreen(
+fun PlatformScreen(
     factory: ViewModelProvider.Factory,
     onCloseButtonClick: () -> Unit,
     onCoinClick: (String) -> Unit,
@@ -108,9 +131,16 @@ private fun PlatformScreen(
     var scrollToTopAfterUpdate by rememberSaveable { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
 
-    Surface(color = ComposeAppTheme.colors.tyler) {
+    Surface(color = Color.Transparent) {
         Column {
-            TopCloseButton(interactionSource, onCloseButtonClick)
+            TopAppBarClose(
+                actionIcon = Icons.Rounded.Close,
+                actionIconContentDescription = "ArrowBack",
+                onActionClick = onCloseButtonClick,
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Transparent,
+                )
+            )
 
             HSSwipeRefresh(
                 refreshing = viewModel.isRefreshing,
@@ -118,17 +148,19 @@ private fun PlatformScreen(
                     viewModel.refresh()
                 }
             ) {
-                Crossfade(viewModel.viewState) { state ->
+                Crossfade(viewModel.viewState, label = "") { state ->
                     when (state) {
                         ViewState.Loading -> {
                             Loading()
                         }
+
                         is ViewState.Error -> {
                             ListErrorView(
                                 stringResource(R.string.SyncError),
                                 viewModel::onErrorClick
                             )
                         }
+
                         ViewState.Success -> {
                             viewModel.viewItems.let { viewItems ->
                                 CoinList(
@@ -195,6 +227,7 @@ private fun PlatformScreen(
                     { viewModel.onSelectorDialogDismiss() }
                 )
             }
+
             else -> {}
         }
     }
@@ -207,7 +240,6 @@ private fun HeaderContent(title: String, description: String, image: ImageSource
             modifier = Modifier
                 .height(100.dp)
                 .padding(horizontal = 16.dp)
-                .background(ComposeAppTheme.colors.tyler)
         ) {
             Column(
                 modifier = Modifier
@@ -229,7 +261,7 @@ private fun HeaderContent(title: String, description: String, image: ImageSource
                     .align(Alignment.CenterVertically)
                     .size(48.dp)
                     .clip(RoundedCornerShape(12.dp))
-                    .background(ComposeAppTheme.colors.lawrence)
+                    .background(MaterialTheme.colorScheme.surface)
             ) {
                 Image(
                     painter = image.painter(),

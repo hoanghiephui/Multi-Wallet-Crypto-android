@@ -13,16 +13,22 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
+import coin.chain.crypto.core.designsystem.component.TopAppBarClose
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.core.slideFromBottom
@@ -76,8 +82,8 @@ class TopNftCollectionsFragment : BaseFragment() {
     }
 
     companion object {
-        private const val sortingFieldKey = "sorting_field"
-        private const val timeDurationKey = "time_duration"
+        const val sortingFieldKey = "sorting_field"
+        const val timeDurationKey = "time_duration"
 
         fun prepareParams(
             sortingField: SortingField,
@@ -91,7 +97,7 @@ class TopNftCollectionsFragment : BaseFragment() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun TopNftCollectionsScreen(
     viewModel: TopNftCollectionsViewModel,
@@ -102,9 +108,16 @@ fun TopNftCollectionsScreen(
     val menu = viewModel.menu
     val header = viewModel.header
 
-    Surface(color = ComposeAppTheme.colors.tyler) {
+    Surface {
         Column {
-            TopCloseButton(interactionSource, onCloseButtonClick)
+            TopAppBarClose(
+                actionIcon = Icons.Rounded.Close,
+                actionIconContentDescription = "ArrowBack",
+                onActionClick = onCloseButtonClick,
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Transparent,
+                )
+            )
 
             HSSwipeRefresh(
                 refreshing = viewModel.isRefreshing,
@@ -112,7 +125,7 @@ fun TopNftCollectionsScreen(
                     viewModel.refresh()
                 }
             ) {
-                Crossfade(viewModel.viewState) { state ->
+                Crossfade(viewModel.viewState, label = "") { state ->
                     when (state) {
                         ViewState.Loading -> {
                             Loading()

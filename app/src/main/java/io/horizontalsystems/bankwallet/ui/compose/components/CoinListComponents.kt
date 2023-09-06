@@ -1,5 +1,6 @@
 package io.horizontalsystems.bankwallet.ui.compose.components
 
+import android.annotation.SuppressLint
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
@@ -17,6 +18,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -52,9 +54,11 @@ fun CoinList(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
-    var revealedCardId by remember { mutableStateOf<String?>(null) }
+    var revealedCardId by rememberSaveable { mutableStateOf<String?>(null) }
 
-    LazyColumn(state = listState, userScrollEnabled = userScrollEnabled) {
+    LazyColumn(state = listState, userScrollEnabled = userScrollEnabled,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         preItems.invoke(this)
         itemsIndexed(items, key = { _, item -> item.coinUid }) { _, item ->
             Box(

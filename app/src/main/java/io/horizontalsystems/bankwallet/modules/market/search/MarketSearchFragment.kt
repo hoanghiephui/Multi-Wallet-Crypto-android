@@ -12,12 +12,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.Divider
 import androidx.compose.material.Icon
+import androidx.compose.material3.Divider
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -27,10 +28,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import coin.chain.crypto.core.designsystem.theme.NiaTheme
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.*
 import io.horizontalsystems.bankwallet.entities.ViewState
+import io.horizontalsystems.bankwallet.material.module.market.SearchToolbar
+import io.horizontalsystems.bankwallet.material.module.market.navigateToMarketCategoryScreen
+import io.horizontalsystems.bankwallet.material.module.market.navigateToMarketTopCoinsScreen
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.market.MarketDataValue
@@ -77,18 +83,17 @@ fun MarketSearchScreen(
 
     val viewState = viewModel.viewState
     val errorMessage = viewModel.errorMessage
-
-    ComposeAppTheme {
-        Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
-            SearchView(
-                onSearchTextChange = { query -> viewModel.searchByQuery(query) },
-                onRightTextButtonClick = {
-                    navController.slideFromRight(R.id.marketAdvancedSearchFragment)
-                },
-                leftIcon = R.drawable.ic_back,
-                onBackButtonClick = { navController.popBackStack() }
+    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
+    NiaTheme {
+        Column {
+            Spacer(Modifier.windowInsetsTopHeight(WindowInsets.safeDrawing))
+            SearchToolbar(
+                onBackClick = { navController.popBackStack() },
+                onSearchQueryChanged = { query -> viewModel.searchByQuery(query) },
+                onSearchTriggered = {},
+                searchQuery = searchQuery,
             )
-            Crossfade(viewState) { viewState ->
+            Crossfade(viewState, label = "") { viewState ->
                 when (viewState) {
                     ViewState.Loading -> {
                         Loading()
@@ -109,13 +114,11 @@ fun MarketSearchScreen(
                                     onCategoryClick = { viewItemType ->
                                         when (viewItemType) {
                                             MarketSearchModule.DiscoveryItem.TopCoins -> {
-                                                navController.slideFromBottom(
-                                                    R.id.marketTopCoinsFragment
-                                                )
+                                                navController.navigateToMarketTopCoinsScreen()
                                             }
                                             is MarketSearchModule.DiscoveryItem.Category -> {
-                                                navController.slideFromBottom(
-                                                    R.id.marketCategoryFragment,
+                                                navController.navigateToMarketCategoryScreen(
+                                                    bundle =
                                                     bundleOf(MarketCategoryFragment.categoryKey to viewItemType.coinCategory)
                                                 )
                                             }
@@ -166,10 +169,7 @@ fun MarketSearchResults(
 ) {
     LazyColumn {
         item {
-            Divider(
-                thickness = 1.dp,
-                color = ComposeAppTheme.colors.steel10,
-            )
+            Divider()
         }
         items(coinResult) { coinViewItem ->
             MarketCoin(
@@ -278,7 +278,9 @@ fun CardsGrid(
 
     LazyColumn {
         item {
-            HeaderSorting(borderTop = true) {
+            HeaderSorting(borderTop = true,
+                color = Color.Transparent
+            ) {
                 ButtonSecondaryCircle(
                     modifier = Modifier
                         .padding(start = 16.dp),
@@ -351,7 +353,6 @@ private fun MarketCoin(
             Icon(
                 painter = painterResource(if (favorited) R.drawable.ic_star_filled_20 else R.drawable.ic_star_20),
                 contentDescription = "coin icon",
-                tint = if (favorited) ComposeAppTheme.colors.jacob else ComposeAppTheme.colors.grey
             )
         }
     }

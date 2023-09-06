@@ -20,7 +20,12 @@ import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.ViewState
+import io.horizontalsystems.bankwallet.material.module.market.navigateToMarketCategoryScreen
+import io.horizontalsystems.bankwallet.material.module.market.navigateToMarketPlatformScreen
+import io.horizontalsystems.bankwallet.material.module.market.navigateToMarketSearchScreen
 import io.horizontalsystems.bankwallet.material.module.market.navigateToMarketTopCoinsScreen
+import io.horizontalsystems.bankwallet.material.module.market.navigateToMarketTopNftCollectionsScreen
+import io.horizontalsystems.bankwallet.material.module.market.navigateToMarketTopPlatformsScreen
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.market.category.MarketCategoryFragment
 import io.horizontalsystems.bankwallet.modules.market.overview.ui.*
@@ -92,11 +97,11 @@ fun MarketOverviewScreen(
                             TopSectorsBoardView(
                                 board = viewItem.topSectorsBoard,
                                 onClickSeeAll = {
-                                    navController.slideFromRight(R.id.marketSearchFragment)
+                                    navController.navigateToMarketSearchScreen()
                                 },
                                 onItemClick = { coinCategory ->
-                                    navController.slideFromBottom(
-                                        R.id.marketCategoryFragment,
+                                    navController.navigateToMarketCategoryScreen(
+                                        bundle =
                                         bundleOf(MarketCategoryFragment.categoryKey to coinCategory)
                                     )
                                 }
@@ -115,7 +120,7 @@ fun MarketOverviewScreen(
                                     val (sortingField, timeDuration) = viewModel.topNftCollectionsParams
                                     val args = TopNftCollectionsFragment.prepareParams(sortingField, timeDuration)
 
-                                    navController.slideFromBottom(R.id.marketTopNftCollectionsFragment, args)
+                                    navController.navigateToMarketTopNftCollectionsScreen(bundle = args)
                                 }
                             )
 
@@ -126,13 +131,13 @@ fun MarketOverviewScreen(
                                 },
                                 onItemClick = {
                                     val args = MarketPlatformFragment.prepareParams(it)
-                                    navController.slideFromRight(R.id.marketPlatformFragment, args)
+                                    navController.navigateToMarketPlatformScreen(bundle = args)
                                 },
                                 onClickSeeAll = {
                                     val timeDuration = viewModel.topPlatformsTimeDuration
                                     val args = TopPlatformsFragment.prepareParams(timeDuration)
 
-                                    navController.slideFromBottom(R.id.marketTopPlatformsFragment, args)
+                                    navController.navigateToMarketTopPlatformsScreen(bundle = args)
                                 }
                             )
                         }

@@ -3,8 +3,10 @@ package io.horizontalsystems.bankwallet.modules.market.topplatforms
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.providers.Translator
@@ -15,12 +17,15 @@ import io.horizontalsystems.bankwallet.modules.market.topcoins.SelectorDialogSta
 import io.horizontalsystems.bankwallet.ui.compose.Select
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TopPlatformsViewModel(
-    private val service: TopPlatformsService,
-    timeDuration: TimeDuration?,
+@HiltViewModel
+class TopPlatformsViewModel @Inject constructor(
+    val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-
+    private val repository = TopPlatformsRepository(App.marketKit, App.currencyManager)
+    private val service = TopPlatformsService(repository, App.currencyManager)
+    private val timeDuration: TimeDuration? = savedStateHandle[TopPlatformsFragment.timeDurationKey]
     private val sortingFields = listOf(
         SortingField.HighestCap,
         SortingField.LowestCap,
@@ -31,7 +36,7 @@ class TopPlatformsViewModel(
     var sortingField: SortingField = SortingField.HighestCap
         private set
 
-    val periodOptions = TimeDuration.values().toList()
+    val periodOptions = TimeDuration.entries
 
     var timePeriod = timeDuration ?: TimeDuration.OneDay
         private set

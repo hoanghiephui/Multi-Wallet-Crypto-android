@@ -13,10 +13,15 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
@@ -24,10 +29,12 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
+import coin.chain.crypto.core.designsystem.component.TopAppBarClose
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.ViewState
+import io.horizontalsystems.bankwallet.material.module.market.navigateToMarketPlatformScreen
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.market.ImageSource
 import io.horizontalsystems.bankwallet.modules.market.MarketDataValue
@@ -73,7 +80,7 @@ class TopPlatformsFragment : BaseFragment() {
     }
 
     companion object {
-        private const val timeDurationKey = "time_duration"
+        const val timeDurationKey = "time_duration"
 
         fun prepareParams(timeDuration: TimeDuration): Bundle {
             return bundleOf(timeDurationKey to timeDuration)
@@ -82,7 +89,7 @@ class TopPlatformsFragment : BaseFragment() {
 }
 
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun TopPlatformsScreen(
     viewModel: TopPlatformsViewModel,
@@ -91,9 +98,16 @@ fun TopPlatformsScreen(
 
     val interactionSource = remember { MutableInteractionSource() }
 
-    Surface(color = ComposeAppTheme.colors.tyler) {
+    Surface {
         Column {
-            TopCloseButton(interactionSource) { navController.popBackStack() }
+            TopAppBarClose(
+                actionIcon = Icons.Rounded.Close,
+                actionIconContentDescription = "ArrowBack",
+                onActionClick = { navController.popBackStack() },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Transparent,
+                )
+            )
 
             HSSwipeRefresh(
                 refreshing = viewModel.isRefreshing,
@@ -101,7 +115,7 @@ fun TopPlatformsScreen(
                     viewModel.refresh()
                 }
             ) {
-                Crossfade(viewModel.viewState) { state ->
+                Crossfade(viewModel.viewState, label = "") { state ->
                     when (state) {
                         ViewState.Loading -> {
                             Loading()
@@ -113,54 +127,52 @@ fun TopPlatformsScreen(
                             )
                         }
                         ViewState.Success -> {
-                            viewModel.viewItems.let { viewItems ->
-                                TopPlatformsList(
-                                    viewItems = viewItems,
-                                    sortingField = viewModel.sortingField,
-                                    timeDuration = viewModel.timePeriod,
-                                    onItemClick = {
-                                        val args = MarketPlatformFragment.prepareParams(it)
-                                        navController.slideFromRight(
-                                            R.id.marketPlatformFragment,
-                                            args
+                            TopPlatformsList(
+                                viewItems = viewModel.viewItems,
+                                sortingField = viewModel.sortingField,
+                                timeDuration = viewModel.timePeriod,
+                                onItemClick = {
+                                    val args = MarketPlatformFragment.prepareParams(it)
+                                    navController.navigateToMarketPlatformScreen(
+                                        bundle =
+                                        args
+                                    )
+                                },
+                                preItems = {
+                                    item {
+                                        DescriptionCard(
+                                            stringResource(R.string.MarketTopPlatforms_PlatofrmsRank),
+                                            stringResource(R.string.MarketTopPlatforms_Description),
+                                            ImageSource.Local(R.drawable.ic_platforms)
                                         )
-                                    },
-                                    preItems = {
-                                        item {
-                                            DescriptionCard(
-                                                stringResource(R.string.MarketTopPlatforms_PlatofrmsRank),
-                                                stringResource(R.string.MarketTopPlatforms_Description),
-                                                ImageSource.Local(R.drawable.ic_platforms)
-                                            )
+                                    }
+
+                                    stickyHeader {
+                                        var timePeriodMenu by remember {
+                                            mutableStateOf(viewModel.timePeriodSelect)
                                         }
 
-                                        stickyHeader {
-                                            var timePeriodMenu by remember {
-                                                mutableStateOf(viewModel.timePeriodSelect)
-                                            }
-
-                                            HeaderSorting(borderTop = true, borderBottom = true) {
-                                                SortMenu(
-                                                    viewModel.sortingSelect.selected.titleResId,
-                                                    viewModel::showSelectorMenu
-                                                )
-                                                Spacer(modifier = Modifier.weight(1f))
-                                                ButtonSecondaryToggle(
-                                                    select = timePeriodMenu,
-                                                    onSelect = {
-                                                        viewModel.onTimePeriodSelect(it)
-                                                        timePeriodMenu = Select(
-                                                            it,
-                                                            viewModel.periodOptions
-                                                        )
-                                                    }
-                                                )
-                                                Spacer(modifier = Modifier.width(16.dp))
-                                            }
+                                        HeaderSorting(borderTop = true, borderBottom = true) {
+                                            SortMenu(
+                                                viewModel.sortingSelect.selected.titleResId,
+                                                viewModel::showSelectorMenu
+                                            )
+                                            Spacer(modifier = Modifier.weight(1f))
+                                            ButtonSecondaryToggle(
+                                                select = timePeriodMenu,
+                                                onSelect = {
+                                                    viewModel.onTimePeriodSelect(it)
+                                                    timePeriodMenu = Select(
+                                                        it,
+                                                        viewModel.periodOptions
+                                                    )
+                                                }
+                                            )
+                                            Spacer(modifier = Modifier.width(16.dp))
                                         }
                                     }
-                                )
-                            }
+                                }
+                            )
                         }
                     }
                 }

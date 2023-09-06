@@ -3,10 +3,13 @@ package io.horizontalsystems.bankwallet.modules.market.search
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cash.z.ecc.android.sdk.ext.collectWith
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.horizontalsystems.bankwallet.R
+import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.subscribeIO
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.entities.viewState
@@ -15,13 +18,19 @@ import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.launch
 import java.net.UnknownHostException
+import javax.inject.Inject
 
-class MarketSearchViewModel(
-    private val service: MarketSearchService
+@HiltViewModel
+class MarketSearchViewModel @Inject constructor(
+    val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-
+    private val service = MarketSearchService(
+        App.marketKit,
+        App.marketFavoritesManager,
+        App.currencyManager.baseCurrency
+    )
     private val disposables = CompositeDisposable()
-
+    val searchQuery = savedStateHandle.getStateFlow(key = SEARCH_QUERY, initialValue = "")
     val timePeriodMenu by service::timePeriodMenu
     val sortDescending by service::sortDescending
 
@@ -69,6 +78,7 @@ class MarketSearchViewModel(
     }
 
     fun searchByQuery(query: String) {
+        savedStateHandle[SEARCH_QUERY] = query
         viewModelScope.launch {
             service.setFilter(query.trim())
         }
@@ -106,3 +116,5 @@ class MarketSearchViewModel(
     }
 
 }
+
+private const val SEARCH_QUERY = "searchQuery"

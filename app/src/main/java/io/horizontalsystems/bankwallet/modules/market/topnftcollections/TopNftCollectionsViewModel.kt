@@ -3,10 +3,13 @@ package io.horizontalsystems.bankwallet.modules.market.topnftcollections
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cash.z.ecc.android.sdk.ext.collectWith
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.horizontalsystems.bankwallet.R
+import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.entities.viewState
@@ -17,20 +20,26 @@ import io.horizontalsystems.bankwallet.modules.market.TimeDuration
 import io.horizontalsystems.bankwallet.ui.compose.Select
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TopNftCollectionsViewModel(
-    private val service: TopNftCollectionsService,
-    private val topNftCollectionsViewItemFactory: TopNftCollectionsViewItemFactory
+@HiltViewModel
+class TopNftCollectionsViewModel @Inject constructor(
+    val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-
+    val sortingField: SortingField by lazy {
+        checkNotNull(savedStateHandle[TopNftCollectionsFragment.sortingFieldKey])
+    }
+    val timeDuration: TimeDuration by lazy {
+        checkNotNull(savedStateHandle[TopNftCollectionsFragment.timeDurationKey])
+    }
+    val topNftCollectionsRepository = TopNftCollectionsRepository(App.marketKit)
+    val service = TopNftCollectionsService(sortingField, timeDuration, topNftCollectionsRepository)
+    val topNftCollectionsViewItemFactory = TopNftCollectionsViewItemFactory(App.numberFormatter)
     val header = MarketModule.Header(
         Translator.getString(R.string.Nft_TopCollections),
         Translator.getString(R.string.Nft_TopCollections_Description),
         ImageSource.Local(R.drawable.ic_top_nfts)
     )
-
-    val sortingField by service::sortingField
-    val timeDuration by service::timeDuration
 
     var menu by mutableStateOf(
         Menu(
@@ -60,7 +69,11 @@ class TopNftCollectionsViewModel(
 
             result.getOrNull()?.let { topNftCollections ->
                 viewItems = topNftCollections.mapIndexed { index, collection ->
-                    topNftCollectionsViewItemFactory.viewItem(collection, service.timeDuration, index + 1)
+                    topNftCollectionsViewItemFactory.viewItem(
+                        collection,
+                        service.timeDuration,
+                        index + 1
+                    )
                 }
             }
         }

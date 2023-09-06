@@ -58,13 +58,14 @@ fun HeaderText(
 fun HeaderSorting(
     borderTop: Boolean = false,
     borderBottom: Boolean = false,
-    content: @Composable RowScope.() -> Unit,
+    color: Color = MaterialTheme.colorScheme.background,
+    content: @Composable RowScope.() -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(44.dp)
-            .background(MaterialTheme.colorScheme.background)
+            .background(color)
     ) {
         if (borderTop) {
             Divider(

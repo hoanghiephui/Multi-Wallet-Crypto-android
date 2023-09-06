@@ -84,7 +84,7 @@ class NftCollectionFragment : BaseFragment() {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun NftCollectionScreen(navController: NavController, viewModel: NftCollectionOverviewViewModel) {
+fun NftCollectionScreen(navController: NavController, viewModel: NftCollectionOverviewViewModel) {
     ComposeAppTheme {
         val tabs = viewModel.tabs
         val pagerState = rememberPagerState(initialPage = 0) { tabs.size}
