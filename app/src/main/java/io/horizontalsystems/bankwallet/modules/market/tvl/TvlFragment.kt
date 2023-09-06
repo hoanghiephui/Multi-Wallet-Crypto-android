@@ -1,9 +1,5 @@
 package io.horizontalsystems.bankwallet.modules.market.tvl
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -33,7 +29,7 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import coin.chain.crypto.core.designsystem.component.TopAppBarClose
 import io.horizontalsystems.bankwallet.R
-import io.horizontalsystems.bankwallet.core.BaseFragment
+import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.CurrencyValue
 import io.horizontalsystems.bankwallet.entities.ViewState
@@ -52,26 +48,16 @@ import io.horizontalsystems.bankwallet.ui.compose.components.*
 import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.helpers.HudHelper
 
-class TvlFragment : BaseFragment() {
+class TvlFragment : BaseComposeFragment() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        val vmFactory = TvlModule.Factory()
-        val tvlChartViewModel by viewModels<TvlChartViewModel> { vmFactory }
-        val viewModel by viewModels<TvlViewModel> { vmFactory }
+    private val vmFactory by lazy { TvlModule.Factory() }
+    private val tvlChartViewModel by viewModels<TvlChartViewModel> { vmFactory }
+    private val viewModel by viewModels<TvlViewModel> { vmFactory }
 
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(
-                ViewCompositionStrategy.DisposeOnLifecycleDestroyed(viewLifecycleOwner)
-            )
-            setContent {
-                ComposeAppTheme {
-                    //TvlScreen(viewModel, tvlChartViewModel) { onCoinClick(it) }
-                }
-            }
+    @Composable
+    override fun GetContent() {
+        ComposeAppTheme {
+            //TvlScreen(viewModel, tvlChartViewModel) { onCoinClick(it) }
         }
     }
 
@@ -121,9 +107,11 @@ class TvlFragment : BaseFragment() {
                         ViewState.Loading -> {
                             Loading()
                         }
+
                         is ViewState.Error -> {
                             ListErrorView(stringResource(R.string.SyncError), tvlViewModel::onErrorClick)
                         }
+
                         ViewState.Success -> {
                             val listState = rememberSaveable(
                                 tvlData?.chainSelect?.selected,
@@ -172,9 +160,11 @@ class TvlFragment : BaseFragment() {
                                                 TvlDiffType.Percent -> item.tvlChangePercent?.let {
                                                     MarketDataValue.DiffNew(Value.Percent(item.tvlChangePercent))
                                                 }
+
                                                 TvlDiffType.Currency -> item.tvlChangeAmount?.let {
                                                     MarketDataValue.DiffNew(Value.Currency(item.tvlChangeAmount))
                                                 }
+
                                                 else -> null
                                             },
                                             item.rank
@@ -183,6 +173,7 @@ class TvlFragment : BaseFragment() {
                                 }
                             }
                         }
+
                         null -> {}
                     }
                 }
@@ -199,6 +190,7 @@ class TvlFragment : BaseFragment() {
                             onDismiss = tvlViewModel::onChainSelectorDialogDismiss
                         )
                     }
+
                     SelectorDialogState.Closed -> {}
                 }
             }

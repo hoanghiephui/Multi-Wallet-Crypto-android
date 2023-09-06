@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -24,8 +23,6 @@ import androidx.navigation.compose.rememberNavController
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.composablePage
 import io.horizontalsystems.bankwallet.core.composablePopup
-import io.horizontalsystems.bankwallet.core.iconPlaceholder
-import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.modules.address.AddressParserModule
 import io.horizontalsystems.bankwallet.modules.address.AddressParserViewModel
@@ -43,7 +40,7 @@ import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
-import io.horizontalsystems.bankwallet.ui.compose.components.CoinImage
+import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import java.math.BigDecimal
 
@@ -56,7 +53,8 @@ const val TransactionInputsSortInfoPage = "transaction_input_sort_info_settings"
 fun SendBitcoinNavHost(
     fragmentNavController: NavController,
     viewModel: SendBitcoinViewModel,
-    amountInputModeViewModel: AmountInputModeViewModel
+    amountInputModeViewModel: AmountInputModeViewModel,
+    sendEntryPointDestId: Int
 ) {
     val navController = rememberNavController()
     NavHost(
@@ -68,7 +66,8 @@ fun SendBitcoinNavHost(
                 fragmentNavController,
                 navController,
                 viewModel,
-                amountInputModeViewModel
+                amountInputModeViewModel,
+                sendEntryPointDestId
             )
         }
         composablePage(SendBtcAdvancedSettingsPage) {
@@ -88,7 +87,8 @@ fun SendBitcoinScreen(
     fragmentNavController: NavController,
     composeNavController: NavController,
     viewModel: SendBitcoinViewModel,
-    amountInputModeViewModel: AmountInputModeViewModel
+    amountInputModeViewModel: AmountInputModeViewModel,
+    sendEntryPointDestId: Int
 ) {
     val wallet = viewModel.wallet
     val uiState = viewModel.uiState
@@ -118,13 +118,7 @@ fun SendBitcoinScreen(
             AppBar(
                 title = TranslatableString.ResString(R.string.Send_Title, fullCoin.coin.code),
                 navigationIcon = {
-                    CoinImage(
-                        iconUrl = fullCoin.coin.imageUrl,
-                        placeholder = fullCoin.iconPlaceholder,
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .size(24.dp)
-                    )
+                    HsBackButton(onClick = { fragmentNavController.popBackStack() })
                 },
                 menuItems = listOf(
                     MenuItem(
@@ -133,11 +127,6 @@ fun SendBitcoinScreen(
                         tint = ComposeAppTheme.colors.jacob,
                         onClick = { composeNavController.navigate(SendBtcAdvancedSettingsPage) }
                     ),
-                    MenuItem(
-                        title = TranslatableString.ResString(R.string.Button_Close),
-                        icon = R.drawable.ic_close,
-                        onClick = { fragmentNavController.popBackStack() }
-                    )
                 )
             )
 
@@ -213,7 +202,7 @@ fun SendBitcoinScreen(
                     onClick = {
                         fragmentNavController.slideFromRight(
                             R.id.sendConfirmation,
-                            SendConfirmationFragment.prepareParams(SendConfirmationFragment.Type.Bitcoin)
+                            SendConfirmationFragment.prepareParams(SendConfirmationFragment.Type.Bitcoin, sendEntryPointDestId)
                         )
                     },
                     enabled = proceedEnabled

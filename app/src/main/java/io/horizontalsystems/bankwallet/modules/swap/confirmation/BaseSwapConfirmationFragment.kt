@@ -3,9 +3,7 @@ package io.horizontalsystems.bankwallet.modules.swap.confirmation
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,14 +16,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.AppLogger
-import io.horizontalsystems.bankwallet.core.BaseFragment
+import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
 import io.horizontalsystems.bankwallet.modules.evmfee.EvmFeeCellViewModel
@@ -44,7 +40,7 @@ import io.horizontalsystems.core.SnackbarDuration
 import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.helpers.HudHelper
 
-abstract class BaseSwapConfirmationFragment : BaseFragment() {
+abstract class BaseSwapConfirmationFragment : BaseComposeFragment() {
 
     protected abstract val logger: AppLogger
     protected abstract val sendEvmTransactionViewModel: SendEvmTransactionViewModel
@@ -53,31 +49,27 @@ abstract class BaseSwapConfirmationFragment : BaseFragment() {
     protected abstract val navGraphId: Int
 
     private var snackbarInProcess: CustomSnackbar? = null
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(
-                ViewCompositionStrategy.DisposeOnLifecycleDestroyed(viewLifecycleOwner)
-            )
-
-            setContent {
-                BaseSwapConfirmationScreen(
-                    sendEvmTransactionViewModel = sendEvmTransactionViewModel,
-                    feeViewModel = feeViewModel,
-                    nonceViewModel = nonceViewModel,
-                    parentNavGraphId = navGraphId,
-                    navController = findNavController(),
-                    onSendClick = {
-                        logger.info("click swap button")
-                        sendEvmTransactionViewModel.send(logger)
-                    })
-            }
+    private val closeUntilDestId by lazy {
+        val swapEntryPointDestId = arguments?.getInt(swapEntryPointDestIdKey) ?: 0
+        if (swapEntryPointDestId == 0) {
+            R.id.swapFragment
+        } else {
+            swapEntryPointDestId
         }
+    }
+
+    @Composable
+    override fun GetContent() {
+        BaseSwapConfirmationScreen(
+            sendEvmTransactionViewModel = sendEvmTransactionViewModel,
+            feeViewModel = feeViewModel,
+            nonceViewModel = nonceViewModel,
+            parentNavGraphId = navGraphId,
+            navController = findNavController(),
+            onSendClick = {
+                logger.info("click swap button")
+                sendEvmTransactionViewModel.send(logger)
+            })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -97,7 +89,7 @@ abstract class BaseSwapConfirmationFragment : BaseFragment() {
                 R.string.Hud_Text_Done
             )
             Handler(Looper.getMainLooper()).postDelayed({
-                findNavController().popBackStack(R.id.swapFragment, true)
+                findNavController().popBackStack(closeUntilDestId, true)
             }, 1200)
         }
 
@@ -106,6 +98,10 @@ abstract class BaseSwapConfirmationFragment : BaseFragment() {
 
             findNavController().popBackStack()
         }
+    }
+
+    companion object {
+        const val swapEntryPointDestIdKey = "swapEntryPointDestIdKey"
     }
 
 }

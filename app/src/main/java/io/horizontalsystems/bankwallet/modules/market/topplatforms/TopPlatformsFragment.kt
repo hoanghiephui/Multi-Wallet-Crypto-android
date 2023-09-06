@@ -1,9 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.market.topplatforms
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -31,7 +28,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import coin.chain.crypto.core.designsystem.component.TopAppBarClose
 import io.horizontalsystems.bankwallet.R
-import io.horizontalsystems.bankwallet.core.BaseFragment
+import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.material.module.market.navigateToMarketPlatformScreen
@@ -50,32 +47,20 @@ import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.parcelable
 import java.math.BigDecimal
 
-class TopPlatformsFragment : BaseFragment() {
+class TopPlatformsFragment : BaseComposeFragment() {
 
     private val timeDuration by lazy { arguments?.parcelable<TimeDuration>(timeDurationKey) }
+    val viewModel by viewModels<TopPlatformsViewModel> {
+        TopPlatformsModule.Factory(timeDuration)
+    }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-
-        val viewModel by viewModels<TopPlatformsViewModel> {
-            TopPlatformsModule.Factory(timeDuration)
-        }
-
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(
-                ViewCompositionStrategy.DisposeOnLifecycleDestroyed(viewLifecycleOwner)
+    @Composable
+    override fun GetContent() {
+        ComposeAppTheme {
+            TopPlatformsScreen(
+                viewModel,
+                findNavController(),
             )
-            setContent {
-                ComposeAppTheme {
-                    TopPlatformsScreen(
-                        viewModel,
-                        findNavController(),
-                    )
-                }
-            }
         }
     }
 

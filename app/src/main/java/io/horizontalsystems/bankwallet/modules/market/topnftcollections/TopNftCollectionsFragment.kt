@@ -1,9 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.market.topnftcollections
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -30,7 +27,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import coin.chain.crypto.core.designsystem.component.TopAppBarClose
 import io.horizontalsystems.bankwallet.R
-import io.horizontalsystems.bankwallet.core.BaseFragment
+import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
@@ -45,7 +42,7 @@ import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.parcelable
 import io.horizontalsystems.marketkit.models.BlockchainType
 
-class TopNftCollectionsFragment : BaseFragment() {
+class TopNftCollectionsFragment : BaseComposeFragment() {
 
     private val sortingField by lazy {
         arguments?.parcelable<SortingField>(sortingFieldKey)!!
@@ -57,27 +54,17 @@ class TopNftCollectionsFragment : BaseFragment() {
         TopNftCollectionsModule.Factory(sortingField, timeDuration)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(
-                ViewCompositionStrategy.DisposeOnLifecycleDestroyed(viewLifecycleOwner)
-            )
-            setContent {
-                ComposeAppTheme {
-                    TopNftCollectionsScreen(
-                        viewModel,
-                        { findNavController().popBackStack() },
-                        { blockchainType, collectionUid ->
-                            val args = NftCollectionFragment.prepareParams(collectionUid, blockchainType)
-                            findNavController().slideFromBottom(R.id.nftCollectionFragment, args)
-                        }
-                    )
+    @Composable
+    override fun GetContent() {
+        ComposeAppTheme {
+            TopNftCollectionsScreen(
+                viewModel,
+                { findNavController().popBackStack() },
+                { blockchainType, collectionUid ->
+                    val args = NftCollectionFragment.prepareParams(collectionUid, blockchainType)
+                    findNavController().slideFromBottom(R.id.nftCollectionFragment, args)
                 }
-            }
+            )
         }
     }
 
@@ -130,12 +117,14 @@ fun TopNftCollectionsScreen(
                         ViewState.Loading -> {
                             Loading()
                         }
+
                         is ViewState.Error -> {
                             ListErrorView(
                                 stringResource(R.string.SyncError),
                                 viewModel::onErrorClick
                             )
                         }
+
                         ViewState.Success -> {
                             TopNftCollectionsList(
                                 collections = viewModel.viewItems,

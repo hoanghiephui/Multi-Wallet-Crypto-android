@@ -1,9 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.market.metricspage
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -45,32 +42,21 @@ import io.horizontalsystems.bankwallet.ui.compose.components.*
 import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.parcelable
 
-class MetricsPageFragment : BaseFragment() {
+class MetricsPageFragment : BaseComposeFragment() {
 
     private val metricsType by lazy {
         requireArguments().parcelable<MetricsType>(METRICS_TYPE_KEY)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    @Composable
+    override fun GetContent() {
         val factory = MetricsPageModule.Factory(metricsType!!)
         val chartViewModel by viewModels<ChartViewModel> { factory }
         val viewModel by viewModels<MetricsPageViewModel> { factory }
-
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(
-                ViewCompositionStrategy.DisposeOnLifecycleDestroyed(viewLifecycleOwner)
-            )
-            setContent {
-                ComposeAppTheme {
-                    /*MetricsPage(viewModel, chartViewModel) {
-                        onCoinClick(it)
-                    }*/
-                }
-            }
+        ComposeAppTheme {
+            /*MetricsPage(viewModel, chartViewModel) {
+                onCoinClick(it)
+            }*/
         }
     }
 

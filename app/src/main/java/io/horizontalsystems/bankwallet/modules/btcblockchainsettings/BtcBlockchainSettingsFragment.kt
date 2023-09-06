@@ -43,32 +43,21 @@ import io.horizontalsystems.bankwallet.ui.compose.components.TextImportantWarnin
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 
-class BtcBlockchainSettingsFragment : BaseFragment() {
+class BtcBlockchainSettingsFragment : BaseComposeFragment() {
 
     /*private val viewModel by viewModels<BtcBlockchainSettingsViewModel> {
         BtcBlockchainSettingsModule.Factory(requireArguments())
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(
-                ViewCompositionStrategy.DisposeOnLifecycleDestroyed(viewLifecycleOwner)
-            )
-            setContent {
-                ComposeAppTheme {
-                    BtcBlockchainSettingsScreen(
-                        viewModel,
-                        findNavController()
-                    )
-                }
-            }
-        }
     }*/
+
+    @Composable
+    override fun GetContent() {
+        ComposeAppTheme {
+            /*BtcBlockchainSettingsScreen(
+                viewModel,
+                findNavController()
+            )*/
+        }
+    }
 
 }
 
