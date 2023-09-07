@@ -8,6 +8,7 @@ import androidx.compose.material.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -28,7 +29,7 @@ fun CellLink(icon: Painter, title: String, onClick: () -> Unit) {
             modifier = Modifier.padding(horizontal = 16.dp),
             painter = icon,
             contentDescription = null,
-            tint = ComposeAppTheme.colors.grey
+            tint = Color.Gray
         )
         body_leah(
             modifier = Modifier.weight(1f),
@@ -38,7 +39,7 @@ fun CellLink(icon: Painter, title: String, onClick: () -> Unit) {
             modifier = Modifier.padding(horizontal = 16.dp),
             painter = painterResource(id = R.drawable.ic_arrow_right),
             contentDescription = null,
-            tint = ComposeAppTheme.colors.grey
+            tint = Color.Gray
         )
     }
 }

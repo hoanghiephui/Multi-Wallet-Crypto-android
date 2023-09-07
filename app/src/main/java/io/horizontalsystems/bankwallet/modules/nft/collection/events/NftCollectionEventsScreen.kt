@@ -7,11 +7,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -55,7 +61,7 @@ fun NftCollectionEventsScreen(navController: NavController, blockchainType: Bloc
             viewModel.refresh()
         }
     ) {
-        Crossfade(viewModel.viewState) { viewState ->
+        Crossfade(viewModel.viewState, label = "") { viewState ->
             when (viewState) {
                 ViewState.Loading -> {
                     Loading()
@@ -81,7 +87,7 @@ private fun ContractBottomSheet(
         iconPainter = painterResource(R.drawable.icon_paper_contract_20),
         title = stringResource(R.string.CoinPage_Contracts),
         onCloseClick = onClose,
-        iconTint = ColorFilter.tint(ComposeAppTheme.colors.jacob)
+        iconTint = ColorFilter.tint(MaterialTheme.colorScheme.surface)
     ) {
         Spacer(Modifier.height(12.dp))
 
@@ -129,13 +135,13 @@ private fun ContractBottomSheet(
                                     modifier = Modifier
                                         .padding(start = 8.dp)
                                         .clip(RoundedCornerShape(4.dp))
-                                        .background(ComposeAppTheme.colors.jeremy)
+                                        .background(MaterialTheme.colorScheme.primaryContainer)
                                 ) {
                                     Text(
                                         modifier = Modifier.padding(start = 4.dp, end = 4.dp, bottom = 1.dp),
                                         text = labelText,
-                                        color = ComposeAppTheme.colors.bran,
-                                        style = ComposeAppTheme.typography.microSB,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        style = MaterialTheme.typography.titleSmall,
                                         maxLines = 1,
                                     )
                                 }
@@ -179,7 +185,7 @@ fun NftEvents(
 
     ModalBottomSheetLayout(
         sheetState = modalBottomSheetState,
-        sheetBackgroundColor = ComposeAppTheme.colors.transparent,
+        sheetBackgroundColor = Color.Transparent,
         sheetContent = {
             ContractBottomSheet(
                 contractSelect = viewModel.contractSelect,

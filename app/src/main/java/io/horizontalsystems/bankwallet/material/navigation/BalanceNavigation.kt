@@ -17,7 +17,9 @@ fun NavGraphBuilder.balanceScreen(
     navController: NavHostController,
     onShowSnackbar: suspend (String, String?) -> Boolean,
 ) {
-    composable(route = balanceRoute) {
+    composable(
+        route = balanceRoute,
+    ) {
         BalanceRouter(
             navController,
             onShowSnackbar

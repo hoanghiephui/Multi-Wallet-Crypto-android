@@ -6,15 +6,23 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.navGraphViewModels
+import coin.chain.crypto.core.designsystem.component.TopAppBarClose
+import coin.chain.crypto.core.designsystem.theme.NiaTheme
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.modules.nft.collection.assets.NftCollectionAssetsScreen
@@ -51,41 +59,39 @@ class NftCollectionFragment : BaseComposeFragment() {
             NftCollectionModule.Factory(blockchainType, nftCollectionUid)
         }
 
-        NftCollectionScreen(
+        /*NftCollectionScreen(
             findNavController(),
             viewModel
-        )
+        )*/
     }
 
     companion object {
-        private const val collectionUidKey = "collectionUid"
-        private const val blockchainTypeKey = "blockchainType"
+        const val collectionUidKey = "collectionUid"
+        const val blockchainTypeKey = "blockchainType"
 
         fun prepareParams(collectionUid: String, blockchainType: BlockchainType) =
             bundleOf(collectionUidKey to collectionUid, blockchainTypeKey to blockchainType.uid)
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun NftCollectionScreen(navController: NavController, viewModel: NftCollectionOverviewViewModel) {
-    ComposeAppTheme {
+fun NftCollectionScreen(navController: NavController, viewModel: NftCollectionOverviewViewModel, onShowSnackbar: suspend (String, String?) -> Boolean,) {
+    NiaTheme {
         val tabs = viewModel.tabs
         val pagerState = rememberPagerState(initialPage = 0) { tabs.size}
         val coroutineScope = rememberCoroutineScope()
         val view = LocalView.current
         val context = LocalContext.current
 
-        Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
-            AppBar(
-                menuItems = listOf(
-                    MenuItem(
-                        title = TranslatableString.ResString(R.string.Button_Close),
-                        icon = R.drawable.ic_close,
-                        onClick = {
-                            navController.popBackStack()
-                        }
-                    )
+        Column {
+
+            TopAppBarClose(
+                actionIcon = Icons.Rounded.Close,
+                actionIconContentDescription = "ArrowBack",
+                onActionClick = {navController.popBackStack()},
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Transparent,
                 )
             )
 
@@ -105,11 +111,14 @@ fun NftCollectionScreen(navController: NavController, viewModel: NftCollectionOv
             ) { page ->
                 when (tabs[page]) {
                     NftCollectionModule.Tab.Overview -> {
+                        val copyText = stringResource(id = R.string.Hud_Text_Copied)
                         NftCollectionOverviewScreen(
                             viewModel,
                             onCopyText = {
                                 TextHelper.copyText(it)
-                                HudHelper.showSuccessMessage(view, R.string.Hud_Text_Copied)
+                                coroutineScope.launch {
+                                    onShowSnackbar.invoke(copyText, null)
+                                }
                             },
                             onOpenUrl = {
                                 LinkHelper.openLinkInAppBrowser(context, it)

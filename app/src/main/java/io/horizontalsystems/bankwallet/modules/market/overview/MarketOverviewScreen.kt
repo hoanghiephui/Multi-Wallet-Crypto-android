@@ -26,6 +26,7 @@ import io.horizontalsystems.bankwallet.material.module.market.navigateToMarketSe
 import io.horizontalsystems.bankwallet.material.module.market.navigateToMarketTopCoinsScreen
 import io.horizontalsystems.bankwallet.material.module.market.navigateToMarketTopNftCollectionsScreen
 import io.horizontalsystems.bankwallet.material.module.market.navigateToMarketTopPlatformsScreen
+import io.horizontalsystems.bankwallet.material.module.nft.navigateToNftCollectionScreen
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.market.category.MarketCategoryFragment
 import io.horizontalsystems.bankwallet.modules.market.overview.ui.*
@@ -114,7 +115,7 @@ fun MarketOverviewScreen(
                                 },
                                 onClickCollection = { blockchainType, collectionUid ->
                                     val args = NftCollectionFragment.prepareParams(collectionUid, blockchainType)
-                                    navController.slideFromBottom(R.id.nftCollectionFragment, args)
+                                    navController.navigateToNftCollectionScreen(bundle = args)
                                 },
                                 onClickSeeAll = {
                                     val (sortingField, timeDuration) = viewModel.topNftCollectionsParams

@@ -5,12 +5,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
 import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -170,8 +172,8 @@ private fun Header(name: String, imageUrl: String?) {
                 .padding(start = 16.dp)
                 .align(Alignment.CenterVertically),
             text = name,
-            style = ComposeAppTheme.typography.headline1,
-            color = ComposeAppTheme.colors.leah,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
@@ -187,8 +189,6 @@ private fun Stats(collection: NftCollectionOverviewViewItem) {
                     .height(105.dp)
                     .weight(1f),
                 shape = RoundedCornerShape(12.dp),
-                elevation = 0.dp,
-                backgroundColor = ComposeAppTheme.colors.lawrence
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp)
@@ -197,14 +197,14 @@ private fun Stats(collection: NftCollectionOverviewViewItem) {
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = collection.totalSupply,
-                        style = ComposeAppTheme.typography.headline1,
-                        color = ComposeAppTheme.colors.bran,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = collection.ownersCount + " " + stringResource(id = R.string.NftCollection_Owners),
-                        style = ComposeAppTheme.typography.subhead1,
-                        color = ComposeAppTheme.colors.grey,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color.Gray,
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                 }
@@ -215,8 +215,6 @@ private fun Stats(collection: NftCollectionOverviewViewItem) {
                     .height(105.dp)
                     .weight(1f),
                 shape = RoundedCornerShape(12.dp),
-                elevation = 0.dp,
-                backgroundColor = ComposeAppTheme.colors.lawrence
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp)
@@ -225,14 +223,14 @@ private fun Stats(collection: NftCollectionOverviewViewItem) {
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = collection.floorPrice?.coinValue ?: "---",
-                        style = ComposeAppTheme.typography.headline1,
-                        color = ComposeAppTheme.colors.bran,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = collection.floorPrice?.fiatValue ?: stringResource(id = R.string.NotAvailable),
-                        style = ComposeAppTheme.typography.subhead1,
-                        color = ComposeAppTheme.colors.grey,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color.Gray,
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                 }
@@ -245,8 +243,6 @@ private fun Stats(collection: NftCollectionOverviewViewItem) {
                     .height(105.dp)
                     .weight(1f),
                 shape = RoundedCornerShape(12.dp),
-                elevation = 0.dp,
-                backgroundColor = ComposeAppTheme.colors.lawrence
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp)
@@ -255,14 +251,14 @@ private fun Stats(collection: NftCollectionOverviewViewItem) {
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = collection.oneDayVolume ?: "---",
-                        style = ComposeAppTheme.typography.headline1,
-                        color = ComposeAppTheme.colors.bran,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = RateText(collection.oneDayVolumeDiff),
                         color = RateColor(collection.oneDayVolumeDiff),
-                        style = ComposeAppTheme.typography.subhead1,
+                        style = MaterialTheme.typography.labelMedium,
                         maxLines = 1,
                     )
                     Spacer(modifier = Modifier.height(4.dp))
@@ -274,8 +270,6 @@ private fun Stats(collection: NftCollectionOverviewViewItem) {
                     .height(105.dp)
                     .weight(1f),
                 shape = RoundedCornerShape(12.dp),
-                elevation = 0.dp,
-                backgroundColor = ComposeAppTheme.colors.lawrence
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp)
@@ -284,14 +278,14 @@ private fun Stats(collection: NftCollectionOverviewViewItem) {
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = collection.oneDaySellersCount?.let { stringResource(R.string.NftCollection_TodaysSalesCount, it) } ?: "",
-                        style = ComposeAppTheme.typography.headline1,
-                        color = ComposeAppTheme.colors.bran,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         text = collection.oneDaySellersAveragePrice ?: "",
-                        style = ComposeAppTheme.typography.subhead1,
-                        color = ComposeAppTheme.colors.grey,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color.Gray,
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                 }

@@ -94,10 +94,11 @@ class NiaAppState(
         }
 
     val shouldShowBottomBar: Boolean
-        get() = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact
+        @Composable get() = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact
+                && topLevelDestinations.find { it.name == currentTopLevelDestination?.name } != null
 
     val shouldShowNavRail: Boolean
-        get() = !shouldShowBottomBar
+        @Composable get() = !shouldShowBottomBar && topLevelDestinations.find { it.name == currentTopLevelDestination?.name } != null
 
     val isOffline = networkMonitor.isOnline
         .map(Boolean::not)
@@ -111,7 +112,7 @@ class NiaAppState(
      * Map of top level destinations to be used in the TopBar, BottomBar and NavRail. The key is the
      * route.
      */
-    val topLevelDestinations: List<TopLevelDestination> = TopLevelDestination.values().asList()
+    val topLevelDestinations: List<TopLevelDestination> = TopLevelDestination.entries
 
 
     /**

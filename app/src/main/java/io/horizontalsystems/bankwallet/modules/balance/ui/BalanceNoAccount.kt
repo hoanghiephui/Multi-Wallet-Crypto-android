@@ -43,7 +43,7 @@ fun BalanceNoAccount(navController: NavController) {
             modifier = Modifier
                 .size(100.dp)
                 .background(
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = MaterialTheme.colorScheme.surface,
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
@@ -52,7 +52,6 @@ fun BalanceNoAccount(navController: NavController) {
                 modifier = Modifier.size(48.dp),
                 painter = painterResource(R.drawable.icon_add_to_wallet_24),
                 contentDescription = "",
-                tint = ComposeAppTheme.colors.grey
             )
         }
         Spacer(Modifier.height(32.dp))

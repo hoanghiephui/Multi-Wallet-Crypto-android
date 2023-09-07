@@ -6,12 +6,20 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
-import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.horizontalsystems.bankwallet.modules.market.ImageSource
@@ -25,29 +33,31 @@ fun <T>Tabs(tabs: List<TabItem<T>>, onClick: (T) -> Unit) {
 
     Box(
         modifier = Modifier
-            .background(ComposeAppTheme.colors.tyler)
-            .height(44.dp)
+            .height(48.dp)
+            .background(Color.Transparent)
     ) {
-        Divider(
-            thickness = 1.dp,
-            color = ComposeAppTheme.colors.steel10,
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
 
         TabRow(
             modifier = Modifier
                 .padding(horizontal = 16.dp)
-                .height(44.dp),
+                .background(Color.Transparent)
+                .height(48.dp),
             selectedTabIndex = selectedIndex,
-            backgroundColor = ComposeAppTheme.colors.transparent,
-            contentColor = ComposeAppTheme.colors.tyler,
+            contentColor = Color.Transparent,
+            containerColor = Color.Transparent,
             indicator = @Composable { tabPositions ->
                 TabRowDefaults.Indicator(
                     modifier = Modifier
                         .tabIndicatorOffset(tabPositions[selectedIndex])
                         .clip(RoundedCornerShape(topStart = 2.dp, topEnd = 2.dp)),
-                    color = ComposeAppTheme.colors.jacob
+                    color = MaterialTheme.colorScheme.primary
                 )
+            },
+            divider = {
+                Divider(
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                )
+
             }
         ) {
             tabs.forEachIndexed { index, tab ->
@@ -61,11 +71,12 @@ fun <T>Tabs(tabs: List<TabItem<T>>, onClick: (T) -> Unit) {
                     },
                     content = {
                         ProvideTextStyle(
-                            ComposeAppTheme.typography.subhead1
+                            MaterialTheme.typography.titleSmall
                         ) {
                             Text(
+                                modifier = Modifier.padding(bottom = 3.dp),
                                 text = tab.title,
-                                color = if (selectedIndex == index) ComposeAppTheme.colors.leah else ComposeAppTheme.colors.grey,
+                                color = if (selectedIndex == index) MaterialTheme.colorScheme.primary else Color.Gray,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -82,26 +93,24 @@ fun <T>ScrollableTabs(tabs: List<TabItem<T>>, onClick: (T) -> Unit) {
 
     Box(
         modifier = Modifier
-            .background(ComposeAppTheme.colors.tyler)
+            .background(MaterialTheme.colorScheme.onBackground)
             .height(44.dp)
     ) {
         Divider(
             modifier = Modifier.align(Alignment.BottomCenter),
             thickness = 1.dp,
-            color = ComposeAppTheme.colors.steel10,
         )
 
         ScrollableTabRow(
             selectedTabIndex = selectedIndex,
-            backgroundColor = ComposeAppTheme.colors.transparent,
-            contentColor = ComposeAppTheme.colors.tyler,
+            contentColor = MaterialTheme.colorScheme.onSurface,
             edgePadding = 16.dp,
             indicator = @Composable { tabPositions ->
                 TabRowDefaults.Indicator(
                     modifier = Modifier
                         .tabIndicatorOffset(tabPositions[selectedIndex])
                         .clip(RoundedCornerShape(topStart = 2.dp, topEnd = 2.dp)),
-                    color = ComposeAppTheme.colors.jacob
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         ) {
@@ -116,11 +125,11 @@ fun <T>ScrollableTabs(tabs: List<TabItem<T>>, onClick: (T) -> Unit) {
                     },
                     content = {
                         ProvideTextStyle(
-                            ComposeAppTheme.typography.subhead1
+                            MaterialTheme.typography.bodySmall
                         ) {
                             Text(
                                 text = tab.title,
-                                color = if (tab.selected) ComposeAppTheme.colors.leah else ComposeAppTheme.colors.grey
+                                color = if (tab.selected) MaterialTheme.colorScheme.primary else Color.Gray
                             )
                         }
                     }

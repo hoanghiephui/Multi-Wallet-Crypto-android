@@ -1829,8 +1829,8 @@ fun E2(
         overflow = overflow,
         maxLines = maxLines,
         onTextLayout = onTextLayout,
-        style = ComposeAppTheme.typography.captionSB,
-        color = ComposeAppTheme.colors.leah,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.onSurface,
     )
 }
 @Composable

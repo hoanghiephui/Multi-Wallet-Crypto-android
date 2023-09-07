@@ -38,6 +38,7 @@ import io.horizontalsystems.bankwallet.material.module.market.marketTopNftCollec
 import io.horizontalsystems.bankwallet.material.module.market.marketTopPlatformsScreen
 import io.horizontalsystems.bankwallet.material.module.market.metricsPageScreen
 import io.horizontalsystems.bankwallet.material.module.market.tvlScreen
+import io.horizontalsystems.bankwallet.material.module.nft.nftCollectionScreen
 import io.horizontalsystems.bankwallet.material.module.setting.navigations.blockchainSettingsScreen
 import io.horizontalsystems.bankwallet.material.module.setting.navigations.btcBlockchainSettingsScreen
 import io.horizontalsystems.bankwallet.material.module.setting.navigations.donateScreen
@@ -99,6 +100,7 @@ fun NiaNavHost(
                 evmSettingsScreen(navController, onShowSnackbar)
             },
         )
+        nftCollectionScreen(navController, onShowSnackbar)
     }
 }
 
@@ -107,6 +109,13 @@ val navOptionsSlideFromRight = NavOptions.Builder()
     .setExitAnim(android.R.anim.fade_out)
     .setPopEnterAnim(android.R.anim.fade_in)
     .setPopExitAnim(R.anim.slide_to_right)
+    .build()
+
+val navOptionsSlideFromBottom = NavOptions.Builder()
+    .setEnterAnim(R.anim.slide_from_bottom)
+    .setExitAnim(android.R.anim.fade_out)
+    .setPopEnterAnim(android.R.anim.fade_in)
+    .setPopExitAnim(R.anim.slide_to_bottom)
     .build()
 
 @SuppressLint("RestrictedApi")

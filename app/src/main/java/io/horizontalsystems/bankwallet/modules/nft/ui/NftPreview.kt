@@ -6,10 +6,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -36,7 +38,7 @@ fun NftAssetPreview(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(ComposeAppTheme.colors.lawrence)
+            .background(MaterialTheme.colorScheme.surface)
             .clickable(onClick = onClick)
     ) {
         Box(
@@ -45,7 +47,7 @@ fun NftAssetPreview(
                 .padding(start = 4.dp, top = 4.dp, end = 4.dp)
                 .height(156.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .background(ComposeAppTheme.colors.steel20)
+                .background(MaterialTheme.colorScheme.primaryContainer)
         ) {
             val painter = rememberAsyncImagePainter(imageUrl)
             if (painter.state !is AsyncImagePainter.State.Success) {
@@ -54,8 +56,8 @@ fun NftAssetPreview(
                         .padding(start = 12.dp, end = 12.dp)
                         .align(Alignment.Center),
                     text = name,
-                    style = ComposeAppTheme.typography.microSB,
-                    color = ComposeAppTheme.colors.grey
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
             Image(
@@ -76,8 +78,8 @@ fun NftAssetPreview(
         Text(
             modifier = Modifier.padding(start = 12.dp, top = 12.dp, end = 12.dp),
             text = name,
-            style = ComposeAppTheme.typography.microSB,
-            color = ComposeAppTheme.colors.grey,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurface,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
@@ -92,8 +94,8 @@ fun NftAssetPreview(
             currencyPrice?.let { currencyPrice ->
                 Text(
                     text = currencyPrice.getFormattedFull(),
-                    style = ComposeAppTheme.typography.micro,
-                    color = ComposeAppTheme.colors.grey
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color.Gray
                 )
             }
         }

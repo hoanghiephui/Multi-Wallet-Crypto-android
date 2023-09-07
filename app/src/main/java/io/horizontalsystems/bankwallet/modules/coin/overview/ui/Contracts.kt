@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,6 +16,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import coin.chain.crypto.core.designsystem.theme.NiaTheme
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.modules.coin.ContractInfo
@@ -25,7 +27,7 @@ import io.horizontalsystems.marketkit.models.BlockchainType
 @Preview
 @Composable
 fun ContractsPreview() {
-    ComposeAppTheme(darkTheme = true) {
+    NiaTheme(darkTheme = true) {
         val contracts = listOf(
             ContractInfo("0xda123as34290098asd0098asdasd9098asd90123asd", BlockchainType.Ethereum.imageUrl,"https://etherscan.io/token/0xda123as34290098asd0098asdasd9098asd90123asd"),
             ContractInfo("0x34290098asd8asdasd98asd8asdasd9098asd098as9", BlockchainType.BinanceChain.imageUrl,"https://bscscan.com/token/0x34290098asd8asdasd98asd8asdasd9098asd098as9"),
@@ -80,13 +82,13 @@ fun Contracts(
                                     modifier = Modifier
                                         .padding(start = 8.dp)
                                         .clip(RoundedCornerShape(4.dp))
-                                        .background(ComposeAppTheme.colors.jeremy)
+                                        .background(MaterialTheme.colorScheme.surface)
                                 ) {
                                     Text(
                                         modifier = Modifier.padding(start = 4.dp, end = 4.dp, bottom = 1.dp),
                                         text = labelText,
-                                        color = ComposeAppTheme.colors.bran,
-                                        style = ComposeAppTheme.typography.microSB,
+                                        color = MaterialTheme.colorScheme.surfaceTint,
+                                        style = MaterialTheme.typography.labelMedium,
                                         maxLines = 1,
                                     )
                                 }

@@ -1,6 +1,11 @@
 package io.horizontalsystems.bankwallet.material.main
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -167,7 +172,15 @@ fun MainApp(
                                     if (uiState.torEnabled) {
                                         TorStatusView()
                                     }
-                                    if (appState.shouldShowBottomBar) {
+                                    AnimatedVisibility(
+                                        visible = appState.shouldShowBottomBar,
+                                        enter = slideInVertically(
+                                            initialOffsetY = { fullHeight -> -fullHeight },
+                                        ) + fadeIn(),
+                                        exit = slideOutVertically(
+                                            targetOffsetY = { fullHeight -> -fullHeight },
+                                        ) + fadeOut(),
+                                    ) {
                                         NiaBottomBar(
                                             uiState.mainNavItems,
                                             destinations = appState.topLevelDestinations,

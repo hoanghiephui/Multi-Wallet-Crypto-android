@@ -6,8 +6,14 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.ButtonColors
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -19,6 +25,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
+import io.horizontalsystems.bankwallet.ui.compose.Grey
+import io.horizontalsystems.bankwallet.ui.compose.Grey50
 
 @Composable
 fun ButtonPrimaryDefaultWithIcon(
@@ -73,10 +81,10 @@ fun ButtonPrimaryDefault(
         modifier = modifier,
         onClick = onClick,
         buttonColors = ButtonPrimaryDefaults.textButtonColors(
-            backgroundColor = ComposeAppTheme.colors.leah,
-            contentColor = ComposeAppTheme.colors.claude,
-            disabledBackgroundColor = ComposeAppTheme.colors.steel20,
-            disabledContentColor = ComposeAppTheme.colors.grey50,
+            backgroundColor = MaterialTheme.colorScheme.onSurface,
+            contentColor = MaterialTheme.colorScheme.surface,
+            disabledBackgroundColor = MaterialTheme.colorScheme.onSurface.copy(0.5f),
+            disabledContentColor = Grey50,
         ),
         content = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         enabled = enabled
@@ -94,18 +102,18 @@ fun ButtonPrimaryTransparent(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     val contentColor = when {
-        !enabled -> ComposeAppTheme.colors.grey50
-        isPressed -> ComposeAppTheme.colors.grey
-        else -> ComposeAppTheme.colors.leah
+        !enabled -> Grey50
+        isPressed -> Grey
+        else -> MaterialTheme.colorScheme.onSurface
     }
 
     Surface(
         modifier = modifier,
-        color = ComposeAppTheme.colors.transparent,
+        color = Color.Transparent,
         contentColor = contentColor,
     ) {
         ProvideTextStyle(
-            value = ComposeAppTheme.typography.headline2
+            value = MaterialTheme.typography.titleSmall
         ) {
             Row(
                 Modifier
@@ -174,10 +182,10 @@ fun ButtonPrimaryYellowWithIcon(
         modifier = modifier,
         onClick = onClick,
         buttonColors = ButtonPrimaryDefaults.textButtonColors(
-            backgroundColor = ComposeAppTheme.colors.yellowD,
-            contentColor = ComposeAppTheme.colors.dark,
-            disabledBackgroundColor = ComposeAppTheme.colors.steel20,
-            disabledContentColor = ComposeAppTheme.colors.grey50,
+            backgroundColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.surface,
+            disabledBackgroundColor = MaterialTheme.colorScheme.surface,
+            disabledContentColor = Grey50,
         ),
         content = {
             if (iconTint != null) {
@@ -214,10 +222,10 @@ fun ButtonPrimaryRed(
         modifier = modifier,
         onClick = onClick,
         buttonColors = ButtonPrimaryDefaults.textButtonColors(
-            backgroundColor = ComposeAppTheme.colors.lucian,
-            contentColor = ComposeAppTheme.colors.claude,
-            disabledBackgroundColor = ComposeAppTheme.colors.steel20,
-            disabledContentColor = ComposeAppTheme.colors.grey50,
+            backgroundColor = Color.Red,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            disabledBackgroundColor = MaterialTheme.colorScheme.surface,
+            disabledContentColor = Grey50,
         ),
         content = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
         enabled = enabled
@@ -237,16 +245,16 @@ fun ButtonPrimaryYellowWithSpinner(
         modifier = modifier,
         onClick = onClick,
         buttonColors = ButtonPrimaryDefaults.textButtonColors(
-            backgroundColor = ComposeAppTheme.colors.yellowD,
-            contentColor = ComposeAppTheme.colors.dark,
-            disabledBackgroundColor = ComposeAppTheme.colors.steel20,
-            disabledContentColor = ComposeAppTheme.colors.grey50,
+            backgroundColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.surface,
+            disabledBackgroundColor = MaterialTheme.colorScheme.onSurface,
+            disabledContentColor = Grey50,
         ),
         content = {
             if (showSpinner) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(16.dp),
-                    color = ComposeAppTheme.colors.grey,
+                    color = Grey,
                     strokeWidth = 2.dp
                 )
             } else {
@@ -280,7 +288,7 @@ fun ButtonPrimary(
         enabled = enabled,
     ) {
         ProvideTextStyle(
-            value = ComposeAppTheme.typography.headline2
+            value = MaterialTheme.typography.titleSmall
         ) {
             Row(
                 Modifier

@@ -72,11 +72,11 @@ fun BadgeRatingD(modifier: Modifier = Modifier, text: String) {
     Text(
         modifier = modifier
             .clip(RoundedCornerShape(4.dp))
-            .background(ComposeAppTheme.colors.lightGrey)
+            .background(Color.Gray)
             .padding(horizontal = 4.dp, vertical = 2.dp),
         text = text,
         color = SteelDark,
-        style = ComposeAppTheme.typography.microSB,
+        style = MaterialTheme.typography.labelSmall,
     )
 }
 
