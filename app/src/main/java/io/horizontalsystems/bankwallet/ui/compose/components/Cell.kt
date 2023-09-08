@@ -87,20 +87,16 @@ fun CellMultilineLawrence(
         modifier = Modifier
             .fillMaxWidth()
             .height(60.dp)
-            .background(ComposeAppTheme.colors.lawrence)
+            .background(MaterialTheme.colorScheme.surface)
     ) {
         if (borderTop) {
             Divider(
-                thickness = 1.dp,
-                color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.align(Alignment.TopCenter)
             )
         }
 
         if (borderBottom) {
             Divider(
-                thickness = 1.dp,
-                color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
         }

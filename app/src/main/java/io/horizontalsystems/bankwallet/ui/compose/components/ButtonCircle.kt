@@ -14,6 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
+import io.horizontalsystems.bankwallet.ui.compose.Grey50
 
 @Composable
 fun ButtonPrimaryCircle(
@@ -28,14 +29,14 @@ fun ButtonPrimaryCircle(
         modifier = Modifier
             .size(50.dp)
             .clip(shape)
-            .background(if (enabled) ComposeAppTheme.colors.leah else ComposeAppTheme.colors.steel20),
+            .background(if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceTint.copy(0.7f)),
         enabled = enabled,
-        rippleColor = ComposeAppTheme.colors.claude
+        rippleColor = MaterialTheme.colorScheme.onSurface
     ) {
         Icon(
             painter = painterResource(id = icon),
             contentDescription = contentDescription,
-            tint = if (enabled) ComposeAppTheme.colors.claude else ComposeAppTheme.colors.grey50
+            tint = if (enabled) MaterialTheme.colorScheme.primary else Grey50
         )
     }
 }

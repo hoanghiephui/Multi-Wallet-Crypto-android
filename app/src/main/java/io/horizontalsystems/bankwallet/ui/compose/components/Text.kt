@@ -1046,8 +1046,8 @@ fun C3(
         overflow = overflow,
         maxLines = maxLines,
         onTextLayout = onTextLayout,
-        style = ComposeAppTheme.typography.subhead1,
-        color = ComposeAppTheme.colors.jacob,
+        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.onSurface,
     )
 }
 @Composable

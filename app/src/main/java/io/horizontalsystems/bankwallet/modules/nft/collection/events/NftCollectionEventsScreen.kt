@@ -30,6 +30,7 @@ import coil.compose.rememberAsyncImagePainter
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.entities.ViewState
+import io.horizontalsystems.bankwallet.material.module.nft.asset.navigateToNftAssetScreen
 import io.horizontalsystems.bankwallet.modules.coin.ContractInfo
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.nft.asset.NftAssetModule
@@ -235,8 +236,8 @@ fun NftEvents(
                                 currencyValue = event.priceInFiat?.getFormattedFull(),
                                 onClick = navController?.let {
                                     {
-                                        navController.slideFromBottom(
-                                            R.id.nftAssetFragment,
+                                        navController.navigateToNftAssetScreen(
+                                            bundle =
                                             NftAssetModule.prepareParams(event.providerCollectionUid, event.nftUid)
                                         )
                                     }

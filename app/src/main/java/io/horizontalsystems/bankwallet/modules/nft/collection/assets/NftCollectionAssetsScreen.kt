@@ -13,6 +13,7 @@ import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.entities.ViewState
+import io.horizontalsystems.bankwallet.material.module.nft.asset.navigateToNftAssetScreen
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.nft.asset.NftAssetModule
 import io.horizontalsystems.bankwallet.modules.nft.holdings.NftAssetViewItem
@@ -76,8 +77,8 @@ private fun NftAssets(
                                 coinPrice = asset.price,
                                 currencyPrice = asset.priceInFiat
                             ) {
-                                navController.slideFromBottom(
-                                    R.id.nftAssetFragment,
+                                navController.navigateToNftAssetScreen(
+                                    bundle =
                                     NftAssetModule.prepareParams(
                                         asset.collectionUid,
                                         asset.nftUid

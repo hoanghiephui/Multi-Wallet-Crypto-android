@@ -25,7 +25,6 @@ import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.About
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Contracts
 import io.horizontalsystems.bankwallet.modules.nft.ui.CellLink
-import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
 import io.horizontalsystems.bankwallet.ui.compose.components.*
 

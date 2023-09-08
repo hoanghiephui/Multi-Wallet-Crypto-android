@@ -38,6 +38,7 @@ import io.horizontalsystems.bankwallet.material.module.market.marketTopNftCollec
 import io.horizontalsystems.bankwallet.material.module.market.marketTopPlatformsScreen
 import io.horizontalsystems.bankwallet.material.module.market.metricsPageScreen
 import io.horizontalsystems.bankwallet.material.module.market.tvlScreen
+import io.horizontalsystems.bankwallet.material.module.nft.asset.nftAssetScreen
 import io.horizontalsystems.bankwallet.material.module.nft.nftCollectionScreen
 import io.horizontalsystems.bankwallet.material.module.setting.navigations.blockchainSettingsScreen
 import io.horizontalsystems.bankwallet.material.module.setting.navigations.btcBlockchainSettingsScreen
@@ -101,6 +102,7 @@ fun NiaNavHost(
             },
         )
         nftCollectionScreen(navController, onShowSnackbar)
+        nftAssetScreen(navController, onShowSnackbar)
     }
 }
 

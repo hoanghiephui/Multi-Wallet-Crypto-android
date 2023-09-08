@@ -18,10 +18,16 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
@@ -41,6 +47,8 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
+import coin.chain.crypto.core.designsystem.component.TopAppBarClose
+import coin.chain.crypto.core.designsystem.theme.NiaTheme
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.shorten
@@ -76,39 +84,43 @@ class NftAssetFragment : BaseComposeFragment() {
     override fun GetContent() {
         val collectionUid = requireArguments().getString(NftAssetModule.collectionUidKey)
         val nftUid = requireArguments().getString(NftAssetModule.nftUidKey)?.let { NftUid.fromUid(it) }
-        NftAssetScreen(findNavController(), collectionUid, nftUid)
+        //NftAssetScreen(findNavController(), collectionUid, nftUid)
     }
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NftAssetScreen(
     navController: NavController,
     collectionUid: String?,
-    nftUid: NftUid?
+    nftUid: NftUid?,
+    onShowSnackbar: suspend (String, String?) -> Boolean,
 ) {
     if (collectionUid == null || nftUid == null) return
 
     val viewModel =
         viewModel<NftAssetViewModel>(factory = NftAssetModule.Factory(collectionUid, nftUid))
     val errorMessage = viewModel.errorMessage
-
-    ComposeAppTheme {
-        Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
-            AppBar(
-                menuItems = listOf(
-                    MenuItem(
-                        title = TranslatableString.ResString(R.string.Button_Close)
-                    ) {
-                        navController.popBackStack()
-                    }
+    val rememberCoroutine = rememberCoroutineScope()
+    NiaTheme {
+        Column(modifier = Modifier.background(color = Color.Transparent)) {
+            TopAppBarClose(
+                actionIcon = Icons.Rounded.Close,
+                actionIconContentDescription = "ArrowBack",
+                onActionClick = {navController.popBackStack()},
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Transparent,
                 )
             )
             NftAsset(viewModel, navController)
         }
 
         errorMessage?.let {
-            SnackbarError(it.getString())
+            val message = it.getString()
+            rememberCoroutine.launch {
+                onShowSnackbar.invoke(message, null)
+            }
             viewModel.errorShown()
         }
     }
@@ -116,7 +128,7 @@ fun NftAssetScreen(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun NftAsset(
+fun NftAsset(
     viewModel: NftAssetViewModel,
     navController: NavController
 ) {
@@ -241,8 +253,8 @@ private fun AssetContent(
 
                 Text(
                     text = asset.name,
-                    color = ComposeAppTheme.colors.leah,
-                    style = ComposeAppTheme.typography.headline1
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.titleMedium
                 )
 
                 CellSingleLine {
@@ -265,7 +277,6 @@ private fun AssetContent(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_arrow_right),
                             contentDescription = null,
-                            tint = ComposeAppTheme.colors.grey
                         )
                     }
                 }
@@ -274,7 +285,7 @@ private fun AssetContent(
                 Row(horizontalArrangement = Arrangement.End) {
                     Crossfade(
                         targetState = asset.showSend,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f), label = ""
                     ) { showSend ->
                         if (showSend) {
                             Row {
@@ -632,7 +643,7 @@ private fun NftAssetAttribute(context: Context, trait: NftAssetViewModel.TraitVi
         modifier = Modifier
             .height(60.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(ComposeAppTheme.colors.lawrence)
+            .background(MaterialTheme.colorScheme.surface)
             .clickable(trait.searchUrl != null) {
                 LinkHelper.openLinkInAppBrowser(context, trait.searchUrl ?: "")
             }
@@ -648,13 +659,13 @@ private fun NftAssetAttribute(context: Context, trait: NftAssetViewModel.TraitVi
                         modifier = Modifier
                             .padding(start = 6.dp)
                             .clip(RoundedCornerShape(4.dp))
-                            .background(ComposeAppTheme.colors.jeremy)
+                            .background(MaterialTheme.colorScheme.primary)
                     ) {
                         Text(
                             modifier = Modifier.padding(start = 4.dp, end = 4.dp, bottom = 1.dp),
                             text = percent,
-                            color = ComposeAppTheme.colors.bran,
-                            style = ComposeAppTheme.typography.microSB,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            style = MaterialTheme.typography.labelSmall,
                             maxLines = 1,
                         )
                     }

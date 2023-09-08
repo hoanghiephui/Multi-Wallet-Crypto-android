@@ -33,7 +33,7 @@ class NftAssetViewModel(private val service: NftAssetService) : ViewModel() {
 
     val nftUid by service::nftUid
 
-    val tabs = NftAssetModule.Tab.values()
+    val tabs = NftAssetModule.Tab.entries.toTypedArray()
 
     init {
         service.serviceDataFlow
