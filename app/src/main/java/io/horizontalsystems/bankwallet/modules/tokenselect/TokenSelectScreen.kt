@@ -11,8 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
-import io.horizontalsystems.bankwallet.modules.balance.BalanceViewItem
+import io.horizontalsystems.bankwallet.modules.balance.BalanceViewItem2
 import io.horizontalsystems.bankwallet.modules.balance.ui.BalanceCardInner
+import io.horizontalsystems.bankwallet.modules.balance.ui.BalanceCardSubtitleType
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.ListEmptyView
 import io.horizontalsystems.bankwallet.ui.compose.components.SearchBar
@@ -24,10 +25,10 @@ import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 fun TokenSelectScreen(
     navController: NavController,
     title: String,
-    onClickEnabled: (BalanceViewItem) -> Boolean = { true },
-    onClickItem: (BalanceViewItem) -> Unit,
+    onClickItem: (BalanceViewItem2) -> Unit,
     viewModel: TokenSelectViewModel,
     emptyItemsText: String,
+    header: @Composable (() -> Unit)? = null
 ) {
     ComposeAppTheme {
         Scaffold(
@@ -53,25 +54,28 @@ fun TokenSelectScreen(
             } else {
                 LazyColumn(contentPadding = paddingValues) {
                     item {
-                        VSpacer(12.dp)
+                        if (header == null) {
+                            VSpacer(12.dp)
+                        }
+                        header?.invoke()
                     }
                     val balanceViewItems = uiState.items
                     itemsIndexed(balanceViewItems) { index, item ->
                         val lastItem = index == balanceViewItems.size - 1
-                        val modifier = if (onClickEnabled.invoke(item)) {
-                            Modifier.clickable {
+
+                        Box(
+                            modifier = Modifier.clickable {
                                 onClickItem.invoke(item)
                             }
-                        } else {
-                            Modifier
-                        }
-
-                        Box(modifier = modifier) {
+                        ) {
                             SectionUniversalItem(
                                 borderTop = true,
                                 borderBottom = lastItem
                             ) {
-                                BalanceCardInner(viewItem = item)
+                                BalanceCardInner(
+                                    viewItem = item,
+                                    type = BalanceCardSubtitleType.CoinName
+                                )
                             }
                         }
                     }

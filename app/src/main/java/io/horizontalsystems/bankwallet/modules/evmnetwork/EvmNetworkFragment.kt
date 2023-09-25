@@ -250,6 +250,7 @@ private fun LazyListScope.CustomRpcListSection(
                 },
             )
             DraggableCardSimple(
+                key = item.id,
                 isRevealed = revealedCardId == item.id,
                 cardOffset = 72f,
                 onReveal = { onReveal(item.id) },

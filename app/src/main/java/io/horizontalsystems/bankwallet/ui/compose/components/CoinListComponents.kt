@@ -92,6 +92,7 @@ fun CoinList(
                     )
                 }
                 DraggableCardSimple(
+                    key = item.coinUid,
                     isRevealed = revealedCardId == item.coinUid,
                     cardOffset = 100f,
                     onReveal = {

@@ -10,7 +10,9 @@ import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.swappable
 import io.horizontalsystems.bankwallet.modules.balance.BalanceModule
 import io.horizontalsystems.bankwallet.modules.balance.BalanceService
-import io.horizontalsystems.bankwallet.modules.balance.BalanceViewItem
+import io.horizontalsystems.bankwallet.modules.balance.BalanceSortType
+import io.horizontalsystems.bankwallet.modules.balance.BalanceSorter
+import io.horizontalsystems.bankwallet.modules.balance.BalanceViewItem2
 import io.horizontalsystems.bankwallet.modules.balance.BalanceViewItemFactory
 import io.horizontalsystems.bankwallet.modules.balance.BalanceViewTypeManager
 import kotlinx.coroutines.Dispatchers
@@ -21,12 +23,13 @@ class TokenSelectViewModel(
     private val service: BalanceService,
     private val balanceViewItemFactory: BalanceViewItemFactory,
     private val balanceViewTypeManager: BalanceViewTypeManager,
-    private val itemsFilter: ((BalanceModule.BalanceItem) -> Boolean)?
+    private val itemsFilter: ((BalanceModule.BalanceItem) -> Boolean)?,
+    private val balanceSorter: BalanceSorter
 ) : ViewModel() {
 
     private var noItems = false
     private var query: String? = null
-    private var balanceViewItems = listOf<BalanceViewItem>()
+    private var balanceViewItems = listOf<BalanceViewItem2>()
     var uiState by mutableStateOf(
         TokenSelectUiState(
             items = balanceViewItems,
@@ -62,14 +65,15 @@ class TokenSelectViewModel(
                     }
                 }
 
-                balanceViewItems = itemsFiltered.map { balanceItem ->
-                    balanceViewItemFactory.viewItem(
+                val itemsSorted = balanceSorter.sort(itemsFiltered, BalanceSortType.Value)
+                balanceViewItems = itemsSorted.map { balanceItem ->
+                    balanceViewItemFactory.viewItem2(
                         item = balanceItem,
                         currency = service.baseCurrency,
-                        expanded = false,
                         hideBalance = false,
                         watchAccount = service.isWatchAccount,
-                        balanceViewType = balanceViewTypeManager.balanceViewTypeFlow.value
+                        balanceViewType = balanceViewTypeManager.balanceViewTypeFlow.value,
+                        networkAvailable = service.networkAvailable
                     )
                 }
             } else {
@@ -104,10 +108,11 @@ class TokenSelectViewModel(
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return TokenSelectViewModel(
-                service = BalanceService.getInstance(),
+                service = BalanceService.getInstance("wallet"),
                 balanceViewItemFactory = BalanceViewItemFactory(),
                 balanceViewTypeManager = App.balanceViewTypeManager,
-                itemsFilter = null
+                itemsFilter = null,
+                balanceSorter = BalanceSorter()
             ) as T
         }
     }
@@ -116,18 +121,19 @@ class TokenSelectViewModel(
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return TokenSelectViewModel(
-                service = BalanceService.getInstance(),
+                service = BalanceService.getInstance("wallet"),
                 balanceViewItemFactory = BalanceViewItemFactory(),
                 balanceViewTypeManager = App.balanceViewTypeManager,
                 itemsFilter = {
                     it.wallet.token.swappable
-                }
+                },
+                balanceSorter = BalanceSorter()
             ) as T
         }
     }
 }
 
 data class TokenSelectUiState(
-    val items: List<BalanceViewItem>,
+    val items: List<BalanceViewItem2>,
     val noItems: Boolean,
 )

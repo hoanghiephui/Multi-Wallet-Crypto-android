@@ -131,8 +131,11 @@
         android:id="@+id/timeLockFragment"
         android:name="io.horizontalsystems.bankwallet.modules.settings.experimental.timelock.TimeLockFragment"/>
     <fragment
-        android:id="@+id/donateFragment"
-        android:name="io.horizontalsystems.bankwallet.modules.settings.donate.DonateFragment"/>
+        android:id="@+id/donateAddressesFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.settings.donate.DonateAddressesFragment"/>
+    <fragment
+        android:id="@+id/donateTokenSelectFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.settings.donate.DonateTokenSelectFragment"/>
     <fragment
         android:id="@+id/metricsPageFragment"
         android:name="io.horizontalsystems.bankwallet.modules.market.metricspage.MetricsPageFragment" />
@@ -348,6 +351,9 @@
     <fragment
         android:id="@+id/tokenBalanceFragment"
         android:name="io.horizontalsystems.bankwallet.modules.balance.token.TokenBalanceFragment" />
+    <fragment
+        android:id="@+id/cexAssetFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.balance.cex.asset.CexAssetFragment" />
     <dialog
         android:id="@+id/wcErrorNoAccountFragment"
         android:name="io.horizontalsystems.bankwallet.modules.walletconnect.WCErrorNoAccountFragment" />

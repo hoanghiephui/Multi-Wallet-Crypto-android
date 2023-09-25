@@ -31,6 +31,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 
 @Composable
 fun SendBinanceScreen(
+    title: String,
     navController: NavController,
     viewModel: SendBinanceViewModel,
     amountInputModeViewModel: AmountInputModeViewModel,
@@ -50,7 +51,6 @@ fun SendBinanceScreen(
     val amountUnique = paymentAddressViewModel.amountUnique
 
     ComposeAppTheme {
-        val fullCoin = wallet.token.fullCoin
         val focusRequester = remember { FocusRequester() }
 
         LaunchedEffect(Unit) {
@@ -58,7 +58,7 @@ fun SendBinanceScreen(
         }
 
         SendScreen(
-            fullCoin = fullCoin,
+            title = title,
             onCloseClick = { navController.popBackStack() }
         ) {
             AvailableBalance(
@@ -90,16 +90,18 @@ fun SendBinanceScreen(
                 amountUnique = amountUnique
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
-            HSAddressInput(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                tokenQuery = wallet.token.tokenQuery,
-                coinCode = wallet.coin.code,
-                error = addressError,
-                textPreprocessor = paymentAddressViewModel,
-                navController = navController
-            ) {
-                viewModel.onEnterAddress(it)
+            if (uiState.showAddressInput) {
+                Spacer(modifier = Modifier.height(12.dp))
+                HSAddressInput(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    tokenQuery = wallet.token.tokenQuery,
+                    coinCode = wallet.coin.code,
+                    error = addressError,
+                    textPreprocessor = paymentAddressViewModel,
+                    navController = navController
+                ) {
+                    viewModel.onEnterAddress(it)
+                }
             }
 
             Spacer(modifier = Modifier.height(12.dp))

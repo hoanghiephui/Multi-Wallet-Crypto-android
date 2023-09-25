@@ -1,7 +1,10 @@
 package io.horizontalsystems.bankwallet.modules.receive.address
 
+import android.content.Intent
+import android.graphics.drawable.AdaptiveIconDrawable
 import android.os.Bundle
 import android.widget.Toast
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,13 +27,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
@@ -48,7 +56,6 @@ import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryDefault
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
-import io.horizontalsystems.bankwallet.ui.compose.components.D1
 import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.HsIconButton
@@ -59,7 +66,8 @@ import io.horizontalsystems.bankwallet.ui.compose.components.TextImportantWarnin
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.body_jacob
-import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_leah
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.helpers.TextHelper
 import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.helpers.HudHelper
@@ -77,6 +85,7 @@ class ReceiveAddressFragment : BaseComposeFragment() {
             return
         }
 
+        val viewContent = LocalContext.current
         val popupDestinationId = arguments?.getInt(POPUP_DESTINATION_ID_KEY)
 
         val viewModel by viewModels<ReceiveAddressViewModel> {
@@ -86,6 +95,13 @@ class ReceiveAddressFragment : BaseComposeFragment() {
         ReceiveAddressScreen(
             viewModel = viewModel,
             navController = navController,
+            onShareClick = { address ->
+                viewContent.startActivity(Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, address)
+                    type = "text/plain"
+                })
+            },
             onCloseClick = {
                 popupDestinationId?.let { destinationId ->
                     if (destinationId != 0) {
@@ -116,7 +132,8 @@ class ReceiveAddressFragment : BaseComposeFragment() {
 private fun ReceiveAddressScreen(
     viewModel: ReceiveAddressViewModel,
     navController: NavController,
-    onCloseClick: () -> Unit
+    onShareClick: (String) -> Unit,
+    onCloseClick: () -> Unit,
 ) {
 
     val localView = LocalView.current
@@ -208,14 +225,17 @@ private fun ReceiveAddressScreen(
                                             ) {
                                                 Image(
                                                     modifier = Modifier.size(32.dp),
-                                                    painter = painterResource(id = R.drawable.launcher_main_preview),
+                                                    painter = adaptiveIconPainterResource(
+                                                        id = R.mipmap.launcher_main,
+                                                        fallbackDrawable = R.drawable.launcher_main_preview
+                                                    ),
                                                     contentDescription = null
                                                 )
                                             }
                                         }
                                     }
                                     VSpacer(12.dp)
-                                    D1(
+                                    subhead2_grey(
                                         text = uiState.qrDescription,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
@@ -231,10 +251,10 @@ private fun ReceiveAddressScreen(
                                                     .fillMaxWidth()
                                                     .padding(horizontal = 16.dp),
                                             ) {
-                                                body_grey(
+                                                subhead2_grey(
                                                     text = item.title,
                                                 )
-                                                body_leah(
+                                                subhead1_leah(
                                                     text = item.value,
                                                     modifier = Modifier
                                                         .padding(start = 16.dp)
@@ -301,8 +321,8 @@ private fun ReceiveAddressScreen(
                                     VSpacer(16.dp)
                                     ButtonPrimaryDefault(
                                         modifier = Modifier.fillMaxWidth(),
-                                        title = stringResource(R.string.Button_Close),
-                                        onClick = onCloseClick
+                                        title = stringResource(R.string.Button_Share),
+                                        onClick = { onShareClick.invoke(uiState.address) },
                                     )
                                 }
                             }
@@ -311,5 +331,18 @@ private fun ReceiveAddressScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun adaptiveIconPainterResource(@DrawableRes id: Int, @DrawableRes fallbackDrawable: Int): Painter {
+    val res = LocalContext.current.resources
+    val theme = LocalContext.current.theme
+
+    val adaptiveIcon = ResourcesCompat.getDrawable(res, id, theme) as? AdaptiveIconDrawable
+    return if (adaptiveIcon != null) {
+        BitmapPainter(adaptiveIcon.toBitmap().asImageBitmap())
+    } else {
+        painterResource(fallbackDrawable)
     }
 }

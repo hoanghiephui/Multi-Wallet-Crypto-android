@@ -7,40 +7,40 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.horizontalsystems.bankwallet.core.App
+import io.horizontalsystems.bankwallet.core.IWalletManager
+import io.horizontalsystems.bankwallet.core.eligibleTokens
+import io.horizontalsystems.bankwallet.core.isDefault
+import io.horizontalsystems.bankwallet.core.utils.Utils
+import io.horizontalsystems.bankwallet.entities.Account
 import io.horizontalsystems.bankwallet.entities.Wallet
-import io.horizontalsystems.bankwallet.modules.balance.BalanceActiveWalletRepository
-import io.horizontalsystems.marketkit.models.Coin
+import io.horizontalsystems.marketkit.models.FullCoin
+import io.horizontalsystems.marketkit.models.Token
 import io.horizontalsystems.marketkit.models.TokenType
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.collect
 
 class ReceiveTokenSelectViewModel(
-    private val activeWalletRepository: BalanceActiveWalletRepository
+    private val walletManager: IWalletManager,
+    private val activeAccount: Account,
+    private val fullCoinsProvider: FullCoinsProvider
 ) : ViewModel() {
-    private var query: String? = null
-    private var wallets: List<Wallet> = listOf()
-    private var coins: List<Coin> = listOf()
+    private var fullCoins: List<FullCoin> = listOf()
 
     var uiState by mutableStateOf(
         ReceiveTokenSelectUiState(
-            coins = coins
+            fullCoins = fullCoins,
         )
     )
 
     init {
-        viewModelScope.launch {
-            activeWalletRepository.itemsObservable.collect {
-                wallets = it.sortedBy { it.coin.code }
-                refreshItems()
+        fullCoinsProvider.setActiveWallets(walletManager.activeWallets)
 
-                emitState()
-            }
-        }
+        refreshItems()
+        emitState()
     }
 
     fun updateFilter(q: String) {
         viewModelScope.launch {
-            query = q
+            fullCoinsProvider.setQuery(q)
             refreshItems()
 
             emitState()
@@ -48,68 +48,115 @@ class ReceiveTokenSelectViewModel(
     }
 
     private fun refreshItems() {
-        var result = wallets
-            .map { it.coin }
-            .distinct()
-
-        query?.let { tmpQuery ->
-            result = result.filter { coin ->
-                coin.code.contains(tmpQuery, true) || coin.name.contains(tmpQuery, true)
-            }
-        }
-
-        coins = result
+        fullCoins = fullCoinsProvider.getItems()
     }
 
 
     private fun emitState() {
         viewModelScope.launch {
             uiState = ReceiveTokenSelectUiState(
-                coins = coins,
+                fullCoins = fullCoins,
             )
         }
     }
 
-    fun getCoinActiveWalletsType(coin: Coin): CoinActiveWalletsType? {
-        val coinWallets = wallets.filter { it.coin == coin }
-        val singleWallet = coinWallets.singleOrNull()
+    suspend fun getCoinForReceiveType(fullCoin: FullCoin): CoinForReceiveType? {
+        val eligibleTokens = fullCoin.eligibleTokens(activeAccount.type)
 
         return when {
-            singleWallet != null -> {
-                CoinActiveWalletsType.Single(singleWallet)
+            eligibleTokens.isEmpty() -> null
+            eligibleTokens.size == 1 -> {
+                CoinForReceiveType.Single(getOrCreateWallet(eligibleTokens.first()))
             }
-            coinWallets.all { it.token.type is TokenType.Derived } -> {
-                CoinActiveWalletsType.MultipleDerivations
+
+            eligibleTokens.all { it.type is TokenType.Derived } -> {
+                val activeWallets =
+                    walletManager.activeWallets.filter { it.coin == fullCoin.coin }
+
+                when {
+                    activeWallets.isEmpty() -> {
+                        eligibleTokens.find { it.type.isDefault }?.let { default ->
+                            CoinForReceiveType.Single(createWallet(default))
+                        }
+                    }
+
+                    activeWallets.size == 1 -> {
+                        CoinForReceiveType.Single(activeWallets.first())
+                    }
+
+                    else -> {
+                        CoinForReceiveType.MultipleDerivations
+                    }
+                }
             }
-            coinWallets.all { it.token.type is TokenType.AddressTyped } -> {
-                CoinActiveWalletsType.MultipleAddressTypes
+
+            eligibleTokens.all { it.type is TokenType.AddressTyped } -> {
+                val activeWallets =
+                    walletManager.activeWallets.filter { it.coin == fullCoin.coin }
+
+                when {
+                    activeWallets.isEmpty() -> {
+                        eligibleTokens.find { it.type.isDefault }?.let { default ->
+                            CoinForReceiveType.Single(createWallet(default))
+                        }
+                    }
+
+                    activeWallets.size == 1 -> {
+                        CoinForReceiveType.Single(activeWallets.first())
+                    }
+
+                    else -> {
+                        CoinForReceiveType.MultipleAddressTypes
+                    }
+                }
             }
-            coinWallets.isNotEmpty() -> {
-                CoinActiveWalletsType.MultipleBlockchains
-            }
-            else -> {
-                null
-            }
+
+            else -> CoinForReceiveType.MultipleBlockchains
         }
     }
 
-    class Factory : ViewModelProvider.Factory {
+    private suspend fun getOrCreateWallet(token: Token): Wallet {
+        return walletManager
+            .activeWallets
+            .find { it.token == token }
+            ?: createWallet(token)
+    }
+
+    private suspend fun createWallet(token: Token): Wallet {
+        val wallet = Wallet(token, activeAccount)
+
+        walletManager.save(listOf(wallet))
+
+        Utils.waitUntil(1000L, 100L) {
+            App.adapterManager.getReceiveAdapterForWallet(wallet) != null
+        }
+
+        return wallet
+    }
+
+    class Factory(private val activeAccount: Account) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            val fullCoinsProvider = FullCoinsProvider(
+                App.marketKit,
+                activeAccount
+            )
             return ReceiveTokenSelectViewModel(
-                BalanceActiveWalletRepository(App.walletManager, App.evmSyncSourceManager)
+                App.walletManager,
+                activeAccount,
+                fullCoinsProvider
             ) as T
         }
     }
 }
 
-sealed interface CoinActiveWalletsType {
-    data class Single(val wallet: Wallet) : CoinActiveWalletsType
-    object MultipleDerivations : CoinActiveWalletsType
-    object MultipleAddressTypes : CoinActiveWalletsType
-    object MultipleBlockchains : CoinActiveWalletsType
+sealed interface CoinForReceiveType {
+    data class Single(val wallet: Wallet) : CoinForReceiveType
+    object MultipleDerivations : CoinForReceiveType
+    object MultipleAddressTypes : CoinForReceiveType
+    object MultipleBlockchains : CoinForReceiveType
 }
 
 data class ReceiveTokenSelectUiState(
-    val coins: List<Coin>
+    val fullCoins: List<FullCoin>
 )

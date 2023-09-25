@@ -29,11 +29,12 @@ object BalanceModule {
                 App.balanceHiddenManager
             )
             return BalanceViewModel(
-                BalanceService.getInstance(),
+                BalanceService.getInstance("wallet"),
                 BalanceViewItemFactory(),
                 App.balanceViewTypeManager,
                 TotalBalance(totalService, App.balanceHiddenManager),
                 App.localStorage,
+                App.wc2Service
             ) as T
         }
     }
@@ -53,8 +54,9 @@ object BalanceModule {
                 TotalBalance(totalService, App.balanceHiddenManager),
                 App.localStorage,
                 App.balanceViewTypeManager,
-                BalanceCexRepositoryWrapper(App.cexAssetManager),
-                BalanceXRateRepository(App.currencyManager, App.marketKit),
+                BalanceViewItemFactory(),
+                BalanceCexRepositoryWrapper(App.cexAssetManager, App.connectivityManager),
+                BalanceXRateRepository("wallet", App.currencyManager, App.marketKit),
                 BalanceCexSorter(),
                 App.cexProviderManager,
             ) as T
