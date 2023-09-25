@@ -14,9 +14,52 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
+
+@Composable
+fun ButtonPrimaryDefaultWithIcon(
+    modifier: Modifier = Modifier,
+    icon: Int,
+    iconTint: Color? = null,
+    title: String,
+    onClick: () -> Unit,
+    enabled: Boolean = true,
+) {
+    ButtonPrimary(
+        modifier = modifier,
+        onClick = onClick,
+        buttonColors = ButtonPrimaryDefaults.textButtonColors(
+            backgroundColor = ComposeAppTheme.colors.leah,
+            contentColor = ComposeAppTheme.colors.claude,
+            disabledBackgroundColor = ComposeAppTheme.colors.steel20,
+            disabledContentColor = ComposeAppTheme.colors.grey50,
+        ),
+        content = {
+            if (iconTint != null) {
+                Icon(
+                    painter = painterResource(icon),
+                    contentDescription = null,
+                    tint = iconTint
+                )
+            } else {
+                Icon(
+                    painter = painterResource(icon),
+                    contentDescription = null
+                )
+            }
+            HSpacer(width = 8.dp)
+            Text(
+                title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
+        enabled = enabled
+    )
+}
 
 @Composable
 fun ButtonPrimaryDefault(
@@ -107,6 +150,48 @@ fun ButtonPrimaryYellow(
             disabledContentColor = ComposeAppTheme.colors.grey50,
         ),
         content = {
+            Text(
+                title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
+        enabled = enabled
+    )
+}
+
+@Composable
+fun ButtonPrimaryYellowWithIcon(
+    modifier: Modifier = Modifier,
+    icon: Int,
+    iconTint: Color? = null,
+    title: String,
+    onClick: () -> Unit,
+    enabled: Boolean = true,
+) {
+    ButtonPrimary(
+        modifier = modifier,
+        onClick = onClick,
+        buttonColors = ButtonPrimaryDefaults.textButtonColors(
+            backgroundColor = ComposeAppTheme.colors.yellowD,
+            contentColor = ComposeAppTheme.colors.dark,
+            disabledBackgroundColor = ComposeAppTheme.colors.steel20,
+            disabledContentColor = ComposeAppTheme.colors.grey50,
+        ),
+        content = {
+            if (iconTint != null) {
+                Icon(
+                    painter = painterResource(icon),
+                    contentDescription = null,
+                    tint = iconTint
+                )
+            } else {
+                Icon(
+                    painter = painterResource(icon),
+                    contentDescription = null
+                )
+            }
+            HSpacer(width = 8.dp)
             Text(
                 title,
                 maxLines = 1,

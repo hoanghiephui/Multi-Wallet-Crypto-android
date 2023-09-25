@@ -1,9 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.main
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -31,9 +28,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -42,7 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.navGraphViewModels
 import io.horizontalsystems.bankwallet.R
-import io.horizontalsystems.bankwallet.core.BaseFragment
+import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.managers.RateAppManager
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
@@ -61,7 +56,7 @@ import io.horizontalsystems.bankwallet.modules.transactions.TransactionsModule
 import io.horizontalsystems.bankwallet.modules.transactions.TransactionsScreen
 import io.horizontalsystems.bankwallet.modules.transactions.TransactionsViewModel
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCAccountTypeNotSupportedDialog
-import io.horizontalsystems.bankwallet.modules.walletconnect.version1.WC1Manager.SupportState
+import io.horizontalsystems.bankwallet.modules.walletconnect.version2.WC2Manager.SupportState
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.DisposableLifecycleCallbacks
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBottomNavigation
@@ -70,29 +65,19 @@ import io.horizontalsystems.bankwallet.ui.extensions.WalletSwitchBottomSheet
 import io.horizontalsystems.core.findNavController
 import kotlinx.coroutines.launch
 
-class MainFragment : BaseFragment() {
+class MainFragment : BaseComposeFragment() {
 
     private val transactionsViewModel by navGraphViewModels<TransactionsViewModel>(R.id.mainFragment) { TransactionsModule.Factory() }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(
-                ViewCompositionStrategy.DisposeOnLifecycleDestroyed(viewLifecycleOwner)
+    @Composable
+    override fun GetContent() {
+        ComposeAppTheme {
+            MainScreenWithRootedDeviceCheck(
+                transactionsViewModel = transactionsViewModel,
+                deepLink = activity?.intent?.data?.toString(),
+                navController = findNavController(),
+                clearActivityData = { activity?.intent?.data = null }
             )
-            setContent {
-                ComposeAppTheme {
-                    MainScreenWithRootedDeviceCheck(
-                        transactionsViewModel = transactionsViewModel,
-                        deepLink = activity?.intent?.data?.toString(),
-                        navController = findNavController(),
-                        clearActivityData = { activity?.intent?.data = null }
-                    )
-                }
-            }
         }
     }
 
@@ -137,7 +122,7 @@ private fun MainScreen(
 
     val uiState = viewModel.uiState
     val selectedPage = uiState.selectedPageIndex
-    val pagerState = rememberPagerState(initialPage = selectedPage)
+    val pagerState = rememberPagerState(initialPage = selectedPage) { uiState.mainNavItems.size }
 
     val coroutineScope = rememberCoroutineScope()
     val modalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
@@ -216,7 +201,6 @@ private fun MainScreen(
 
                     HorizontalPager(
                         modifier = Modifier.weight(1f),
-                        pageCount = uiState.mainNavItems.size,
                         state = pagerState,
                         userScrollEnabled = false,
                         verticalAlignment = Alignment.Top

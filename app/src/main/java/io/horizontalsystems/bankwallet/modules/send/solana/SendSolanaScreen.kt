@@ -28,9 +28,11 @@ import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 
 @Composable
 fun SendSolanaScreen(
+    title: String,
     navController: NavController,
     viewModel: SendSolanaViewModel,
-    amountInputModeViewModel: AmountInputModeViewModel
+    amountInputModeViewModel: AmountInputModeViewModel,
+    sendEntryPointDestId: Int
 ) {
     val wallet = viewModel.wallet
     val uiState = viewModel.uiState
@@ -46,7 +48,6 @@ fun SendSolanaScreen(
 
 
     ComposeAppTheme {
-        val fullCoin = wallet.token.fullCoin
         val focusRequester = remember { FocusRequester() }
 
         LaunchedEffect(Unit) {
@@ -54,7 +55,7 @@ fun SendSolanaScreen(
         }
 
         SendScreen(
-            fullCoin = fullCoin,
+            title = title,
             onCloseClick = { navController.popBackStack() }
         ) {
             AvailableBalance(
@@ -86,16 +87,18 @@ fun SendSolanaScreen(
                     amountUnique = amountUnique
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
-            HSAddressInput(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                tokenQuery = wallet.token.tokenQuery,
-                coinCode = wallet.coin.code,
-                error = addressError,
-                textPreprocessor = paymentAddressViewModel,
-                navController = navController
-            ) {
-                viewModel.onEnterAddress(it)
+            if (uiState.showAddressInput) {
+                Spacer(modifier = Modifier.height(12.dp))
+                HSAddressInput(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    tokenQuery = wallet.token.tokenQuery,
+                    coinCode = wallet.coin.code,
+                    error = addressError,
+                    textPreprocessor = paymentAddressViewModel,
+                    navController = navController
+                ) {
+                    viewModel.onEnterAddress(it)
+                }
             }
 
             ButtonPrimaryYellow(
@@ -106,7 +109,10 @@ fun SendSolanaScreen(
                     onClick = {
                         navController.slideFromRight(
                                 R.id.sendConfirmation,
-                                SendConfirmationFragment.prepareParams(SendConfirmationFragment.Type.Solana)
+                                SendConfirmationFragment.prepareParams(
+                                    SendConfirmationFragment.Type.Solana,
+                                    sendEntryPointDestId
+                                )
                         )
                     },
                     enabled = proceedEnabled

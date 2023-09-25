@@ -10,6 +10,9 @@ import io.horizontalsystems.bankwallet.core.ILocalStorage
 import io.horizontalsystems.bankwallet.entities.Account
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.entities.Wallet
+import io.horizontalsystems.bankwallet.modules.walletconnect.list.WalletConnectListModule
+import io.horizontalsystems.bankwallet.modules.walletconnect.list.WalletConnectListViewModel
+import io.horizontalsystems.bankwallet.modules.walletconnect.version2.WC2Service
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -21,11 +24,12 @@ class BalanceViewModel(
     private val balanceViewTypeManager: BalanceViewTypeManager,
     private val totalBalance: TotalBalance,
     private val localStorage: ILocalStorage,
+    private val wc2Service: WC2Service
 ) : ViewModel(), ITotalBalance by totalBalance {
 
     private var balanceViewType = balanceViewTypeManager.balanceViewTypeFlow.value
     private var viewState: ViewState? = null
-    private var balanceViewItems = listOf<BalanceViewItem>()
+    private var balanceViewItems = listOf<BalanceViewItem2>()
     private var isRefreshing = false
 
     var uiState by mutableStateOf(
@@ -41,7 +45,8 @@ class BalanceViewModel(
     val sortTypes = listOf(BalanceSortType.Value, BalanceSortType.Name, BalanceSortType.PercentGrowth)
     var sortType by service::sortType
 
-    private var expandedWallet: Wallet? = null
+    var connectionResult by mutableStateOf<WalletConnectListViewModel.ConnectionResult?>(null)
+        private set
 
     init {
         viewModelScope.launch {
@@ -109,13 +114,13 @@ class BalanceViewModel(
             if (balanceItems != null) {
                 viewState = ViewState.Success
                 balanceViewItems = balanceItems.map { balanceItem ->
-                    balanceViewItemFactory.viewItem(
+                    balanceViewItemFactory.viewItem2(
                         balanceItem,
                         service.baseCurrency,
-                        balanceItem.wallet == expandedWallet,
                         balanceHidden,
                         service.isWatchAccount,
-                        balanceViewType
+                        balanceViewType,
+                        service.networkAvailable
                     )
                 }
             } else {
@@ -127,25 +132,24 @@ class BalanceViewModel(
         }
     }
 
-    override fun onCleared() {
-        totalBalance.stop()
-        service.clear()
-    }
-
-    fun onItem(viewItem: BalanceViewItem) {
-        viewModelScope.launch {
-            expandedWallet = when {
-                viewItem.wallet == expandedWallet -> null
-                else -> viewItem.wallet
+    fun setConnectionUri(uri: String) {
+        connectionResult = when (WalletConnectListModule.getVersionFromUri(uri)) {
+            2 -> {
+                wc2Service.pair(uri)
+                null
             }
 
-            service.balanceItemsFlow.value?.let { refreshViewItems(it) }
+            else -> WalletConnectListViewModel.ConnectionResult.Error
         }
     }
 
-    fun getWalletForReceive(viewItem: BalanceViewItem) = when {
-        viewItem.wallet.account.isBackedUp || viewItem.wallet.account.isFileBackedUp -> viewItem.wallet
-        else -> throw BackupRequiredError(viewItem.wallet.account, viewItem.coinTitle)
+    fun onHandleRoute() {
+        connectionResult = null
+    }
+
+    override fun onCleared() {
+        totalBalance.stop()
+        service.clear()
     }
 
     fun onRefresh() {
@@ -178,13 +182,21 @@ class BalanceViewModel(
         }
     }
 
-    fun disable(viewItem: BalanceViewItem) {
+    fun disable(viewItem: BalanceViewItem2) {
         service.disable(viewItem.wallet)
     }
 
-    fun getSyncErrorDetails(viewItem: BalanceViewItem): SyncError = when {
+    fun getSyncErrorDetails(viewItem: BalanceViewItem2): SyncError = when {
         service.networkAvailable -> SyncError.Dialog(viewItem.wallet, viewItem.errorMessage)
         else -> SyncError.NetworkNotAvailable()
+    }
+
+    fun getReceiveAllowedState(): ReceiveAllowedState? {
+        val tmpAccount = service.account ?: return null
+        return when {
+            tmpAccount.hasAnyBackup -> ReceiveAllowedState.Allowed
+            else -> ReceiveAllowedState.BackupRequired(tmpAccount)
+        }
     }
 
     sealed class SyncError {
@@ -193,10 +205,15 @@ class BalanceViewModel(
     }
 }
 
+sealed class ReceiveAllowedState {
+    object Allowed : ReceiveAllowedState()
+    data class BackupRequired(val account: Account) : ReceiveAllowedState()
+}
+
 class BackupRequiredError(val account: Account, val coinTitle: String) : Error("Backup Required")
 
 data class BalanceUiState(
-    val balanceViewItems: List<BalanceViewItem>,
+    val balanceViewItems: List<BalanceViewItem2>,
     val viewState: ViewState?,
     val isRefreshing: Boolean,
     val headerNote: HeaderNote

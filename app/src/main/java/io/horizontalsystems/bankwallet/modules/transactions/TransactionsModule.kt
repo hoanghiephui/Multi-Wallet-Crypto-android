@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.entities.Account
-import io.horizontalsystems.bankwallet.entities.CoinSettings
 import io.horizontalsystems.marketkit.models.Blockchain
 import io.horizontalsystems.marketkit.models.Token
 import java.math.BigDecimal
@@ -54,5 +53,5 @@ data class TransactionWallet(
 data class TransactionSource(
     val blockchain: Blockchain,
     val account: Account,
-    val coinSettings: CoinSettings
+    val meta: String?
 )

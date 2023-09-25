@@ -18,6 +18,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -29,8 +30,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.managers.FaqManager
+import io.horizontalsystems.bankwallet.core.providers.Translator
+import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.modules.balance.*
+import io.horizontalsystems.bankwallet.modules.manageaccount.dialogs.BackupRequiredDialog
 import io.horizontalsystems.bankwallet.modules.rateapp.RateAppModule
 import io.horizontalsystems.bankwallet.modules.rateapp.RateAppViewModel
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
@@ -133,7 +137,7 @@ fun Note(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BalanceItems(
-    balanceViewItems: List<BalanceViewItem>,
+    balanceViewItems: List<BalanceViewItem2>,
     viewModel: BalanceViewModel,
     accountViewItem: AccountViewItem,
     navController: NavController,
@@ -177,6 +181,59 @@ fun BalanceItems(
                         HudHelper.vibrate(context)
                     }
                 )
+            }
+
+            if (!accountViewItem.isWatchAccount) {
+                item {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        ButtonPrimaryYellowWithIcon(
+                            modifier = Modifier.weight(1f),
+                            icon = R.drawable.ic_arrow_up_right_24,
+                            title = stringResource(R.string.Balance_Send),
+                            onClick = {
+                                navController.slideFromRight(R.id.sendTokenSelectFragment)
+                            }
+                        )
+                        HSpacer(8.dp)
+                        ButtonPrimaryCircle(
+                            icon = R.drawable.ic_arrow_down_left_24,
+                            contentDescription = stringResource(R.string.Balance_Receive),
+                            onClick = {
+                                when (val receiveAllowedState = viewModel.getReceiveAllowedState()) {
+                                    ReceiveAllowedState.Allowed -> {
+                                        navController.slideFromRight(R.id.receiveTokenSelectFragment)
+                                    }
+
+                                    is ReceiveAllowedState.BackupRequired -> {
+                                        val account = receiveAllowedState.account
+                                        val text = Translator.getString(
+                                            R.string.Balance_Receive_BackupRequired_Description,
+                                            account.name
+                                        )
+                                        navController.slideFromBottom(
+                                            R.id.backupRequiredDialog,
+                                            BackupRequiredDialog.prepareParams(account, text)
+                                        )
+                                    }
+
+                                    null -> Unit
+                                }
+                            },
+                        )
+                        HSpacer(8.dp)
+                        ButtonPrimaryCircle(
+                            icon = R.drawable.ic_swap_24,
+                            contentDescription = stringResource(R.string.Swap),
+                            onClick = {
+                                navController.slideFromRight(R.id.swapTokenSelectFragment)
+                            }
+                        )
+                    }
+                    VSpacer(12.dp)
+                }
             }
 
             item {
@@ -299,7 +356,7 @@ fun BalanceSortingSelector(
         SelectorDialogCompose(
             title = stringResource(R.string.Balance_Sort_PopupTitle),
             items = sortTypes.map {
-                TabItem(stringResource(it.getTitleRes()), it == sortType, it)
+                SelectorItem(stringResource(it.getTitleRes()), it == sortType, it)
             },
             onDismissRequest = {
                 showSortTypeSelectorDialog = false
