@@ -37,8 +37,6 @@ android {
         resValue("string", "walletConnectAppMetaDataName", "Unstoppable")
         resValue("string", "walletConnectAppMetaDataUrl", "unstoppable.money")
         resValue("string", "walletConnectAppMetaDataIcon", "https://raw.githubusercontent.com/horizontalsystems/HS-Design/master/PressKit/UW-AppIcon-on-light.png")
-        resValue("string", "walletConnectV1PeerMetaName", "Unstoppable Wallet")
-        resValue("string", "walletConnectV1PeerMetaUrl", "https://unstoppable.money")
         resValue("string", "accountsBackupFileSalt", "unstoppable")
     }
 
@@ -208,7 +206,6 @@ dependencies {
     }
 
     // WalletConnect
-    implementation(libs.wallet.connect.kotlin)
     implementation(libs.okhttp)
     // WalletConnect V2
     implementation(platform(libs.walletconnect.bom))
