@@ -3,28 +3,35 @@ package io.horizontalsystems.bankwallet.modules.coin
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.horizontalsystems.bankwallet.R
+import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.Clearable
 import io.horizontalsystems.bankwallet.core.ILocalStorage
 import io.horizontalsystems.bankwallet.core.managers.SubscriptionManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
+import javax.inject.Inject
 
-class CoinViewModel(
-    private val service: CoinService,
-    private val clearables: List<Clearable>,
-    private val localStorage: ILocalStorage,
-    private val subscriptionManager: SubscriptionManager
+@HiltViewModel
+class CoinViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+    val coinUid: String = checkNotNull(savedStateHandle[CoinFragment.COIN_UID_KEY])
+    val fullCoin = App.marketKit.fullCoins(coinUids = listOf(coinUid)).first()
+    private val service: CoinService = CoinService(fullCoin, App.marketFavoritesManager)
+    private val clearables: List<Clearable> = listOf(service)
+    private val localStorage: ILocalStorage = App.localStorage
+    private val subscriptionManager: SubscriptionManager = App.subscriptionManager
 
     val tabs = CoinModule.Tab.values()
-    val fullCoin by service::fullCoin
 
     val isWatchlistEnabled = localStorage.marketsTabEnabled
-    var isFavorite by mutableStateOf<Boolean>(false)
+    var isFavorite by mutableStateOf(false)
         private set
     var successMessage by mutableStateOf<Int?>(null)
         private set
@@ -58,7 +65,7 @@ class CoinViewModel(
         successMessage = null
     }
 
-    fun shouldShowSubscriptionInfo():Boolean {
+    fun shouldShowSubscriptionInfo(): Boolean {
         return !subscriptionManager.hasSubscription() && !subscriptionInfoShown
     }
 

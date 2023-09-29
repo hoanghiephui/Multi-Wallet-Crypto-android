@@ -21,8 +21,10 @@
         android:label="@string/App_Name"
         android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true"
+        android:enableOnBackInvokedCallback="true"
         android:theme="@style/Theme.Nia.Splash"
-        tools:ignore="GoogleAppIndexingWarning">
+        tools:ignore="GoogleAppIndexingWarning"
+        tools:targetApi="tiramisu">
 
         <receiver
             android:name=".widgets.MarketWidgetReceiver"

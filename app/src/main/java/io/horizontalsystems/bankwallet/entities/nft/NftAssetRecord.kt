@@ -3,6 +3,7 @@ package io.horizontalsystems.bankwallet.entities.nft
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import io.horizontalsystems.bankwallet.core.storage.AccountRecord
 import io.horizontalsystems.marketkit.models.BlockchainType
 
@@ -14,8 +15,8 @@ import io.horizontalsystems.marketkit.models.BlockchainType
         childColumns = ["accountId"],
         onDelete = ForeignKey.CASCADE,
         deferred = true
-    )
-    ]
+    )],
+    indices = [Index(value = ["accountId"], unique = true)]
 )
 data class NftAssetRecord(
     val blockchainType: BlockchainType,

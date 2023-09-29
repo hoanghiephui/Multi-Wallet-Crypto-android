@@ -477,7 +477,7 @@ fun <T> CellUniversalLawrenceSection(
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.onBackground)
+            .background(MaterialTheme.colorScheme.onPrimary)
             .then(frameModifier)
     ) {
         val size = items.size

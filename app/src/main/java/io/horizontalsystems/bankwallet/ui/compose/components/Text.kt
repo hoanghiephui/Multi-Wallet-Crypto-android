@@ -538,8 +538,8 @@ fun B1(
         overflow = overflow,
         maxLines = maxLines,
         onTextLayout = onTextLayout,
-        style = ComposeAppTheme.typography.body,
-        color = ComposeAppTheme.colors.grey,
+        style = MaterialTheme.typography.bodyLarge,
+        color = Grey,
     )
 }
 @Composable

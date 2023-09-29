@@ -5,25 +5,34 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.core.os.bundleOf
-import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavController
 import androidx.navigation.navGraphViewModels
+import coin.chain.crypto.core.designsystem.component.TopAppBar
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromBottom
-import io.horizontalsystems.bankwallet.modules.coin.analytics.CoinAnalyticsScreen
-import io.horizontalsystems.bankwallet.modules.coin.coinmarkets.CoinMarketsScreen
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.CoinOverviewScreen
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
-import io.horizontalsystems.bankwallet.ui.compose.components.*
-import io.horizontalsystems.core.findNavController
+import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
+import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
+import io.horizontalsystems.bankwallet.ui.compose.components.ListEmptyView
+import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
+import io.horizontalsystems.bankwallet.ui.compose.components.TabItem
+import io.horizontalsystems.bankwallet.ui.compose.components.Tabs
 import io.horizontalsystems.core.helpers.HudHelper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -43,12 +52,12 @@ class CoinFragment : BaseComposeFragment() {
             activity?.intent?.data = null
         }
 
-        CoinScreen(
+        /*CoinScreen(
             coinUid,
             coinViewModel(coinUid),
             findNavController(),
             childFragmentManager
-        )
+        )*/
     }
 
     private fun coinViewModel(coinUid: String): CoinViewModel? = try {
@@ -61,7 +70,7 @@ class CoinFragment : BaseComposeFragment() {
     }
 
     companion object {
-        private const val COIN_UID_KEY = "coin_uid_key"
+        const val COIN_UID_KEY = "coin_uid_key"
 
         fun prepareParams(coinUid: String) = bundleOf(COIN_UID_KEY to coinUid)
     }
@@ -72,58 +81,60 @@ fun CoinScreen(
     coinUid: String,
     coinViewModel: CoinViewModel?,
     navController: NavController,
-    fragmentManager: FragmentManager
+    onShowSnackbar: suspend (String, String?) -> Boolean,
 ) {
     ComposeAppTheme {
         if (coinViewModel != null) {
-            CoinTabs(coinViewModel, navController, fragmentManager)
+            CoinTabs(coinViewModel, navController, onShowSnackbar)
         } else {
             CoinNotFound(coinUid, navController)
         }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CoinTabs(
     viewModel: CoinViewModel,
     navController: NavController,
-    fragmentManager: FragmentManager
+    onShowSnackbar: suspend (String, String?) -> Boolean,
 ) {
     val tabs = viewModel.tabs
     val pagerState = rememberPagerState(initialPage = 0) { tabs.size }
     val coroutineScope = rememberCoroutineScope()
     val view = LocalView.current
 
-    Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
-        AppBar(
-            title = TranslatableString.PlainString(viewModel.fullCoin.coin.code),
-            navigationIcon = {
-                HsBackButton(onClick = { navController.popBackStack() })
-            },
-            menuItems = buildList {
+    Column {
+        val actionIcon = if (viewModel.isWatchlistEnabled) {
+            if (viewModel.isFavorite) {
+                Icons.Rounded.Favorite
+            } else {
+                Icons.Rounded.FavoriteBorder
+            }
+        } else {
+            null
+        }
+        TopAppBar(
+            titleRes = viewModel.fullCoin.coin.code,
+            navigationIcon = Icons.Rounded.ArrowBack,
+            actionIconContentDescription = "ArrowBack",
+            onNavigationClick = { navController.popBackStack() },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = Color.Transparent,
+            ),
+            actionIcon = actionIcon,
+            onActionClick = {
                 if (viewModel.isWatchlistEnabled) {
                     if (viewModel.isFavorite) {
-                        add(
-                            MenuItem(
-                                title = TranslatableString.ResString(R.string.CoinPage_Unfavorite),
-                                icon = R.drawable.ic_filled_star_24,
-                                tint = ComposeAppTheme.colors.jacob,
-                                onClick = { viewModel.onUnfavoriteClick() }
-                            )
-                        )
+                        viewModel.onUnfavoriteClick()
                     } else {
-                        add(
-                            MenuItem(
-                                title = TranslatableString.ResString(R.string.CoinPage_Favorite),
-                                icon = R.drawable.ic_star_24,
-                                onClick = { viewModel.onFavoriteClick() }
-                            )
-                        )
+                        viewModel.onFavoriteClick()
                     }
                 }
-            }
+            },
+            modifier = Modifier
         )
+
 
         val selectedTab = tabs[pagerState.currentPage]
         val tabItems = tabs.map {
@@ -153,15 +164,17 @@ fun CoinTabs(
                         navController = navController
                     )
                 }
+
                 CoinModule.Tab.Market -> {
-                    CoinMarketsScreen(fullCoin = viewModel.fullCoin)
+                    //CoinMarketsScreen(fullCoin = viewModel.fullCoin)
                 }
+
                 CoinModule.Tab.Details -> {
-                    CoinAnalyticsScreen(
+                    /*CoinAnalyticsScreen(
                         fullCoin = viewModel.fullCoin,
                         navController = navController,
-                        fragmentManager = fragmentManager
-                    )
+                        //fragmentManager = fragmentManager
+                    )*/
                 }
 //                CoinModule.Tab.Tweets -> {
 //                    CoinTweetsScreen(fullCoin = viewModel.fullCoin)
@@ -170,21 +183,27 @@ fun CoinTabs(
         }
 
         viewModel.successMessage?.let {
-            HudHelper.showSuccessMessage(view, it)
-
+            val message  = stringResource(id = it)
+            coroutineScope.launch {
+                onShowSnackbar.invoke(message, null)
+            }
             viewModel.onSuccessMessageShown()
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoinNotFound(coinUid: String, navController: NavController) {
-    Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
-        AppBar(
-            title = TranslatableString.PlainString(coinUid),
-            navigationIcon = {
-                HsBackButton(onClick = { navController.popBackStack() })
-            }
+    Column {
+        TopAppBar(
+            titleRes = coinUid,
+            navigationIcon = Icons.Rounded.ArrowBack,
+            navigationIconContentDescription = "ArrowBack",
+            onNavigationClick = { navController.popBackStack() },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = Color.Transparent,
+            )
         )
 
         ListEmptyView(

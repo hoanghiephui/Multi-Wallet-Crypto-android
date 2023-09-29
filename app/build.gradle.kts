@@ -70,7 +70,7 @@ android {
             resValue("string", "providerCoinsJsonUrl", "https://raw.githubusercontent.com/horizontalsystems/cryptocurrencies/master/provider.coins.json")
             resValue("string", "marketApiBaseUrl", "https://api-dev.blocksdecoded.com")
             resValue("string", "marketApiKey", "IQf1uAjkthZp1i2pYzkXFDom")
-            resValue("string", "openSeaApiKey", "cc98f68d836b4c8c8ab8f894b6e2aae8")
+            resValue("string", "openSeaApiKey", "bfbd6061a33e455c8581b594774fecb3")
             resValue("string", "walletConnectV2Key", "8b4f41c60880a3e3ad57d82fddb30568")
             resValue("string", "solscanApiKey", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkQXQiOjE2Nzk0NjQyMTQ4NDAsImVtYWlsIjoiaHJ6c3lzdGVtczEwMUBnbWFpbC5jb20iLCJhY3Rpb24iOiJ0b2tlbi1hcGkiLCJpYXQiOjE2Nzk0NjQyMTR9.BRM7J9RbDpHgd2oMAus00XfWOxTJgV2Tn2_chXZOdtk")
             resValue("string", "trongridApiKey", "33374494-8060-447e-8367-90c5efd4ed95")
@@ -104,7 +104,7 @@ android {
             resValue("string", "providerCoinsJsonUrl", "https://raw.githubusercontent.com/horizontalsystems/cryptocurrencies/v0.21/provider.coins.json")
             resValue("string", "marketApiBaseUrl", "https://api.blocksdecoded.com")
             resValue("string", "marketApiKey", "IQf1uAjkthZp1i2pYzkXFDom")
-            resValue("string", "openSeaApiKey", "cc98f68d836b4c8c8ab8f894b6e2aae8")
+            resValue("string", "openSeaApiKey", "bfbd6061a33e455c8581b594774fecb3")
             resValue("string", "walletConnectV2Key", "0c5ca155c2f165a7d0c88686f2113a72")
             resValue("string", "solscanApiKey", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkQXQiOjE2Nzk0NjQxMTQ0ODUsImVtYWlsIjoiaHNkYW84ODg4QGdtYWlsLmNvbSIsImFjdGlvbiI6InRva2VuLWFwaSIsImlhdCI6MTY3OTQ2NDExNH0.91DUjjjYu86f1ZMMJ5cyJxIKTTw_srhI-vNgYaTCPUU")
             resValue("string", "trongridApiKey", "8f5ae2c8-8012-42a8-b0ca-ffc2741f6a29")
@@ -137,6 +137,9 @@ android {
             substitute(module("com.tinder.scarlet:message-adapter-gson:0.1.12")).using(module("com.github.WalletConnect.Scarlet:message-adapter-gson:1.0.0"))
             substitute(module("com.tinder.scarlet:lifecycle-android:0.1.12")).using(module("com.github.WalletConnect.Scarlet:lifecycle-android:1.0.0"))
         }
+    }
+    hilt {
+        enableAggregatingTask = true
     }
 
 }
@@ -218,8 +221,6 @@ dependencies {
     // Ethereum Name Service
     implementation(libs.web3j.core)
 
-    // in case native file tor.so not loading, do full gradle clean and build.
-    implementation(libs.tor.kit.android)
     implementation(libs.twitter.text)
 
     implementation(libs.kotlinx.coroutines.android)
@@ -286,4 +287,11 @@ dependencies {
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:2.0.9")
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:2.0.9")
     testRuntimeOnly("org.jetbrains.kotlin:kotlin-reflect:1.8.0")
+
+    //Android Tor
+    implementation("info.guardianproject:tor-android:0.4.7.14")
+    implementation("info.guardianproject:jtorctl:0.4.5.7")
+
+    api("com.jaredrummler:android-shell:1.0.0")
+    api("com.offbynull.portmapper:portmapper:2.0.5")
 }

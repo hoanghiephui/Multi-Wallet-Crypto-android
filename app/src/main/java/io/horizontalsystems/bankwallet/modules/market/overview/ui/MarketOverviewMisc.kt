@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.material.module.coin.navigateToCoinScreen
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
 import io.horizontalsystems.bankwallet.modules.market.MarketViewItem
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
@@ -18,7 +19,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 
 fun onItemClick(marketViewItem: MarketViewItem, navController: NavController) {
     val arguments = CoinFragment.prepareParams(marketViewItem.coinUid)
-    navController.slideFromRight(R.id.coinFragment, arguments)
+    navController.navigateToCoinScreen(bundle = arguments)
 }
 
 @Composable

@@ -54,7 +54,7 @@ import io.horizontalsystems.marketkit.models.HsPointTimePeriod
 fun CoinAnalyticsScreen(
     fullCoin: FullCoin,
     navController: NavController,
-    fragmentManager: FragmentManager
+    //fragmentManager: FragmentManager
 ) {
     val viewModel = viewModel<CoinAnalyticsViewModel>(factory = CoinAnalyticsModule.Factory(fullCoin))
     val uiState = viewModel.uiState
@@ -63,7 +63,7 @@ fun CoinAnalyticsScreen(
         refreshing = uiState.isRefreshing,
         onRefresh = { viewModel.refresh() },
     ) {
-        Crossfade(uiState.viewState) { viewState ->
+        Crossfade(uiState.viewState, label = "") { viewState ->
             when (viewState) {
                 ViewState.Loading -> {
                     Loading()
@@ -86,12 +86,11 @@ fun CoinAnalyticsScreen(
                         }
 
                         is AnalyticsViewItem.Analytics -> {
-                            AnalyticsData(
+                            /*AnalyticsData(
                                 item.blocks,
                                 navController,
-                                fragmentManager,
-                                { viewModel.onPeriodChange(it) }
-                            )
+                                fragmentManager
+                            ) { viewModel.onPeriodChange(it) }*/
                         }
 
                         null -> {
