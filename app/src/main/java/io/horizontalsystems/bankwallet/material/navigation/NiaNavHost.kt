@@ -30,6 +30,7 @@ import androidx.navigation.compose.NavHost
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.material.main.NiaAppState
 import io.horizontalsystems.bankwallet.material.module.coin.coinScreen
+import io.horizontalsystems.bankwallet.material.module.coin.indicators.indicatorsScreen
 import io.horizontalsystems.bankwallet.material.module.info.btcBlockchainRestoreSourceInfoScreen
 import io.horizontalsystems.bankwallet.material.module.market.marketCategoryScreen
 import io.horizontalsystems.bankwallet.material.module.market.marketPlatformScreen
@@ -105,6 +106,7 @@ fun NiaNavHost(
         nftCollectionScreen(navController, onShowSnackbar)
         nftAssetScreen(navController, onShowSnackbar)
         coinScreen(navController, onShowSnackbar)
+        indicatorsScreen(navController, onShowSnackbar)
     }
 }
 

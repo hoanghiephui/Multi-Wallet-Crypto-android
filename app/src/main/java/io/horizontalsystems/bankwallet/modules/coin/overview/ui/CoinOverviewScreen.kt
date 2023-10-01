@@ -9,15 +9,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -35,6 +33,7 @@ import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.ViewState
+import io.horizontalsystems.bankwallet.material.module.coin.indicators.navigateToIndicatorsScreen
 import io.horizontalsystems.bankwallet.modules.chart.ChartViewModel
 import io.horizontalsystems.bankwallet.modules.coin.CoinLink
 import io.horizontalsystems.bankwallet.modules.coin.overview.CoinOverviewModule
@@ -64,11 +63,13 @@ import io.horizontalsystems.core.helpers.HudHelper
 import io.horizontalsystems.core.parcelable
 import io.horizontalsystems.marketkit.models.FullCoin
 import io.horizontalsystems.marketkit.models.LinkType
+import kotlinx.coroutines.launch
 
 @Composable
 fun CoinOverviewScreen(
     fullCoin: FullCoin,
-    navController: NavController
+    navController: NavController,
+    onShowSnackbar: suspend (String, String?) -> Boolean,
 ) {
     val vmFactory by lazy { CoinOverviewModule.Factory(fullCoin) }
     val viewModel = viewModel<CoinOverviewViewModel>(factory = vmFactory)
@@ -81,22 +82,23 @@ fun CoinOverviewScreen(
 
     val view = LocalView.current
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
 
     viewModel.showHudMessage?.let {
         when (it.type) {
-            HudMessageType.Error -> HudHelper.showErrorMessage(
-                contenView = view,
-                resId = it.text,
-                icon = it.iconRes,
-                iconTint = R.color.white
-            )
+            HudMessageType.Error -> {
+                val message = stringResource(id = it.text)
+                coroutineScope.launch {
+                    onShowSnackbar.invoke(message, null)
+                }
+            }
 
-            HudMessageType.Success -> HudHelper.showSuccessMessage(
-                contenView = view,
-                resId = it.text,
-                icon = it.iconRes,
-                iconTint = R.color.white
-            )
+            HudMessageType.Success -> {
+                val message = stringResource(id = it.text)
+                coroutineScope.launch {
+                    onShowSnackbar.invoke(message, null)
+                }
+            }
         }
 
         viewModel.onHudMessageShown()
@@ -182,7 +184,7 @@ fun CoinOverviewScreen(
                                             ButtonSecondaryCircle(
                                                 icon = R.drawable.ic_setting_20
                                             ) {
-                                                navController.slideFromRight(R.id.indicatorsFragment)
+                                                navController.navigateToIndicatorsScreen()
                                             }
                                         }
                                     }

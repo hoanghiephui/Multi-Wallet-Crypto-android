@@ -4,8 +4,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.fragment.findNavController
+import coin.chain.crypto.core.designsystem.component.TopAppBar
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromRight
@@ -47,6 +52,7 @@ class IndicatorsFragment : BaseComposeFragment() {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun IndicatorsScreen(navController: NavController) {
     val chartIndicatorsViewModel = viewModel<ChartIndicatorsViewModel>(factory = ChartIndicatorsViewModel.Factory())
@@ -61,13 +67,16 @@ fun IndicatorsScreen(navController: NavController) {
     }
 
     Scaffold(
-        backgroundColor = ComposeAppTheme.colors.tyler,
+        containerColor = Color.Transparent,
         topBar = {
-            AppBar(
-                title = TranslatableString.ResString(R.string.CoinPage_Indicators),
-                navigationIcon = {
-                    HsBackButton(onClick = { navController.popBackStack() })
-                }
+            TopAppBar(
+                titleRes = R.string.CoinPage_Indicators,
+                navigationIcon = Icons.Rounded.ArrowBack,
+                navigationIconContentDescription = "ArrowBack",
+                onNavigationClick = { navController.popBackStack() },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Transparent,
+                )
             )
         }
     ) {
@@ -141,7 +150,7 @@ private fun IndicatorCell(
             Icon(
                 painter = painterResource(R.drawable.ic_edit_20),
                 contentDescription = null,
-                tint = ComposeAppTheme.colors.grey
+                tint = Color.Gray
             )
         }
         HSpacer(16.dp)

@@ -1,8 +1,8 @@
 package io.horizontalsystems.bankwallet.modules.coin
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -10,6 +10,8 @@ import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -26,14 +28,9 @@ import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.CoinOverviewScreen
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
-import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
-import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
-import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.ListEmptyView
-import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.TabItem
 import io.horizontalsystems.bankwallet.ui.compose.components.Tabs
-import io.horizontalsystems.core.helpers.HudHelper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -103,91 +100,97 @@ fun CoinTabs(
     val pagerState = rememberPagerState(initialPage = 0) { tabs.size }
     val coroutineScope = rememberCoroutineScope()
     val view = LocalView.current
-
-    Column {
-        val actionIcon = if (viewModel.isWatchlistEnabled) {
-            if (viewModel.isFavorite) {
-                Icons.Rounded.Favorite
+    Scaffold(
+        contentColor = Color.Transparent,
+        containerColor = Color.Transparent,
+        topBar = {
+            val actionIcon = if (viewModel.isWatchlistEnabled) {
+                if (viewModel.isFavorite) {
+                    Icons.Rounded.Favorite
+                } else {
+                    Icons.Rounded.FavoriteBorder
+                }
             } else {
-                Icons.Rounded.FavoriteBorder
+                null
             }
-        } else {
-            null
-        }
-        TopAppBar(
-            titleRes = viewModel.fullCoin.coin.code,
-            navigationIcon = Icons.Rounded.ArrowBack,
-            actionIconContentDescription = "ArrowBack",
-            onNavigationClick = { navController.popBackStack() },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = Color.Transparent,
-            ),
-            actionIcon = actionIcon,
-            onActionClick = {
-                if (viewModel.isWatchlistEnabled) {
-                    if (viewModel.isFavorite) {
-                        viewModel.onUnfavoriteClick()
-                    } else {
-                        viewModel.onFavoriteClick()
+            TopAppBar(
+                titleRes = viewModel.fullCoin.coin.code,
+                navigationIcon = Icons.Rounded.ArrowBack,
+                actionIconContentDescription = "ArrowBack",
+                onNavigationClick = { navController.popBackStack() },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Transparent,
+                ),
+                actionIcon = actionIcon,
+                onActionClick = {
+                    if (viewModel.isWatchlistEnabled) {
+                        if (viewModel.isFavorite) {
+                            viewModel.onUnfavoriteClick()
+                        } else {
+                            viewModel.onFavoriteClick()
+                        }
+                    }
+                },
+                modifier = Modifier
+            )
+        },
+
+    ) {
+        Column(modifier = Modifier.padding(it)) {
+            val selectedTab = tabs[pagerState.currentPage]
+            val tabItems = tabs.map {
+                TabItem(stringResource(id = it.titleResId), it == selectedTab, it)
+            }
+            Tabs(tabItems, onClick = { tab ->
+                coroutineScope.launch {
+                    pagerState.scrollToPage(tab.ordinal)
+
+                    if (tab == CoinModule.Tab.Details && viewModel.shouldShowSubscriptionInfo()) {
+                        viewModel.subscriptionInfoShown()
+
+                        delay(1000)
+                        navController.slideFromBottom(R.id.subscriptionInfoFragment)
                     }
                 }
-            },
-            modifier = Modifier
-        )
+            })
 
+            HorizontalPager(
+                state = pagerState,
+                userScrollEnabled = false
+            ) { page ->
+                when (tabs[page]) {
+                    CoinModule.Tab.Overview -> {
+                        CoinOverviewScreen(
+                            fullCoin = viewModel.fullCoin,
+                            navController = navController,
+                            onShowSnackbar = onShowSnackbar
+                        )
+                    }
 
-        val selectedTab = tabs[pagerState.currentPage]
-        val tabItems = tabs.map {
-            TabItem(stringResource(id = it.titleResId), it == selectedTab, it)
-        }
-        Tabs(tabItems, onClick = { tab ->
-            coroutineScope.launch {
-                pagerState.scrollToPage(tab.ordinal)
+                    CoinModule.Tab.Market -> {
+                        //CoinMarketsScreen(fullCoin = viewModel.fullCoin)
+                    }
 
-                if (tab == CoinModule.Tab.Details && viewModel.shouldShowSubscriptionInfo()) {
-                    viewModel.subscriptionInfoShown()
-
-                    delay(1000)
-                    navController.slideFromBottom(R.id.subscriptionInfoFragment)
-                }
-            }
-        })
-
-        HorizontalPager(
-            state = pagerState,
-            userScrollEnabled = false
-        ) { page ->
-            when (tabs[page]) {
-                CoinModule.Tab.Overview -> {
-                    CoinOverviewScreen(
-                        fullCoin = viewModel.fullCoin,
-                        navController = navController
-                    )
-                }
-
-                CoinModule.Tab.Market -> {
-                    //CoinMarketsScreen(fullCoin = viewModel.fullCoin)
-                }
-
-                CoinModule.Tab.Details -> {
-                    /*CoinAnalyticsScreen(
-                        fullCoin = viewModel.fullCoin,
-                        navController = navController,
-                        //fragmentManager = fragmentManager
-                    )*/
-                }
+                    CoinModule.Tab.Details -> {
+                        /*CoinAnalyticsScreen(
+                            fullCoin = viewModel.fullCoin,
+                            navController = navController,
+                            //fragmentManager = fragmentManager
+                        )*/
+                    }
 //                CoinModule.Tab.Tweets -> {
 //                    CoinTweetsScreen(fullCoin = viewModel.fullCoin)
 //                }
+                }
             }
-        }
 
-        viewModel.successMessage?.let {
-            val message  = stringResource(id = it)
-            coroutineScope.launch {
-                onShowSnackbar.invoke(message, null)
+            viewModel.successMessage?.let {
+                val message = stringResource(id = it)
+                coroutineScope.launch {
+                    onShowSnackbar.invoke(message, null)
+                }
+                viewModel.onSuccessMessageShown()
             }
-            viewModel.onSuccessMessageShown()
         }
     }
 }

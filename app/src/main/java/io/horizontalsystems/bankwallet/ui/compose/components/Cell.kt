@@ -334,7 +334,7 @@ fun CellFooter(text: String) {
             .height(58.dp)
             .fillMaxWidth(),
     ) {
-        Divider()
+        //Divider()
         caption_grey(
             text = text,
             modifier = Modifier
