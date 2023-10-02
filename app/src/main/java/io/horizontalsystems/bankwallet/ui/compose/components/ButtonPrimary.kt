@@ -153,8 +153,8 @@ fun ButtonPrimaryYellow(
         modifier = modifier,
         onClick = onClick,
         buttonColors = ButtonPrimaryDefaults.textButtonColors(
-            backgroundColor = MaterialTheme.colorScheme.onPrimary,
-            contentColor = MaterialTheme.colorScheme.onSurface,
+            backgroundColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.surface,
             disabledBackgroundColor = MaterialTheme.colorScheme.onSurfaceVariant,
             disabledContentColor = MaterialTheme.colorScheme.surface.copy(0.5f),
         ),

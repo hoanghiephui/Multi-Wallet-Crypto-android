@@ -304,7 +304,7 @@ fun ButtonsGroupWithShade(
         )
         Box(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.primary)
+                .background(Color.Transparent)
                 .padding(bottom = 8.dp) // With 24dp offset actual padding will be 32dp
         ) {
             ButtonsContent()

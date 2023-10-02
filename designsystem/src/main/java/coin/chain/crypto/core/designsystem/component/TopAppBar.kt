@@ -139,12 +139,13 @@ fun TopAppBar(
     navigationIcon: ImageVector,
     onActionClick: () -> Unit = {},
     onNavigationClick: () -> Unit = {},
+    enabled: Boolean = true
 ) {
     CenterAlignedTopAppBar(
         title = { Text(text = titleRes) },
         actions = {
             if (actionIcon != null) {
-                IconButton(onClick = onActionClick) {
+                IconButton(onClick = onActionClick, enabled = enabled) {
                     Icon(
                         imageVector = actionIcon,
                         contentDescription = actionIconContentDescription,

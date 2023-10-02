@@ -1,13 +1,22 @@
 package io.horizontalsystems.bankwallet.modules.coin.indicators
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Restore
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -15,26 +24,23 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coin.chain.crypto.core.designsystem.component.TopAppBar
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.entities.DataState
 import io.horizontalsystems.bankwallet.modules.chart.ChartIndicatorSetting
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
-import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
-import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
-import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
 import io.horizontalsystems.bankwallet.ui.compose.components.FormsInput
 import io.horizontalsystems.bankwallet.ui.compose.components.HeaderText
-import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.InfoText
-import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.SelectorDialogCompose
 import io.horizontalsystems.bankwallet.ui.compose.components.SelectorItem
@@ -42,6 +48,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_grey
 
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun EmaSettingsScreen(navController: NavController, indicatorSetting: ChartIndicatorSetting) {
     val viewModel = viewModel<MovingAverageSettingViewModel>(
@@ -75,26 +82,26 @@ fun EmaSettingsScreen(navController: NavController, indicatorSetting: ChartIndic
     }
 
     Scaffold(
-        backgroundColor = ComposeAppTheme.colors.tyler,
+        containerColor = Color.Transparent,
         topBar = {
-            AppBar(
-                title = TranslatableString.PlainString(viewModel.name),
-                navigationIcon = {
-                    HsBackButton(onClick = { navController.popBackStack() })
+            TopAppBar(
+                titleRes = viewModel.name,
+                navigationIcon = Icons.Rounded.ArrowBack,
+                actionIconContentDescription = "ArrowBack",
+                onNavigationClick = { navController.popBackStack() },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Transparent,
+                ),
+                actionIcon = Icons.Rounded.Restore,
+                onActionClick = {
+                    viewModel.reset()
                 },
-                menuItems = listOf(
-                    MenuItem(
-                        title = TranslatableString.ResString(R.string.Button_Reset),
-                        enabled = uiState.resetEnabled,
-                        onClick = {
-                            viewModel.reset()
-                        }
-                    )
-                )
+                modifier = Modifier,
+                enabled = uiState.resetEnabled
             )
         }
     ) {
-        Column(Modifier.padding(it)) {
+        Column(Modifier.padding(it).consumeWindowInsets(it).imePadding()) {
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -125,7 +132,7 @@ fun EmaSettingsScreen(navController: NavController, indicatorSetting: ChartIndic
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_down_arrow_20),
                                 contentDescription = null,
-                                tint = ComposeAppTheme.colors.grey
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
@@ -150,18 +157,16 @@ fun EmaSettingsScreen(navController: NavController, indicatorSetting: ChartIndic
                 )
                 VSpacer(32.dp)
             }
-            ButtonsGroupWithShade {
-                ButtonPrimaryYellow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp),
-                    title = stringResource(R.string.SwapSettings_Apply),
-                    onClick = {
-                        viewModel.save()
-                    },
-                    enabled = uiState.applyEnabled
-                )
-            }
+            ButtonPrimaryYellow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 16.dp, end = 16.dp),
+                title = stringResource(R.string.SwapSettings_Apply),
+                onClick = {
+                    viewModel.save()
+                },
+                enabled = uiState.applyEnabled
+            )
         }
     }
 }

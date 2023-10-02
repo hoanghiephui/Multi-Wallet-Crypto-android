@@ -25,6 +25,7 @@ import coin.chain.crypto.core.designsystem.component.TopAppBar
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.material.module.coin.indicators.navigateToIndicatorSettingsScreen
 import io.horizontalsystems.bankwallet.modules.chart.ChartIndicatorSetting
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
@@ -100,7 +101,7 @@ fun IndicatorsScreen(navController: NavController) {
                         toggleIndicator.invoke(indicator, it)
                     },
                     onEditClick = {
-                        navController.slideFromRight(R.id.indicatorSettingsFragment, IndicatorSettingsFragment.params(indicator.id))
+                        navController.navigateToIndicatorSettingsScreen(bundle = IndicatorSettingsFragment.params(indicator.id))
                     }
                 )
             }
@@ -116,7 +117,7 @@ fun IndicatorsScreen(navController: NavController) {
                         toggleIndicator.invoke(indicator, it)
                     },
                     onEditClick = {
-                        navController.slideFromRight(R.id.indicatorSettingsFragment, IndicatorSettingsFragment.params(indicator.id))
+                        navController.navigateToIndicatorSettingsScreen(bundle = IndicatorSettingsFragment.params(indicator.id))
                     }
                 )
             }
