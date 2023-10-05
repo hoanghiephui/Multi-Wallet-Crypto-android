@@ -928,7 +928,7 @@ fun C1(
         overflow = overflow,
         maxLines = maxLines,
         onTextLayout = onTextLayout,
-        style = MaterialTheme.typography.labelLarge,
+        style = MaterialTheme.typography.titleSmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(0.7f)
     )
 }

@@ -13,6 +13,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -41,8 +42,8 @@ fun CoinMarketsScreen(
     val viewItemState by viewModel.viewStateLiveData.observeAsState()
     val viewItems by viewModel.viewItemsLiveData.observeAsState()
 
-    Surface(color = ComposeAppTheme.colors.tyler) {
-        Crossfade(viewItemState) { viewItemState ->
+    Surface(color = Color.Transparent) {
+        Crossfade(viewItemState, label = "") { viewItemState ->
             when (viewItemState) {
                 ViewState.Loading -> {
                     Loading()

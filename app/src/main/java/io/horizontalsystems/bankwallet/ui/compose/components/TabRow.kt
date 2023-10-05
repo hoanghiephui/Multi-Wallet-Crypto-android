@@ -33,7 +33,7 @@ fun <T>Tabs(tabs: List<TabItem<T>>, onClick: (T) -> Unit) {
 
     Box(
         modifier = Modifier
-            .height(48.dp)
+            .height(50.dp)
             .background(Color.Transparent)
     ) {
 
@@ -74,7 +74,7 @@ fun <T>Tabs(tabs: List<TabItem<T>>, onClick: (T) -> Unit) {
                             MaterialTheme.typography.titleSmall
                         ) {
                             Text(
-                                modifier = Modifier.padding(bottom = 3.dp),
+                                modifier = Modifier.padding(bottom = 6.dp),
                                 text = tab.title,
                                 color = if (selectedIndex == index) MaterialTheme.colorScheme.primary else Color.Gray,
                                 maxLines = 1,

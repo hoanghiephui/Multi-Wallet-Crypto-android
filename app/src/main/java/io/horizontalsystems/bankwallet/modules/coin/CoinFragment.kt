@@ -2,6 +2,8 @@ package io.horizontalsystems.bankwallet.modules.coin
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -26,6 +28,7 @@ import coin.chain.crypto.core.designsystem.component.TopAppBar
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromBottom
+import io.horizontalsystems.bankwallet.modules.coin.coinmarkets.CoinMarketsScreen
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.CoinOverviewScreen
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.ListEmptyView
@@ -89,7 +92,9 @@ fun CoinScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalLayoutApi::class
+)
 @Composable
 fun CoinTabs(
     viewModel: CoinViewModel,
@@ -136,7 +141,7 @@ fun CoinTabs(
         },
 
     ) {
-        Column(modifier = Modifier.padding(it)) {
+        Column(modifier = Modifier.padding(it).consumeWindowInsets(it)) {
             val selectedTab = tabs[pagerState.currentPage]
             val tabItems = tabs.map {
                 TabItem(stringResource(id = it.titleResId), it == selectedTab, it)
@@ -168,7 +173,7 @@ fun CoinTabs(
                     }
 
                     CoinModule.Tab.Market -> {
-                        //CoinMarketsScreen(fullCoin = viewModel.fullCoin)
+                        CoinMarketsScreen(fullCoin = viewModel.fullCoin)
                     }
 
                     CoinModule.Tab.Details -> {

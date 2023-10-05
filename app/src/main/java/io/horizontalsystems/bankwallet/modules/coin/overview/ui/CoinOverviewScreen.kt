@@ -180,7 +180,7 @@ fun CoinOverviewScreen(
                                                     }
                                                 )
                                             }
-                                            HSpacer(width = 8.dp)
+                                            HSpacer(width = 12.dp)
                                             ButtonSecondaryCircle(
                                                 icon = R.drawable.ic_setting_20
                                             ) {
@@ -204,6 +204,7 @@ fun CoinOverviewScreen(
 
                                 viewModel.tokenVariants?.let { tokenVariants ->
                                     Spacer(modifier = Modifier.height(24.dp))
+                                    val messageCopy = stringResource(id = R.string.Hud_Text_Copied)
                                     TokenVariants(
                                         tokenVariants = tokenVariants,
                                         onClickAddToWallet = {
@@ -214,7 +215,9 @@ fun CoinOverviewScreen(
                                         },
                                         onClickCopy = {
                                             TextHelper.copyText(it)
-                                            HudHelper.showSuccessMessage(view, R.string.Hud_Text_Copied)
+                                            coroutineScope.launch {
+                                                onShowSnackbar.invoke(messageCopy, null)
+                                            }
                                         },
                                         onClickExplorer = {
                                             LinkHelper.openLinkInAppBrowser(context, it)
