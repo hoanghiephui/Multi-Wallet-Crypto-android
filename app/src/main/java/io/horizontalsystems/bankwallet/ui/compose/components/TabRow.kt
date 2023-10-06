@@ -33,18 +33,18 @@ fun <T>Tabs(tabs: List<TabItem<T>>, onClick: (T) -> Unit) {
 
     Box(
         modifier = Modifier
-            .height(50.dp)
-            .background(Color.Transparent)
+            .height(48.dp)
+            .background(Color.Unspecified)
     ) {
 
         TabRow(
             modifier = Modifier
                 .padding(horizontal = 16.dp)
-                .background(Color.Transparent)
+                .background(Color.Unspecified)
                 .height(48.dp),
             selectedTabIndex = selectedIndex,
-            contentColor = Color.Transparent,
-            containerColor = Color.Transparent,
+            contentColor = Color.Unspecified,
+            containerColor = Color.Unspecified,
             indicator = @Composable { tabPositions ->
                 TabRowDefaults.Indicator(
                     modifier = Modifier

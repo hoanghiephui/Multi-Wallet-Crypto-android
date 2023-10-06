@@ -86,11 +86,11 @@ fun CoinAnalyticsScreen(
                         }
 
                         is AnalyticsViewItem.Analytics -> {
-                            /*AnalyticsData(
+                            AnalyticsData(
                                 item.blocks,
                                 navController,
-                                fragmentManager
-                            ) { viewModel.onPeriodChange(it) }*/
+                                //fragmentManager
+                            ) { viewModel.onPeriodChange(it) }
                         }
 
                         null -> {
@@ -111,7 +111,7 @@ fun CoinAnalyticsScreen(
 private fun AnalyticsData(
     blocks: List<CoinAnalyticsModule.BlockViewItem>,
     navController: NavController,
-    fragmentManager: FragmentManager,
+    //fragmentManager: FragmentManager,
     onPeriodChange: (HsPointTimePeriod) -> Unit
 ) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -119,7 +119,7 @@ private fun AnalyticsData(
             AnalyticsBlock(
                 block,
                 navController,
-                fragmentManager,
+                //fragmentManager,
                 onPeriodChange
             )
         }
@@ -148,7 +148,7 @@ private fun AnalyticsDataPreview(
 private fun AnalyticsBlock(
     block: CoinAnalyticsModule.BlockViewItem,
     navController: NavController,
-    fragmentManager: FragmentManager,
+    //fragmentManager: FragmentManager,
     onPeriodChange: (HsPointTimePeriod) -> Unit
 ) {
     AnalyticsContainer(
@@ -192,12 +192,12 @@ private fun AnalyticsBlock(
                     val coinUid = block.analyticChart?.coinUid
                     val chartType = block.analyticChart?.chartType
                     if (coinUid != null && chartType != null) {
-                        ProChartFragment.show(
+                        /*ProChartFragment.show(
                             fragmentManager,
                             coinUid,
                             Translator.getString(chartType.titleRes),
                             chartType,
-                        )
+                        )*/
                     }
                 }
             )
