@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
@@ -158,7 +159,8 @@ private fun KeyStoreScreen(
 }
 
 @Composable
-private fun NoSystemLockWarning() {
+fun NoSystemLockWarning() {
+    val context = LocalContext.current
     Column() {
         Spacer(Modifier.height(12.dp))
         Image(
@@ -173,6 +175,17 @@ private fun NoSystemLockWarning() {
             textAlign = TextAlign.Center
         )
         Spacer(Modifier.height(12.dp))
+        BottomSheetsElementsButtons(
+            buttonPrimaryText = stringResource(R.string.Settings_Title),
+            onClickPrimary = {
+                try {
+                    context.startActivity(Intent(Settings.ACTION_SECURITY_SETTINGS))
+                } catch (ex: Exception) {
+                    context.startActivity(Intent(Settings.ACTION_SETTINGS))
+                }
+
+            }
+        )
     }
 }
 
