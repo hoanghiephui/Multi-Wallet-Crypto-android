@@ -24,6 +24,7 @@ import io.horizontalsystems.bankwallet.core.managers.RestoreSettingsManager
 import io.horizontalsystems.bankwallet.core.managers.SolanaRpcSourceManager
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.storage.BlockchainSettingsStorage
+import io.horizontalsystems.bankwallet.core.storage.EvmSyncSourceStorage
 import io.horizontalsystems.bankwallet.entities.Account
 import io.horizontalsystems.bankwallet.entities.AccountOrigin
 import io.horizontalsystems.bankwallet.entities.AccountType
@@ -39,6 +40,7 @@ import io.horizontalsystems.bankwallet.modules.chart.ChartIndicatorSetting
 import io.horizontalsystems.bankwallet.modules.chart.ChartIndicatorSettingsDao
 import io.horizontalsystems.bankwallet.modules.contacts.ContactsRepository
 import io.horizontalsystems.bankwallet.modules.contacts.model.Contact
+import io.horizontalsystems.bankwallet.modules.settings.appearance.AppIcon
 import io.horizontalsystems.bankwallet.modules.settings.appearance.AppIconService
 import io.horizontalsystems.bankwallet.modules.settings.appearance.LaunchScreenService
 import io.horizontalsystems.bankwallet.modules.swap.SwapMainModule
@@ -94,6 +96,7 @@ class BackupProvider(
     private val currencyManager: CurrencyManager,
     private val btcBlockchainManager: BtcBlockchainManager,
     private val evmSyncSourceManager: EvmSyncSourceManager,
+    private val evmSyncSourceStorage: EvmSyncSourceStorage,
     private val solanaRpcSourceManager: SolanaRpcSourceManager,
     private val contactsRepository: ContactsRepository
 ) {
@@ -252,10 +255,13 @@ class BackupProvider(
             blockchainSettingsStorage.save(syncSource.url, blockchainType)
         }
 
-        blockchainSettingsStorage.save(settings.solanaSyncSource.name, BlockchainType.Solana)
+        settings.solanaSyncSource?.let {
+            blockchainSettingsStorage.save(settings.solanaSyncSource.name, BlockchainType.Solana)
+        }
 
-//            Log.e("ee", "appIcon: title=${settings.appIcon}, enum=${AppIcon.fromTitle(settings.appIcon)}")
-//            AppIcon.fromTitle(settings.appIcon)?.let { appIconService.setAppIcon(it) }
+        if (settings.appIcon != (localStorage.appIcon ?: AppIcon.Main).titleText) {
+            AppIcon.fromTitle(settings.appIcon)?.let { appIconService.setAppIcon(it) }
+        }
     }
 
     private fun restoreChartSettings(
@@ -373,105 +379,37 @@ class BackupProvider(
         accounts: List<Account>,
         watchlist: List<String>,
         contacts: List<Contact>,
-        isLockTimeEnabled: Boolean,
-        language: String,
-        currency: String
+        customRpcsCount: Int?
     ): BackupItems {
-        val wallets = accounts.filter { !it.isWatchAccount }.sortedBy { it.name.lowercase() }
-
-        val otherBackupItems = buildList {
-            val watchWallets = accounts.filter { it.isWatchAccount }
-            if (watchWallets.isNotEmpty()) {
-                add(
-                    BackupItem(
-                        title = Translator.getString(R.string.BackupManager_WatchWallets),
-                        subtitle = Translator.getString(R.string.BackupManager_Addresses, watchWallets.size),
-                    )
-                )
-            }
-
-            if (watchlist.isNotEmpty()) {
-                add(
-                    BackupItem(
-                        title = Translator.getString(R.string.BackupManager_WatchlistTitle),
-                        subtitle = Translator.getString(R.string.BackupManager_WatchlistDescription),
-                    )
-                )
-            }
-
-            if (contacts.isNotEmpty()) {
-                add(
-                    BackupItem(
-                        title = Translator.getString(R.string.Contacts),
-                        subtitle = Translator.getString(R.string.BackupManager_Addresses, contacts.size)
-                    )
-                )
-            }
-
-            add(
-                BackupItem(
-                    title = Translator.getString(R.string.BlockchainSettings_Title),
-                    subtitle = Translator.getString(R.string.BackupManager_BlockchainSettingsDescription)
-                )
-            )
-
-            add(
-                BackupItem(
-                    title = Translator.getString(R.string.Info_LockTime_Title),
-                    subtitle = if (isLockTimeEnabled)
-                        Translator.getString(R.string.BackupManager_Enabled)
-                    else
-                        Translator.getString(R.string.BackupManager_Disabled)
-                )
-            )
-
-            add(
-                BackupItem(
-                    title = Translator.getString(R.string.CoinPage_Indicators),
-                    subtitle = "MA, MACD, RSI"
-                )
-            )
-
-            add(
-                BackupItem(
-                    title = Translator.getString(R.string.BackupManager_LanguageAndCurrency),
-                    subtitle = "$language, $currency"
-                )
-            )
-
-            add(
-                BackupItem(
-                    title = Translator.getString(R.string.Settings_Appearance),
-                    subtitle = Translator.getString(R.string.BackupManager_AppearanceSettingsDescription)
-                )
-            )
-        }
-
-        return BackupItems(wallets, otherBackupItems)
+        val nonWatchAccounts = accounts.filter { !it.isWatchAccount }.sortedBy { it.name.lowercase() }
+        val watchAccounts = accounts.filter { it.isWatchAccount }
+        return BackupItems(
+            accounts = nonWatchAccounts,
+            watchWallets = watchAccounts.ifEmpty { null }?.size,
+            watchlist = watchlist.ifEmpty { null }?.size,
+            contacts = contacts.ifEmpty { null }?.size,
+            customRpc = customRpcsCount,
+        )
     }
 
-    fun fullBackupItems() = fullBackupItems(
-        accounts = accountManager.accounts,
-        watchlist = marketFavoritesManager.getAll().map { it.coinUid },
-        contacts = contactsRepository.contacts,
-        isLockTimeEnabled = localStorage.isLockTimeEnabled,
-        language = languageManager.currentLanguageName,
-        currency = currencyManager.baseCurrency.code,
-    )
+    fun fullBackupItems() =
+        fullBackupItems(
+            accounts = accountManager.accounts,
+            watchlist = marketFavoritesManager.getAll().map { it.coinUid },
+            contacts = contactsRepository.contacts,
+            customRpcsCount = evmSyncSourceStorage.getAll().ifEmpty { null }?.size
+        )
 
-    fun fullBackupItems(decryptedFullBackup: DecryptedFullBackup): BackupItems = fullBackupItems(
-        accounts = decryptedFullBackup.wallets.map { it.account },
-        watchlist = decryptedFullBackup.watchlist,
-        contacts = decryptedFullBackup.contacts,
-        isLockTimeEnabled = decryptedFullBackup.settings.lockTimeEnabled,
-        language = languageManager.getName(decryptedFullBackup.settings.language),
-        currency = decryptedFullBackup.settings.baseCurrency,
-    )
+    fun fullBackupItems(decryptedFullBackup: DecryptedFullBackup) =
+        fullBackupItems(
+            accounts = decryptedFullBackup.wallets.map { it.account },
+            watchlist = decryptedFullBackup.watchlist,
+            contacts = decryptedFullBackup.contacts,
+            customRpcsCount = decryptedFullBackup.settings.evmSyncSources.custom.ifEmpty { null }?.size
+        )
 
-    fun shouldShowMergeWarning(decryptedFullBackup: DecryptedFullBackup?): Boolean {
-        return decryptedFullBackup != null &&
-                (decryptedFullBackup.wallets.isNotEmpty() && accountManager.accounts.isNotEmpty() ||
-                        decryptedFullBackup.contacts.isNotEmpty() && contactsRepository.contacts.isNotEmpty())
+    fun shouldShowReplaceWarning(decryptedFullBackup: DecryptedFullBackup?): Boolean {
+        return decryptedFullBackup != null && decryptedFullBackup.contacts.isNotEmpty() && contactsRepository.contacts.isNotEmpty()
     }
 
     @Throws
@@ -523,7 +461,7 @@ class BackupProvider(
 
         val settings = Settings(
             balanceViewType = balanceViewTypeManager.balanceViewTypeFlow.value,
-            appIcon = appIconService.optionsFlow.value.selected.titleText,
+            appIcon = localStorage.appIcon?.titleText ?: AppIcon.Main.titleText,
             currentTheme = themeService.optionsFlow.value.selected,
             chartIndicatorsEnabled = localStorage.chartIndicatorsEnabled,
             chartIndicators = chartIndicators,
@@ -635,7 +573,7 @@ class BackupProvider(
             val tokenQuery = TokenQuery.fromId(it.tokenQueryId) ?: return@mapNotNull null
             val settings = settingsManager.settings(account, tokenQuery.blockchainType).values
             BackupLocalModule.EnabledWalletBackup(
-                tokenQueryId = it.tokenQueryId,
+                tokenQueryId = it.tokenQueryId.lowercase(),
                 coinName = it.coinName,
                 coinCode = it.coinCode,
                 decimals = it.coinDecimals,
@@ -685,7 +623,10 @@ data class BackupItem(
 
 data class BackupItems(
     val accounts: List<Account>,
-    val others: List<BackupItem>
+    val watchWallets: Int?,
+    val watchlist: Int?,
+    val contacts: Int?,
+    val customRpc: Int?,
 )
 
 data class WalletBackup2(
@@ -793,7 +734,7 @@ data class Settings(
     @SerializedName("evm_sync_sources")
     val evmSyncSources: EvmSyncSources,
     @SerializedName("solana_sync_source")
-    val solanaSyncSource: SolanaSyncSource
+    val solanaSyncSource: SolanaSyncSource?
 )
 
 sealed class RestoreException(message: String) : Exception(message) {

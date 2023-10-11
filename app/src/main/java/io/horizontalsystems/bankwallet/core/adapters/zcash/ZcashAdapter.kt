@@ -11,11 +11,27 @@ import cash.z.ecc.android.sdk.ext.collectWith
 import cash.z.ecc.android.sdk.ext.convertZatoshiToZec
 import cash.z.ecc.android.sdk.ext.convertZecToZatoshi
 import cash.z.ecc.android.sdk.ext.fromHex
-import cash.z.ecc.android.sdk.model.*
+import cash.z.ecc.android.sdk.model.Account
+import cash.z.ecc.android.sdk.model.BlockHeight
+import cash.z.ecc.android.sdk.model.PercentDecimal
+import cash.z.ecc.android.sdk.model.WalletBalance
+import cash.z.ecc.android.sdk.model.Zatoshi
+import cash.z.ecc.android.sdk.model.ZcashNetwork
+import cash.z.ecc.android.sdk.model.defaultForNetwork
 import cash.z.ecc.android.sdk.tool.DerivationTool
 import cash.z.ecc.android.sdk.type.AddressType
 import co.electriccoin.lightwallet.client.model.LightWalletEndpoint
-import io.horizontalsystems.bankwallet.core.*
+import io.horizontalsystems.bankwallet.core.AdapterState
+import io.horizontalsystems.bankwallet.core.App
+import io.horizontalsystems.bankwallet.core.AppLogger
+import io.horizontalsystems.bankwallet.core.BalanceData
+import io.horizontalsystems.bankwallet.core.IAdapter
+import io.horizontalsystems.bankwallet.core.IBalanceAdapter
+import io.horizontalsystems.bankwallet.core.ILocalStorage
+import io.horizontalsystems.bankwallet.core.IReceiveAdapter
+import io.horizontalsystems.bankwallet.core.ISendZcashAdapter
+import io.horizontalsystems.bankwallet.core.ITransactionsAdapter
+import io.horizontalsystems.bankwallet.core.UnsupportedAccountException
 import io.horizontalsystems.bankwallet.core.managers.RestoreSettings
 import io.horizontalsystems.bankwallet.entities.AccountOrigin
 import io.horizontalsystems.bankwallet.entities.AccountType
@@ -32,7 +48,6 @@ import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import java.math.BigDecimal
 import kotlin.math.max
@@ -137,6 +152,14 @@ class ZcashAdapter(
 
     override val balanceData: BalanceData
         get() = BalanceData(balance, balanceLocked)
+
+    val statusInfo: Map<String, Any>
+        get() {
+            val statusInfo = LinkedHashMap<String, Any>()
+            statusInfo["Last Block Info"] = lastBlockInfo ?: ""
+            statusInfo["Sync State"] = syncState
+            return statusInfo
+        }
 
     private val balance: BigDecimal
         get() {
@@ -293,12 +316,12 @@ class ZcashAdapter(
                 blockHeight = transaction.minedHeight?.toInt(),
                 confirmationsThreshold = confirmationsThreshold,
                 timestamp = transaction.timestamp,
-                fee = null,
+                fee = transaction.feePaid?.let { it.convertZatoshiToZec(decimalCount) },
                 failed = transaction.failed,
                 lockInfo = null,
                 conflictingHash = null,
                 showRawTransaction = false,
-                amount = Zatoshi(transaction.value).convertZatoshiToZec(decimalCount),
+                amount = transaction.value.convertZatoshiToZec(decimalCount),
                 from = null,
                 memo = transaction.memo,
                 source = wallet.transactionSource
@@ -312,12 +335,12 @@ class ZcashAdapter(
                 blockHeight = transaction.minedHeight?.toInt(),
                 confirmationsThreshold = confirmationsThreshold,
                 timestamp = transaction.timestamp,
-                fee = null,
+                fee = transaction.feePaid?.let { it.convertZatoshiToZec(decimalCount) },
                 failed = transaction.failed,
                 lockInfo = null,
                 conflictingHash = null,
                 showRawTransaction = false,
-                amount = Zatoshi(transaction.value).convertZatoshiToZec(decimalCount).negate(),
+                amount = transaction.value.convertZatoshiToZec(decimalCount).negate(),
                 to = transaction.toAddress,
                 sentToSelf = false,
                 memo = transaction.memo,
