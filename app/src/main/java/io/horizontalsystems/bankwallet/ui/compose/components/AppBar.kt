@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
@@ -34,7 +35,7 @@ fun AppBarMenuButton(
     onClick: () -> Unit,
     description: String,
     enabled: Boolean = true,
-    tint: Color = Color.Unspecified,
+    tint: Color = MaterialTheme.colors.onSurface,
 ) {
     HsIconButton(
         onClick = onClick,
@@ -106,7 +107,7 @@ fun AppBar(
             menuItems.forEach { menuItem ->
                 val color = if (menuItem.enabled) {
                     if (menuItem.tint == Color.Unspecified)
-                        ComposeAppTheme.colors.jacob
+                        MaterialTheme.colors.onSurface
                     else
                         menuItem.tint
                 } else {

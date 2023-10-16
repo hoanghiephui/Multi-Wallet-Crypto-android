@@ -93,7 +93,7 @@ fun BackupRequiredScreen(navController: NavController, account: Account, text: S
                     .padding(horizontal = 24.dp),
                 title = stringResource(R.string.BackupRecoveryPhrase_ManualBackup),
                 icon = R.drawable.ic_edit_24,
-                iconTint = ComposeAppTheme.colors.dark,
+                iconTint = ComposeAppTheme.colors.light,
                 onClick = {
                     navController.slideFromBottom(
                         R.id.backupKeyFragment,
