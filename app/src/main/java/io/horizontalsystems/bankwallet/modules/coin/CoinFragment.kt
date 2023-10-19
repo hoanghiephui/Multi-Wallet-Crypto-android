@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -108,7 +109,7 @@ fun CoinTabs(
                             MenuItem(
                                 title = TranslatableString.ResString(R.string.CoinPage_Unfavorite),
                                 icon = R.drawable.ic_filled_star_24,
-                                tint = ComposeAppTheme.colors.jacob,
+                                tint = MaterialTheme.colors.onSurface,
                                 onClick = { viewModel.onUnfavoriteClick() }
                             )
                         )

@@ -95,7 +95,7 @@ fun BottomSheetsElementsHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(64.dp)
+            .height(68.dp)
             .padding(start = 12.dp, top = 12.dp, end = 12.dp, bottom = 9.dp)
     ) {
         Image(
@@ -114,7 +114,7 @@ fun BottomSheetsElementsHeader(
             modifier = Modifier
                 .size(24.dp)
                 .clickable(onClick = onClickClose),
-            painter = painterResource(R.drawable.icon_24_close_3),
+            painter = painterResource(R.drawable.ic_close),
             contentDescription = null,
             tint = ComposeAppTheme.colors.grey
         )

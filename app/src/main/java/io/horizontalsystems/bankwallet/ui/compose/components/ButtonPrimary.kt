@@ -145,7 +145,7 @@ fun ButtonPrimaryYellow(
         onClick = onClick,
         buttonColors = ButtonPrimaryDefaults.textButtonColors(
             backgroundColor = ComposeAppTheme.colors.yellowD,
-            contentColor = ComposeAppTheme.colors.dark,
+            contentColor = ComposeAppTheme.colors.light,
             disabledBackgroundColor = ComposeAppTheme.colors.steel20,
             disabledContentColor = ComposeAppTheme.colors.grey50,
         ),
@@ -174,7 +174,7 @@ fun ButtonPrimaryYellowWithIcon(
         onClick = onClick,
         buttonColors = ButtonPrimaryDefaults.textButtonColors(
             backgroundColor = ComposeAppTheme.colors.yellowD,
-            contentColor = ComposeAppTheme.colors.dark,
+            contentColor = ComposeAppTheme.colors.light,
             disabledBackgroundColor = ComposeAppTheme.colors.steel20,
             disabledContentColor = ComposeAppTheme.colors.grey50,
         ),
@@ -237,7 +237,7 @@ fun ButtonPrimaryYellowWithSpinner(
         onClick = onClick,
         buttonColors = ButtonPrimaryDefaults.textButtonColors(
             backgroundColor = ComposeAppTheme.colors.yellowD,
-            contentColor = ComposeAppTheme.colors.dark,
+            contentColor = ComposeAppTheme.colors.light,
             disabledBackgroundColor = ComposeAppTheme.colors.steel20,
             disabledContentColor = ComposeAppTheme.colors.grey50,
         ),

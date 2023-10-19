@@ -5,6 +5,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -33,6 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.navGraphViewModels
@@ -42,6 +44,10 @@ import io.horizontalsystems.bankwallet.core.managers.RateAppManager
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.modules.balance.ui.BalanceScreen
+import io.horizontalsystems.bankwallet.modules.keystore.KeyStoreActivity
+import io.horizontalsystems.bankwallet.modules.keystore.NoSystemLockWarning
+import io.horizontalsystems.bankwallet.modules.launcher.LaunchModule
+import io.horizontalsystems.bankwallet.modules.launcher.LaunchViewModel
 import io.horizontalsystems.bankwallet.modules.main.MainModule.MainNavigation
 import io.horizontalsystems.bankwallet.modules.manageaccount.dialogs.BackupRequiredDialog
 import io.horizontalsystems.bankwallet.modules.market.MarketScreen
@@ -62,6 +68,7 @@ import io.horizontalsystems.bankwallet.ui.compose.DisposableLifecycleCallbacks
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBottomNavigation
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBottomNavigationItem
 import io.horizontalsystems.bankwallet.ui.extensions.WalletSwitchBottomSheet
+import io.horizontalsystems.bankwallet.ui.extensions.rememberLifecycleEvent
 import io.horizontalsystems.core.findNavController
 import kotlinx.coroutines.launch
 
@@ -119,14 +126,14 @@ private fun MainScreen(
     clearActivityData: () -> Unit,
     viewModel: MainViewModel = viewModel(factory = MainModule.Factory(deepLink))
 ) {
-
+    val launchViewModel = viewModel<LaunchViewModel>(factory = LaunchModule.Factory())
     val uiState = viewModel.uiState
     val selectedPage = uiState.selectedPageIndex
     val pagerState = rememberPagerState(initialPage = selectedPage) { uiState.mainNavItems.size }
-
+    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val modalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
-
+    val lifecycleEvent = rememberLifecycleEvent()
     ModalBottomSheetLayout(
         sheetState = modalBottomSheetState,
         sheetBackgroundColor = ComposeAppTheme.colors.transparent,
@@ -207,7 +214,38 @@ private fun MainScreen(
                     ) { page ->
                         when (uiState.mainNavItems[page].mainNavItem) {
                             MainNavigation.Market -> MarketScreen(fragmentNavController)
-                            MainNavigation.Balance -> BalanceScreen(fragmentNavController)
+                            MainNavigation.Balance -> {
+                                if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
+                                    when(launchViewModel.getPage()) {
+                                        LaunchViewModel.Page.Unlock -> {
+                                        }
+
+                                        LaunchViewModel.Page.NoSystemLock -> {
+                                            Column(
+                                                modifier = Modifier
+                                                    .fillMaxSize(),
+                                                verticalArrangement = Arrangement.Center
+                                            ) {
+                                                NoSystemLockWarning()
+                                            }
+                                        }
+
+                                        LaunchViewModel.Page.KeyInvalidated -> {
+                                            KeyStoreActivity.startForInvalidKey(context)
+                                        }
+
+                                        LaunchViewModel.Page.UserAuthentication -> {
+                                            KeyStoreActivity.startForUserAuthentication(context)
+                                        }
+
+                                        LaunchViewModel.Page.Main -> {
+                                            BalanceScreen(fragmentNavController)
+                                        }
+                                        else -> Unit
+
+                                    }
+                                }
+                            }
                             MainNavigation.Transactions -> TransactionsScreen(
                                 fragmentNavController,
                                 transactionsViewModel
@@ -232,7 +270,6 @@ private fun MainScreen(
     }
 
     if (uiState.showRateAppDialog) {
-        val context = LocalContext.current
         RateApp(
             onRateClick = {
                 RateAppManager.openPlayMarket(context)
@@ -266,7 +303,7 @@ private fun MainScreen(
                     WCAccountTypeNotSupportedDialog.prepareParams(wcSupportState.accountTypeDescription)
                 )
             }
-            null -> {}
+            else -> Unit
         }
         viewModel.wcSupportStateHandled()
     }

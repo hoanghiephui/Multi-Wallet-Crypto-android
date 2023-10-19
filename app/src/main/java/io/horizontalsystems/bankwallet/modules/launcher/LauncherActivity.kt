@@ -18,7 +18,7 @@ class LauncherActivity : AppCompatActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        when (viewModel.getPage()) {
+        when (viewModel.getPageStart()) {
             LaunchViewModel.Page.Welcome -> {
                 IntroActivity.start(this)
                 finish()

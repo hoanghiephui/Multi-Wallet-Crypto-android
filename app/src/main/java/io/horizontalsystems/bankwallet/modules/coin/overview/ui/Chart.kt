@@ -285,7 +285,7 @@ fun Chart(
     Column {
         var selectedPoint by remember { mutableStateOf<ChartModule.ChartHeaderView?>(null) }
 
-        Crossfade(targetState = uiState.viewState) {
+        Crossfade(targetState = uiState.viewState, label = "") {
             when (it) {
                 is ViewState.Error -> {
                     val height = if (uiState.hasVolumes) 268.dp else 224.dp
