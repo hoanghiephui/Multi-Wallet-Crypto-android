@@ -6,14 +6,14 @@ buildscript {
         min_sdk_version = 27
         lifecycle_version = '2.6.2'
 
-        compose_version = '1.5.1'
+        compose_version = '1.5.4'
         kotlin_version = '1.9.10'
-        material_version = "1.9.0"
+        material_version = "1.10.0"
         appcompat_version = "1.6.1"
         constraint_version = "2.1.4"
         core_ktx_version = "1.12.0"
         fragment_ktx_version = "1.6.1"
-        navigation_ktx_version = "2.7.3"
+        navigation_ktx_version = "2.7.4"
         rxjava_version = "2.2.21"
         biometric_version = "1.1.0"
         junit_version = "4.13.2"
