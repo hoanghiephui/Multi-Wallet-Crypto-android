@@ -2,6 +2,7 @@ package io.horizontalsystems.bankwallet.modules.backuplocal
 
 import com.google.gson.annotations.SerializedName
 import io.horizontalsystems.bankwallet.core.App
+import io.horizontalsystems.bankwallet.core.managers.RestoreSettingType
 import io.horizontalsystems.bankwallet.entities.AccountType
 import io.horizontalsystems.bankwallet.entities.CexType
 import io.horizontalsystems.hdwalletkit.Base58
@@ -10,7 +11,7 @@ import io.horizontalsystems.tronkit.toBigInteger
 object BackupLocalModule {
     private const val MNEMONIC = "mnemonic"
     private const val PRIVATE_KEY = "private_key"
-    private const val ADDRESS = "address"
+    private const val ADDRESS = "evm_address"
     private const val SOLANA_ADDRESS = "solana_address"
     private const val TRON_ADDRESS = "tron_address"
     private const val HD_EXTENDED_LEY = "hd_extended_key"
@@ -22,8 +23,12 @@ object BackupLocalModule {
         val crypto: BackupCrypto,
         val id: String,
         val type: String,
+        @SerializedName("enabled_wallets")
+        val enabledWallets: List<EnabledWalletBackup>?,
         @SerializedName("manual_backup")
         val manualBackup: Boolean,
+        @SerializedName("file_backup")
+        val fileBackup: Boolean,
         val timestamp: Long,
         val version: Int
     )
@@ -35,6 +40,17 @@ object BackupLocalModule {
         val kdf: String,
         val kdfparams: KdfParams,
         val mac: String
+    )
+
+    data class EnabledWalletBackup(
+        @SerializedName("token_query_id")
+        val tokenQueryId: String,
+        @SerializedName("coin_name")
+        val coinName: String? = null,
+        @SerializedName("coin_code")
+        val coinCode: String? = null,
+        val decimals: Int? = null,
+        val settings: Map<RestoreSettingType, String>?
     )
 
     data class CipherParams(

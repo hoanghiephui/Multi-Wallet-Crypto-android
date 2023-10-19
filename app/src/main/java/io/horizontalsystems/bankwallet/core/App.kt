@@ -63,6 +63,7 @@ import io.horizontalsystems.bankwallet.core.managers.TorManager
 import io.horizontalsystems.bankwallet.core.managers.TransactionAdapterManager
 import io.horizontalsystems.bankwallet.core.managers.TronAccountManager
 import io.horizontalsystems.bankwallet.core.managers.TronKitManager
+import io.horizontalsystems.bankwallet.core.managers.UserManager
 import io.horizontalsystems.bankwallet.core.managers.WalletActivator
 import io.horizontalsystems.bankwallet.core.managers.WalletManager
 import io.horizontalsystems.bankwallet.core.managers.WalletStorage
@@ -80,6 +81,7 @@ import io.horizontalsystems.bankwallet.core.storage.EnabledWalletsStorage
 import io.horizontalsystems.bankwallet.core.storage.EvmSyncSourceStorage
 import io.horizontalsystems.bankwallet.core.storage.NftStorage
 import io.horizontalsystems.bankwallet.core.storage.RestoreSettingsStorage
+import io.horizontalsystems.bankwallet.modules.backuplocal.fullbackup.BackupProvider
 import io.horizontalsystems.bankwallet.modules.balance.BalanceViewTypeManager
 import io.horizontalsystems.bankwallet.modules.chart.ChartIndicatorManager
 import io.horizontalsystems.bankwallet.modules.contacts.ContactsRepository
@@ -91,8 +93,12 @@ import io.horizontalsystems.bankwallet.modules.market.topnftcollections.TopNftCo
 import io.horizontalsystems.bankwallet.modules.market.topnftcollections.TopNftCollectionsViewItemFactory
 import io.horizontalsystems.bankwallet.modules.market.topplatforms.TopPlatformsRepository
 import io.horizontalsystems.bankwallet.modules.pin.PinComponent
+import io.horizontalsystems.bankwallet.modules.pin.core.PinDbStorage
 import io.horizontalsystems.bankwallet.modules.profeatures.ProFeaturesAuthorizationManager
 import io.horizontalsystems.bankwallet.modules.profeatures.storage.ProFeaturesStorage
+import io.horizontalsystems.bankwallet.modules.settings.appearance.AppIconService
+import io.horizontalsystems.bankwallet.modules.settings.appearance.LaunchScreenService
+import io.horizontalsystems.bankwallet.modules.theme.ThemeService
 import io.horizontalsystems.bankwallet.modules.theme.ThemeType
 import io.horizontalsystems.bankwallet.modules.walletconnect.storage.WC2SessionStorage
 import io.horizontalsystems.bankwallet.modules.walletconnect.version2.WC2Manager
@@ -140,6 +146,7 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         lateinit var tokenAutoEnableManager: TokenAutoEnableManager
         lateinit var walletStorage: IWalletStorage
         lateinit var accountManager: IAccountManager
+        lateinit var userManager: UserManager
         lateinit var accountFactory: IAccountFactory
         lateinit var backupManager: IBackupManager
         lateinit var proFeatureAuthorizationManager: ProFeaturesAuthorizationManager
@@ -183,6 +190,7 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         lateinit var cexProviderManager: CexProviderManager
         lateinit var cexAssetManager: CexAssetManager
         lateinit var chartIndicatorManager: ChartIndicatorManager
+        lateinit var backupProvider: BackupProvider
     }
 
     override fun onCreate() {
@@ -204,7 +212,8 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
 
         LocalStorageManager(preferences).apply {
             localStorage = this
-            pinStorage = this
+            pinSettingsStorage = this
+            lockoutStorage = this
             thirdKeyboardStorage = this
             marketStorage = this
         }
@@ -246,6 +255,7 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
 
         accountCleaner = AccountCleaner()
         accountManager = AccountManager(accountsStorage, accountCleaner)
+        userManager = UserManager(accountManager)
 
         val proFeaturesStorage = ProFeaturesStorage(appDatabase)
         proFeatureAuthorizationManager = ProFeaturesAuthorizationManager(proFeaturesStorage, accountManager, appConfigProvider)
@@ -262,11 +272,9 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
 
         tronKitManager = TronKitManager(appConfigProvider, backgroundManager)
 
-        blockchainSettingsStorage = BlockchainSettingsStorage(appDatabase)
-
         wordsManager = WordsManager(Mnemonic())
         networkManager = NetworkManager()
-        accountFactory = AccountFactory(accountManager)
+        accountFactory = AccountFactory(accountManager, userManager)
         backupManager = BackupManager(accountManager)
 
 
@@ -324,7 +332,20 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
             appDatabase.syncerStateDao()
         )
 
-        val adapterFactory = AdapterFactory(instance, btcBlockchainManager, evmBlockchainManager, evmSyncSourceManager, binanceKitManager, solanaKitManager, tronKitManager, backgroundManager, restoreSettingsManager, coinManager, evmLabelManager)
+        val adapterFactory = AdapterFactory(
+            context = instance,
+            btcBlockchainManager = btcBlockchainManager,
+            evmBlockchainManager = evmBlockchainManager,
+            evmSyncSourceManager = evmSyncSourceManager,
+            binanceKitManager = binanceKitManager,
+            solanaKitManager = solanaKitManager,
+            tronKitManager = tronKitManager,
+            backgroundManager = backgroundManager,
+            restoreSettingsManager = restoreSettingsManager,
+            coinManager = coinManager,
+            evmLabelManager = evmLabelManager,
+            localStorage = localStorage
+        )
         adapterManager = AdapterManager(walletManager, adapterFactory, btcBlockchainManager, evmBlockchainManager, binanceKitManager, solanaKitManager, tronKitManager)
         transactionAdapterManager = TransactionAdapterManager(adapterManager, adapterFactory)
 
@@ -333,13 +354,14 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         addressParserFactory = AddressParserFactory()
 
         pinComponent = PinComponent(
-                pinStorage = pinStorage,
-                encryptionManager = encryptionManager,
-                excludedActivityNames = listOf(
-                        KeyStoreActivity::class.java.name,
-                        LockScreenActivity::class.java.name,
-                        LauncherActivity::class.java.name,
-                )
+            pinSettingsStorage = pinSettingsStorage,
+            excludedActivityNames = listOf(
+                KeyStoreActivity::class.java.name,
+                LockScreenActivity::class.java.name,
+                LauncherActivity::class.java.name,
+            ),
+            userManager = userManager,
+            pinDbStorage = PinDbStorage(appDatabase.pinDao())
         )
 
         backgroundStateChangeListener = BackgroundStateChangeListener(systemInfoManager, keyStoreManager, pinComponent).apply {
@@ -387,6 +409,34 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         cexProviderManager = CexProviderManager(accountManager)
         cexAssetManager = CexAssetManager(marketKit, appDatabase.cexAssetsDao())
         chartIndicatorManager = ChartIndicatorManager(appDatabase.chartIndicatorSettingsDao(), localStorage)
+
+        backupProvider = BackupProvider(
+            localStorage = localStorage,
+            languageManager = languageManager,
+            walletStorage = enabledWalletsStorage,
+            settingsManager = restoreSettingsManager,
+            accountManager = accountManager,
+            accountFactory = accountFactory,
+            walletManager = walletManager,
+            restoreSettingsManager = restoreSettingsManager,
+            blockchainSettingsStorage = blockchainSettingsStorage,
+            evmBlockchainManager = evmBlockchainManager,
+            marketFavoritesManager = marketFavoritesManager,
+            balanceViewTypeManager = balanceViewTypeManager,
+            appIconService = AppIconService(localStorage),
+            themeService = ThemeService(localStorage),
+            chartIndicatorManager = chartIndicatorManager,
+            chartIndicatorSettingsDao = appDatabase.chartIndicatorSettingsDao(),
+            balanceHiddenManager = balanceHiddenManager,
+            baseTokenManager = baseTokenManager,
+            launchScreenService = LaunchScreenService(localStorage),
+            currencyManager = currencyManager,
+            btcBlockchainManager = btcBlockchainManager,
+            evmSyncSourceManager = evmSyncSourceManager,
+            evmSyncSourceStorage = evmSyncSourceStorage,
+            solanaRpcSourceManager = solanaRpcSourceManager,
+            contactsRepository = contactsRepository
+        )
 
         startTasks()
     }
@@ -474,9 +524,7 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         Thread {
             rateAppManager.onAppLaunch()
             nftMetadataSyncer.start()
-            accountManager.loadAccounts()
-            walletManager.loadWallets()
-            adapterManager.preloadAdapters()
+            pinComponent.initDefaultPinLevel()
             accountManager.clearAccounts()
 
             AppVersionManager(systemInfoManager, localStorage).apply { storeAppVersion() }

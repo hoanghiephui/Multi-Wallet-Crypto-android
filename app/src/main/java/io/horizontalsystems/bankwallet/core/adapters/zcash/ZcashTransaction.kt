@@ -1,53 +1,43 @@
 package io.horizontalsystems.bankwallet.core.adapters.zcash
 
-import cash.z.ecc.android.sdk.model.PendingTransaction
+import cash.z.ecc.android.sdk.model.FirstClassByteArray
 import cash.z.ecc.android.sdk.model.TransactionOverview
-import cash.z.ecc.android.sdk.model.TransactionRecipient
-import cash.z.ecc.android.sdk.model.isFailure
+import cash.z.ecc.android.sdk.model.TransactionState
+import cash.z.ecc.android.sdk.model.Zatoshi
+import java.util.Date
 
 class ZcashTransaction : Comparable<ZcashTransaction> {
-    val id: Long
+    val rawId: FirstClassByteArray
     val transactionHash: ByteArray
     val transactionIndex: Int
     val toAddress: String?
     val expiryHeight: Int?
     val minedHeight: Long?
     val timestamp: Long
-    val value: Long
+    val value: Zatoshi
+    val feePaid: Zatoshi?
     val memo: String?
     val failed: Boolean
     val isIncoming: Boolean
 
     constructor(confirmedTransaction: TransactionOverview, recipient: String?, memo: String?) {
         confirmedTransaction.let {
-            id = it.id
+            rawId = it.rawId
             transactionHash = it.rawId.byteArray
-            transactionIndex = it.index.toInt()
+            transactionIndex = it.index?.toInt() ?: -1
             toAddress = recipient
             expiryHeight = it.expiryHeight?.value?.toInt()
             minedHeight = it.minedHeight?.value
-            timestamp = it.blockTimeEpochSeconds
-            value = it.netValue.value
+            timestamp = it.blockTimeEpochSeconds ?: when (it.transactionState) {
+                TransactionState.Pending -> Date().time / 1000
+                else -> 0
+            }
+            value = it.netValue
+            feePaid = it.feePaid
             this.memo = memo
             failed = false
             isIncoming = !it.isSentTransaction
         }
-    }
-
-    constructor(pendingTransaction: PendingTransaction, receiveAddress: String) {
-        pendingTransaction.let {
-            id = it.id
-            transactionHash = it.rawTransactionId?.byteArray ?: byteArrayOf()
-            transactionIndex = -1
-            toAddress = (it.recipient as? TransactionRecipient.Address)?.addressValue
-            expiryHeight = it.expiryHeight?.value?.toInt()
-            minedHeight = it.minedHeight?.value
-            timestamp = it.createTime / 1000
-            value = it.value.value
-            memo = it.memo?.byteArray?.toUtf8Memo()
-            failed = it.isFailure()
-        }
-        isIncoming = toAddress.isNullOrBlank() || toAddress == receiveAddress
     }
 
     override fun equals(other: Any?): Boolean {

@@ -51,7 +51,7 @@ fun AppBarMenuButton(
 
 @Composable
 fun AppBar(
-    title: TranslatableString? = null,
+    title: String? = null,
     navigationIcon: @Composable (() -> Unit)? = null,
     menuItems: List<MenuItem> = listOf(),
     showSpinner: Boolean = false,
@@ -60,7 +60,7 @@ fun AppBar(
     val titleComposable: @Composable () -> Unit = {
         title?.let {
             title3_leah(
-                text = title.getString(),
+                text = title,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )

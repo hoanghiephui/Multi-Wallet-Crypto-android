@@ -99,6 +99,12 @@
         android:id="@+id/blockchainSettingsFragment"
         android:name="io.horizontalsystems.bankwallet.modules.blockchainsettings.BlockchainSettingsFragment"/>
     <fragment
+        android:id="@+id/autoLockIntervalsFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.settings.security.autolock.AutoLockIntervalsFragment" />
+    <fragment
+        android:id="@+id/backupManagerFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.backuplocal.fullbackup.BackupManagerFragment"/>
+    <fragment
         android:id="@+id/faqListFragment"
         android:name="io.horizontalsystems.bankwallet.modules.settings.faq.FaqListFragment"
         android:label="@string/Settings_Faq"/>
@@ -186,8 +192,26 @@
         android:id="@+id/coinReportsFragment"
         android:name="io.horizontalsystems.bankwallet.modules.coin.reports.CoinReportsFragment" />
     <fragment
-        android:id="@+id/pinFragment"
-        android:name="io.horizontalsystems.bankwallet.modules.pin.PinFragment" />
+        android:id="@+id/setPinFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.pin.SetPinFragment" />
+    <fragment
+        android:id="@+id/editPinFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.pin.EditPinFragment" />
+    <fragment
+        android:id="@+id/setDuressPinIntroFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.pin.SetDuressPinIntroFragment" />
+    <fragment
+        android:id="@+id/setDuressPinSelectAccounts"
+        android:name="io.horizontalsystems.bankwallet.modules.pin.SetDuressPinSelectAccountsFragment" />
+    <fragment
+        android:id="@+id/setDuressPinFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.pin.SetDuressPinFragment" />
+    <fragment
+        android:id="@+id/editDuressPinFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.pin.EditDuressPinFragment" />
+    <fragment
+        android:id="@+id/confirmPinFragment"
+        android:name="io.horizontalsystems.bankwallet.modules.pin.ConfirmPinFragment" />
     <fragment
         android:id="@+id/releaseNotesFragment"
         android:name="io.horizontalsystems.bankwallet.modules.releasenotes.ReleaseNotesFragment" />

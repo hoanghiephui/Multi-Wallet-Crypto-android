@@ -22,9 +22,10 @@ class BaseTokenManager(
         coinManager.getToken(it)
     }
 
-    private var token = localStorage.balanceTotalCoinUid?.let { balanceTotalCoinUid ->
+    var token = localStorage.balanceTotalCoinUid?.let { balanceTotalCoinUid ->
         tokens.find { it.coin.uid == balanceTotalCoinUid }
     } ?: tokens.firstOrNull()
+        private set
 
     private val _baseTokenFlow = MutableStateFlow(token)
     val baseTokenFlow = _baseTokenFlow.asStateFlow()
@@ -42,4 +43,11 @@ class BaseTokenManager(
             token
         }
     }
+
+    fun setBaseTokenQueryId(tokenQueryId: String) {
+        val token = TokenQuery.fromId(tokenQueryId)?.let { coinManager.getToken(it) } ?: tokens.first()
+
+        setBaseToken(token)
+    }
+
 }

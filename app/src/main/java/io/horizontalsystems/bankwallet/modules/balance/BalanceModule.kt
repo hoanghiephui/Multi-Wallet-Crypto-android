@@ -34,7 +34,8 @@ object BalanceModule {
                 App.balanceViewTypeManager,
                 TotalBalance(totalService, App.balanceHiddenManager),
                 App.localStorage,
-                App.wc2Service
+                App.wc2Service,
+                App.wc2Manager,
             ) as T
         }
     }
@@ -67,6 +68,7 @@ object BalanceModule {
         val wallet: Wallet,
         val balanceData: BalanceData,
         val state: AdapterState,
+        val sendAllowed: Boolean,
         val coinPrice: CoinPrice? = null
     ) {
         val fiatValue get() = coinPrice?.value?.let { balanceData.available.times(it) }

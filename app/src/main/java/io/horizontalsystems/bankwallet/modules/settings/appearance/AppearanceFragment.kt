@@ -22,7 +22,6 @@ import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.modules.theme.ThemeType
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.Select
-import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.*
 import io.horizontalsystems.bankwallet.ui.extensions.BottomSheetHeader
 import io.horizontalsystems.core.findNavController
@@ -66,7 +65,7 @@ fun AppearanceScreen(navController: NavController) {
             ) {
                 Column {
                     AppBar(
-                        TranslatableString.ResString(R.string.Settings_Appearance),
+                        title = stringResource(R.string.Settings_Appearance),
                         navigationIcon = {
                             HsBackButton(onClick = { navController.popBackStack() })
                         },
@@ -180,39 +179,6 @@ fun AppearanceScreen(navController: NavController) {
                                 viewModel.onEnterBalanceViewType(option)
                             }
                         }
-
-                        Spacer(modifier = Modifier.height(32.dp))
-
-                        CellUniversalLawrenceSection(
-                            listOf {
-                                RowUniversal(
-                                    modifier = Modifier.padding(horizontal = 16.dp),
-                                ) {
-                                    Image(
-                                        modifier = Modifier.size(24.dp),
-                                        painter = painterResource(id = R.drawable.ic_off_24),
-                                        contentDescription = null,
-                                        colorFilter = ColorFilter.tint(ComposeAppTheme.colors.grey)
-                                    )
-
-                                    body_leah(
-                                        text = stringResource(id = R.string.Appearance_BalanceAutoHide),
-                                        modifier = Modifier
-                                            .weight(1f)
-                                            .padding(horizontal = 16.dp)
-                                    )
-
-                                    HsSwitch(
-                                        checked = uiState.balanceAutoHideEnabled,
-                                        onCheckedChange = {
-                                            viewModel.onSetBalanceAutoHidden(it)
-                                        }
-                                    )
-
-                                }
-
-                            }
-                        )
                         Spacer(modifier = Modifier.height(24.dp))
 
                         HeaderText(text = stringResource(id = R.string.Appearance_AppIcon))

@@ -26,6 +26,7 @@ data class Account(
     val name: String,
     val type: AccountType,
     val origin: AccountOrigin,
+    val level: Int,
     val isBackedUp: Boolean = false,
     val isFileBackedUp: Boolean = false,
 ) : Parcelable {
@@ -35,13 +36,7 @@ data class Account(
 
     @IgnoredOnParcel
     val isWatchAccount: Boolean
-        get() = when (this.type) {
-            is AccountType.EvmAddress -> true
-            is AccountType.SolanaAddress -> true
-            is AccountType.TronAddress -> true
-            is AccountType.HdExtendedKey -> this.type.hdExtendedKey.isPublic
-            else -> false
-        }
+        get() = type.isWatchAccountType
 
     @IgnoredOnParcel
     val nonStandard: Boolean by lazy {
@@ -282,6 +277,15 @@ sealed class AccountType : Parcelable {
     val supportsWalletConnect: Boolean
         get() = when (this) {
             is Mnemonic, is EvmPrivateKey -> true
+            else -> false
+        }
+
+    val isWatchAccountType: Boolean
+        get() = when (this) {
+            is EvmAddress -> true
+            is SolanaAddress -> true
+            is TronAddress -> true
+            is HdExtendedKey -> hdExtendedKey.isPublic
             else -> false
         }
 

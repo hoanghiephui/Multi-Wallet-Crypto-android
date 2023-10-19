@@ -5,31 +5,30 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.gson.GsonBuilder
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.IAccountManager
 import io.horizontalsystems.bankwallet.core.PasswordError
-import io.horizontalsystems.bankwallet.core.managers.EncryptDecryptManager
 import io.horizontalsystems.bankwallet.core.managers.PassphraseValidator
 import io.horizontalsystems.bankwallet.core.providers.Translator
-import io.horizontalsystems.bankwallet.entities.Account
 import io.horizontalsystems.bankwallet.entities.DataState
-import io.horizontalsystems.bankwallet.modules.backuplocal.BackupLocalModule
-import io.horizontalsystems.bankwallet.modules.backuplocal.BackupLocalModule.WalletBackup
-import io.horizontalsystems.core.toHexString
+import io.horizontalsystems.bankwallet.modules.backuplocal.fullbackup.BackupProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.security.MessageDigest
+
+sealed class BackupType {
+    class SingleWalletBackup(val accountId: String) : BackupType()
+    class FullBackup(val accountIds: List<String>) : BackupType()
+}
 
 class BackupLocalPasswordViewModel(
+    private val type: BackupType,
     private val passphraseValidator: PassphraseValidator,
     private val accountManager: IAccountManager,
-    accountId: String?,
+    private val backupProvider: BackupProvider,
 ) : ViewModel() {
 
-    private var account: Account? = null
     private var passphrase = ""
     private var passphraseConfirmation = ""
 
@@ -37,8 +36,8 @@ class BackupLocalPasswordViewModel(
     private var passphraseConfirmState: DataState.Error? = null
     private var showButtonSpinner = false
     private var closeScreen = false
-    private var showAccountIsNullError = false
-    private val encryptDecryptManager = EncryptDecryptManager()
+    private var error: String? = null
+
     private var backupJson: String? = null
 
     var backupFileName: String = "UW_Backup.json"
@@ -51,21 +50,30 @@ class BackupLocalPasswordViewModel(
             showButtonSpinner = showButtonSpinner,
             backupJson = backupJson,
             closeScreen = closeScreen,
-            showAccountIsNullError = showAccountIsNullError
+            error = error
         )
     )
         private set
 
     init {
-        val account = accountId?.let { accountManager.account(it) }
-        if (account == null) {
-            showAccountIsNullError = true
-            syncState()
-        } else {
-            this.account = account
-            val walletName = account.name.replace(" ", "_")
-            backupFileName = "UW_Backup_$walletName.json"
+        when (type) {
+            is BackupType.SingleWalletBackup -> {
+                val account = accountManager.account(type.accountId)
+                if (account == null) {
+                    error = "Account is NULL"
+
+                } else {
+                    val walletName = account.name.replace(" ", "_")
+                    backupFileName = "UW_Backup_$walletName.json"
+                }
+            }
+
+            is BackupType.FullBackup -> {
+                backupFileName = "UW_App_Backup.json"
+            }
         }
+
+        syncState()
     }
 
     fun onChangePassphrase(v: String) {
@@ -102,9 +110,17 @@ class BackupLocalPasswordViewModel(
         showButtonSpinner = false
         syncState()
         viewModelScope.launch {
-            account?.let {
-                if (!it.isFileBackedUp) {
-                    accountManager.update(it.copy(isFileBackedUp = true))
+            when (type) {
+                is BackupType.SingleWalletBackup -> {
+                    accountManager.account(type.accountId)?.let { account ->
+                        if (!account.isFileBackedUp) {
+                            accountManager.update(account.copy(isFileBackedUp = true))
+                        }
+                    }
+                }
+
+                is BackupType.FullBackup -> {
+                    // FullBackup doesn't change account's backup state
                 }
             }
             delay(1700) //Wait for showing Snackbar (SHORT duration ~ 1500ms)
@@ -119,7 +135,7 @@ class BackupLocalPasswordViewModel(
     }
 
     fun accountErrorIsShown() {
-        showAccountIsNullError = false
+        error = null
         syncState()
     }
 
@@ -130,49 +146,32 @@ class BackupLocalPasswordViewModel(
     }
 
     private fun saveAccount() {
-        val accountNonNull = account ?: return
         viewModelScope.launch(Dispatchers.IO) {
-            val kdfParams = BackupLocalModule.kdfDefault
-            val secretText = BackupLocalModule.getDataForEncryption(accountNonNull.type)
-            val id = getId(secretText)
-            val key = EncryptDecryptManager.getKey(passphrase, kdfParams) ?: return@launch
+            try {
+                backupJson = when (type) {
+                    is BackupType.FullBackup -> {
+                        backupProvider.createFullBackup(
+                            accountIds = type.accountIds,
+                            passphrase = passphrase
+                        )
+                    }
 
-            val iv = EncryptDecryptManager.generateRandomBytes(16).toHexString()
-            val encrypted = encryptDecryptManager.encrypt(secretText, key, iv)
-            val mac = EncryptDecryptManager.generateMac(key, encrypted.toByteArray())
+                    is BackupType.SingleWalletBackup -> {
+                        val account = accountManager.account(type.accountId) ?: throw Exception("Account is NULL")
+                        backupProvider.createWalletBackup(
+                            account = account.copy(isFileBackedUp = true),
+                            passphrase = passphrase
+                        )
+                    }
+                }
+            } catch (t: Throwable) {
+                error = t.message ?: t.javaClass.simpleName
+            }
 
-            val crypto = BackupLocalModule.BackupCrypto(
-                cipher = "aes-128-ctr",
-                cipherparams = BackupLocalModule.CipherParams(iv),
-                ciphertext = encrypted,
-                kdf = "scrypt",
-                kdfparams = kdfParams,
-                mac = mac.toHexString()
-            )
-
-            val backup = WalletBackup(
-                crypto = crypto,
-                id = id,
-                type = BackupLocalModule.getAccountTypeString(accountNonNull.type),
-                manualBackup = accountNonNull.isBackedUp,
-                timestamp = System.currentTimeMillis() / 1000,
-                version = 1
-            )
-
-            val gson = GsonBuilder()
-                .disableHtmlEscaping()
-                .create()
-            backupJson = gson.toJson(backup)
             withContext(Dispatchers.Main) {
                 syncState()
             }
         }
-    }
-
-    private fun getId(value: ByteArray): String {
-        val md = MessageDigest.getInstance("SHA-512")
-        val digest = md.digest(value)
-        return digest.toHexString()
     }
 
     private fun syncState() {
@@ -182,7 +181,7 @@ class BackupLocalPasswordViewModel(
             showButtonSpinner = showButtonSpinner,
             backupJson = backupJson,
             closeScreen = closeScreen,
-            showAccountIsNullError = showAccountIsNullError
+            error = error
         )
     }
 

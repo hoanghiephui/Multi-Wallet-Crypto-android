@@ -129,7 +129,7 @@ fun ContactScreen(
                     .background(color = ComposeAppTheme.colors.tyler)
             ) {
                 AppBar(
-                    title = uiState.headerTitle,
+                    title = uiState.headerTitle.getString(),
                     navigationIcon = {
                         HsBackButton {
                             confirmNavigateToBack()
@@ -150,7 +150,7 @@ fun ContactScreen(
                         modifier = Modifier
                             .focusRequester(focusRequester)
                             .padding(horizontal = 16.dp),
-                        initial = uiState.contactName,
+                        initial = viewModel.contact.name,
                         pasteEnabled = false,
                         state = uiState.error?.let { DataState.Error(it) },
                         hint = stringResource(R.string.Contacts_NameHint),

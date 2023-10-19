@@ -17,8 +17,8 @@ android {
         compileSdk compile_sdk_version
         minSdkVersion min_sdk_version
         targetSdkVersion compile_sdk_version
-        versionCode 90
-        versionName "0.35.1"
+        versionCode 91
+        versionName "0.36.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         kapt {
@@ -92,6 +92,7 @@ android {
             resValue "string", "walletConnectV2Key", "8b4f41c60880a3e3ad57d82fddb30568"
             resValue "string", "solscanApiKey", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkQXQiOjE2Nzk0NjQyMTQ4NDAsImVtYWlsIjoiaHJ6c3lzdGVtczEwMUBnbWFpbC5jb20iLCJhY3Rpb24iOiJ0b2tlbi1hcGkiLCJpYXQiOjE2Nzk0NjQyMTR9.BRM7J9RbDpHgd2oMAus00XfWOxTJgV2Tn2_chXZOdtk"
             resValue "string", "trongridApiKey", "33374494-8060-447e-8367-90c5efd4ed95"
+            resValue "string", "udnApiKey", "r2phzgatt_zt9-hd_wyvdjrdsrimnxgokm7knyag1malzgcz"
         }
 
         appcenterdebug {
@@ -131,6 +132,7 @@ android {
             resValue "string", "walletConnectV2Key", "0c5ca155c2f165a7d0c88686f2113a72"
             resValue "string", "solscanApiKey", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkQXQiOjE2Nzk0NjQxMTQ0ODUsImVtYWlsIjoiaHNkYW84ODg4QGdtYWlsLmNvbSIsImFjdGlvbiI6InRva2VuLWFwaSIsImlhdCI6MTY3OTQ2NDExNH0.91DUjjjYu86f1ZMMJ5cyJxIKTTw_srhI-vNgYaTCPUU"
             resValue "string", "trongridApiKey", "8f5ae2c8-8012-42a8-b0ca-ffc2741f6a29"
+            resValue "string", "udnApiKey", "r2phzgatt_zt9-hd_wyvdjrdsrimnxgokm7knyag1malzgcz"
         }
 
         appcenterrelease {
@@ -266,15 +268,15 @@ dependencies {
     debugImplementation leakCanary
 
     // Wallet kits
-    implementation 'com.github.horizontalsystems:bitcoin-kit-android:5b9ebaa'
-    implementation 'com.github.horizontalsystems:ethereum-kit-android:e714fea'
+    implementation 'com.github.horizontalsystems:bitcoin-kit-android:8e990e3'
+    implementation 'com.github.horizontalsystems:ethereum-kit-android:ddf4404'
     implementation 'com.github.horizontalsystems:blockchain-fee-rate-kit-android:1d3bd49'
     implementation 'com.github.horizontalsystems:binance-chain-kit-android:7e4d7c0'
-    implementation 'com.github.horizontalsystems:market-kit-android:0b065d2'
-    implementation 'com.github.horizontalsystems:solana-kit-android:f9d9f4a'
+    implementation 'com.github.horizontalsystems:market-kit-android:0059cac'
+    implementation 'com.github.horizontalsystems:solana-kit-android:5cc6e81'
     implementation 'com.github.horizontalsystems:tron-kit-android:67f8d53'
     // Zcash SDK
-    implementation "cash.z.ecc.android:zcash-android-sdk:1.14.0-beta01"
+    implementation "cash.z.ecc.android:zcash-android-sdk:2.0.1"
     implementation("io.github.binance:binance-connector-java:3.0.0rc2") {
         exclude group: "org.bouncycastle", module: "bcprov-jdk18on"
     }
@@ -285,7 +287,7 @@ dependencies {
     implementation 'com.walletconnect:android-core'
 
     // Unstoppable Domains
-    implementation 'com.github.unstoppabledomains:resolution-java:v6.2.2'
+    implementation 'com.github.unstoppabledomains:resolution-java:v7.1.0'
 
     // Ethereum Name Service
     implementation "org.web3j:core:4.9.0"
@@ -314,7 +316,7 @@ dependencies {
 
     implementation "androidx.compose.runtime:runtime-livedata:$compose_version"
 
-    def coil_version = "2.2.2"
+    def coil_version = "2.4.0"
     implementation "io.coil-kt:coil-compose:$coil_version"
     implementation "io.coil-kt:coil-svg:$coil_version"
     implementation("io.coil-kt:coil-gif:$coil_version")

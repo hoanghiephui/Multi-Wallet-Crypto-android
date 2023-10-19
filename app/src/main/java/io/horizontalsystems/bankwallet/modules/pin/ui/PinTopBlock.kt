@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,34 +25,36 @@ import io.horizontalsystems.bankwallet.modules.pin.PinModule
 import io.horizontalsystems.bankwallet.modules.pin.unlock.PinUnlockModule.InputState
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.animations.shake
-import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryTransparent
-import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
-import io.horizontalsystems.bankwallet.ui.compose.components.headline1_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
-import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_leah
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_jacob
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_lucian
 
 @Composable
 fun PinTopBlock(
     modifier: Modifier = Modifier,
-    title: @Composable ColumnScope.() -> Unit,
+    title: String,
+    error: String? = null,
     enteredCount: Int,
-    showCancelButton: Boolean = false,
     showShakeAnimation: Boolean = false,
     inputState: InputState = InputState.Enabled(),
-    onShakeAnimationFinish: (() -> Unit)? = null,
-    onCancelClick: (() -> Unit)? = null
+    onShakeAnimationFinish: (() -> Unit)? = null
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 24.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        when (inputState) {
-            is InputState.Enabled -> {
-                title()
-                Spacer(Modifier.height(16.dp))
+    when (inputState) {
+        is InputState.Enabled -> {
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.Bottom
+                ) {
+                    subhead2_grey(text = title)
+                    Spacer(Modifier.height(16.dp))
+                }
+
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     modifier = Modifier.shake(
@@ -61,23 +62,36 @@ fun PinTopBlock(
                         onAnimationFinish = { onShakeAnimationFinish?.invoke() }
                     )
                 ) {
-                    for (i in 1..PinModule.PIN_COUNT) {
-                        IndicatorCircle(i <= enteredCount)
+                    repeat(PinModule.PIN_COUNT) {
+                        IndicatorCircle(it < enteredCount)
                     }
                 }
-                VSpacer(16.dp)
-                subhead2_leah(
-                    text = inputState.attemptsLeft?.let { stringResource(R.string.Unlock_AttemptsLeft, it) } ?: ""
-                )
-                if (showCancelButton) {
-                    VSpacer(16.dp)
-                    ButtonSecondaryTransparent(
-                        title = stringResource(R.string.Button_Cancel),
-                        onClick = { onCancelClick?.invoke() }
-                    )
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                ) {
+                    Spacer(Modifier.height(16.dp))
+                    when {
+                        error != null -> {
+                            subhead2_lucian(text = error)
+                        }
+                        inputState.attemptsLeft != null -> {
+                            subhead2_jacob(
+                                text = stringResource(R.string.Unlock_AttemptsLeft, inputState.attemptsLeft)
+                            )
+                        }
+                    }
                 }
             }
-            is InputState.Locked -> {
+        }
+        is InputState.Locked -> {
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Image(
                     painter = painterResource(R.drawable.icon_lock_48),
                     contentDescription = null
@@ -91,7 +105,6 @@ fun PinTopBlock(
                 )
             }
         }
-
     }
 }
 
@@ -115,9 +128,8 @@ fun Preview_PinTopBlockEnabled() {
                 .background(color = ComposeAppTheme.colors.tyler)
         ) {
             PinTopBlock(
-                title = { headline1_leah(text = "text") },
+                title = "text",
                 enteredCount = 3,
-                showCancelButton = true,
                 showShakeAnimation = false,
             )
         }
@@ -133,9 +145,8 @@ fun Preview_PinTopBlockLocked() {
                 .background(color = ComposeAppTheme.colors.tyler)
         ) {
             PinTopBlock(
-                title = { headline1_leah(text = "text") },
+                title = "text",
                 enteredCount = 3,
-                showCancelButton = true,
                 showShakeAnimation = false,
                 inputState = InputState.Locked("12:33")
             )

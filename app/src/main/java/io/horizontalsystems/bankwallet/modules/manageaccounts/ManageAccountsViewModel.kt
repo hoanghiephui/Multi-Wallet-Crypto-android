@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.horizontalsystems.bankwallet.core.IAccountManager
+import io.horizontalsystems.bankwallet.core.managers.ActiveAccountState
 import io.horizontalsystems.bankwallet.entities.Account
 import io.horizontalsystems.bankwallet.modules.manageaccounts.ManageAccountsModule.AccountViewItem
 import kotlinx.coroutines.launch
@@ -18,7 +19,6 @@ class ManageAccountsViewModel(
 
     var viewItems by mutableStateOf<Pair<List<AccountViewItem>, List<AccountViewItem>>?>(null)
     var finish by mutableStateOf(false)
-    val isCloseButtonVisible = mode == ManageAccountsModule.Mode.Switcher
 
     init {
         viewModelScope.launch {
@@ -29,9 +29,11 @@ class ManageAccountsViewModel(
         }
 
         viewModelScope.launch {
-            accountManager.activeAccountObservable.asFlow()
-                .collect { activeAccount ->
-                    updateViewItems(activeAccount.orElse(null), accountManager.accounts)
+            accountManager.activeAccountStateFlow
+                .collect { activeAccountState ->
+                    if (activeAccountState is ActiveAccountState.ActiveAccount) {
+                        updateViewItems(activeAccountState.account, accountManager.accounts)
+                    }
                 }
         }
 

@@ -18,8 +18,10 @@ import io.horizontalsystems.bankwallet.modules.market.MarketField
 import io.horizontalsystems.bankwallet.modules.market.MarketModule
 import io.horizontalsystems.bankwallet.modules.market.SortingField
 import io.horizontalsystems.bankwallet.modules.settings.appearance.AppIcon
+import io.horizontalsystems.bankwallet.modules.settings.security.autolock.AutoLockInterval
 import io.horizontalsystems.bankwallet.modules.theme.ThemeType
-import io.horizontalsystems.core.IPinStorage
+import io.horizontalsystems.core.ILockoutStorage
+import io.horizontalsystems.core.IPinSettingsStorage
 import io.horizontalsystems.core.IThirdKeyboard
 import io.horizontalsystems.marketkit.models.BlockchainType
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +31,7 @@ import java.util.UUID
 
 class LocalStorageManager(
     private val preferences: SharedPreferences
-) : ILocalStorage, IPinStorage, IThirdKeyboard, IMarketStorage {
+) : ILocalStorage, IPinSettingsStorage, ILockoutStorage, IThirdKeyboard, IMarketStorage {
 
     private val THIRD_KEYBOARD_WARNING_MSG = "third_keyboard_warning_msg"
     private val SEND_INPUT_TYPE = "send_input_type"
@@ -76,6 +78,7 @@ class LocalStorageManager(
     private val NON_RECOMMENDED_ACCOUNT_ALERT_DISMISSED_ACCOUNTS = "non_recommended_account_alert_dismissed_accounts"
     private val PERSONAL_SUPPORT_ENABLED = "personal_support_enabled"
     private val APP_ID = "app_id"
+    private val APP_AUTO_LOCK_INTERVAL = "app_auto_lock_interval"
 
     private val gson by lazy { Gson() }
 
@@ -99,6 +102,12 @@ class LocalStorageManager(
                 null -> editor.remove(SEND_INPUT_TYPE).apply()
                 else -> editor.putString(SEND_INPUT_TYPE, value.name).apply()
             }
+        }
+
+    override var zcashAccountIds: Set<String>
+        get() = preferences.getStringSet("zcashAccountIds", setOf()) ?: setOf()
+        set(value) {
+            preferences.edit().putStringSet("zcashAccountIds", value).apply()
         }
 
     override var baseCurrencyCode: String?
@@ -276,10 +285,6 @@ class LocalStorageManager(
         set(value) {
             preferences.edit().putString(PIN, value).apply()
         }
-
-    override fun clearPin() {
-        preferences.edit().remove(PIN).apply()
-    }
 
     //used only in db migration
     override var syncMode: SyncMode?
@@ -465,6 +470,14 @@ class LocalStorageManager(
     override fun setSwapProviderId(blockchainType: BlockchainType, providerId: String) {
         preferences.edit().putString(getSwapProviderKey(blockchainType), providerId).apply()
     }
+
+    override var autoLockInterval: AutoLockInterval
+        get() = preferences.getString(APP_AUTO_LOCK_INTERVAL, null)?.let {
+            AutoLockInterval.fromRaw(it)
+        } ?: AutoLockInterval.AFTER_1_MIN
+        set(value) {
+            preferences.edit().putString(APP_AUTO_LOCK_INTERVAL, value.raw).apply()
+        }
 
     private fun getSwapProviderKey(blockchainType: BlockchainType): String {
         return SWAP_PROVIDER + blockchainType.uid

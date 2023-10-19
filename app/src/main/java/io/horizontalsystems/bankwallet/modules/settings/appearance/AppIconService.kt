@@ -1,5 +1,8 @@
 package io.horizontalsystems.bankwallet.modules.settings.appearance
 
+import android.content.ComponentName
+import android.content.pm.PackageManager
+import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.ILocalStorage
 import io.horizontalsystems.bankwallet.ui.compose.Select
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +22,17 @@ class AppIconService(private val localStorage: ILocalStorage) {
 
         _optionsFlow.update {
             Select(appIcon, appIcons)
+        }
+
+        val enabled = PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+        val disabled = PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+
+        AppIcon.values().forEach { item ->
+            App.instance.packageManager.setComponentEnabledSetting(
+                ComponentName(App.instance, item.launcherName),
+                if (appIcon == item) enabled else disabled,
+                PackageManager.DONT_KILL_APP
+            )
         }
     }
 }

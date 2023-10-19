@@ -22,19 +22,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
-import com.google.gson.Gson
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.navigateWithTermsAccepted
 import io.horizontalsystems.bankwallet.core.slideFromBottom
-import io.horizontalsystems.bankwallet.modules.backuplocal.BackupLocalModule
+import io.horizontalsystems.bankwallet.modules.backuplocal.fullbackup.BackupFileValidator
 import io.horizontalsystems.bankwallet.modules.backuplocal.password.BackupLocalPasswordViewModel.*
 import io.horizontalsystems.bankwallet.modules.contacts.screen.ConfirmationBottomSheet
 import io.horizontalsystems.bankwallet.modules.manageaccounts.ManageAccountsModule
 import io.horizontalsystems.bankwallet.modules.restorelocal.RestoreLocalFragment
 import io.horizontalsystems.bankwallet.modules.swap.settings.Caution
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
-import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.*
 import io.horizontalsystems.core.findNavController
 import kotlinx.coroutines.delay
@@ -75,11 +73,8 @@ private fun ImportWalletScreen(
                     inputStream.bufferedReader().use { br ->
                         val jsonString = br.readText()
                         //validate json format
-                        val json = Gson().fromJson(jsonString, BackupLocalModule.WalletBackup::class.java)
-                        //Gson will set field as null if the json file doesn't have the matching field
-                        if (json.version == null || json.crypto == null){
-                            throw Exception("Invalid json format")
-                        }
+                        BackupFileValidator().validate(jsonString)
+
                         navController.navigateWithTermsAccepted {
                             val fileName = context.getFileName(uriNonNull)
                             navController.slideFromBottom(
@@ -120,6 +115,7 @@ private fun ImportWalletScreen(
                     cancelText = stringResource(R.string.Button_Cancel),
                     onConfirm = {
                         restoreLauncher.launch(arrayOf("application/json"))
+                        coroutineScope.launch { bottomSheetState.hide() }
                     },
                     onClose = {
                         coroutineScope.launch { bottomSheetState.hide() }
@@ -131,14 +127,8 @@ private fun ImportWalletScreen(
                 backgroundColor = ComposeAppTheme.colors.tyler,
                 topBar = {
                     AppBar(
-                        title = TranslatableString.ResString(R.string.ManageAccounts_ImportWallet),
-                        menuItems = listOf(
-                            MenuItem(
-                                title = TranslatableString.ResString(R.string.Button_Close),
-                                icon = R.drawable.ic_close,
-                                onClick = { navController.popBackStack() }
-                            )
-                        )
+                        title = stringResource(R.string.ManageAccounts_ImportWallet),
+                        navigationIcon = { HsBackButton(onClick = { navController.popBackStack() }) }
                     )
                 }
             ) {
@@ -222,7 +212,7 @@ private fun ImportOption(
     }
 }
 
-fun Context.getFileName(uri: Uri): String? = when(uri.scheme) {
+fun Context.getFileName(uri: Uri): String? = when (uri.scheme) {
     ContentResolver.SCHEME_CONTENT -> getContentFileName(uri)
     else -> uri.path?.let(::File)?.name
 }
