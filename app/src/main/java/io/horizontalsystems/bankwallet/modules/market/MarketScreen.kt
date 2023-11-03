@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -17,6 +18,8 @@ import io.horizontalsystems.bankwallet.modules.market.favorites.MarketFavoritesS
 import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewScreen
 import io.horizontalsystems.bankwallet.modules.market.posts.MarketPostsScreen
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
+import io.horizontalsystems.bankwallet.ui.compose.NiaTab
+import io.horizontalsystems.bankwallet.ui.compose.NiaTabRow
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
@@ -49,12 +52,15 @@ fun MarketScreen(navController: NavController) {
         LaunchedEffect(key1 = selectedTab, block = {
             pagerState.scrollToPage(selectedTab.ordinal)
         })
-        val tabItems = tabs.map {
-            TabItem(stringResource(id = it.titleResId), it == selectedTab, it)
+        NiaTabRow(selectedTabIndex = selectedTab.ordinal) {
+            tabs.forEach { title ->
+                NiaTab(
+                    selected = title == selectedTab,
+                    onClick = { marketViewModel.onSelect(title)},
+                    text = { Text(text = stringResource(id = title.titleResId)) },
+                )
+            }
         }
-        Tabs(tabItems, onClick = {
-            marketViewModel.onSelect(it)
-        })
 
         HorizontalPager(
             state = pagerState,

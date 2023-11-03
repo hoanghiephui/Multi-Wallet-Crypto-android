@@ -37,7 +37,7 @@ fun MarketPostsScreen(viewModel: MarketPostsViewModel = viewModel(factory = Mark
             viewModel.refresh()
         }
     ) {
-        Crossfade(viewState) { viewState ->
+        Crossfade(viewState, label = "MarketPostsScreen") { viewState ->
             when (viewState) {
                 ViewState.Loading -> {
                     Loading()

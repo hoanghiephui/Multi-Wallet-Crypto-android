@@ -48,7 +48,7 @@ fun MarketOverviewScreen(
             viewModel.refresh()
         }
     ) {
-        Crossfade(viewState) { viewState ->
+        Crossfade(viewState, label = "MarketOverviewScreen") { viewState ->
             when (viewState) {
                 ViewState.Loading -> {
                     Loading()

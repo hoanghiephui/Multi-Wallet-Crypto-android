@@ -37,6 +37,7 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.navGraphViewModels
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
@@ -65,6 +66,8 @@ import io.horizontalsystems.bankwallet.modules.walletconnect.WCAccountTypeNotSup
 import io.horizontalsystems.bankwallet.modules.walletconnect.version2.WC2Manager.SupportState
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.DisposableLifecycleCallbacks
+import io.horizontalsystems.bankwallet.ui.compose.NiaNavigationBar
+import io.horizontalsystems.bankwallet.ui.compose.NiaNavigationBarItem
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBottomNavigation
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBottomNavigationItem
 import io.horizontalsystems.bankwallet.ui.extensions.WalletSwitchBottomSheet
@@ -164,7 +167,13 @@ private fun MainScreen(
                         if (uiState.torEnabled) {
                             TorStatusView()
                         }
-                        HsBottomNavigation(
+                        NiaBottomBar(
+                            destinations = uiState.mainNavItems,
+                            onNavigateToDestination = {
+                                viewModel.onSelect(it.mainNavItem)
+                            }
+                        )
+                        /*HsBottomNavigation(
                             backgroundColor = ComposeAppTheme.colors.tyler,
                             elevation = 10.dp
                         ) {
@@ -192,7 +201,7 @@ private fun MainScreen(
                                     }
                                 )
                             }
-                        }
+                        }*/
                     }
                 }
             ) {
@@ -362,6 +371,40 @@ private fun BadgedIcon(
             Box {
                 icon()
             }
+        }
+    }
+}
+
+@Composable
+private fun NiaBottomBar(
+    destinations: List<MainModule.NavigationViewItem>,
+    onNavigateToDestination: (MainModule.NavigationViewItem) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    NiaNavigationBar(
+        modifier = modifier,
+    ) {
+        destinations.forEach { destination ->
+            val selected = destination.selected
+            NiaNavigationBarItem(
+                selected = selected,
+                onClick = { onNavigateToDestination(destination) },
+                icon = {
+                    androidx.compose.material3.Icon(
+                        painter = painterResource(destination.mainNavItem.iconRes),
+                        contentDescription = stringResource(destination.mainNavItem.titleRes)
+                    )
+                },
+                selectedIcon = {
+                    androidx.compose.material3.Icon(
+                        painter = painterResource(destination.mainNavItem.iconRes),
+                        contentDescription = stringResource(destination.mainNavItem.titleRes)
+                    )
+                },
+                label = { androidx.compose.material3.Text(stringResource(destination.mainNavItem.titleRes)) },
+                modifier = Modifier,
+                enabled = destination.enabled
+            )
         }
     }
 }
