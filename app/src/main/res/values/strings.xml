@@ -246,7 +246,7 @@
     <string name="EmptyResults">No results found</string>
     <string name="Market_Filters">Filters</string>
     <string name="Market_AdvancedSearch_Results">Results</string>
-    <string name="Market_Search_Hint">Search</string>
+    <string name="Market_Search_Hint">Search Blockchain</string>
     <string name="Market_Search_BrowseCategories">Browse categories</string>
     <string name="Market_Filter_ChooseSet">Choose Set</string>
     <string name="Market_Filter_MarketCap">Market Cap</string>

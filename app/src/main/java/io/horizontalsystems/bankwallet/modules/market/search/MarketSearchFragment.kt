@@ -99,7 +99,7 @@ fun MarketSearchScreen(
                 leftIcon = R.drawable.ic_back,
                 onBackButtonClick = { navController.popBackStack() }
             )
-            Crossfade(viewState) { viewState ->
+            Crossfade(viewState, label = "SearchView") { viewState ->
                 when (viewState) {
                     ViewState.Loading -> {
                         Loading()

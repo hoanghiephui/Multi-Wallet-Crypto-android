@@ -18,7 +18,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Badge
 import androidx.compose.material.BadgedBox
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
@@ -26,10 +25,17 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -37,7 +43,6 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import androidx.navigation.navGraphViewModels
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
@@ -68,8 +73,6 @@ import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.DisposableLifecycleCallbacks
 import io.horizontalsystems.bankwallet.ui.compose.NiaNavigationBar
 import io.horizontalsystems.bankwallet.ui.compose.NiaNavigationBarItem
-import io.horizontalsystems.bankwallet.ui.compose.components.HsBottomNavigation
-import io.horizontalsystems.bankwallet.ui.compose.components.HsBottomNavigationItem
 import io.horizontalsystems.bankwallet.ui.extensions.WalletSwitchBottomSheet
 import io.horizontalsystems.bankwallet.ui.extensions.rememberLifecycleEvent
 import io.horizontalsystems.core.findNavController
@@ -137,6 +140,22 @@ private fun MainScreen(
     val coroutineScope = rememberCoroutineScope()
     val modalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val lifecycleEvent = rememberLifecycleEvent()
+
+    val bottomBarHeight = 80.dp
+    val bottomBarHeightPx = with(LocalDensity.current) { bottomBarHeight.roundToPx().toFloat() }
+    val bottomBarOffsetHeightPx = remember { mutableFloatStateOf(0f) }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+
+                val delta = available.y
+                val newOffset = bottomBarOffsetHeightPx.floatValue + delta
+                bottomBarOffsetHeightPx.floatValue = newOffset.coerceIn(-bottomBarHeightPx, 0f)
+
+                return Offset.Zero
+            }
+        }
+    }
     ModalBottomSheetLayout(
         sheetState = modalBottomSheetState,
         sheetBackgroundColor = ComposeAppTheme.colors.transparent,
@@ -161,6 +180,7 @@ private fun MainScreen(
     ) {
         Box(Modifier.fillMaxSize()) {
             Scaffold(
+                Modifier.nestedScroll(nestedScrollConnection),
                 backgroundColor = ComposeAppTheme.colors.tyler,
                 bottomBar = {
                     Column {
@@ -225,7 +245,7 @@ private fun MainScreen(
                             MainNavigation.Market -> MarketScreen(fragmentNavController)
                             MainNavigation.Balance -> {
                                 if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
-                                    when(launchViewModel.getPage()) {
+                                    when (launchViewModel.getPage()) {
                                         LaunchViewModel.Page.Unlock -> {
                                         }
 
@@ -250,15 +270,18 @@ private fun MainScreen(
                                         LaunchViewModel.Page.Main -> {
                                             BalanceScreen(fragmentNavController)
                                         }
+
                                         else -> Unit
 
                                     }
                                 }
                             }
+
                             MainNavigation.Transactions -> TransactionsScreen(
                                 fragmentNavController,
                                 transactionsViewModel
                             )
+
                             MainNavigation.Settings -> SettingsScreen(fragmentNavController)
                         }
                     }
@@ -293,10 +316,12 @@ private fun MainScreen(
             SupportState.Supported -> {
                 fragmentNavController.slideFromRight(R.id.wallet_connect_graph)
             }
+
             SupportState.NotSupportedDueToNoActiveAccount -> {
                 clearActivityData.invoke()
                 fragmentNavController.slideFromBottom(R.id.wcErrorNoAccountFragment)
             }
+
             is SupportState.NotSupportedDueToNonBackedUpAccount -> {
                 clearActivityData.invoke()
                 val text = stringResource(R.string.WalletConnect_Error_NeedBackup)
@@ -305,6 +330,7 @@ private fun MainScreen(
                     BackupRequiredDialog.prepareParams(wcSupportState.account, text)
                 )
             }
+
             is SupportState.NotSupported -> {
                 clearActivityData.invoke()
                 fragmentNavController.slideFromBottom(
@@ -312,6 +338,7 @@ private fun MainScreen(
                     WCAccountTypeNotSupportedDialog.prepareParams(wcSupportState.accountTypeDescription)
                 )
             }
+
             else -> Unit
         }
         viewModel.wcSupportStateHandled()
@@ -329,7 +356,10 @@ private fun HideContentBox(contentHidden: Boolean) {
     } else {
         Modifier
     }
-    Box(Modifier.fillMaxSize().then(backgroundModifier))
+    Box(
+        Modifier
+            .fillMaxSize()
+            .then(backgroundModifier))
 }
 
 @Composable
@@ -353,6 +383,7 @@ private fun BadgedIcon(
                 },
                 content = icon
             )
+
         MainModule.BadgeType.BadgeDot ->
             BadgedBox(
                 badge = {
@@ -367,6 +398,7 @@ private fun BadgedIcon(
                 },
                 content = icon
             )
+
         else -> {
             Box {
                 icon()
