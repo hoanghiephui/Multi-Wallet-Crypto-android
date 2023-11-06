@@ -29,6 +29,7 @@ import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -315,6 +316,7 @@ private fun OptionCell(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ZcashAppBar(
     onCloseClick: () -> Unit,

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -56,6 +57,7 @@ class WatchAddressFragment : BaseComposeFragment() {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WatchAddressScreen(navController: NavController, popUpToInclusiveId: Int, inclusive: Boolean) {
     val view = LocalView.current
@@ -96,7 +98,7 @@ fun WatchAddressScreen(navController: NavController, popUpToInclusiveId: Int, in
     }
 
     ComposeAppTheme {
-        Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+        Column {
             AppBar(
                 title = stringResource(R.string.ManageAccounts_WatchAddress),
                 navigationIcon = {

@@ -9,6 +9,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -62,7 +64,7 @@ class TvlFragment : BaseComposeFragment() {
         }
     }
 
-    @OptIn(ExperimentalFoundationApi::class)
+    @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
     @Composable
     private fun TvlScreen(
         tvlViewModel: TvlViewModel,
@@ -76,7 +78,7 @@ class TvlFragment : BaseComposeFragment() {
         val isRefreshing by tvlViewModel.isRefreshingLiveData.observeAsState(false)
         val chainSelectorDialogState by tvlViewModel.chainSelectorDialogStateLiveData.observeAsState(SelectorDialogState.Closed)
 
-        Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+        Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
             AppBar(
                 menuItems = listOf(
                     MenuItem(

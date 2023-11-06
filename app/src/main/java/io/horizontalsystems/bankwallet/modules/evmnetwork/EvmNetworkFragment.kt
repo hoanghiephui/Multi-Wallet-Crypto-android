@@ -20,6 +20,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.Surface
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -107,6 +109,7 @@ private fun EvmNetworkNavHost(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EvmNetworkScreen(
     arguments: Bundle,
@@ -118,7 +121,7 @@ private fun EvmNetworkScreen(
     var revealedCardId by remember { mutableStateOf<String?>(null) }
     val view = LocalView.current
 
-    Surface(color = ComposeAppTheme.colors.tyler) {
+    Surface(color = MaterialTheme.colorScheme.background) {
         Column {
             AppBar(
                 title = viewModel.title,

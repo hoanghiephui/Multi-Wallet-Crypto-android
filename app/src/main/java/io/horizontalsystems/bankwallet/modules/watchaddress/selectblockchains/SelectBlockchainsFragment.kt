@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -72,6 +73,7 @@ class SelectBlockchainsFragment : BaseComposeFragment() {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SelectBlockchainsScreen(
     accountType: AccountType,
@@ -102,9 +104,7 @@ private fun SelectBlockchainsScreen(
         }
     }
 
-    Column(
-        modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)
-    ) {
+    Column {
         AppBar(
             title = stringResource(title),
             navigationIcon = {

@@ -13,6 +13,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -86,6 +88,7 @@ private fun AboutNavHost(fragmentNavController: NavController) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AboutScreen(
     navController: NavController,
@@ -93,7 +96,7 @@ private fun AboutScreen(
     onBackPress: () -> Unit,
     aboutViewModel: AboutViewModel = viewModel(factory = AboutModule.Factory()),
 ) {
-    Surface(color = ComposeAppTheme.colors.tyler) {
+    Surface(color = MaterialTheme.colorScheme.background) {
         Column {
             AppBar(
                 title = stringResource(R.string.SettingsAboutApp_Title),

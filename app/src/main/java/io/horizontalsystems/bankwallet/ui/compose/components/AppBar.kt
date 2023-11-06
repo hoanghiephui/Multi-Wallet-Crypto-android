@@ -5,11 +5,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,7 +38,7 @@ fun AppBarMenuButton(
     onClick: () -> Unit,
     description: String,
     enabled: Boolean = true,
-    tint: Color = MaterialTheme.colors.onSurface,
+    tint: Color = MaterialTheme.colorScheme.onSurface,
 ) {
     HsIconButton(
         onClick = onClick,
@@ -50,13 +53,14 @@ fun AppBarMenuButton(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppBar(
     title: String? = null,
     navigationIcon: @Composable (() -> Unit)? = null,
     menuItems: List<MenuItem> = listOf(),
     showSpinner: Boolean = false,
-    backgroundColor: Color = ComposeAppTheme.colors.tyler
+    backgroundColor: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors()
 ) {
     val titleComposable: @Composable () -> Unit = {
         title?.let {
@@ -77,22 +81,20 @@ fun AppBar(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppBar(
     title: @Composable () -> Unit,
     navigationIcon: @Composable (() -> Unit)? = null,
     menuItems: List<MenuItem> = listOf(),
     showSpinner: Boolean = false,
-    backgroundColor: Color = ComposeAppTheme.colors.tyler
+    backgroundColor: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors()
 ) {
     TopAppBar(
-        modifier = Modifier.height(64.dp),
         title = title,
-        backgroundColor = backgroundColor,
-        navigationIcon = navigationIcon?.let {
-            {
-                navigationIcon()
-            }
+        colors = backgroundColor,
+        navigationIcon = {
+            navigationIcon?.invoke()
         },
         actions = {
             if (showSpinner) {
@@ -107,7 +109,7 @@ fun AppBar(
             menuItems.forEach { menuItem ->
                 val color = if (menuItem.enabled) {
                     if (menuItem.tint == Color.Unspecified)
-                        MaterialTheme.colors.onSurface
+                        MaterialTheme.colorScheme.onSurface
                     else
                         menuItem.tint
                 } else {
@@ -137,6 +139,5 @@ fun AppBar(
                 }
             }
         },
-        elevation = 0.dp
     )
 }

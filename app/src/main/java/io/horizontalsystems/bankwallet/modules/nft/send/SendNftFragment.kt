@@ -3,9 +3,12 @@ package io.horizontalsystems.bankwallet.modules.nft.send
 import android.os.Bundle
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Scaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
@@ -118,11 +121,13 @@ private fun getFactory(requireArguments: Bundle): SendNftModule.Factory? {
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShowErrorMessage(navController: NavController) {
     ComposeAppTheme {
         Scaffold(
-            backgroundColor = ComposeAppTheme.colors.tyler,
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.background,
             topBar = {
                 AppBar(
                     title = stringResource(R.string.SendNft_Title),

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -52,6 +53,7 @@ class FaqListFragment : BaseComposeFragment() {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FaqScreen(
     onCloseClick: () -> Unit,
@@ -59,7 +61,7 @@ private fun FaqScreen(
     viewModel: FaqViewModel = viewModel(factory = FaqModule.Factory())
 ) {
     val viewState = viewModel.viewState
-    Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+    Column {
         AppBar(
             title = stringResource(R.string.Settings_Faq),
             navigationIcon = {

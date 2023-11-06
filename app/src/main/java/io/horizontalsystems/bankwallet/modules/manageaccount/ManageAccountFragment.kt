@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Icon
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -68,6 +69,7 @@ class ManageAccountFragment : BaseComposeFragment() {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageAccountScreen(navController: NavController, accountId: String) {
     val viewModel =
@@ -79,7 +81,7 @@ fun ManageAccountScreen(navController: NavController, accountId: String) {
     }
 
     ComposeAppTheme {
-        Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+        Column {
             AppBar(
                 title = viewModel.viewState.title,
                 navigationIcon = {

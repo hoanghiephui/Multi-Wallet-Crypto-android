@@ -15,6 +15,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Icon
 import androidx.compose.material.Surface
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -53,12 +55,13 @@ class FilterCoinFragment : BaseComposeFragment() {
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterCoinScreen(navController: NavController, viewModel: TransactionsViewModel) {
     val filterCoins by viewModel.filterCoinsLiveData.observeAsState()
 
     ComposeAppTheme {
-        Surface(color = ComposeAppTheme.colors.tyler) {
+        Surface(color = MaterialTheme.colorScheme.background) {
             Column {
                 AppBar(
                     title = stringResource(R.string.Transactions_Filter_ChooseCoin),

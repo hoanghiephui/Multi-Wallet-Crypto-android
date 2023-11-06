@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -57,7 +59,7 @@ class MetricsPageFragment : BaseComposeFragment() {
         findNavController().slideFromRight(R.id.coinFragment, arguments)
     }
 
-    @OptIn(ExperimentalFoundationApi::class)
+    @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
     @Composable
     fun MetricsPage(
         viewModel: MetricsPageViewModel,
@@ -69,7 +71,7 @@ class MetricsPageFragment : BaseComposeFragment() {
         val marketData by viewModel.marketLiveData.observeAsState()
         val isRefreshing by viewModel.isRefreshingLiveData.observeAsState(false)
 
-        Column(Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+        Column(Modifier.background(color = MaterialTheme.colorScheme.background)) {
             AppBar(
                 menuItems = listOf(
                     MenuItem(

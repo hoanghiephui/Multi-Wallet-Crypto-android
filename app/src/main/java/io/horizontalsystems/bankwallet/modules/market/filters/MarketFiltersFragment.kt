@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,7 +51,7 @@ class MarketFiltersFragment : BaseComposeFragment() {
 
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun AdvancedSearchScreen(
     viewModel: MarketFiltersViewModel,
@@ -77,7 +79,7 @@ private fun AdvancedSearchScreen(
                 )
             },
         ) {
-            Surface(color = ComposeAppTheme.colors.tyler) {
+            Surface(color = MaterialTheme.colorScheme.background) {
                 Column {
                     AppBar(
                         title = stringResource(R.string.Market_Filters),

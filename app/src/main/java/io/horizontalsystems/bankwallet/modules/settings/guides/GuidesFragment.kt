@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -58,6 +59,7 @@ class GuidesFragment : BaseComposeFragment() {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GuidesScreen(navController: NavController) {
     val viewModel = viewModel<GuidesViewModel>(factory = GuidesModule.Factory())
@@ -67,7 +69,7 @@ fun GuidesScreen(navController: NavController) {
     val selectedCategory = viewModel.selectedCategory
     val guides = viewModel.guides
 
-    Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+    Column {
         AppBar(
             title = stringResource(R.string.Guides_Title),
             navigationIcon = {

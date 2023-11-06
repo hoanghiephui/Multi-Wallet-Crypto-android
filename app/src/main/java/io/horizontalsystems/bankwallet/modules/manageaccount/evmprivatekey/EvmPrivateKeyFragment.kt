@@ -3,6 +3,8 @@ package io.horizontalsystems.bankwallet.modules.manageaccount.evmprivatekey
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
@@ -42,7 +44,7 @@ class EvmPrivateKeyFragment : BaseComposeFragment(screenshotEnabled = false) {
 
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun EvmPrivateKeyScreen(
     navController: NavController,
@@ -75,7 +77,7 @@ private fun EvmPrivateKeyScreen(
                 )
             }
         ) {
-            Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+            Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
                 AppBar(
                     title = stringResource(R.string.EvmPrivateKey_Title),
                     navigationIcon = {

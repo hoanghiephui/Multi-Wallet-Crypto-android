@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -84,7 +85,7 @@ fun CoinScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CoinTabs(
     viewModel: CoinViewModel,
@@ -178,6 +179,7 @@ fun CoinTabs(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoinNotFound(coinUid: String, navController: NavController) {
     Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -71,6 +72,7 @@ class CoinAuditsFragment : BaseComposeFragment() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CoinAuditsScreen(
     viewModel: CoinAuditsViewModel,
@@ -92,7 +94,7 @@ private fun CoinAuditsScreen(
             refreshing = isRefreshing,
             onRefresh = viewModel::refresh
         ) {
-            Crossfade(viewState) { viewState ->
+            Crossfade(viewState, label = "") { viewState ->
                 when (viewState) {
                     ViewState.Loading -> {
                         Loading()

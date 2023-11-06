@@ -5,11 +5,19 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -26,7 +34,7 @@ import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 
 @ExperimentalAnimationApi
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(
     title: String,
@@ -40,9 +48,9 @@ fun SearchBar(
     var showClearButton by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
     var searchText by remember { mutableStateOf("") }
+    val backgroundColor: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors()
 
     TopAppBar(
-        modifier = Modifier.height(64.dp),
         title = {
             title3_leah(
                 text = if (searchMode) "" else title,
@@ -50,8 +58,7 @@ fun SearchBar(
                 overflow = TextOverflow.Ellipsis
             )
         },
-        backgroundColor = ComposeAppTheme.colors.tyler,
-        elevation = 0.dp,
+        colors = backgroundColor,
         navigationIcon = {
                 HsIconButton(onClick = {
                     if (searchMode) {
@@ -65,7 +72,6 @@ fun SearchBar(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_back),
                         contentDescription = stringResource(R.string.Button_Back),
-                        tint = ComposeAppTheme.colors.jacob
                     )
                 }
             },
@@ -114,7 +120,7 @@ fun SearchBar(
                                 Icon(
                                     painter = painterResource(R.drawable.ic_close),
                                     contentDescription = stringResource(R.string.Button_Cancel),
-                                    tint = ComposeAppTheme.colors.jacob
+                                    tint = MaterialTheme.colorScheme.primary
                                 )
                             }
 

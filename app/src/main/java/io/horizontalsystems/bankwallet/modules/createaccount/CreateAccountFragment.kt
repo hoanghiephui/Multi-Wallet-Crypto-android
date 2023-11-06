@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Surface
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -81,6 +84,7 @@ private fun CreateAccountNavHost(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CreateAccountIntroScreen(
     openCreateAdvancedScreen: () -> Unit,
@@ -106,7 +110,7 @@ private fun CreateAccountIntroScreen(
     }
 
     ComposeAppTheme {
-        Surface(color = ComposeAppTheme.colors.tyler) {
+        Surface(color = MaterialTheme.colorScheme.background) {
             Column(Modifier.fillMaxSize()) {
                 AppBar(
                     title = stringResource(R.string.ManageAccounts_CreateNewWallet),
@@ -119,7 +123,6 @@ private fun CreateAccountIntroScreen(
                     navigationIcon = {
                         HsBackButton(onClick = onBackClick)
                     },
-                    backgroundColor = Color.Transparent
                 )
                 Spacer(Modifier.height(12.dp))
 

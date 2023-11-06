@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,7 +32,7 @@ import io.horizontalsystems.bankwallet.ui.extensions.BottomSheetHeader
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SendBtcAdvancedSettingsScreen(
     fragmentNavController: NavController,
@@ -75,7 +76,7 @@ fun SendBtcAdvancedSettingsScreen(
                 )
             },
         ) {
-            Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+            Column {
                 AppBar(
                     title = stringResource(R.string.Send_Advanced),
                     navigationIcon = {

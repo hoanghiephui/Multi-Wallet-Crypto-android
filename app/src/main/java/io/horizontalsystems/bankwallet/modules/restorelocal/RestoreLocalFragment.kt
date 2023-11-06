@@ -11,8 +11,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -22,6 +24,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
@@ -156,7 +159,7 @@ private fun RestoreLocalNavHost(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun RestoreLocalScreen(
     viewModel: RestoreLocalViewModel,
@@ -212,7 +215,8 @@ private fun RestoreLocalScreen(
 
     ComposeAppTheme {
         Scaffold(
-            backgroundColor = ComposeAppTheme.colors.tyler,
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.background,
             topBar = {
                 AppBar(
                     title = stringResource(R.string.ImportBackupFile_EnterPassword),
@@ -269,7 +273,7 @@ private fun RestoreLocalScreen(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun BackupFileItems(
     viewModel: RestoreLocalViewModel,
@@ -330,7 +334,8 @@ private fun BackupFileItems(
             }
         ) {
             Scaffold(
-                backgroundColor = ComposeAppTheme.colors.tyler,
+                containerColor = Color.Transparent,
+                contentColor = MaterialTheme.colorScheme.background,
                 topBar = {
                     AppBar(
                         title = stringResource(R.string.BackupManager_BаckupFile),

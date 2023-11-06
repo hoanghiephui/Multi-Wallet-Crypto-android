@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -32,15 +33,14 @@ class TimeLockFragment : BaseComposeFragment() {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ExperimentalScreen(
     navController: NavController,
     viewModel: TimeLockViewModel = viewModel(factory = TimeLockModule.Factory())
 ) {
     ComposeAppTheme {
-        Column(
-            modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)
-        ) {
+        Column {
             AppBar(
                 title = stringResource(R.string.BitcoinHodling_Title),
                 navigationIcon = {

@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,6 +51,7 @@ class ManageAccountsFragment : BaseComposeFragment() {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageAccountsScreen(navController: NavController, mode: ManageAccountsModule.Mode) {
     BackupAlert(navController)
@@ -63,7 +66,7 @@ fun ManageAccountsScreen(navController: NavController, mode: ManageAccountsModul
     }
 
     ComposeAppTheme {
-        Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+        Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
             AppBar(
                 title = stringResource(R.string.ManageAccounts_Title),
                 navigationIcon = { HsBackButton(onClick = { navController.popBackStack() }) }

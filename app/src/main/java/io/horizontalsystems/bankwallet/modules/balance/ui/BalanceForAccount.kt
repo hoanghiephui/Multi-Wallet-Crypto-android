@@ -15,6 +15,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -55,7 +56,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.title3_leah
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun BalanceForAccount(navController: NavController, accountViewItem: AccountViewItem) {
     val viewModel = viewModel<BalanceViewModel>(factory = BalanceModule.Factory())

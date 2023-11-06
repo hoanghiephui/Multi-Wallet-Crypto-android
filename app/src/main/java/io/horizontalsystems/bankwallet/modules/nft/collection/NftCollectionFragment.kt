@@ -5,6 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -65,7 +67,7 @@ class NftCollectionFragment : BaseComposeFragment() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun NftCollectionScreen(navController: NavController, viewModel: NftCollectionOverviewViewModel) {
     ComposeAppTheme {
@@ -75,7 +77,7 @@ private fun NftCollectionScreen(navController: NavController, viewModel: NftColl
         val view = LocalView.current
         val context = LocalContext.current
 
-        Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+        Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
             AppBar(
                 menuItems = listOf(
                     MenuItem(

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -57,6 +58,7 @@ import io.horizontalsystems.core.SnackbarDuration
 import io.horizontalsystems.core.helpers.HudHelper
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SendTronConfirmationScreen(
     navController: NavController,
@@ -128,7 +130,7 @@ fun SendTronConfirmationScreen(
     }
 
     ComposeAppTheme {
-        Column(Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+        Column {
             AppBar(
                 title = stringResource(R.string.Send_Confirmation_Title),
                 navigationIcon = {

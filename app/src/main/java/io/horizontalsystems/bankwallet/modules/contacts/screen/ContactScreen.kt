@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -38,7 +39,7 @@ enum class ContactScreenBottomSheetType {
     DeleteConfirmation, DiscardChangesConfirmation
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ContactScreen(
     viewModel: ContactViewModel,
@@ -126,7 +127,6 @@ fun ContactScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(color = ComposeAppTheme.colors.tyler)
             ) {
                 AppBar(
                     title = uiState.headerTitle.getString(),

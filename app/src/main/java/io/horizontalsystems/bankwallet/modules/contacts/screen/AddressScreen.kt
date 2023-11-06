@@ -3,6 +3,7 @@ package io.horizontalsystems.bankwallet.modules.contacts.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -19,7 +20,7 @@ import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.*
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AddressScreen(
     viewModel: AddressViewModel,
@@ -58,7 +59,6 @@ fun AddressScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(color = ComposeAppTheme.colors.tyler)
             ) {
                 AppBar(
                     title = uiState.headerTitle.getString(),

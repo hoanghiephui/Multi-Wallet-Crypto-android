@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -59,6 +61,7 @@ class TransactionInfoFragment : BaseComposeFragment() {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionInfoScreen(
     viewModel: TransactionInfoViewModel,
@@ -66,7 +69,7 @@ fun TransactionInfoScreen(
 ) {
 
     ComposeAppTheme {
-        Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+        Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
             AppBar(
                 title = stringResource(R.string.TransactionInfo_Title),
                 menuItems = listOf(

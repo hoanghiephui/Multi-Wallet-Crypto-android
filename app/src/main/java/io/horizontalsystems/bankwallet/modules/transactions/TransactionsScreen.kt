@@ -7,9 +7,9 @@ import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -33,6 +33,7 @@ import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionsScreen(
     navController: NavController,
@@ -48,124 +49,122 @@ fun TransactionsScreen(
     val syncing by viewModel.syncingLiveData.observeAsState(false)
     val filterResetEnabled by viewModel.filterResetEnabled.collectAsState()
 
-    Surface(color = ComposeAppTheme.colors.tyler) {
-        Column {
-            AppBar(
-                title = stringResource(R.string.Transactions_Title),
-                showSpinner = syncing,
-                menuItems = listOf(
-                    MenuItem(
-                        title = TranslatableString.ResString(R.string.Button_Reset),
-                        enabled = filterResetEnabled,
-                        onClick = {
-                            viewModel.resetFilters()
-                        }
-                    )
+    Column {
+        AppBar(
+            title = stringResource(R.string.Transactions_Title),
+            showSpinner = syncing,
+            menuItems = listOf(
+                MenuItem(
+                    title = TranslatableString.ResString(R.string.Button_Reset),
+                    enabled = filterResetEnabled,
+                    onClick = {
+                        viewModel.resetFilters()
+                    }
                 )
             )
-            filterTypes?.let { filterTypes ->
-                FilterTypeTabs(
-                    filterTypes = filterTypes,
-                    onTransactionTypeClick = viewModel::setFilterTransactionType
-                )
-            }
-            filterBlockchains?.let { filterBlockchains ->
-                CellHeaderSorting(borderBottom = true) {
-                    var showFilterBlockchainDialog by remember { mutableStateOf(false) }
-                    if (showFilterBlockchainDialog) {
-                        SelectorDialogCompose(
-                            title = stringResource(R.string.Transactions_Filter_Blockchain),
-                            items = filterBlockchains.map {
-                                SelectorItem(it.item?.name ?: stringResource(R.string.Transactions_Filter_AllBlockchains), it.selected, it)
-                            },
-                            onDismissRequest = {
-                                showFilterBlockchainDialog = false
-                            },
-                            onSelectItem = viewModel::onEnterFilterBlockchain
-                        )
-                    }
+        )
+        filterTypes?.let { filterTypes ->
+            FilterTypeTabs(
+                filterTypes = filterTypes,
+                onTransactionTypeClick = viewModel::setFilterTransactionType
+            )
+        }
+        filterBlockchains?.let { filterBlockchains ->
+            CellHeaderSorting(borderBottom = true) {
+                var showFilterBlockchainDialog by remember { mutableStateOf(false) }
+                if (showFilterBlockchainDialog) {
+                    SelectorDialogCompose(
+                        title = stringResource(R.string.Transactions_Filter_Blockchain),
+                        items = filterBlockchains.map {
+                            SelectorItem(it.item?.name ?: stringResource(R.string.Transactions_Filter_AllBlockchains), it.selected, it)
+                        },
+                        onDismissRequest = {
+                            showFilterBlockchainDialog = false
+                        },
+                        onSelectItem = viewModel::onEnterFilterBlockchain
+                    )
+                }
 
-                    val filterBlockchain = filterBlockchains.firstOrNull { it.selected }?.item
-                    Row(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
+                val filterBlockchain = filterBlockchains.firstOrNull { it.selected }?.item
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    ButtonSecondaryTransparent(
+                        title = filterBlockchain?.name ?: stringResource(R.string.Transactions_Filter_AllBlockchains),
+                        iconRight = R.drawable.ic_down_arrow_20,
+                        onClick = {
+                            showFilterBlockchainDialog = true
+                        }
+                    )
+
+                    filterCoins?.let { filterCoins ->
+                        val filterCoin = filterCoins.find { it.selected }?.item
+
+                        val coinCode = filterCoin?.token?.coin?.code
+                        val badge = filterCoin?.badge
+                        val title = when {
+                            badge != null -> "$coinCode ($badge)"
+                            else -> coinCode
+                        }
+
                         ButtonSecondaryTransparent(
-                            title = filterBlockchain?.name ?: stringResource(R.string.Transactions_Filter_AllBlockchains),
+                            title = title ?: stringResource(R.string.Transactions_Filter_AllCoins),
                             iconRight = R.drawable.ic_down_arrow_20,
                             onClick = {
-                                showFilterBlockchainDialog = true
+                                navController.slideFromBottom(R.id.filterCoinFragment)
                             }
                         )
-
-                        filterCoins?.let { filterCoins ->
-                            val filterCoin = filterCoins.find { it.selected }?.item
-
-                            val coinCode = filterCoin?.token?.coin?.code
-                            val badge = filterCoin?.badge
-                            val title = when {
-                                badge != null -> "$coinCode ($badge)"
-                                else -> coinCode
-                            }
-
-                            ButtonSecondaryTransparent(
-                                title = title ?: stringResource(R.string.Transactions_Filter_AllCoins),
-                                iconRight = R.drawable.ic_down_arrow_20,
-                                onClick = {
-                                    navController.slideFromBottom(R.id.filterCoinFragment)
-                                }
-                            )
-                        }
                     }
                 }
             }
+        }
 
-            Crossfade(viewState, label = "") { viewState ->
-                when (viewState) {
-                    ViewState.Success -> {
-                        transactions?.let { transactionItems ->
-                            if (transactionItems.isEmpty()) {
-                                if (syncing) {
-                                    ListEmptyView(
-                                        text = stringResource(R.string.Transactions_WaitForSync),
-                                        icon = R.drawable.ic_clock
-                                    )
-                                } else {
-                                    ListEmptyView(
-                                        text = stringResource(R.string.Transactions_EmptyList),
-                                        icon = R.drawable.ic_outgoingraw
-                                    )
-                                }
+        Crossfade(viewState, label = "") { viewState ->
+            when (viewState) {
+                ViewState.Success -> {
+                    transactions?.let { transactionItems ->
+                        if (transactionItems.isEmpty()) {
+                            if (syncing) {
+                                ListEmptyView(
+                                    text = stringResource(R.string.Transactions_WaitForSync),
+                                    icon = R.drawable.ic_clock
+                                )
                             } else {
-                                val filterCoin = filterCoins?.find { it.selected }?.item
-                                val filterType = filterTypes?.find { it.selected }?.item
-                                val filterBlockchain = filterBlockchains?.find { it.selected }?.item
+                                ListEmptyView(
+                                    text = stringResource(R.string.Transactions_EmptyList),
+                                    icon = R.drawable.ic_outgoingraw
+                                )
+                            }
+                        } else {
+                            val filterCoin = filterCoins?.find { it.selected }?.item
+                            val filterType = filterTypes?.find { it.selected }?.item
+                            val filterBlockchain = filterBlockchains?.find { it.selected }?.item
 
-                                val listState = rememberSaveable(
-                                    filterCoin,
-                                    filterType,
-                                    filterBlockchain,
-                                    (accountsViewModel.balanceScreenState as? BalanceScreenState.HasAccount)?.accountViewItem?.id,
-                                    saver = LazyListState.Saver
-                                ) {
-                                    LazyListState(0, 0)
-                                }
-                                LazyColumn(state = listState) {
-                                    transactionList(
-                                        transactionsMap = transactionItems,
-                                        willShow = { viewModel.willShow(it) },
-                                        onClick = { onTransactionClick(it, viewModel, navController) },
-                                        onBottomReached = { viewModel.onBottomReached() }
-                                    )
-                                }
+                            val listState = rememberSaveable(
+                                filterCoin,
+                                filterType,
+                                filterBlockchain,
+                                (accountsViewModel.balanceScreenState as? BalanceScreenState.HasAccount)?.accountViewItem?.id,
+                                saver = LazyListState.Saver
+                            ) {
+                                LazyListState(0, 0)
+                            }
+                            LazyColumn(state = listState) {
+                                transactionList(
+                                    transactionsMap = transactionItems,
+                                    willShow = { viewModel.willShow(it) },
+                                    onClick = { onTransactionClick(it, viewModel, navController) },
+                                    onBottomReached = { viewModel.onBottomReached() }
+                                )
                             }
                         }
                     }
-                    is ViewState.Error,
-                    ViewState.Loading,
-                    null -> {}
                 }
+                is ViewState.Error,
+                ViewState.Loading,
+                null -> {}
             }
         }
     }

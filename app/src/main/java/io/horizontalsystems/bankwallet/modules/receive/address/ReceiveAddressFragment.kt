@@ -19,13 +19,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
@@ -128,6 +131,7 @@ class ReceiveAddressFragment : BaseComposeFragment() {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ReceiveAddressScreen(
     viewModel: ReceiveAddressViewModel,
@@ -149,7 +153,8 @@ private fun ReceiveAddressScreen(
 
     ComposeAppTheme {
         Scaffold(
-            backgroundColor = ComposeAppTheme.colors.tyler,
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.background,
             topBar = {
                 AppBar(
                     title = stringResource(R.string.Deposit_Title, uiState.coinCode),

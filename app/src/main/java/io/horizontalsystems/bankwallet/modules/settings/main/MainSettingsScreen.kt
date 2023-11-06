@@ -15,14 +15,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Divider
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -48,6 +51,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.BadgeCount
 import io.horizontalsystems.bankwallet.ui.compose.components.CellSingleLineLawrenceSection
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
+import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
@@ -55,23 +59,25 @@ import io.horizontalsystems.bankwallet.ui.compose.components.caption_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_grey
 import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     navController: NavController,
     viewModel: MainSettingsViewModel = viewModel(factory = MainSettingsModule.Factory()),
 ) {
-
-    Surface(color = ComposeAppTheme.colors.tyler) {
-        Column {
+    Scaffold(
+        containerColor = Color.Transparent,
+        contentColor = MaterialTheme.colorScheme.background,
+        topBar = {
             AppBar(
-                stringResource(R.string.Settings_Title),
+                title = stringResource(R.string.Settings_Title)
             )
-
-            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                Spacer(modifier = Modifier.height(12.dp))
-                SettingSections(viewModel, navController)
-                SettingsFooter(viewModel.appVersion, viewModel.companyWebPage)
-            }
+        }
+    ) {
+        Column(modifier = Modifier.verticalScroll(rememberScrollState()).padding(it)) {
+            Spacer(modifier = Modifier.height(12.dp))
+            SettingSections(viewModel, navController)
+            SettingsFooter(viewModel.appVersion, viewModel.companyWebPage)
         }
     }
 }
@@ -368,7 +374,7 @@ private fun SettingsFooter(appVersion: String, companyWebPage: String) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         caption_grey(text = stringResource(R.string.Settings_InfoTitleWithVersion, appVersion).uppercase())
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .width(100.dp)
                 .padding(top = 8.dp, bottom = 4.5.dp),
@@ -412,7 +418,7 @@ private fun shareAppLink(appLink: String, context: Context) {
 
 @Preview
 @Composable
-private fun previewSettingsScreen() {
+private fun PreviewSettingsScreen() {
     ComposeAppTheme {
         Column {
             CellSingleLineLawrenceSection(

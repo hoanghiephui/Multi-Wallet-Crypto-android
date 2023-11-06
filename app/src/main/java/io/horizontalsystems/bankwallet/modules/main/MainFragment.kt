@@ -9,33 +9,34 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Badge
-import androidx.compose.material.BadgedBox
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -73,6 +74,7 @@ import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.DisposableLifecycleCallbacks
 import io.horizontalsystems.bankwallet.ui.compose.NiaNavigationBar
 import io.horizontalsystems.bankwallet.ui.compose.NiaNavigationBarItem
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.extensions.WalletSwitchBottomSheet
 import io.horizontalsystems.bankwallet.ui.extensions.rememberLifecycleEvent
 import io.horizontalsystems.core.findNavController
@@ -85,12 +87,14 @@ class MainFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent() {
         ComposeAppTheme {
-            MainScreenWithRootedDeviceCheck(
-                transactionsViewModel = transactionsViewModel,
-                deepLink = activity?.intent?.data?.toString(),
-                navController = findNavController(),
-                clearActivityData = { activity?.intent?.data = null }
-            )
+            NiaBackground {
+                MainScreenWithRootedDeviceCheck(
+                    transactionsViewModel = transactionsViewModel,
+                    deepLink = activity?.intent?.data?.toString(),
+                    navController = findNavController(),
+                    clearActivityData = { activity?.intent?.data = null }
+                )
+            }
         }
     }
 
@@ -141,21 +145,6 @@ private fun MainScreen(
     val modalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val lifecycleEvent = rememberLifecycleEvent()
 
-    val bottomBarHeight = 80.dp
-    val bottomBarHeightPx = with(LocalDensity.current) { bottomBarHeight.roundToPx().toFloat() }
-    val bottomBarOffsetHeightPx = remember { mutableFloatStateOf(0f) }
-    val nestedScrollConnection = remember {
-        object : NestedScrollConnection {
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-
-                val delta = available.y
-                val newOffset = bottomBarOffsetHeightPx.floatValue + delta
-                bottomBarOffsetHeightPx.floatValue = newOffset.coerceIn(-bottomBarHeightPx, 0f)
-
-                return Offset.Zero
-            }
-        }
-    }
     ModalBottomSheetLayout(
         sheetState = modalBottomSheetState,
         sheetBackgroundColor = ComposeAppTheme.colors.transparent,
@@ -180,8 +169,9 @@ private fun MainScreen(
     ) {
         Box(Modifier.fillMaxSize()) {
             Scaffold(
-                Modifier.nestedScroll(nestedScrollConnection),
-                backgroundColor = ComposeAppTheme.colors.tyler,
+                containerColor = Color.Transparent,
+                contentColor = MaterialTheme.colorScheme.background,
+                contentWindowInsets = WindowInsets(0, 0, 0, 0),
                 bottomBar = {
                     Column {
                         if (uiState.torEnabled) {
@@ -224,13 +214,19 @@ private fun MainScreen(
                         }*/
                     }
                 }
-            ) {
+            ) { padding ->
                 BackHandler(enabled = modalBottomSheetState.isVisible) {
                     coroutineScope.launch {
                         modalBottomSheetState.hide()
                     }
                 }
-                Column(modifier = Modifier.padding(it)) {
+                Column(modifier = Modifier.padding(padding)
+                    .consumeWindowInsets(padding)
+                    .windowInsetsPadding(
+                        WindowInsets.safeDrawing.only(
+                            WindowInsetsSides.Horizontal,
+                        ),
+                    )) {
                     LaunchedEffect(key1 = selectedPage, block = {
                         pagerState.scrollToPage(selectedPage)
                     })
@@ -359,7 +355,8 @@ private fun HideContentBox(contentHidden: Boolean) {
     Box(
         Modifier
             .fillMaxSize()
-            .then(backgroundModifier))
+            .then(backgroundModifier)
+    )
 }
 
 @Composable
@@ -372,7 +369,7 @@ private fun BadgedIcon(
             BadgedBox(
                 badge = {
                     Badge(
-                        backgroundColor = ComposeAppTheme.colors.lucian
+                        contentColor = ComposeAppTheme.colors.lucian
                     ) {
                         Text(
                             text = badge.number.toString(),

@@ -3,11 +3,14 @@ package io.horizontalsystems.bankwallet.modules.tokenselect
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Scaffold
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
@@ -16,6 +19,7 @@ import io.horizontalsystems.bankwallet.modules.balance.ui.BalanceCardInner
 import io.horizontalsystems.bankwallet.modules.balance.ui.BalanceCardSubtitleType
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.ListEmptyView
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.compose.components.SearchBar
 import io.horizontalsystems.bankwallet.ui.compose.components.SectionUniversalItem
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
@@ -31,59 +35,64 @@ fun TokenSelectScreen(
     header: @Composable (() -> Unit)? = null
 ) {
     ComposeAppTheme {
-        Scaffold(
-            backgroundColor = ComposeAppTheme.colors.tyler,
-            topBar = {
-                SearchBar(
-                    title = title,
-                    searchHintText = "",
-                    menuItems = listOf(),
-                    onClose = { navController.popBackStack() },
-                    onSearchTextChanged = { text ->
-                        viewModel.updateFilter(text)
-                    }
-                )
-            }
-        ) { paddingValues ->
-            val uiState = viewModel.uiState
-            if (uiState.noItems) {
-                ListEmptyView(
-                    text = emptyItemsText,
-                    icon = R.drawable.ic_empty_wallet
-                )
-            } else {
-                LazyColumn(contentPadding = paddingValues) {
-                    item {
-                        if (header == null) {
-                            VSpacer(12.dp)
+        NiaBackground {
+            Scaffold(
+                containerColor = Color.Transparent,
+                contentColor = MaterialTheme.colorScheme.background,
+                contentWindowInsets = WindowInsets(0, 0, 0, 0),
+                topBar = {
+                    SearchBar(
+                        title = title,
+                        searchHintText = "",
+                        menuItems = listOf(),
+                        onClose = { navController.popBackStack() },
+                        onSearchTextChanged = { text ->
+                            viewModel.updateFilter(text)
                         }
-                        header?.invoke()
-                    }
-                    val balanceViewItems = uiState.items
-                    itemsIndexed(balanceViewItems) { index, item ->
-                        val lastItem = index == balanceViewItems.size - 1
+                    )
+                }
+            ) { paddingValues ->
+                val uiState = viewModel.uiState
+                if (uiState.noItems) {
+                    ListEmptyView(
+                        text = emptyItemsText,
+                        icon = R.drawable.ic_empty_wallet
+                    )
+                } else {
+                    LazyColumn(contentPadding = paddingValues) {
+                        item {
+                            if (header == null) {
+                                VSpacer(12.dp)
+                            }
+                            header?.invoke()
+                        }
+                        val balanceViewItems = uiState.items
+                        itemsIndexed(balanceViewItems) { index, item ->
+                            val lastItem = index == balanceViewItems.size - 1
 
-                        Box(
-                            modifier = Modifier.clickable {
-                                onClickItem.invoke(item)
-                            }
-                        ) {
-                            SectionUniversalItem(
-                                borderTop = true,
-                                borderBottom = lastItem
+                            Box(
+                                modifier = Modifier.clickable {
+                                    onClickItem.invoke(item)
+                                }
                             ) {
-                                BalanceCardInner(
-                                    viewItem = item,
-                                    type = BalanceCardSubtitleType.CoinName
-                                )
+                                SectionUniversalItem(
+                                    borderTop = true,
+                                    borderBottom = lastItem
+                                ) {
+                                    BalanceCardInner(
+                                        viewItem = item,
+                                        type = BalanceCardSubtitleType.CoinName
+                                    )
+                                }
                             }
                         }
-                    }
-                    item {
-                        VSpacer(32.dp)
+                        item {
+                            VSpacer(32.dp)
+                        }
                     }
                 }
             }
         }
+
     }
 }

@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.Icon
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,6 +67,7 @@ class NftHoldingsFragment : BaseComposeFragment() {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NftHoldingsScreen(navController: NavController) {
     val account = App.accountManager.activeAccount ?: return
@@ -78,7 +81,7 @@ fun NftHoldingsScreen(navController: NavController) {
     val loading = viewModel.refreshing
 
     ComposeAppTheme {
-        Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+        Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
             AppBar(
                 title = stringResource(R.string.Nfts_Title),
                 navigationIcon = {

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -57,6 +58,7 @@ class CoinReportsFragment : BaseComposeFragment() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CoinReportsScreen(
     viewModel: CoinReportsViewModel,
@@ -67,7 +69,7 @@ private fun CoinReportsScreen(
     val isRefreshing by viewModel.isRefreshingLiveData.observeAsState(false)
     val reportViewItems by viewModel.reportViewItemsLiveData.observeAsState()
 
-    Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+    Column {
         AppBar(
             title = stringResource(R.string.CoinPage_Reports),
             navigationIcon = {

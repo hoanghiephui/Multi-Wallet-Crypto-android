@@ -19,6 +19,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -54,7 +56,7 @@ import io.horizontalsystems.marketkit.models.Blockchain
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ManageWalletsScreen(
     mainViewModel: RestoreViewModel,
@@ -142,7 +144,7 @@ fun ManageWalletsScreen(
         },
     ) {
         Column(
-            modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)
+            modifier = Modifier.background(color = MaterialTheme.colorScheme.background)
         ) {
             AppBar(
                 title = stringResource(R.string.Restore_Title),

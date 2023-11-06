@@ -3,6 +3,8 @@ package io.horizontalsystems.bankwallet.modules.manageaccount.recoveryphrase
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
@@ -39,7 +41,7 @@ class RecoveryPhraseFragment : BaseComposeFragment(screenshotEnabled = false) {
 
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun RecoveryPhraseScreen(
     navController: NavController,
@@ -74,7 +76,7 @@ private fun RecoveryPhraseScreen(
                 )
             }
         ) {
-            Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+            Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
                 AppBar(
                     title = stringResource(R.string.RecoveryPhrase_Title),
                     navigationIcon = {

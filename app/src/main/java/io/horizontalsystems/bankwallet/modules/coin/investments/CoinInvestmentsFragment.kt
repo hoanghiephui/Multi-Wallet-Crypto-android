@@ -2,7 +2,6 @@ package io.horizontalsystems.bankwallet.modules.coin.investments
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -72,6 +72,7 @@ class CoinInvestmentsFragment : BaseComposeFragment() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CoinInvestmentsScreen(
     viewModel: CoinInvestmentsViewModel,
@@ -82,7 +83,7 @@ private fun CoinInvestmentsScreen(
     val isRefreshing by viewModel.isRefreshingLiveData.observeAsState(false)
     val viewItems by viewModel.viewItemsLiveData.observeAsState()
 
-    Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+    Column {
         AppBar(
             title = stringResource(R.string.CoinPage_FundsInvested),
             navigationIcon = {
@@ -94,7 +95,7 @@ private fun CoinInvestmentsScreen(
             refreshing = isRefreshing,
             onRefresh = viewModel::refresh
         ) {
-            Crossfade(viewState) { viewState ->
+            Crossfade(viewState, label = "") { viewState ->
                 when (viewState) {
                     ViewState.Loading -> {
                         Loading()

@@ -14,6 +14,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -54,6 +56,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RestorePhrase(
     advanced: Boolean,
@@ -91,7 +94,7 @@ fun RestorePhrase(
     }
 
     val coroutineScope = rememberCoroutineScope()
-    Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+    Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
         AppBar(
             title = if (advanced) stringResource(R.string.Restore_Advanced_Title) else stringResource(R.string.ManageAccounts_ImportWallet),
             navigationIcon = {

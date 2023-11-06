@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,6 +47,7 @@ import kotlinx.coroutines.launch
 
 class MarketWidgetConfigurationActivity : AppCompatActivity() {
 
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -64,7 +66,7 @@ class MarketWidgetConfigurationActivity : AppCompatActivity() {
             var selectedType by remember { mutableStateOf<MarketWidgetType?>(null) }
 
             ComposeAppTheme {
-                Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+                Column {
                     AppBar(
                         title = stringResource(R.string.WidgetList_Config_Title),
                         navigationIcon = null,
