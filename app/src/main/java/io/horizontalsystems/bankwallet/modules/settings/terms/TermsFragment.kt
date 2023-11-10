@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -83,6 +84,7 @@ fun TermsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
     ) {
         AppBar(
             title = stringResource(R.string.Settings_Terms),
@@ -137,16 +139,14 @@ fun TermsScreen(
         }
 
         if (viewModel.buttonVisible) {
-            ButtonsGroupWithShade {
-                ButtonPrimaryYellow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp),
-                    title = stringResource(R.string.Button_IAgree),
-                    onClick = { viewModel.onAgreeClick() },
-                    enabled = viewModel.buttonEnabled
-                )
-            }
+            ButtonPrimaryYellow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                title = stringResource(R.string.Button_IAgree),
+                onClick = { viewModel.onAgreeClick() },
+                enabled = viewModel.buttonEnabled
+            )
         }
     }
 

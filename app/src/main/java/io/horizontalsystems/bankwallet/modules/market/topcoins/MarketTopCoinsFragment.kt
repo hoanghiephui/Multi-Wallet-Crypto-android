@@ -6,6 +6,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Surface
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -83,7 +84,7 @@ class MarketTopCoinsFragment : BaseComposeFragment() {
 
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun TopCoinsScreen(
     viewModel: MarketTopCoinsViewModel,
@@ -102,7 +103,7 @@ fun TopCoinsScreen(
 
     Surface(color = ComposeAppTheme.colors.tyler) {
         Column {
-            TopCloseButton(interactionSource, onCloseButtonClick)
+            TopCloseButton(interactionSource, onCloseButtonClick = onCloseButtonClick)
 
             HSSwipeRefresh(
                 refreshing = isRefreshing,

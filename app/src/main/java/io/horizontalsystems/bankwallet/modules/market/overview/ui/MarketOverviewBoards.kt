@@ -6,7 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -70,7 +70,7 @@ fun <T : WithTranslatableTitle> TopBoardHeader(
     onClickSeeAll: () -> Unit
 ) {
     Column {
-        Divider(
+        HorizontalDivider(
             thickness = 1.dp,
             color = ComposeAppTheme.colors.steel10
         )
@@ -110,9 +110,10 @@ fun <T : WithTranslatableTitle> TopBoardHeader(
 }
 
 @Composable
-private fun MarketCoinWithBackground(
+fun MarketCoinWithBackground(
     marketViewItem: MarketViewItem,
-    navController: NavController
+    navController: NavController,
+    click: () -> Unit = {}
 ) {
     MarketCoinClear(
         marketViewItem.coinName,
@@ -124,5 +125,6 @@ private fun MarketCoinWithBackground(
         marketViewItem.rank
     ) {
         onItemClick(marketViewItem, navController)
+        click.invoke()
     }
 }

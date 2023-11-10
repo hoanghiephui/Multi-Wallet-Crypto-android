@@ -264,9 +264,9 @@ dependencies {
     // WorkManager RxJava2 support
     implementation "androidx.work:work-rxjava2:$work_version"
 
-    def leakCanary = 'com.squareup.leakcanary:leakcanary-android:2.10'
-    appcenterdebugImplementation leakCanary
-    debugImplementation leakCanary
+    //def leakCanary = 'com.squareup.leakcanary:leakcanary-android:2.10'
+    //appcenterdebugImplementation leakCanary
+    //debugImplementation leakCanary
 
     // Wallet kits
     implementation 'com.github.horizontalsystems:bitcoin-kit-android:8e990e3'

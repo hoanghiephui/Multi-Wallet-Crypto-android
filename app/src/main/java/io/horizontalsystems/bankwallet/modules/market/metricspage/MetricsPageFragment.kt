@@ -90,7 +90,7 @@ class MetricsPageFragment : BaseComposeFragment() {
                     viewModel.refresh()
                 }
             ) {
-                Crossfade(viewState) { viewState ->
+                Crossfade(viewState, label = "") { viewState ->
                     when (viewState) {
                         ViewState.Loading -> {
                             Loading()

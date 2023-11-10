@@ -41,6 +41,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -58,6 +59,8 @@ import io.horizontalsystems.bankwallet.modules.launcher.LaunchViewModel
 import io.horizontalsystems.bankwallet.modules.main.MainModule.MainNavigation
 import io.horizontalsystems.bankwallet.modules.manageaccount.dialogs.BackupRequiredDialog
 import io.horizontalsystems.bankwallet.modules.market.MarketScreen
+import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchModule
+import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchViewModel
 import io.horizontalsystems.bankwallet.modules.rateapp.RateApp
 import io.horizontalsystems.bankwallet.modules.releasenotes.ReleaseNotesFragment
 import io.horizontalsystems.bankwallet.modules.rooteddevice.RootedDeviceModule
@@ -83,6 +86,7 @@ import kotlinx.coroutines.launch
 class MainFragment : BaseComposeFragment() {
 
     private val transactionsViewModel by navGraphViewModels<TransactionsViewModel>(R.id.mainFragment) { TransactionsModule.Factory() }
+    private val searchViewModel by viewModels<MarketSearchViewModel> { MarketSearchModule.Factory() }
 
     @Composable
     override fun GetContent() {
@@ -92,7 +96,8 @@ class MainFragment : BaseComposeFragment() {
                     transactionsViewModel = transactionsViewModel,
                     deepLink = activity?.intent?.data?.toString(),
                     navController = findNavController(),
-                    clearActivityData = { activity?.intent?.data = null }
+                    clearActivityData = { activity?.intent?.data = null },
+                    searchViewModel = searchViewModel
                 )
             }
         }
@@ -118,12 +123,19 @@ private fun MainScreenWithRootedDeviceCheck(
     deepLink: String?,
     navController: NavController,
     clearActivityData: () -> Unit,
-    rootedDeviceViewModel: RootedDeviceViewModel = viewModel(factory = RootedDeviceModule.Factory())
+    rootedDeviceViewModel: RootedDeviceViewModel = viewModel(factory = RootedDeviceModule.Factory()),
+    searchViewModel: MarketSearchViewModel
 ) {
     if (rootedDeviceViewModel.showRootedDeviceWarning) {
         RootedDeviceScreen { rootedDeviceViewModel.ignoreRootedDeviceWarning() }
     } else {
-        MainScreen(transactionsViewModel, deepLink, navController, clearActivityData)
+        MainScreen(
+            transactionsViewModel,
+            deepLink,
+            navController,
+            clearActivityData,
+            searchViewModel = searchViewModel
+        )
     }
 }
 
@@ -134,7 +146,8 @@ private fun MainScreen(
     deepLink: String?,
     fragmentNavController: NavController,
     clearActivityData: () -> Unit,
-    viewModel: MainViewModel = viewModel(factory = MainModule.Factory(deepLink))
+    viewModel: MainViewModel = viewModel(factory = MainModule.Factory(deepLink)),
+    searchViewModel: MarketSearchViewModel,
 ) {
     val launchViewModel = viewModel<LaunchViewModel>(factory = LaunchModule.Factory())
     val uiState = viewModel.uiState
@@ -220,13 +233,16 @@ private fun MainScreen(
                         modalBottomSheetState.hide()
                     }
                 }
-                Column(modifier = Modifier.padding(padding)
-                    .consumeWindowInsets(padding)
-                    .windowInsetsPadding(
-                        WindowInsets.safeDrawing.only(
-                            WindowInsetsSides.Horizontal,
-                        ),
-                    )) {
+                Column(
+                    modifier = Modifier
+                        .padding(padding)
+                        .consumeWindowInsets(padding)
+                        .windowInsetsPadding(
+                            WindowInsets.safeDrawing.only(
+                                WindowInsetsSides.Horizontal,
+                            ),
+                        )
+                ) {
                     LaunchedEffect(key1 = selectedPage, block = {
                         pagerState.scrollToPage(selectedPage)
                     })
@@ -238,7 +254,11 @@ private fun MainScreen(
                         verticalAlignment = Alignment.Top
                     ) { page ->
                         when (uiState.mainNavItems[page].mainNavItem) {
-                            MainNavigation.Market -> MarketScreen(fragmentNavController)
+                            MainNavigation.Market -> MarketScreen(
+                                fragmentNavController,
+                                searchViewModel
+                            )
+
                             MainNavigation.Balance -> {
                                 if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
                                     when (launchViewModel.getPage()) {

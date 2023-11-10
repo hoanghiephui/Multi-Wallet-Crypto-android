@@ -12,10 +12,19 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -106,7 +115,7 @@ fun CoinList(
                         ) { onCoinClick.invoke(item.fullCoin.coin.uid) }
                     }
                 )
-                Divider(
+                HorizontalDivider(
                     thickness = 1.dp,
                     color = ComposeAppTheme.colors.steel10,
                     modifier = Modifier.align(Alignment.BottomCenter)
@@ -228,36 +237,28 @@ fun SortMenu(titleRes: Int, onClick: () -> Unit) {
     SortMenu(TranslatableString.ResString(titleRes), onClick)
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopCloseButton(
     interactionSource: MutableInteractionSource,
+    colors: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent),
     onCloseButtonClick: () -> Unit
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(modifier = Modifier.weight(1f))
-        Box(
-            modifier = Modifier.clickable(
-                interactionSource = interactionSource,
-                indication = null
-            ) {
-                onCloseButtonClick.invoke()
-            }
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_close),
-                contentDescription = "close icon",
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .size(24.dp),
-                tint = ComposeAppTheme.colors.jacob
+    androidx.compose.material3.TopAppBar(
+        title = {},
+        colors = colors,
+        navigationIcon = {},
+        actions = {
+            AppBarMenuButton(
+                icon = R.drawable.ic_close,
+                onClick = {
+                    onCloseButtonClick.invoke()
+                },
+                enabled = true,
+                description = "close icon"
             )
-        }
-    }
+        },
+    )
 }
 
 @Composable
@@ -266,7 +267,6 @@ fun DescriptionCard(title: String, description: String, image: ImageSource) {
         Row(
             modifier = Modifier
                 .height(108.dp)
-                .background(ComposeAppTheme.colors.tyler)
         ) {
             Column(
                 modifier = Modifier
@@ -296,7 +296,7 @@ fun DescriptionCard(title: String, description: String, image: ImageSource) {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RowScope.CategoryCard(
     type: DiscoveryItem,
@@ -307,9 +307,8 @@ fun RowScope.CategoryCard(
             .padding(6.dp)
             .height(128.dp)
             .weight(1f),
-        shape = RoundedCornerShape(12.dp),
-        elevation = 0.dp,
-        backgroundColor = ComposeAppTheme.colors.lawrence,
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         onClick = onClick
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -340,7 +339,8 @@ fun RowScope.CategoryCard(
                         modifier = Modifier
                             .height(108.dp)
                             .width(76.dp)
-                            .align(Alignment.TopEnd)) { imageRes ->
+                            .align(Alignment.TopEnd), label = ""
+                    ) { imageRes ->
                         Image(
                             painter = rememberAsyncImagePainter(imageRes),
                             contentDescription = "category image",

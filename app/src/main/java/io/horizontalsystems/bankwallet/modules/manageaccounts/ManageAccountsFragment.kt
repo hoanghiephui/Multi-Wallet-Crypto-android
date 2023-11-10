@@ -72,7 +72,7 @@ fun ManageAccountsScreen(navController: NavController, mode: ManageAccountsModul
                 navigationIcon = { HsBackButton(onClick = { navController.popBackStack() }) }
             )
 
-            LazyColumn(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+            LazyColumn {
                 item {
                     Spacer(modifier = Modifier.height(12.dp))
 

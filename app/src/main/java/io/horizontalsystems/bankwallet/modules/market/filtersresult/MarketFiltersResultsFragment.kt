@@ -3,7 +3,7 @@ package io.horizontalsystems.bankwallet.modules.market.filtersresult
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Surface
+import androidx.compose.material3.Surface
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -78,7 +78,7 @@ private fun SearchResultsScreen(
                 },
             )
 
-            Crossfade(viewModel.viewState) { state ->
+            Crossfade(viewModel.viewState, label = "") { state ->
                 when (state) {
                     ViewState.Loading -> {
                         Loading()

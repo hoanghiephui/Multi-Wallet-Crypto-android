@@ -1,7 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.market.search
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -17,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,16 +49,20 @@ import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchModule.
 import io.horizontalsystems.bankwallet.ui.compose.ColoredTextStyle
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.Select
+import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
+import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryCircle
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryToggle
 import io.horizontalsystems.bankwallet.ui.compose.components.CategoryCard
 import io.horizontalsystems.bankwallet.ui.compose.components.CoinImage
 import io.horizontalsystems.bankwallet.ui.compose.components.HeaderSorting
+import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.HsIconButton
 import io.horizontalsystems.bankwallet.ui.compose.components.ListEmptyView
 import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
 import io.horizontalsystems.bankwallet.ui.compose.components.MarketCoinFirstRow
 import io.horizontalsystems.bankwallet.ui.compose.components.MarketCoinSecondRow
+import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.SectionItemBorderedRowUniversalClear
 import io.horizontalsystems.bankwallet.ui.compose.components.SnackbarError
 import io.horizontalsystems.bankwallet.ui.compose.components.body_grey50
@@ -80,6 +84,7 @@ class MarketSearchFragment : BaseComposeFragment() {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MarketSearchScreen(
     viewModel: MarketSearchViewModel,
@@ -90,14 +95,22 @@ fun MarketSearchScreen(
     val errorMessage = viewModel.errorMessage
 
     ComposeAppTheme {
-        Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
-            SearchView(
-                onSearchTextChange = { query -> viewModel.searchByQuery(query) },
-                onRightTextButtonClick = {
-                    navController.slideFromRight(R.id.marketAdvancedSearchFragment)
+        Column {
+            AppBar(
+                title = stringResource(R.string.Market_Overview_TopSectors),
+                navigationIcon = {
+                    HsBackButton(onClick = { navController.popBackStack() })
                 },
-                leftIcon = R.drawable.ic_back,
-                onBackButtonClick = { navController.popBackStack() }
+                menuItems = listOf(
+                    MenuItem(
+                        title = TranslatableString.ResString(R.string.Market_Filters),
+                        enabled = true,
+                        onClick = {
+                            navController.slideFromRight(R.id.marketAdvancedSearchFragment)
+                        },
+                        icon = R.drawable.baseline_filter_list_24
+                    )
+                )
             )
             Crossfade(viewState, label = "SearchView") { viewState ->
                 when (viewState) {

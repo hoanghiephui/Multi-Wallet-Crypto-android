@@ -97,7 +97,7 @@ fun CoinTabs(
     val coroutineScope = rememberCoroutineScope()
     val view = LocalView.current
 
-    Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+    Column(modifier = Modifier.background(color = androidx.compose.material3.MaterialTheme.colorScheme.background)) {
         AppBar(
             title = viewModel.fullCoin.coin.code,
             navigationIcon = {

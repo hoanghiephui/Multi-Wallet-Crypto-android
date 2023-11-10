@@ -10,6 +10,8 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Surface
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -76,7 +78,7 @@ class TopNftCollectionsFragment : BaseComposeFragment() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun TopNftCollectionsScreen(
     viewModel: TopNftCollectionsViewModel,
@@ -87,9 +89,9 @@ fun TopNftCollectionsScreen(
     val menu = viewModel.menu
     val header = viewModel.header
 
-    Surface(color = ComposeAppTheme.colors.tyler) {
+    Surface(color = MaterialTheme.colorScheme.background) {
         Column {
-            TopCloseButton(interactionSource, onCloseButtonClick)
+            TopCloseButton(interactionSource, onCloseButtonClick = onCloseButtonClick)
 
             HSSwipeRefresh(
                 refreshing = viewModel.isRefreshing,
@@ -97,7 +99,7 @@ fun TopNftCollectionsScreen(
                     viewModel.refresh()
                 }
             ) {
-                Crossfade(viewModel.viewState) { state ->
+                Crossfade(viewModel.viewState, label = "") { state ->
                     when (state) {
                         ViewState.Loading -> {
                             Loading()

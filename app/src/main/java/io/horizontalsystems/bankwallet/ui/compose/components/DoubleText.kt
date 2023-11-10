@@ -27,7 +27,6 @@ fun DoubleText(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(ComposeAppTheme.colors.tyler)
             .padding(horizontal = 16.dp, vertical = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

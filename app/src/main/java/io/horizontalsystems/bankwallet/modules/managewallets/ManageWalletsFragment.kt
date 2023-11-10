@@ -1,21 +1,31 @@
 package io.horizontalsystems.bankwallet.modules.managewallets
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -47,17 +57,18 @@ class ManageWalletsFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent() {
         ComposeAppTheme {
-            ManageWalletsScreen(
-                findNavController(),
-                viewModel,
-                restoreSettingsViewModel
-            )
+            NiaBackground {
+                ManageWalletsScreen(
+                    findNavController(),
+                    viewModel,
+                    restoreSettingsViewModel
+                )
+            }
         }
     }
 
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun ManageWalletsScreen(
     navController: NavController,
@@ -85,68 +96,81 @@ private fun ManageWalletsScreen(
         navController.slideFromBottom(R.id.zcashConfigure)
     }
 
-    Column(
-        modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)
-    ) {
-        SearchBar(
-            title = stringResource(R.string.ManageCoins_title),
-            searchHintText = stringResource(R.string.ManageCoins_Search),
-            menuItems = if (viewModel.addTokenEnabled) {
-                listOf(
-                    MenuItem(
-                        title = TranslatableString.ResString(R.string.ManageCoins_AddToken),
-                        icon = R.drawable.ic_add_yellow,
-                        onClick = {
-                            navController.slideFromRight(R.id.addTokenFragment)
-                        }
-                    ))
-            } else {
-                listOf()
-            },
-            onClose = { navController.popBackStack() },
-            onSearchTextChanged = { text ->
-                viewModel.updateFilter(text)
-            }
-        )
+    SearchBar(
+        title = stringResource(R.string.ManageCoins_title),
+        onSearchTextChanged = {
+            viewModel.updateFilter(it)
+        },
+        hint = stringResource(R.string.ManageCoins_Search),
+        navigationAction = {
+            navController.popBackStack()
+        },
+        menuItems = listOf(
+            MenuItem(
+                title = TranslatableString.ResString(R.string.ManageCoins_AddToken),
+                icon = R.drawable.ic_add_yellow,
+                onClick = {
+                    navController.slideFromRight(R.id.addTokenFragment)
+                },
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+        ),
+        content = {
+            Content(coinItems, viewModel, navController)
+        }
+    )
+}
 
-        coinItems?.let {
-            if (it.isEmpty()) {
-                ListEmptyView(
-                    text = stringResource(R.string.ManageCoins_NoResults),
-                    icon = R.drawable.ic_not_found
-                )
-            } else {
-                LazyColumn {
-                    item {
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Divider(
-                            thickness = 1.dp,
-                            color = ComposeAppTheme.colors.steel10,
-                        )
-                    }
-                    items(it) { viewItem ->
-                        CoinCell(
-                            viewItem = viewItem,
-                            onItemClick = {
-                                if (viewItem.enabled) {
-                                    viewModel.disable(viewItem.item)
-                                } else {
-                                    viewModel.enable(viewItem.item)
-                                }
-                            },
-                            onInfoClick = {
-                                navController.slideFromBottom(R.id.configuredTokenInfo, ConfiguredTokenInfoDialog.prepareParams(viewItem.item))
+@Composable
+private fun Content(
+    coinItems: List<CoinViewItem<Token>>?,
+    viewModel: ManageWalletsViewModel,
+    navController: NavController
+) {
+    coinItems?.let { items ->
+        if (items.isEmpty()) {
+            ListEmptyView(
+                text = stringResource(R.string.ManageCoins_NoResults),
+                icon = R.drawable.ic_not_found
+            )
+        } else {
+            LazyColumn {
+                item {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    HorizontalDivider(
+                        thickness = 1.dp,
+                        color = ComposeAppTheme.colors.steel10,
+                    )
+                }
+                items(
+                    items = items,
+                    key = { it.item })
+                { viewItem ->
+                    CoinCell(
+                        viewItem = viewItem,
+                        onItemClick = {
+                            if (viewItem.enabled) {
+                                viewModel.disable(viewItem.item)
+                            } else {
+                                viewModel.enable(viewItem.item)
                             }
-                        )
-                    }
-                    item {
-                        VSpacer(height = 32.dp)
-                    }
+                        },
+                        onInfoClick = {
+                            navController.slideFromBottom(
+                                R.id.configuredTokenInfo,
+                                ConfiguredTokenInfoDialog.prepareParams(viewItem.item)
+                            )
+                        }
+                    )
+                }
+                item {
+                    VSpacer(height = 32.dp)
                 }
             }
         }
     }
 }
+
 
 @Composable
 private fun CoinCell(
@@ -220,7 +244,7 @@ private fun CoinCell(
                 onCheckedChange = { onItemClick.invoke() },
             )
         }
-        Divider(
+        HorizontalDivider(
             thickness = 1.dp,
             color = ComposeAppTheme.colors.steel10,
         )

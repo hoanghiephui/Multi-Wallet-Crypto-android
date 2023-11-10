@@ -244,7 +244,7 @@ fun BalanceItems(
             }
 
             stickyHeader {
-                HeaderSorting {
+                HeaderSorting(background = Color.Transparent) {
                     BalanceSortingSelector(
                         sortType = viewModel.sortType,
                         sortTypes = viewModel.sortTypes

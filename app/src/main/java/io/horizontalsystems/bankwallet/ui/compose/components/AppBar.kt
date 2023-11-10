@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -60,7 +61,8 @@ fun AppBar(
     navigationIcon: @Composable (() -> Unit)? = null,
     menuItems: List<MenuItem> = listOf(),
     showSpinner: Boolean = false,
-    backgroundColor: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors()
+    colors: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent),
+    scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     val titleComposable: @Composable () -> Unit = {
         title?.let {
@@ -77,7 +79,8 @@ fun AppBar(
         navigationIcon = navigationIcon,
         menuItems = menuItems,
         showSpinner = showSpinner,
-        backgroundColor = backgroundColor
+        colors = colors,
+        scrollBehavior = scrollBehavior
     )
 }
 
@@ -88,11 +91,13 @@ fun AppBar(
     navigationIcon: @Composable (() -> Unit)? = null,
     menuItems: List<MenuItem> = listOf(),
     showSpinner: Boolean = false,
-    backgroundColor: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors()
+    colors: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent),
+    scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     TopAppBar(
+        scrollBehavior = scrollBehavior,
         title = title,
-        colors = backgroundColor,
+        colors = colors,
         navigationIcon = {
             navigationIcon?.invoke()
         },

@@ -5,6 +5,9 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
@@ -15,10 +18,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -32,9 +41,101 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
+import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SearchBar(
+    content: @Composable (() -> Unit),
+    navigationAction: () -> Unit,
+    menuItems: List<MenuItem> = listOf(),
+    hint: String,
+    onSearchTextChanged: (String) -> Unit = {},
+    title: String
+) {
+    var text by rememberSaveable { mutableStateOf("") }
+    var active by rememberSaveable { mutableStateOf(false) }
+    var searchMode by remember { mutableStateOf(false) }
+    var searchClear by remember { mutableStateOf(false) }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val menuItem = mutableListOf(
+        MenuItem(
+            title = TranslatableString.ResString(R.string.Button_Search),
+            icon = R.drawable.icon_search,
+            onClick = {
+                searchMode = true
+                active = true
+                keyboardController?.show()
+            },
+            tint = MaterialTheme.colorScheme.onSurface
+        )
+    ).also {
+        it.addAll(menuItems)
+    }
+    Box(
+        Modifier
+            .fillMaxSize()
+    ) {
+        if (!searchMode) {
+            Column {
+                AppBar(
+                    title = title,
+                    navigationIcon = {
+                        HsBackButton(onClick = navigationAction)
+                    },
+                    menuItems = menuItem
+                )
+                content.invoke()
+            }
+        } else {
+            androidx.compose.material3.SearchBar(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .fillMaxWidth(),
+                query = text,
+                onQueryChange = {
+                    text = it
+                    onSearchTextChanged.invoke(it)
+                    searchClear = it.isNotEmpty()
+                },
+                onSearch = {
+                    active = false
+                    searchMode = false
+                    keyboardController?.hide()
+                },
+                active = active,
+                onActiveChange = {
+                    active = it
+                },
+                placeholder = { Text(hint) },
+                leadingIcon = {
+                    IconButton(onClick = {
+                        active = false
+                        searchMode = false
+                        keyboardController?.hide()
+                    }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                    }
+                },
+                trailingIcon = {
+                    if (searchClear) {
+                        IconButton(onClick = {
+                            searchClear = false
+                            text = ""
+                        }) {
+                            Icon(Icons.Default.Clear, contentDescription = null)
+                        }
+                    }
+                },
+            ) {
+                content.invoke()
+            }
+        }
+    }
+}
 
 @ExperimentalAnimationApi
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(
     title: String,

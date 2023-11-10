@@ -5,8 +5,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Divider
-import androidx.compose.material.Scaffold
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,26 +26,21 @@ fun SelectCoinScreen(
     onSelectAsset: (CexAsset) -> Unit,
     withBalance: Boolean
 ) {
-    val viewModel = viewModel<SelectCexAssetViewModel>(factory = SelectCexAssetViewModel.Factory(withBalance))
+    val viewModel =
+        viewModel<SelectCexAssetViewModel>(factory = SelectCexAssetViewModel.Factory(withBalance))
 
     val uiState = viewModel.uiState
 
-    ComposeAppTheme {
-        Scaffold(
-            backgroundColor = ComposeAppTheme.colors.tyler,
-            topBar = {
-                SearchBar(
-                    title = stringResource(R.string.Cex_ChooseCoin),
-                    searchHintText = stringResource(R.string.Cex_SelectCoin_Search),
-                    onClose = onClose,
-                    onSearchTextChanged = {
-                        viewModel.onEnterQuery(it)
-                    }
-                )
-            }
-        ) {
-            Crossfade(targetState = uiState.loading) { loading ->
-                Column(modifier = Modifier.padding(it)) {
+    NiaBackground {
+        SearchBar(
+            title = stringResource(R.string.Cex_ChooseCoin),
+            onSearchTextChanged = {
+                viewModel.onEnterQuery(it)
+            },
+            hint = stringResource(R.string.Cex_SelectCoin_Search),
+            navigationAction = onClose,
+            content = {
+                Crossfade(targetState = uiState.loading, label = "") { loading ->
                     if (loading) {
                         Loading()
                     } else {
@@ -60,7 +54,7 @@ fun SelectCoinScreen(
                                 LazyColumn {
                                     item {
                                         Spacer(modifier = Modifier.height(12.dp))
-                                        Divider(
+                                        HorizontalDivider(
                                             thickness = 1.dp,
                                             color = ComposeAppTheme.colors.steel10,
                                         )
@@ -80,7 +74,7 @@ fun SelectCoinScreen(
                     }
                 }
             }
-        }
+        )
     }
 }
 
@@ -125,7 +119,7 @@ private fun CoinCell(
                 Badge(text = stringResource(R.string.Suspended))
             }
         }
-        Divider(
+        HorizontalDivider(
             thickness = 1.dp,
             color = ComposeAppTheme.colors.steel10,
         )
