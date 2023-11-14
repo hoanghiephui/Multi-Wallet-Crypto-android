@@ -12,9 +12,6 @@
             </gradient>
         </aapt:attr>
     </path>
-    <path android:fillColor="#212121" android:fillType="evenOdd"
-        android:pathData="M40,0L472,0A40,40 0,0 1,512 40L512,472A40,40 0,0 1,472 512L40,512A40,40 0,0 1,0 472L0,40A40,40 0,0 1,40 0z"
-        android:strokeColor="#00000000" android:strokeWidth="1"/>
     <path android:fillColor="#FFFFFF" android:fillType="nonZero"
         android:pathData="M266.09,453L361,394.08L361,273.76C361,271.41 360.58,269.16 359.87,267L264,326.51C265.35,329.71 266.09,333.19 266.09,336.79L266.09,453L266.09,453Z"
         android:strokeColor="#00000000" android:strokeWidth="1"/>

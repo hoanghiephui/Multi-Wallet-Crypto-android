@@ -9,6 +9,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -244,7 +245,7 @@ private fun AppIconSection(appIconOptions: Select<AppIcon>, onAppIconSelect: (Ap
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(ComposeAppTheme.colors.lawrence)
+            .background(CardDefaults.cardColors().containerColor)
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
@@ -305,7 +306,10 @@ private fun IconBox(
             painter = painterResource(icon),
             contentDescription = null,
         )
-        Box(Modifier.height(6.dp).background(ComposeAppTheme.colors.red50))
+        Box(
+            Modifier
+                .height(6.dp)
+                .background(ComposeAppTheme.colors.red50))
         if (selected) {
             subhead1_jacob(name)
         } else {
