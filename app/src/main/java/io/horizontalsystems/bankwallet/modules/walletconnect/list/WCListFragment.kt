@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.modules.walletconnect.list.ui.WCSessionsScreen
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.core.findNavController
 
 class WCListFragment : BaseComposeFragment() {
@@ -13,10 +14,12 @@ class WCListFragment : BaseComposeFragment() {
         val deepLinkUri = activity?.intent?.data?.toString()
         activity?.intent?.data = null
         ComposeAppTheme {
-            WCSessionsScreen(
-                findNavController(),
-                deepLinkUri
-            )
+            NiaBackground {
+                WCSessionsScreen(
+                    findNavController(),
+                    deepLinkUri
+                )
+            }
         }
     }
 

@@ -7,7 +7,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Surface
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -41,8 +42,8 @@ fun CoinMarketsScreen(
     val viewItemState by viewModel.viewStateLiveData.observeAsState()
     val viewItems by viewModel.viewItemsLiveData.observeAsState()
 
-    Surface(color = ComposeAppTheme.colors.tyler) {
-        Crossfade(viewItemState) { viewItemState ->
+    Surface(color = MaterialTheme.colorScheme.background) {
+        Crossfade(viewItemState, label = "") { viewItemState ->
             when (viewItemState) {
                 ViewState.Loading -> {
                     Loading()

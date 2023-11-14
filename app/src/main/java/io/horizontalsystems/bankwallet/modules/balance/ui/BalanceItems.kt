@@ -6,18 +6,32 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,13 +47,31 @@ import io.horizontalsystems.bankwallet.core.managers.FaqManager
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
-import io.horizontalsystems.bankwallet.modules.balance.*
+import io.horizontalsystems.bankwallet.modules.balance.AccountViewItem
+import io.horizontalsystems.bankwallet.modules.balance.BalanceSortType
+import io.horizontalsystems.bankwallet.modules.balance.BalanceUiState
+import io.horizontalsystems.bankwallet.modules.balance.BalanceViewItem2
+import io.horizontalsystems.bankwallet.modules.balance.BalanceViewModel
+import io.horizontalsystems.bankwallet.modules.balance.HeaderNote
+import io.horizontalsystems.bankwallet.modules.balance.ReceiveAllowedState
+import io.horizontalsystems.bankwallet.modules.balance.TotalUIState
 import io.horizontalsystems.bankwallet.modules.manageaccount.dialogs.BackupRequiredDialog
 import io.horizontalsystems.bankwallet.modules.rateapp.RateAppModule
 import io.horizontalsystems.bankwallet.modules.rateapp.RateAppViewModel
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
-import io.horizontalsystems.bankwallet.ui.compose.components.*
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryCircle
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellowWithIcon
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryCircle
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryTransparent
+import io.horizontalsystems.bankwallet.ui.compose.components.DoubleText
+import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
+import io.horizontalsystems.bankwallet.ui.compose.components.HeaderSorting
+import io.horizontalsystems.bankwallet.ui.compose.components.HsIconButton
+import io.horizontalsystems.bankwallet.ui.compose.components.SelectorDialogCompose
+import io.horizontalsystems.bankwallet.ui.compose.components.SelectorItem
+import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_leah
 import io.horizontalsystems.core.helpers.HudHelper
 
 @Composable
@@ -134,7 +166,7 @@ fun Note(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun BalanceItems(
     balanceViewItems: List<BalanceViewItem2>,
@@ -170,77 +202,72 @@ fun BalanceItems(
             }
         ) {
             item {
-                TotalBalanceRow(
-                    totalState = totalState,
-                    onClickTitle = {
-                        viewModel.toggleBalanceVisibility()
-                        HudHelper.vibrate(context)
-                    },
-                    onClickSubtitle = {
-                        viewModel.toggleTotalType()
-                        HudHelper.vibrate(context)
-                    }
-                )
-            }
+                ElevatedCard(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    TotalBalanceRow(
+                        totalState = totalState,
+                        onClickTitle = {
+                            viewModel.toggleBalanceVisibility()
+                            HudHelper.vibrate(context)
+                        },
+                        onClickSubtitle = {
+                            viewModel.toggleTotalType()
+                            HudHelper.vibrate(context)
+                        }
+                    )
 
-            if (!accountViewItem.isWatchAccount) {
-                item {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 24.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        ButtonPrimaryYellowWithIcon(
-                            modifier = Modifier.weight(1f),
-                            icon = R.drawable.ic_arrow_up_right_24,
-                            title = stringResource(R.string.Balance_Send),
-                            onClick = {
-                                navController.slideFromRight(R.id.sendTokenSelectFragment)
-                            }
-                        )
-                        HSpacer(8.dp)
-                        ButtonPrimaryCircle(
-                            icon = R.drawable.ic_arrow_down_left_24,
-                            contentDescription = stringResource(R.string.Balance_Receive),
-                            onClick = {
-                                when (val receiveAllowedState = viewModel.getReceiveAllowedState()) {
-                                    ReceiveAllowedState.Allowed -> {
-                                        navController.slideFromRight(R.id.receiveTokenSelectFragment)
-                                    }
-
-                                    is ReceiveAllowedState.BackupRequired -> {
-                                        val account = receiveAllowedState.account
-                                        val text = Translator.getString(
-                                            R.string.Balance_Receive_BackupRequired_Description,
-                                            account.name
-                                        )
-                                        navController.slideFromBottom(
-                                            R.id.backupRequiredDialog,
-                                            BackupRequiredDialog.prepareParams(account, text)
-                                        )
-                                    }
-
-                                    null -> Unit
+                    if (!accountViewItem.isWatchAccount) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 24.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            ButtonPrimaryYellowWithIcon(
+                                modifier = Modifier.weight(1f),
+                                icon = R.drawable.ic_arrow_up_right_24,
+                                title = stringResource(R.string.Balance_Send),
+                                onClick = {
+                                    navController.slideFromRight(R.id.sendTokenSelectFragment)
                                 }
-                            },
-                        )
-                        HSpacer(8.dp)
-                        ButtonPrimaryCircle(
-                            icon = R.drawable.ic_swap_24,
-                            contentDescription = stringResource(R.string.Swap),
-                            onClick = {
-                                navController.slideFromRight(R.id.swapTokenSelectFragment)
-                            }
-                        )
-                    }
-                    VSpacer(12.dp)
-                }
-            }
+                            )
+                            HSpacer(8.dp)
+                            ButtonPrimaryCircle(
+                                icon = R.drawable.ic_arrow_down_left_24,
+                                contentDescription = stringResource(R.string.Balance_Receive),
+                                onClick = {
+                                    when (val receiveAllowedState =
+                                        viewModel.getReceiveAllowedState()) {
+                                        ReceiveAllowedState.Allowed -> {
+                                            navController.slideFromRight(R.id.receiveTokenSelectFragment)
+                                        }
 
-            item {
-                Divider(
-                    thickness = 1.dp,
-                    color = ComposeAppTheme.colors.steel10,
-                )
+                                        is ReceiveAllowedState.BackupRequired -> {
+                                            val account = receiveAllowedState.account
+                                            val text = Translator.getString(
+                                                R.string.Balance_Receive_BackupRequired_Description,
+                                                account.name
+                                            )
+                                            navController.slideFromBottom(
+                                                R.id.backupRequiredDialog,
+                                                BackupRequiredDialog.prepareParams(account, text)
+                                            )
+                                        }
+
+                                        null -> Unit
+                                    }
+                                },
+                            )
+                            HSpacer(8.dp)
+                            ButtonPrimaryCircle(
+                                icon = R.drawable.ic_swap_24,
+                                contentDescription = stringResource(R.string.Swap),
+                                onClick = {
+                                    navController.slideFromRight(R.id.swapTokenSelectFragment)
+                                }
+                            )
+                        }
+                        VSpacer(12.dp)
+                    }
+                }
+
             }
 
             stickyHeader {
@@ -278,7 +305,12 @@ fun BalanceItems(
                     HeaderNote.None -> Unit
                     HeaderNote.NonStandardAccount -> {
                         NoteError(
-                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp),
+                            modifier = Modifier.padding(
+                                start = 16.dp,
+                                end = 16.dp,
+                                top = 12.dp,
+                                bottom = 24.dp
+                            ),
                             text = stringResource(R.string.AccountRecovery_MigrationRequired),
                             onClick = {
                                 FaqManager.showFaqPage(
@@ -291,7 +323,12 @@ fun BalanceItems(
 
                     HeaderNote.NonRecommendedAccount -> {
                         NoteWarning(
-                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp),
+                            modifier = Modifier.padding(
+                                start = 16.dp,
+                                end = 16.dp,
+                                top = 12.dp,
+                                bottom = 24.dp
+                            ),
                             text = stringResource(R.string.AccountRecovery_MigrationRecommended),
                             onClick = {
                                 FaqManager.showFaqPage(

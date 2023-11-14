@@ -23,12 +23,12 @@ import io.horizontalsystems.bankwallet.modules.walletconnect.request.signmessage
 import io.horizontalsystems.bankwallet.modules.walletconnect.request.signmessage.WCSignMessageRequestViewModel
 import io.horizontalsystems.bankwallet.modules.walletconnect.request.signmessage.ui.SignMessageRequestScreen
 import io.horizontalsystems.bankwallet.modules.walletconnect.version2.WC2SessionManager
-import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryDefault
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.compose.components.TextImportantWarning
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,7 +39,7 @@ fun WC2UnsupportedRequestScreen(
 ) {
     val viewModel = viewModel<WC2UnsupportedRequestViewModel>(factory = WC2UnsupportedRequestViewModel.Factory(requestData))
 
-    ComposeAppTheme {
+    NiaBackground {
         Scaffold(
             containerColor = Color.Transparent,
             contentColor = MaterialTheme.colorScheme.background,

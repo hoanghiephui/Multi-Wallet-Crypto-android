@@ -38,6 +38,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawren
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.HsSwitch
 import io.horizontalsystems.bankwallet.ui.compose.components.InfoText
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
@@ -58,13 +59,15 @@ class SecuritySettingsFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent() {
         ComposeAppTheme {
-            SecurityCenterScreen(
-                securitySettingsViewModel = securitySettingsViewModel,
-                torViewModel = torViewModel,
-                navController = findNavController(),
-                showAppRestartAlert = { showAppRestartAlert() },
-                restartApp = { restartApp() },
-            )
+            NiaBackground {
+                SecurityCenterScreen(
+                    securitySettingsViewModel = securitySettingsViewModel,
+                    torViewModel = torViewModel,
+                    navController = findNavController(),
+                    showAppRestartAlert = { showAppRestartAlert() },
+                    restartApp = { restartApp() },
+                )
+            }
         }
     }
 

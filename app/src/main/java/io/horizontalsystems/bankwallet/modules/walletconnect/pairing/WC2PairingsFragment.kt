@@ -36,6 +36,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryCircle
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.body_lucian
@@ -46,7 +47,9 @@ class WC2PairingsFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent() {
-        WCPairingsScreen(findNavController())
+        ComposeAppTheme {
+            WCPairingsScreen(findNavController())
+        }
     }
 
 }
@@ -63,7 +66,7 @@ fun WCPairingsScreen(navController: NavController) {
         }
     }
 
-    ComposeAppTheme {
+    NiaBackground {
         Scaffold(
             containerColor = Color.Transparent,
             contentColor = MaterialTheme.colorScheme.background,

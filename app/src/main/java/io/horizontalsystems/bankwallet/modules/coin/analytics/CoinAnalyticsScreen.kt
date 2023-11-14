@@ -63,7 +63,7 @@ fun CoinAnalyticsScreen(
         refreshing = uiState.isRefreshing,
         onRefresh = { viewModel.refresh() },
     ) {
-        Crossfade(uiState.viewState) { viewState ->
+        Crossfade(uiState.viewState, label = "") { viewState ->
             when (viewState) {
                 ViewState.Loading -> {
                     Loading()

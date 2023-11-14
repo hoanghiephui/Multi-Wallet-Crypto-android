@@ -5,8 +5,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -187,8 +187,6 @@ private fun Stats(collection: NftCollectionOverviewViewItem) {
                     .height(105.dp)
                     .weight(1f),
                 shape = RoundedCornerShape(12.dp),
-                elevation = 0.dp,
-                backgroundColor = ComposeAppTheme.colors.lawrence
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp)
@@ -214,9 +212,7 @@ private fun Stats(collection: NftCollectionOverviewViewItem) {
                 modifier = Modifier
                     .height(105.dp)
                     .weight(1f),
-                shape = RoundedCornerShape(12.dp),
-                elevation = 0.dp,
-                backgroundColor = ComposeAppTheme.colors.lawrence
+                shape = RoundedCornerShape(12.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp)
@@ -245,8 +241,6 @@ private fun Stats(collection: NftCollectionOverviewViewItem) {
                     .height(105.dp)
                     .weight(1f),
                 shape = RoundedCornerShape(12.dp),
-                elevation = 0.dp,
-                backgroundColor = ComposeAppTheme.colors.lawrence
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp)
@@ -274,8 +268,6 @@ private fun Stats(collection: NftCollectionOverviewViewItem) {
                     .height(105.dp)
                     .weight(1f),
                 shape = RoundedCornerShape(12.dp),
-                elevation = 0.dp,
-                backgroundColor = ComposeAppTheme.colors.lawrence
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp)

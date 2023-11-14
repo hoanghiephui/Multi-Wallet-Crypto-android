@@ -24,6 +24,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.B2
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.HsSwitch
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.TextImportantWarning
 import io.horizontalsystems.core.findNavController
@@ -32,10 +33,12 @@ class ExperimentalFeaturesFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent() {
-        ExperimentalScreen(
-            onCloseClick = { findNavController().popBackStack() },
-            openTimeLock = { findNavController().slideFromRight(R.id.timeLockFragment) },
-        )
+        ComposeAppTheme {
+            ExperimentalScreen(
+                onCloseClick = { findNavController().popBackStack() },
+                openTimeLock = { findNavController().slideFromRight(R.id.timeLockFragment) },
+            )
+        }
     }
 
 }
@@ -46,7 +49,7 @@ private fun ExperimentalScreen(
     onCloseClick: () -> Unit,
     openTimeLock: () -> Unit,
 ) {
-    ComposeAppTheme {
+    NiaBackground {
         Column {
             AppBar(
                 title = stringResource(R.string.ExperimentalFeatures_Title),

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -41,7 +42,7 @@ fun PasscodeBlock(
                 start = {
                     Icon(
                         painter = painterResource(R.drawable.ic_passcode),
-                        tint = ComposeAppTheme.colors.jacob,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(24.dp),
                         contentDescription = null,
                     )

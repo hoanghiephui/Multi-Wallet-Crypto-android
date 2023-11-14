@@ -40,6 +40,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.core.CustomSnackbar
 import io.horizontalsystems.core.SnackbarDuration
 import io.horizontalsystems.core.findNavController
@@ -73,17 +74,19 @@ class TransactionSpeedUpCancelFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent() {
-        TransactionSpeedUpCancelScreen(
-            sendEvmTransactionViewModel = sendEvmTransactionViewModel,
-            feeViewModel = feeViewModel,
-            nonceViewModel = nonceViewModel,
-            parentNavGraphId = R.id.transactionSpeedUpCancelFragment,
-            speedUpCancelViewModel = speedUpCancelViewModel,
-            navController = findNavController(),
-            onSendClick = {
-                logger.info("click send button")
-                sendEvmTransactionViewModel.send(logger)
-            })
+        ComposeAppTheme {
+            TransactionSpeedUpCancelScreen(
+                sendEvmTransactionViewModel = sendEvmTransactionViewModel,
+                feeViewModel = feeViewModel,
+                nonceViewModel = nonceViewModel,
+                parentNavGraphId = R.id.transactionSpeedUpCancelFragment,
+                speedUpCancelViewModel = speedUpCancelViewModel,
+                navController = findNavController(),
+                onSendClick = {
+                    logger.info("click send button")
+                    sendEvmTransactionViewModel.send(logger)
+                })
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -159,7 +162,7 @@ private fun TransactionSpeedUpCancelScreen(
 ) {
     val enabled by sendEvmTransactionViewModel.sendEnabledLiveData.observeAsState(false)
 
-    ComposeAppTheme {
+    NiaBackground {
         Scaffold(
             containerColor = Color.Transparent,
             contentColor = MaterialTheme.colorScheme.background,

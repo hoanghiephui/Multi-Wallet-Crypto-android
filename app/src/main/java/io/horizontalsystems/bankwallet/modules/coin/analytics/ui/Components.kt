@@ -13,9 +13,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -108,7 +109,7 @@ fun AnalyticsFooterCell(
     onActionClick: (CoinAnalyticsModule.ActionType) -> Unit
 ) {
     if (showTopDivider) {
-        Divider(
+        HorizontalDivider(
             thickness = 1.dp,
             color = ComposeAppTheme.colors.steel10,
             modifier = Modifier.fillMaxWidth()
@@ -238,24 +239,23 @@ fun AnalyticsContainer(
 ) {
     VSpacer(12.dp)
     sectionTitle?.let {
-        Divider(
+        HorizontalDivider(
             thickness = 1.dp,
             color = ComposeAppTheme.colors.steel10,
             modifier = Modifier.fillMaxWidth()
         )
         RowUniversal(content = it)
     }
-    Column(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(ComposeAppTheme.colors.lawrence)
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(12.dp)
     ) {
         titleRow?.invoke()
         content.invoke()
         if (showFooterDivider) {
-            Divider(
+            HorizontalDivider(
                 thickness = 1.dp,
                 color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.fillMaxWidth()

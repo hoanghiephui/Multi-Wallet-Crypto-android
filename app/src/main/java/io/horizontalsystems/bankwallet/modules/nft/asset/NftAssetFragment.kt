@@ -18,6 +18,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
@@ -175,7 +176,7 @@ private fun NftAssetInfo(
         }
     }
 
-    Crossfade(combinedState) { state ->
+    Crossfade(combinedState, label = "") { state ->
         when (state) {
             is ViewState.Loading -> {
                 Loading()
@@ -265,7 +266,7 @@ private fun AssetContent(
                 Row(horizontalArrangement = Arrangement.End) {
                     Crossfade(
                         targetState = asset.showSend,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f), label = ""
                     ) { showSend ->
                         if (showSend) {
                             Row {
@@ -606,16 +607,18 @@ private fun ChipVerticalGrid(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NftAssetAttribute(context: Context, trait: NftAssetViewModel.TraitViewItem) {
-    Box(
+    Card(
+        onClick = {
+              if (trait.searchUrl != null) {
+                  LinkHelper.openLinkInAppBrowser(context, trait.searchUrl)
+              }
+        },
         modifier = Modifier
-            .height(60.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(ComposeAppTheme.colors.lawrence)
-            .clickable(trait.searchUrl != null) {
-                LinkHelper.openLinkInAppBrowser(context, trait.searchUrl ?: "")
-            }
+            .height(60.dp),
+        shape = RoundedCornerShape(12.dp)
     ) {
         Column(
             modifier = Modifier

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
@@ -50,7 +51,7 @@ fun SignMessageRequestScreen(
     }
 
     ComposeAppTheme {
-        Column {
+        Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
             AppBar(
                 stringResource(R.string.WalletConnect_SignMessageRequest_Title),
                 menuItems = listOf(

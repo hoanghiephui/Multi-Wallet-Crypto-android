@@ -32,6 +32,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
 import io.horizontalsystems.bankwallet.ui.compose.components.HeaderText
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.ScreenMessageWithAction
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
@@ -53,29 +54,31 @@ class TechnicalIndicatorsDetailsFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent() {
         ComposeAppTheme {
-            if (coinUid == null || period == null) {
-                ScreenMessageWithAction(
-                    text = stringResource(R.string.Error),
-                    icon = R.drawable.ic_error_48
-                ) {
-                    ButtonPrimaryYellow(
-                        modifier = Modifier
-                            .padding(horizontal = 48.dp)
-                            .fillMaxWidth(),
-                        title = stringResource(R.string.Button_Close),
-                        onClick = {
+            NiaBackground {
+                if (coinUid == null || period == null) {
+                    ScreenMessageWithAction(
+                        text = stringResource(R.string.Error),
+                        icon = R.drawable.ic_error_48
+                    ) {
+                        ButtonPrimaryYellow(
+                            modifier = Modifier
+                                .padding(horizontal = 48.dp)
+                                .fillMaxWidth(),
+                            title = stringResource(R.string.Button_Close),
+                            onClick = {
+                                findNavController().popBackStack()
+                            }
+                        )
+                    }
+                } else {
+                    TechnicalIndicatorsDetailsScreen(
+                        coinUid = coinUid!!,
+                        period = period!!,
+                        onBackPress = {
                             findNavController().popBackStack()
                         }
                     )
                 }
-            } else {
-                TechnicalIndicatorsDetailsScreen(
-                    coinUid = coinUid!!,
-                    period = period!!,
-                    onBackPress = {
-                        findNavController().popBackStack()
-                    }
-                )
             }
         }
     }
@@ -122,7 +125,6 @@ private fun TechnicalIndicatorsDetailsScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
-                                .background(color = ComposeAppTheme.colors.tyler)
                         ) {
                             VSpacer(12.dp)
                             DetailsView(uiState.sections)

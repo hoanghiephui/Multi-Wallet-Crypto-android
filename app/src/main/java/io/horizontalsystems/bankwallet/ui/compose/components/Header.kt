@@ -6,6 +6,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -57,7 +58,7 @@ fun HeaderText(
 fun HeaderSorting(
     borderTop: Boolean = false,
     borderBottom: Boolean = false,
-    background: Color = ComposeAppTheme.colors.tyler,
+    background: Color = MaterialTheme.colorScheme.background,
     content: @Composable RowScope.() -> Unit
 ) {
     Box(

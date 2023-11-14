@@ -1,7 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.settings.language
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -12,7 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,6 +29,7 @@ import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
@@ -39,10 +39,12 @@ class LanguageSettingsFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent() {
-        LanguageScreen(
-            findNavController(),
-            { activity?.let { MainModule.startAsNewTask(it) } }
-        )
+        ComposeAppTheme {
+            LanguageScreen(
+                findNavController(),
+                { activity?.let { MainModule.startAsNewTask(it) } }
+            )
+        }
     }
 
 }
@@ -64,7 +66,7 @@ private fun LanguageScreen(
         reloadApp()
     }
 
-    ComposeAppTheme {
+    NiaBackground {
         Column {
             AppBar(
                 title = stringResource(R.string.Settings_Language),

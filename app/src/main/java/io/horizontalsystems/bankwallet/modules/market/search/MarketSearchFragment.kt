@@ -1,6 +1,7 @@
 package io.horizontalsystems.bankwallet.modules.market.search
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -17,6 +18,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,6 +65,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
 import io.horizontalsystems.bankwallet.ui.compose.components.MarketCoinFirstRow
 import io.horizontalsystems.bankwallet.ui.compose.components.MarketCoinSecondRow
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.compose.components.SectionItemBorderedRowUniversalClear
 import io.horizontalsystems.bankwallet.ui.compose.components.SnackbarError
 import io.horizontalsystems.bankwallet.ui.compose.components.body_grey50
@@ -76,10 +79,12 @@ class MarketSearchFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent() {
-        MarketSearchScreen(
-            viewModel,
-            findNavController(),
-        )
+        ComposeAppTheme {
+            MarketSearchScreen(
+                viewModel,
+                findNavController(),
+            )
+        }
     }
 
 }
@@ -94,8 +99,8 @@ fun MarketSearchScreen(
     val viewState = viewModel.viewState
     val errorMessage = viewModel.errorMessage
 
-    ComposeAppTheme {
-        Column {
+    NiaBackground {
+        Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
             AppBar(
                 title = stringResource(R.string.Market_Overview_TopSectors),
                 navigationIcon = {

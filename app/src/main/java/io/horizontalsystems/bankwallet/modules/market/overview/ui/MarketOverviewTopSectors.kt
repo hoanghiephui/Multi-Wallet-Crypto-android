@@ -3,11 +3,15 @@ package io.horizontalsystems.bankwallet.modules.market.overview.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Divider
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -30,18 +34,18 @@ fun TopSectorsBoardView(
     onClickSeeAll: () -> Unit,
     onItemClick: (CoinCategory) -> Unit
 ) {
-    Divider(
+    HorizontalDivider(
         thickness = 1.dp,
         color = ComposeAppTheme.colors.steel10
     )
     Row(modifier = Modifier.height(42.dp)) {
         Row(
             modifier = Modifier
-                    .height(42.dp)
-                    .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                    ) { onClickSeeAll.invoke() },
+                .height(42.dp)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) { onClickSeeAll.invoke() },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
@@ -70,20 +74,13 @@ private fun TopSectorsGrid(
     items: List<MarketSearchModule.DiscoveryItem.Category>,
     onItemClick: (CoinCategory) -> Unit,
 ) {
-
-    if (items.isNotEmpty() && items.size >= 2) {
-        Row(modifier = Modifier.padding(horizontal = 10.dp)) {
-            CategoryCard(items[0]) { onItemClick(items[0].coinCategory) }
-            CategoryCard(items[1]) { onItemClick(items[1].coinCategory) }
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(16.dp),
+        content = {
+            items(items) {
+                CategoryCard(it) { onItemClick(it.coinCategory) }
+            }
         }
-    }
-
-    if (items.isNotEmpty() && items.size >= 4) {
-        Row(modifier = Modifier.padding(horizontal = 10.dp)) {
-            CategoryCard(items[2]) { onItemClick(items[2].coinCategory) }
-            CategoryCard(items[3]) { onItemClick(items[3].coinCategory) }
-        }
-    }
-
-    Spacer(modifier = Modifier.height(18.dp))
+    )
 }

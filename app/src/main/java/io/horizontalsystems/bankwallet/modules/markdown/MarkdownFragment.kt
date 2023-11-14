@@ -17,6 +17,7 @@ import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.core.findNavController
 
 class MarkdownFragment : BaseComposeFragment() {
@@ -24,17 +25,19 @@ class MarkdownFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent() {
         ComposeAppTheme {
-            MarkdownScreen(
-                handleRelativeUrl = arguments?.getBoolean(handleRelativeUrlKey) ?: false,
-                showAsPopup = arguments?.getBoolean(showAsPopupKey) ?: false,
-                markdownUrl = arguments?.getString(markdownUrlKey) ?: "",
-                onCloseClick = { findNavController().popBackStack() },
-                onUrlClick = { url ->
-                    findNavController().slideFromRight(
-                        R.id.markdownFragment, bundleOf(markdownUrlKey to url)
-                    )
-                }
-            )
+            NiaBackground {
+                MarkdownScreen(
+                    handleRelativeUrl = arguments?.getBoolean(handleRelativeUrlKey) ?: false,
+                    showAsPopup = arguments?.getBoolean(showAsPopupKey) ?: false,
+                    markdownUrl = arguments?.getString(markdownUrlKey) ?: "",
+                    onCloseClick = { findNavController().popBackStack() },
+                    onUrlClick = { url ->
+                        findNavController().slideFromRight(
+                            R.id.markdownFragment, bundleOf(markdownUrlKey to url)
+                        )
+                    }
+                )
+            }
         }
     }
 

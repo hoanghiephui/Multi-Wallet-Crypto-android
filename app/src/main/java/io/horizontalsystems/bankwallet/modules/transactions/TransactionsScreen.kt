@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -49,7 +50,7 @@ fun TransactionsScreen(
     val syncing by viewModel.syncingLiveData.observeAsState(false)
     val filterResetEnabled by viewModel.filterResetEnabled.collectAsState()
 
-    Column {
+    Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         AppBar(
             title = stringResource(R.string.Transactions_Title),
             showSpinner = syncing,

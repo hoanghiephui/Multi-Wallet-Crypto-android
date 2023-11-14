@@ -5,8 +5,13 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,7 +55,7 @@ fun AppearanceScreen(navController: NavController) {
     )
 
     ComposeAppTheme {
-        Surface(color = ComposeAppTheme.colors.tyler) {
+        Surface(color = MaterialTheme.colorScheme.background) {
             ModalBottomSheetLayout(
                 sheetState = sheetState,
                 sheetBackgroundColor = ComposeAppTheme.colors.transparent,

@@ -8,8 +8,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Surface
+import androidx.compose.material3.Surface
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -94,7 +95,7 @@ private fun PlatformScreen(
     var scrollToTopAfterUpdate by rememberSaveable { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
 
-    Surface(color = ComposeAppTheme.colors.tyler) {
+    Surface(color = MaterialTheme.colorScheme.background) {
         Column {
             TopCloseButton(interactionSource, onCloseButtonClick = onCloseButtonClick)
 
@@ -104,7 +105,7 @@ private fun PlatformScreen(
                     viewModel.refresh()
                 }
             ) {
-                Crossfade(viewModel.viewState) { state ->
+                Crossfade(viewModel.viewState, label = "") { state ->
                     when (state) {
                         ViewState.Loading -> {
                             Loading()
@@ -193,7 +194,6 @@ private fun HeaderContent(title: String, description: String, image: ImageSource
             modifier = Modifier
                 .height(100.dp)
                 .padding(horizontal = 16.dp)
-                .background(ComposeAppTheme.colors.tyler)
         ) {
             Column(
                 modifier = Modifier

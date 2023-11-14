@@ -69,7 +69,7 @@ fun CoinList(
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .background(if (item.favorited) ComposeAppTheme.colors.lucian else ComposeAppTheme.colors.jacob)
+                        .background(if (item.favorited) ComposeAppTheme.colors.lucian else MaterialTheme.colorScheme.background)
                         .align(Alignment.CenterEnd)
                         .width(100.dp)
                         .clickable {
@@ -87,7 +87,7 @@ fun CoinList(
                 ) {
                     Icon(
                         painter = painterResource(id = if (item.favorited) R.drawable.ic_star_off_24 else R.drawable.ic_star_24),
-                        tint = ComposeAppTheme.colors.claude,
+                        tint = MaterialTheme.colorScheme.onSurface,
                         contentDescription = stringResource(if (item.favorited) R.string.CoinPage_Unfavorite else R.string.CoinPage_Favorite),
                     )
                 }
@@ -298,7 +298,7 @@ fun DescriptionCard(title: String, description: String, image: ImageSource) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RowScope.CategoryCard(
+fun CategoryCard(
     type: DiscoveryItem,
     onClick: () -> Unit
 ) {
@@ -306,9 +306,8 @@ fun RowScope.CategoryCard(
         modifier = Modifier
             .padding(6.dp)
             .height(128.dp)
-            .weight(1f),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            .wrapContentSize(),
+        shape = RoundedCornerShape(12.dp),
         onClick = onClick
     ) {
         Box(modifier = Modifier.fillMaxSize()) {

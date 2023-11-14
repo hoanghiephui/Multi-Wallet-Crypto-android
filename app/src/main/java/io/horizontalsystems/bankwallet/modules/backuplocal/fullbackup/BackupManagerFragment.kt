@@ -39,6 +39,7 @@ import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.body_jacob
 import io.horizontalsystems.core.findNavController
@@ -50,30 +51,32 @@ class BackupManagerFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent() {
         ComposeAppTheme {
-            val navController = findNavController()
-            BackupManagerScreen(
-                onBackClick = {
-                    navController.popBackStack()
-                },
-                onRestoreBackup = { jsonString, fileName ->
-                    navController.navigateWithTermsAccepted {
-                        navController.slideFromBottom(
-                            R.id.restoreLocalFragment,
-                            bundleOf(
-                                ManageAccountsModule.popOffOnSuccessKey to R.id.backupManagerFragment,
-                                ManageAccountsModule.popOffInclusiveKey to false,
-                                RestoreLocalFragment.jsonFileKey to jsonString,
-                                RestoreLocalFragment.fileNameKey to fileName
+            NiaBackground {
+                val navController = findNavController()
+                BackupManagerScreen(
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                    onRestoreBackup = { jsonString, fileName ->
+                        navController.navigateWithTermsAccepted {
+                            navController.slideFromBottom(
+                                R.id.restoreLocalFragment,
+                                bundleOf(
+                                    ManageAccountsModule.popOffOnSuccessKey to R.id.backupManagerFragment,
+                                    ManageAccountsModule.popOffInclusiveKey to false,
+                                    RestoreLocalFragment.jsonFileKey to jsonString,
+                                    RestoreLocalFragment.fileNameKey to fileName
+                                )
                             )
-                        )
+                        }
+                    },
+                    onCreateBackup = {
+                        navController.authorizedAction {
+                            navController.slideFromRight(R.id.backupLocalFragment)
+                        }
                     }
-                },
-                onCreateBackup = {
-                    navController.authorizedAction {
-                        navController.slideFromRight(R.id.backupLocalFragment)
-                    }
-                }
-            )
+                )
+            }
         }
     }
 }

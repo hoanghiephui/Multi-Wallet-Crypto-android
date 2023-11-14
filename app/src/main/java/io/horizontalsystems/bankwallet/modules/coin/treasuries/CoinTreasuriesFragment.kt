@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -71,7 +72,7 @@ class CoinTreasuriesFragment : BaseComposeFragment() {
         val treasuriesData by viewModel.coinTreasuriesLiveData.observeAsState()
         val chainSelectorDialogState by viewModel.treasuryTypeSelectorDialogStateLiveData.observeAsState(TvlModule.SelectorDialogState.Closed)
 
-        Column {
+        Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
             AppBar(
                 title = stringResource(R.string.CoinPage_Treasuries),
                 navigationIcon = {

@@ -7,8 +7,8 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Divider
-import androidx.compose.material.Text
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,10 +34,10 @@ fun TorStatusView(
 
     val animatedSize by animateDpAsState(
         targetValue = if (viewModel.torViewState.torIsActive) 20.dp else 50.dp,
-        animationSpec = tween(durationMillis = 250, easing = LinearOutSlowInEasing)
+        animationSpec = tween(durationMillis = 250, easing = LinearOutSlowInEasing), label = ""
     )
 
-    Divider(
+    HorizontalDivider(
         thickness = 1.dp,
         color = ComposeAppTheme.colors.steel10,
         modifier = Modifier.fillMaxWidth()

@@ -37,7 +37,7 @@ class WCErrorNoAccountFragment : BaseComposableBottomSheetFragment() {
             )
             setContent {
                 ComposeAppTheme {
-                    WalletConnectErrorNoAccount() {
+                    WalletConnectErrorNoAccount {
                         findNavController().popBackStack()
                     }
                 }

@@ -15,7 +15,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,10 +63,10 @@ fun <T> CellMultilineLawrenceSection(
     items: Iterable<T>,
     itemContent: @Composable (T) -> Unit
 ) {
-    Column(
+    Card(
         modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(12.dp))
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(12.dp)
     ) {
         items.forEachIndexed { index, marketDataLine ->
             CellMultilineLawrence(borderTop = index != 0) {
@@ -85,10 +86,9 @@ fun CellMultilineLawrence(
         modifier = Modifier
             .fillMaxWidth()
             .height(60.dp)
-            .background(ComposeAppTheme.colors.lawrence)
     ) {
         if (borderTop) {
-            Divider(
+            HorizontalDivider(
                 thickness = 1.dp,
                 color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.align(Alignment.TopCenter)
@@ -96,7 +96,7 @@ fun CellMultilineLawrence(
         }
 
         if (borderBottom) {
-            Divider(
+            HorizontalDivider(
                 thickness = 1.dp,
                 color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.align(Alignment.BottomCenter)
@@ -112,10 +112,10 @@ fun <T> CellSingleLineLawrenceSection(
     items: List<T>,
     itemContent: @Composable (T) -> Unit
 ) {
-    Column(
+    Card(
         modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(12.dp))
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(12.dp)
     ) {
         items.forEachIndexed { index, marketDataLine ->
             CellSingleLineLawrence(borderTop = index != 0) {
@@ -180,7 +180,6 @@ fun CellSingleLineLawrence(
     CellSingleLine(
         borderTop = borderTop,
         borderBottom = borderBottom,
-        color = ComposeAppTheme.colors.lawrence,
         content = content
     )
 }
@@ -203,7 +202,7 @@ fun CellSingleLine(
             .then(colorModifier)
     ) {
         if (borderTop) {
-            Divider(
+            HorizontalDivider(
                 thickness = 1.dp,
                 color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.align(Alignment.TopCenter)
@@ -211,7 +210,7 @@ fun CellSingleLine(
         }
 
         if (borderBottom) {
-            Divider(
+            HorizontalDivider(
                 thickness = 1.dp,
                 color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.align(Alignment.BottomCenter)
@@ -234,7 +233,7 @@ fun CellHeaderSorting(
             .height(44.dp)
     ) {
         if (borderTop) {
-            Divider(
+            HorizontalDivider(
                 thickness = 1.dp,
                 color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.align(Alignment.TopCenter)
@@ -242,7 +241,7 @@ fun CellHeaderSorting(
         }
 
         if (borderBottom) {
-            Divider(
+            HorizontalDivider(
                 thickness = 1.dp,
                 color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.align(Alignment.BottomCenter)
@@ -287,7 +286,7 @@ fun CellMultilineClear(
             .then(clickableModifier)
     ) {
         if (borderTop) {
-            Divider(
+            HorizontalDivider(
                 thickness = 1.dp,
                 color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.align(Alignment.TopCenter)
@@ -295,7 +294,7 @@ fun CellMultilineClear(
         }
 
         if (borderBottom) {
-            Divider(
+            HorizontalDivider(
                 thickness = 1.dp,
                 color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.align(Alignment.BottomCenter)
@@ -319,7 +318,7 @@ fun CellSingleLineClear(
             .height(48.dp)
     ) {
         if (borderTop) {
-            Divider(
+            HorizontalDivider(
                 thickness = 1.dp,
                 color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.align(Alignment.TopCenter)
@@ -327,7 +326,7 @@ fun CellSingleLineClear(
         }
 
         if (borderBottom) {
-            Divider(
+            HorizontalDivider(
                 thickness = 1.dp,
                 color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.align(Alignment.BottomCenter)
@@ -352,7 +351,7 @@ fun CellFooter(text: String) {
             .height(58.dp)
             .fillMaxWidth(),
     ) {
-        Divider(color = ComposeAppTheme.colors.steel10)
+        HorizontalDivider(color = ComposeAppTheme.colors.steel10)
         caption_grey(
             text = text,
             modifier = Modifier
@@ -409,11 +408,10 @@ fun CellUniversalLawrenceSection(
 fun CellUniversalLawrenceSection(
     composableItems: List<@Composable () -> Unit>
 ) {
-    Column(
+    Card(
         modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(ComposeAppTheme.colors.lawrence)
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(12.dp)
     ) {
         composableItems.forEachIndexed { index, composable ->
             SectionUniversalItem(
@@ -437,12 +435,11 @@ fun <T> CellUniversalLawrenceSection(
         Modifier
     }
 
-    Column(
+    Card(
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(ComposeAppTheme.colors.lawrence)
-            .then(frameModifier)
+            .then(frameModifier),
+        shape = RoundedCornerShape(12.dp)
     ) {
         items.forEachIndexed { index, itemData ->
             SectionUniversalItem(
@@ -491,12 +488,11 @@ fun <T> CellUniversalLawrenceSection(
         Modifier
     }
 
-    Column(
+    Card(
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(ComposeAppTheme.colors.lawrence)
-            .then(frameModifier)
+            .then(frameModifier),
+        shape = RoundedCornerShape(12.dp)
     ) {
         val size = items.size
         items.subList(0, limit.coerceAtMost(size)).forEachIndexed { index, itemData ->
@@ -559,7 +555,7 @@ fun SectionUniversalItem(
         modifier = Modifier.fillMaxWidth()
     ) {
         if (borderTop) {
-            Divider(
+            HorizontalDivider(
                 thickness = 1.dp,
                 color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.align(Alignment.TopCenter)
@@ -567,7 +563,7 @@ fun SectionUniversalItem(
         }
 
         if (borderBottom) {
-            Divider(
+            HorizontalDivider(
                 thickness = 1.dp,
                 color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.align(Alignment.BottomCenter)
@@ -588,7 +584,7 @@ fun SectionItemBorderedRowUniversalClear(
 ) {
     Column {
         if (borderTop) {
-            Divider(
+            HorizontalDivider(
                 thickness = 1.dp,
                 color = ComposeAppTheme.colors.steel10,
             )
@@ -599,7 +595,7 @@ fun SectionItemBorderedRowUniversalClear(
             content = content
         )
         if (borderBottom) {
-            Divider(
+            HorizontalDivider(
                 thickness = 1.dp,
                 color = ComposeAppTheme.colors.steel10,
             )
@@ -621,7 +617,7 @@ fun CellBorderedRowUniversal(
             .background(backgroundColor)
     ) {
         if (borderTop) {
-            Divider(
+            HorizontalDivider(
                 thickness = 1.dp,
                 color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.align(Alignment.TopCenter)
@@ -629,7 +625,7 @@ fun CellBorderedRowUniversal(
         }
 
         if (borderBottom) {
-            Divider(
+            HorizontalDivider(
                 thickness = 1.dp,
                 color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.align(Alignment.BottomCenter)

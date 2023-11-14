@@ -20,15 +20,18 @@ import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.InfoText
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.core.findNavController
 
 class TimeLockFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent() {
-        ExperimentalScreen(
-            findNavController()
-        )
+        ComposeAppTheme {
+            ExperimentalScreen(
+                findNavController()
+            )
+        }
     }
 
 }
@@ -39,7 +42,7 @@ private fun ExperimentalScreen(
     navController: NavController,
     viewModel: TimeLockViewModel = viewModel(factory = TimeLockModule.Factory())
 ) {
-    ComposeAppTheme {
+    NiaBackground {
         Column {
             AppBar(
                 title = stringResource(R.string.BitcoinHodling_Title),

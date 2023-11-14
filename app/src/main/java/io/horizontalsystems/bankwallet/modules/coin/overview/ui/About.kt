@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,12 +38,11 @@ fun About(text: String) {
             body_leah(text = stringResource(id = R.string.CoinPage_Overview))
         }
 
-        Column(
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(ComposeAppTheme.colors.lawrence)
+                .padding(horizontal = 16.dp),
+            shape = RoundedCornerShape(12.dp)
         ) {
             DescriptionMarkdown(
                 text = text,

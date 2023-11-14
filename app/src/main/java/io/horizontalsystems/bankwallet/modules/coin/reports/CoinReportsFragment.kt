@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -69,7 +70,7 @@ private fun CoinReportsScreen(
     val isRefreshing by viewModel.isRefreshingLiveData.observeAsState(false)
     val reportViewItems by viewModel.reportViewItemsLiveData.observeAsState()
 
-    Column {
+    Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         AppBar(
             title = stringResource(R.string.CoinPage_Reports),
             navigationIcon = {

@@ -12,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.Surface
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -55,7 +56,7 @@ private fun BlockchainSettingsScreen(
     viewModel: BlockchainSettingsViewModel = viewModel(factory = BlockchainSettingsModule.Factory()),
 ) {
 
-    Surface(color = ComposeAppTheme.colors.tyler) {
+    Surface(color = MaterialTheme.colorScheme.background) {
         Column {
             AppBar(
                 title = stringResource(R.string.BlockchainSettings_Title),

@@ -1,10 +1,23 @@
 package io.horizontalsystems.bankwallet.modules.market.overview.ui
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,37 +40,37 @@ import io.horizontalsystems.chartview.ChartMinimal
 import java.math.BigDecimal
 
 @Composable
-fun MetricChartsView(marketMetrics: MarketOverviewModule.MarketMetrics, navController: NavController) {
-    Column(
-        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp)
-    ) {
-        Row {
-            ChartView(marketMetrics.totalMarketCap, navController)
-            Spacer(Modifier.width(8.dp))
-            ChartView(marketMetrics.volume24h, navController)
+fun MetricChartsView(
+    marketMetrics: MarketOverviewModule.MarketMetrics,
+    navController: NavController
+) {
+    val items = listOf(
+        marketMetrics.totalMarketCap,
+        marketMetrics.volume24h,
+        marketMetrics.defiCap,
+        marketMetrics.defiTvl
+    )
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(16.dp),
+        content = {
+            items(items) {
+                ChartView(it, navController)
+            }
         }
-        Spacer(Modifier.height(8.dp))
-        Row {
-            ChartView(marketMetrics.defiCap, navController)
-            Spacer(Modifier.width(8.dp))
-            ChartView(marketMetrics.defiTvl, navController)
-        }
-    }
+    )
 }
 
 @Composable
-private fun RowScope.ChartView(metricsData: MetricData, navController: NavController) {
+private fun ChartView(metricsData: MetricData, navController: NavController) {
     Card(
         modifier = Modifier
             .height(105.dp)
-            .weight(1f)
-            .clip(RoundedCornerShape(12.dp))
+            .width(200.dp)
             .clickable {
                 openMetricsPage(metricsData.type, navController)
             },
         shape = RoundedCornerShape(12.dp),
-        elevation = 0.dp,
-        backgroundColor = ComposeAppTheme.colors.lawrence
     ) {
         Column(
             modifier = Modifier.padding(12.dp)

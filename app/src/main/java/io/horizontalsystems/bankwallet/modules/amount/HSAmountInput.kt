@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Divider
-import androidx.compose.material.Text
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -209,7 +209,7 @@ fun HSAmountInput(
                 }
             }
 
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 8.dp),
                 color = ComposeAppTheme.colors.steel10
             )

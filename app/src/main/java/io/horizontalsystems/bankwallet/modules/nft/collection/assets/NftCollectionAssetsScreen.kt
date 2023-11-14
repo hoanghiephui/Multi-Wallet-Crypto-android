@@ -33,7 +33,7 @@ fun NftCollectionAssetsScreen(navController: NavController, blockchainType: Bloc
             viewModel.refresh()
         }
     ) {
-        Crossfade(viewModel.viewState) { viewState ->
+        Crossfade(viewModel.viewState, label = "") { viewState ->
             when (viewState) {
                 ViewState.Loading -> {
                     Loading()

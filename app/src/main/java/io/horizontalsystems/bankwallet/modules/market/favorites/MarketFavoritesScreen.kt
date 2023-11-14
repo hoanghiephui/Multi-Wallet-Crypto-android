@@ -4,7 +4,9 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -23,7 +25,6 @@ import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.market.MarketField
 import io.horizontalsystems.bankwallet.modules.market.SortingField
-import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
 import io.horizontalsystems.bankwallet.ui.compose.Select
 import io.horizontalsystems.bankwallet.ui.compose.components.*
@@ -48,15 +49,19 @@ fun MarketFavoritesScreen(
     ) {
         Crossfade(
             targetState = viewState,
-            modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)
+            modifier = Modifier
+                .background(color = MaterialTheme.colorScheme.background)
+                .fillMaxHeight(), label = ""
         ) { viewState ->
             when (viewState) {
                 ViewState.Loading -> {
                     Loading()
                 }
+
                 is ViewState.Error -> {
                     ListErrorView(stringResource(R.string.SyncError), viewModel::onErrorClick)
                 }
+
                 ViewState.Success -> {
                     marketFavoritesData?.let { data ->
                         if (data.marketItems.isEmpty()) {
@@ -91,6 +96,7 @@ fun MarketFavoritesScreen(
                         }
                     }
                 }
+
                 null -> {}
             }
         }
@@ -108,8 +114,10 @@ fun MarketFavoritesScreen(
                 { viewModel.onSortingFieldDialogDismiss() }
             )
         }
+
         MarketFavoritesModule.SelectorDialogState.Closed,
-        null -> {}
+        null -> {
+        }
     }
 }
 

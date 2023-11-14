@@ -12,9 +12,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
-import androidx.compose.material.Surface
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -72,7 +73,7 @@ private fun BtcBlockchainSettingsScreen(
         navController.popBackStack()
     }
 
-    Surface(color = ComposeAppTheme.colors.tyler) {
+    Surface(color = MaterialTheme.colorScheme.background) {
         Column {
             AppBar(
                 title = viewModel.title,

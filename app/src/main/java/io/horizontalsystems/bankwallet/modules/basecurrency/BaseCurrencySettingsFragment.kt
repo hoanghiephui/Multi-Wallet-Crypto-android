@@ -4,6 +4,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -28,7 +29,9 @@ class BaseCurrencySettingsFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent() {
-        BaseCurrencyScreen(findNavController())
+        ComposeAppTheme {
+            BaseCurrencyScreen(findNavController())
+        }
     }
 
 }
@@ -62,7 +65,7 @@ private fun BaseCurrencyScreen(
         }
     }
 
-    ComposeAppTheme {
+    NiaBackground {
         ModalBottomSheetLayout(
             sheetState = sheetState,
             sheetBackgroundColor = ComposeAppTheme.colors.transparent,
@@ -83,9 +86,7 @@ private fun BaseCurrencyScreen(
                 )
             }
         ) {
-            Column(
-                modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)
-            ) {
+            Column {
                 AppBar(
                     title = stringResource(R.string.SettingsCurrency_Title),
                     navigationIcon = {

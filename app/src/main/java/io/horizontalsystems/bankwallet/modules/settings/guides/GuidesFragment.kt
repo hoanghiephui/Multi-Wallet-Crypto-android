@@ -3,7 +3,6 @@ package io.horizontalsystems.bankwallet.modules.settings.guides
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,11 +15,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -39,6 +38,7 @@ import io.horizontalsystems.bankwallet.modules.markdown.MarkdownFragment
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.compose.components.ScreenMessageWithAction
 import io.horizontalsystems.bankwallet.ui.compose.components.ScrollableTabs
 import io.horizontalsystems.bankwallet.ui.compose.components.TabItem
@@ -53,7 +53,9 @@ class GuidesFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent() {
         ComposeAppTheme {
-            GuidesScreen(findNavController())
+            NiaBackground {
+                GuidesScreen(findNavController())
+            }
         }
     }
 
@@ -77,7 +79,7 @@ fun GuidesScreen(navController: NavController) {
             }
         )
 
-        Crossfade(viewState) { viewState ->
+        Crossfade(viewState, label = "") { viewState ->
             when (viewState) {
                 ViewState.Loading -> {
                     Loading()
@@ -130,15 +132,15 @@ fun GuidesScreen(navController: NavController) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardsPreviewCardsGuide(guide: Guide, onClick: () -> Unit) {
-    Column(
+    Card(
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(ComposeAppTheme.colors.lawrence)
-            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp),
+        shape = RoundedCornerShape(12.dp)
     ) {
         Box(
             modifier = Modifier

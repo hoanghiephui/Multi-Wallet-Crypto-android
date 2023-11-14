@@ -63,7 +63,7 @@ fun MarketOverviewScreen(
                                 .verticalScroll(scrollState)
                         ) {
                             Box(
-                                modifier = Modifier.height(240.dp)
+                                modifier = Modifier.height(142.dp)
                             ) {
                                 MetricChartsView(viewItem.marketMetrics, navController)
                             }

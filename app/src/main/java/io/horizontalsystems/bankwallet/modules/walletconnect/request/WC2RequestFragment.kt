@@ -19,6 +19,7 @@ import io.horizontalsystems.bankwallet.modules.walletconnect.request.signmessage
 import io.horizontalsystems.bankwallet.modules.walletconnect.version2.WC2SendEthereumTransactionRequest
 import io.horizontalsystems.bankwallet.modules.walletconnect.version2.WC2SignMessageRequest
 import io.horizontalsystems.bankwallet.modules.walletconnect.version2.WC2UnsupportedRequest
+import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.helpers.HudHelper
 
@@ -34,7 +35,9 @@ class WC2RequestFragment : BaseComposeFragment() {
         val requestData = wc2RequestViewModel.requestData
         when (requestData?.pendingRequest) {
             is WC2UnsupportedRequest -> {
-                WC2UnsupportedRequestScreen(navController, requestData)
+                ComposeAppTheme {
+                    WC2UnsupportedRequestScreen(navController, requestData)
+                }
             }
 
             is WC2SignMessageRequest -> {

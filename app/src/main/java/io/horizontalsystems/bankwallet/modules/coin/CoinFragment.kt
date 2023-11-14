@@ -5,8 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -97,7 +97,7 @@ fun CoinTabs(
     val coroutineScope = rememberCoroutineScope()
     val view = LocalView.current
 
-    Column(modifier = Modifier.background(color = androidx.compose.material3.MaterialTheme.colorScheme.background)) {
+    Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
         AppBar(
             title = viewModel.fullCoin.coin.code,
             navigationIcon = {
@@ -110,7 +110,7 @@ fun CoinTabs(
                             MenuItem(
                                 title = TranslatableString.ResString(R.string.CoinPage_Unfavorite),
                                 icon = R.drawable.ic_filled_star_24,
-                                tint = MaterialTheme.colors.onSurface,
+                                tint = MaterialTheme.colorScheme.onSurface,
                                 onClick = { viewModel.onUnfavoriteClick() }
                             )
                         )

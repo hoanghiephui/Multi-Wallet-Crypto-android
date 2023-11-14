@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -83,7 +84,7 @@ private fun CoinAuditsScreen(
     val isRefreshing by viewModel.isRefreshingLiveData.observeAsState(false)
     val viewItems by viewModel.viewItemsLiveData.observeAsState()
 
-    Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+    Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
         AppBar(
             title = stringResource(R.string.CoinPage_Audits),
             navigationIcon = {

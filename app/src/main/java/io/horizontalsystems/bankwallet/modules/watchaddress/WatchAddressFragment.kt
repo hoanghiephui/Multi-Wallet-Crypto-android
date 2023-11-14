@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -46,13 +47,11 @@ class WatchAddressFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent() {
-        ComposeAppTheme {
-            val popUpToInclusiveId =
-                arguments?.getInt(ManageAccountsModule.popOffOnSuccessKey, R.id.watchAddressFragment) ?: R.id.watchAddressFragment
-            val inclusive =
-                arguments?.getBoolean(ManageAccountsModule.popOffInclusiveKey) ?: true
-            WatchAddressScreen(findNavController(), popUpToInclusiveId, inclusive)
-        }
+        val popUpToInclusiveId =
+            arguments?.getInt(ManageAccountsModule.popOffOnSuccessKey, R.id.watchAddressFragment) ?: R.id.watchAddressFragment
+        val inclusive =
+            arguments?.getBoolean(ManageAccountsModule.popOffInclusiveKey) ?: true
+        WatchAddressScreen(findNavController(), popUpToInclusiveId, inclusive)
     }
 
 }
@@ -98,7 +97,7 @@ fun WatchAddressScreen(navController: NavController, popUpToInclusiveId: Int, in
     }
 
     ComposeAppTheme {
-        Column {
+        Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
             AppBar(
                 title = stringResource(R.string.ManageAccounts_WatchAddress),
                 navigationIcon = {

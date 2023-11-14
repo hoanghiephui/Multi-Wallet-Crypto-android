@@ -15,9 +15,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
-import androidx.compose.material.Text
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -104,7 +105,7 @@ private fun SelectBlockchainsScreen(
         }
     }
 
-    Column {
+    Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         AppBar(
             title = stringResource(title),
             navigationIcon = {
@@ -126,7 +127,7 @@ private fun SelectBlockchainsScreen(
         ) {
             item {
                 Spacer(modifier = Modifier.height(12.dp))
-                Divider(
+                HorizontalDivider(
                     thickness = 1.dp,
                     color = ComposeAppTheme.colors.steel10,
                 )

@@ -27,6 +27,7 @@ import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.ScreenMessageWithAction
 import io.horizontalsystems.bankwallet.ui.compose.components.ScrollableTabs
@@ -40,14 +41,16 @@ class FaqListFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent() {
         ComposeAppTheme {
-            FaqScreen(
-                onCloseClick = { findNavController().popBackStack() },
-                onItemClick = { faqItem ->
-                    val arguments =
-                        bundleOf(MarkdownFragment.markdownUrlKey to faqItem.markdown)
-                    findNavController().slideFromRight(R.id.markdownFragment, arguments)
-                }
-            )
+            NiaBackground {
+                FaqScreen(
+                    onCloseClick = { findNavController().popBackStack() },
+                    onItemClick = { faqItem ->
+                        val arguments =
+                            bundleOf(MarkdownFragment.markdownUrlKey to faqItem.markdown)
+                        findNavController().slideFromRight(R.id.markdownFragment, arguments)
+                    }
+                )
+            }
         }
     }
 
@@ -68,7 +71,7 @@ private fun FaqScreen(
                 HsBackButton(onClick = onCloseClick)
             }
         )
-        Crossfade(viewState) { viewState ->
+        Crossfade(viewState, label = "") { viewState ->
             when (viewState) {
                 ViewState.Loading -> {
                     Loading()

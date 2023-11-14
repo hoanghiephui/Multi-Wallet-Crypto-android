@@ -9,14 +9,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Scaffold
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -32,6 +34,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 import io.horizontalsystems.bankwallet.ui.compose.components.FormsInputPassword
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.InfoText
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.compose.components.TextImportantWarning
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.core.SnackbarDuration
@@ -97,71 +100,74 @@ fun LocalBackupPasswordScreen(
     }
 
     ComposeAppTheme {
-        Scaffold(
-            backgroundColor = ComposeAppTheme.colors.tyler,
-            topBar = {
-                AppBar(
-                    title = stringResource(R.string.LocalBackup_SetPassword),
-                    navigationIcon = {
-                        HsBackButton(onClick = onBackClick)
-                    }
-                )
-            }
-        ) {
-            Column(modifier = Modifier.padding(it)) {
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .verticalScroll(
-                            rememberScrollState()
-                        )
-                ) {
-
-                    InfoText(text = stringResource(R.string.LocalBackup_ProtextBackupWithPasswordInfo))
-                    VSpacer(24.dp)
-                    FormsInputPassword(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        hint = stringResource(R.string.Password),
-                        state = uiState.passphraseState,
-                        onValueChange = viewModel::onChangePassphrase,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        hide = hidePassphrase,
-                        onToggleHide = {
-                            hidePassphrase = !hidePassphrase
+        NiaBackground {
+            Scaffold(
+                containerColor = Color.Transparent,
+                contentColor = MaterialTheme.colorScheme.background,
+                topBar = {
+                    AppBar(
+                        title = stringResource(R.string.LocalBackup_SetPassword),
+                        navigationIcon = {
+                            HsBackButton(onClick = onBackClick)
                         }
                     )
-                    VSpacer(16.dp)
-                    FormsInputPassword(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        hint = stringResource(R.string.ConfirmPassphrase),
-                        state = uiState.passphraseConfirmState,
-                        onValueChange = viewModel::onChangePassphraseConfirmation,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        hide = hidePassphrase,
-                        onToggleHide = {
-                            hidePassphrase = !hidePassphrase
-                        }
-                    )
-                    VSpacer(32.dp)
-                    TextImportantWarning(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        text = stringResource(R.string.LocalBackup_DontForgetPasswordWarning)
-                    )
-                    VSpacer(32.dp)
-
                 }
-                ButtonsGroupWithShade {
-                    ButtonPrimaryYellowWithSpinner(
+            ) {
+                Column(modifier = Modifier.padding(it)) {
+                    Column(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp),
-                        title = stringResource(R.string.LocalBackup_SaveAndBackup),
-                        showSpinner = uiState.showButtonSpinner,
-                        enabled = uiState.showButtonSpinner.not(),
-                        onClick = {
-                            viewModel.onSaveClick()
-                        },
-                    )
+                            .weight(1f)
+                            .verticalScroll(
+                                rememberScrollState()
+                            )
+                    ) {
+
+                        InfoText(text = stringResource(R.string.LocalBackup_ProtextBackupWithPasswordInfo))
+                        VSpacer(24.dp)
+                        FormsInputPassword(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            hint = stringResource(R.string.Password),
+                            state = uiState.passphraseState,
+                            onValueChange = viewModel::onChangePassphrase,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                            hide = hidePassphrase,
+                            onToggleHide = {
+                                hidePassphrase = !hidePassphrase
+                            }
+                        )
+                        VSpacer(16.dp)
+                        FormsInputPassword(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            hint = stringResource(R.string.ConfirmPassphrase),
+                            state = uiState.passphraseConfirmState,
+                            onValueChange = viewModel::onChangePassphraseConfirmation,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                            hide = hidePassphrase,
+                            onToggleHide = {
+                                hidePassphrase = !hidePassphrase
+                            }
+                        )
+                        VSpacer(32.dp)
+                        TextImportantWarning(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            text = stringResource(R.string.LocalBackup_DontForgetPasswordWarning)
+                        )
+                        VSpacer(32.dp)
+
+                    }
+                    ButtonsGroupWithShade {
+                        ButtonPrimaryYellowWithSpinner(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 16.dp, end = 16.dp),
+                            title = stringResource(R.string.LocalBackup_SaveAndBackup),
+                            showSpinner = uiState.showButtonSpinner,
+                            enabled = uiState.showButtonSpinner.not(),
+                            onClick = {
+                                viewModel.onSaveClick()
+                            },
+                        )
+                    }
                 }
             }
         }
