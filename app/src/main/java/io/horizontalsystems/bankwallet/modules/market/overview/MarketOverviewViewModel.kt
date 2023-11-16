@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.App
+import io.horizontalsystems.bankwallet.core.BaseViewModel
 import io.horizontalsystems.bankwallet.core.managers.CurrencyManager
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.subscribeIO
@@ -44,7 +45,7 @@ class MarketOverviewViewModel(
     private val service: MarketOverviewService,
     private val topNftCollectionsViewItemFactory: TopNftCollectionsViewItemFactory,
     private val currencyManager: CurrencyManager
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val disposables = CompositeDisposable()
 

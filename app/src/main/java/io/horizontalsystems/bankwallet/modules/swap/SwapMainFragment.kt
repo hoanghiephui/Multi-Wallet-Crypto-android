@@ -1,5 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.swap
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -14,9 +15,14 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -140,7 +146,7 @@ private fun SwapMainScreen(
     val providerViewItems = viewModel.swapState.providerViewItems
     val focusManager = LocalFocusManager.current
 
-    ComposeAppTheme {
+    NiaBackground {
         ModalBottomSheetLayout(
             sheetState = modalBottomSheetState,
             sheetBackgroundColor = ComposeAppTheme.colors.transparent,
@@ -155,7 +161,7 @@ private fun SwapMainScreen(
                 }
             },
         ) {
-            Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
+            Column {
                 AppBar(
                     title = stringResource(R.string.Swap),
                     navigationIcon = {
@@ -225,12 +231,11 @@ fun SwapCards(
 
             VSpacer(12.dp)
 
-            Column(
+            androidx.compose.material3.Card(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(ComposeAppTheme.colors.lawrence)
+                    .padding(horizontal = 16.dp),
+                shape = RoundedCornerShape(12.dp)
             ) {
 
                 SwapCoinCardView(
@@ -498,7 +503,9 @@ private fun BottomSheetProviderSelector(
                 },
             ) {
                 Image(
-                    modifier = Modifier.padding(horizontal = 16.dp).size(32.dp),
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .size(32.dp),
                     painter = painterResource(
                         id = getDrawableResource(item.provider.id, context)
                             ?: R.drawable.coin_placeholder
@@ -529,6 +536,7 @@ private fun BottomSheetProviderSelector(
     }
 }
 
+@SuppressLint("UnrememberedMutableInteractionSource")
 @Composable
 fun PriceImpact(
     priceImpact: SwapMainModule.PriceImpactViewItem,

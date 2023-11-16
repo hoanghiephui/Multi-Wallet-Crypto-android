@@ -66,7 +66,6 @@ android {
         debug {
             debuggable true
             minifyEnabled false
-            applicationIdSuffix ".dev"
             resValue "string", "twitterBearerToken", "AAAAAAAAAAAAAAAAAAAAAJgeNwEAAAAA6xVpR6xLKTrxIA3kkSyRA92LDpA%3Da6auybDwcymUyh2BcS6zZwicUdxGtrzJC0qvOSdRwKLeqBGhwB"
             resValue "string", "cryptoCompareApiKey", "2b08fe1dba559ca6acf5e1897b6de8749cee0ace6052d7aa7fccf6aa9f1b3255"
             resValue "string", "uniswapGraphUrl", "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2"
@@ -246,7 +245,7 @@ dependencies {
     implementation 'me.relex:circleindicator:2.1.6'
 
     //Custom tabs, chrome
-    implementation "androidx.browser:browser:1.6.0"
+    implementation "androidx.browser:browser:1.7.0"
 
     // Navigation component
     implementation "androidx.navigation:navigation-fragment-ktx:$navigation_ktx_version"
@@ -305,10 +304,10 @@ dependencies {
     implementation project(':components:chartview')
     implementation platform('androidx.compose:compose-bom:2023.10.01')
     // Integration with activities
-    implementation 'androidx.activity:activity-compose:1.8.0'
+    implementation 'androidx.activity:activity-compose:1.8.1'
     // Compose Material Design
     implementation "androidx.compose.material:material"
-    implementation "androidx.compose.material3:material3:1.2.0-alpha10"
+    implementation "androidx.compose.material3:material3:1.2.0-alpha11"
     // Animations
     implementation "androidx.compose.animation:animation"
     // Tooling support (Previews, etc.)
@@ -353,7 +352,7 @@ dependencies {
 
     api 'com.jaredrummler:android-shell:1.0.0'
     api 'com.offbynull.portmapper:portmapper:2.0.5'
-    implementation("com.applovin:applovin-sdk:11.11.3")
+    implementation("com.applovin:applovin-sdk:12.0.0")
     implementation("com.google.android.gms:play-services-ads-identifier:18.0.1")
 }
 

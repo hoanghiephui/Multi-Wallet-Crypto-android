@@ -292,6 +292,10 @@
                 <data android:scheme="unstoppable" />
             </intent-filter>
         </activity-alias>
+
+        <meta-data
+            android:name="applovin.sdk.key"
+            android:value="SDK_KEY_HERE" />
     </application>
 
 </manifest>

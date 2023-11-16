@@ -1,9 +1,11 @@
 package io.horizontalsystems.bankwallet.core
 
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import android.os.Build
+import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
@@ -12,6 +14,7 @@ import coil.ImageLoaderFactory
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
+import com.applovin.sdk.AppLovinSdk
 import com.walletconnect.android.Core
 import com.walletconnect.android.CoreClient
 import com.walletconnect.android.relay.ConnectionType
@@ -121,7 +124,7 @@ import java.util.logging.Logger
 import androidx.work.Configuration as WorkConfiguration
 
 class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
-
+    lateinit var appLoVinSdk: AppLovinSdk
     companion object : ICoreApp by CoreApp {
 
         lateinit var preferences: SharedPreferences
@@ -205,7 +208,7 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         RxJavaPlugins.setErrorHandler { e: Throwable? ->
             Log.w("RxJava ErrorHandler", e)
         }
-
+        initApplovin()
         EthereumKit.init()
 
         instance = this
@@ -540,5 +543,36 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
             contactsRepository.initialize()
 
         }.start()
+    }
+
+    private fun initApplovin() {
+        AppLovinSdk.getInstance(this).apply {
+            mediationProvider = "max"
+            appLoVinSdk = this
+        }
+    }
+
+    private class AdjustLifecycleCallbacks : ActivityLifecycleCallbacks {
+        override fun onActivityCreated(activity: Activity, bundle: Bundle?) {
+
+        }
+
+        override fun onActivityStarted(activity: Activity) {
+
+        }
+
+        override fun onActivityResumed(activity: Activity) {
+
+        }
+
+        override fun onActivityPaused(activity: Activity) {
+
+        }
+
+        override fun onActivityStopped(activity: Activity) {}
+
+        override fun onActivitySaveInstanceState(activity: Activity, bundle: Bundle) {}
+
+        override fun onActivityDestroyed(activity: Activity) {}
     }
 }

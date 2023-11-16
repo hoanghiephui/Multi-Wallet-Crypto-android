@@ -77,16 +77,6 @@ private fun ContactOptionsScreen(
                     sendEmail(reportEmail, context)
                 }
             )
-            VSpacer(12.dp)
-            ButtonPrimaryDefault(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                title = stringResource(R.string.Settings_Contact_ViaTelegram),
-                onClick = {
-                    navController.slideFromRight(R.id.personalSupportFragment)
-                }
-            )
             VSpacer(24.dp)
         }
     }

@@ -2,6 +2,7 @@ package io.horizontalsystems.bankwallet.ui.compose.components
 
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.PrimaryTabRow
@@ -25,6 +26,7 @@ data class TabItem<T>(
     val enabled: Boolean = true
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T> Tabs(tabs: List<TabItem<T>>, onClick: (T) -> Unit) {
     val selectedIndex = tabs.indexOfFirst { it.selected }
@@ -58,6 +60,7 @@ fun <T> Tabs(tabs: List<TabItem<T>>, onClick: (T) -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T> ScrollableTabs(tabs: List<TabItem<T>>, onClick: (T) -> Unit) {
     val selectedIndex = tabs.indexOfFirst { it.selected }

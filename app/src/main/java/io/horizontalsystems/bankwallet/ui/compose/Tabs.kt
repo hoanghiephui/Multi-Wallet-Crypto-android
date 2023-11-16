@@ -18,6 +18,7 @@ package io.horizontalsystems.bankwallet.ui.compose
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.ProvideTextStyle
@@ -75,6 +76,7 @@ fun NiaTab(
  * @param tabs The tabs inside this tab row. Typically this will be multiple [NiaTab]s. Each element
  * inside this lambda will be measured and placed evenly across the row, each taking up equal space.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NiaTabRow(
     selectedTabIndex: Int,

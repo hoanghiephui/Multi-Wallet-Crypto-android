@@ -295,12 +295,6 @@ private fun SettingSections(
     CellUniversalLawrenceSection(
         listOf({
             HsSettingCell(
-                R.string.Settings_RateUs,
-                R.drawable.ic_star_20,
-                onClick = { RateAppManager.openPlayMarket(context) }
-            )
-        }, {
-            HsSettingCell(
                 R.string.Settings_ShareThisWallet,
                 R.drawable.ic_share_20,
                 onClick = { shareAppLink(viewModel.appWebPageLink, context) }

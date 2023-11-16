@@ -128,19 +128,6 @@ private fun SettingSections(
     val context = LocalContext.current
     val termsShowAlert = viewModel.termsShowAlert
 
-    CellUniversalLawrenceSection(
-        listOf {
-            HsSettingCell(
-                R.string.SettingsAboutApp_WhatsNew,
-                R.drawable.ic_info_20,
-                onClick = {
-                    navController.navigate(ReleaseNotesPage)
-                }
-            )
-        }
-    )
-
-    Spacer(Modifier.height(32.dp))
 
     CellUniversalLawrenceSection(
         listOf({
@@ -182,12 +169,6 @@ private fun SettingSections(
             )
         }, {
             HsSettingCell(
-                R.string.SettingsAboutApp_Twitter,
-                R.drawable.ic_twitter_20,
-                onClick = { LinkHelper.openLinkInAppBrowser(context, viewModel.twitterLink) }
-            )
-        }, {
-            HsSettingCell(
                 R.string.SettingsAboutApp_Site,
                 R.drawable.ic_globe,
                 onClick = { LinkHelper.openLinkInAppBrowser(context, viewModel.appWebPageLink) }
@@ -207,7 +188,7 @@ fun AboutHeader(appVersion: String) {
     ) {
         Image(
             modifier = Modifier.size(72.dp),
-            painter = painterResource(id = R.drawable.ic_app_logo_72),
+            painter = painterResource(id = R.drawable.ic_logo_splash),
             contentDescription = null,
         )
         Column(

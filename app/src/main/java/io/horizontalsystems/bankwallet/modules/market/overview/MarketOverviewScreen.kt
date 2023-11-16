@@ -8,14 +8,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.ViewState
@@ -40,7 +43,12 @@ fun MarketOverviewScreen(
     val viewItem by viewModel.viewItem.observeAsState()
 
     val scrollState = rememberScrollState()
-
+    val context = LocalContext.current
+    val nativeAd by viewModel.adState
+    LaunchedEffect(key1 = Unit, block = {
+        viewModel.loadAds(context,
+            "YOUR_AD_UNIT_ID")
+    })
     HSSwipeRefresh(
         refreshing = isRefreshing,
         onRefresh = {
@@ -66,6 +74,9 @@ fun MarketOverviewScreen(
                                 modifier = Modifier.height(142.dp)
                             ) {
                                 MetricChartsView(viewItem.marketMetrics, navController)
+                            }
+                            nativeAd?.let {
+                                MaxTemplateNativeAdViewComposable(it)
                             }
                             BoardsView(
                                 boards = viewItem.boards,
