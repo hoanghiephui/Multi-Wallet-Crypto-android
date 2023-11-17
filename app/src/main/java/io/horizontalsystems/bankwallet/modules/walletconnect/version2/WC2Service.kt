@@ -19,9 +19,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.concurrent.CopyOnWriteArrayList
 
-class WC2Service(
-    private val sessionRequestFilterManager: SessionRequestFilterManager
-) : SignClient.WalletDelegate {
+class WC2Service : SignClient.WalletDelegate {
 
     private val TAG = "WC2Service"
 
@@ -102,8 +100,18 @@ class WC2Service(
     }
 
     fun approve(proposal: Sign.Model.SessionProposal, blockchains: List<WCBlockchain>) {
+        val supportedMethods = listOf(
+            "personal_sign",
+            "eth_signTypedData",
+            "eth_sendTransaction",
+            "eth_sign",
+        )
+
         val namespaces = proposal.requiredNamespaces + proposal.optionalNamespaces
-        val methods = namespaces.values.flatMap { it.methods }.distinct()
+        val methods = namespaces.values
+            .flatMap { it.methods }
+            .distinct()
+            .filter { supportedMethods.contains(it) }
         val events = namespaces.values.flatMap { it.events }.distinct()
 
         val sessionNamespaces = blockchains
@@ -217,9 +225,6 @@ class WC2Service(
     }
 
     override fun onSessionRequest(sessionRequest: Sign.Model.SessionRequest, verifyContext: Sign.Model.VerifyContext) {
-        if (sessionRequestFilterManager.canHandle(sessionRequest)) {
-            return
-        }
         sessionsRequestReceivedSubject.onNext(sessionRequest)
         pendingRequestUpdatedSubject.onNext(Unit)
     }
