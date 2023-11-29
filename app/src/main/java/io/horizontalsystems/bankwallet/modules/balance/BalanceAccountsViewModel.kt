@@ -6,11 +6,12 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cash.z.ecc.android.sdk.ext.collectWith
+import io.horizontalsystems.bankwallet.core.BaseViewModel
 import io.horizontalsystems.bankwallet.core.IAccountManager
 import io.horizontalsystems.bankwallet.core.managers.ActiveAccountState
 import io.horizontalsystems.bankwallet.entities.AccountType
 
-class BalanceAccountsViewModel(accountManager: IAccountManager) : ViewModel() {
+class BalanceAccountsViewModel(accountManager: IAccountManager) : BaseViewModel() {
 
     var balanceScreenState by mutableStateOf<BalanceScreenState?>(null)
         private set

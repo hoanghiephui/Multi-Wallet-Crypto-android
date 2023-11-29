@@ -151,3 +151,5 @@ private fun TextStyle.withFontFamily(default: FontFamily): TextStyle {
 }
 
 internal val LocalTypography = staticCompositionLocalOf { Typography() }
+
+fun TextStyle.bold() = this.merge(TextStyle(fontWeight = FontWeight.Bold))

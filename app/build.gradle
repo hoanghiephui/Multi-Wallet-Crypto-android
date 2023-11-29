@@ -9,6 +9,12 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
+def localProperties = new Properties()
+try {
+    localProperties.load(new FileInputStream(rootProject.file("local.properties")))
+} catch (Exception ignored) {
+    logger.warn("No Local Properties File Found!")
+}
 
 android {
 
@@ -45,6 +51,14 @@ android {
         resValue "string", "walletConnectAppMetaDataUrl", "unstoppable.money"
         resValue "string", "walletConnectAppMetaDataIcon", "https://raw.githubusercontent.com/horizontalsystems/HS-Design/master/PressKit/UW-AppIcon-on-light.png"
         resValue "string", "accountsBackupFileSalt", "unstoppable"
+
+        if (!localProperties['keyApplovin']) {
+            logger.warn('keyApplovin must be set for signature verification. ' +
+                    'You can add it to local.properties once you have gotten it from Applovin. ' +
+                    'Example: keyApplovin=[key value]')
+        }
+        //buildConfigField("String", "APPLOVIN_SDK_KEY", "\"" + localProperties['keyApplovin'] + "\"")
+        resValue("string", "APPLOVIN_SDK_KEY", "\"" + localProperties['keyApplovin'] + "\"")
     }
 
     buildFeatures {

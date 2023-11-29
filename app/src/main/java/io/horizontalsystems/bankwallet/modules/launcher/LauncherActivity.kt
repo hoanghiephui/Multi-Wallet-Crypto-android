@@ -23,11 +23,7 @@ class LauncherActivity : AppCompatActivity() {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
         var uiState: Boolean by mutableStateOf(true)
-        (application as? App)?.appLoVinSdk?.initializeSdk {
-            Log.d("AppLovinSdk", "InitializeSdk")
-            uiState = false
-            loadPage()
-        }
+        loadPage()
         // Keep the splash screen on-screen until the UI state is loaded. This condition is
         // evaluated each time the app needs to be redrawn so it should be fast to avoid blocking
         // the UI.

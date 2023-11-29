@@ -295,7 +295,7 @@
 
         <meta-data
             android:name="applovin.sdk.key"
-            android:value="SDK_KEY_HERE" />
+            android:value="@string/APPLOVIN_SDK_KEY" />
     </application>
 
 </manifest>

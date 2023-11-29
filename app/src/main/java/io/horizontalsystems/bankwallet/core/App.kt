@@ -123,8 +123,8 @@ import java.util.logging.Logger
 import androidx.work.Configuration as WorkConfiguration
 
 class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
-    lateinit var appLoVinSdk: AppLovinSdk
     companion object : ICoreApp by CoreApp {
+        lateinit var appLoVinSdk: AppLovinSdk
 
         lateinit var preferences: SharedPreferences
         lateinit var feeRateProvider: FeeRateProvider
