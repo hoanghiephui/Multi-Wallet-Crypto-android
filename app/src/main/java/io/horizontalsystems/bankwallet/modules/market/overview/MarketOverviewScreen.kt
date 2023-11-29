@@ -47,7 +47,7 @@ fun MarketOverviewScreen(
     val context = LocalContext.current
     val nativeAd by viewModel.adState
     LaunchedEffect(key1 = Unit, block = {
-        viewModel.loadAds(context,"028f93a51f5aeb70")
+        //viewModel.loadAds(context,"028f93a51f5aeb70")
     })
     HSSwipeRefresh(
         refreshing = isRefreshing,

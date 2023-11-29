@@ -101,7 +101,8 @@ class MaxTemplateNativeAdViewComposableLoader(
  * Jetpack Compose function to display MAX native ads using the Templates API.
  */
 @Composable
-fun MaxTemplateNativeAdViewComposable(adViewState: AdViewState) {
+fun MaxTemplateNativeAdViewComposable(adViewState: AdViewState,
+                                      adType: AdType = AdType.MEDIUM) {
     Crossfade(adViewState, label = "MaxTemplateNativeAdView") { viewState ->
         when (viewState) {
             is AdViewState.Default -> {
@@ -148,7 +149,7 @@ fun MaxTemplateNativeAdViewComposable(adViewState: AdViewState) {
 
                         Button(
                             modifier = Modifier
-                                .padding(top = 24.dp, bottom = 24.dp)
+                                .padding(top = 24.dp, bottom = 12.dp)
                                 .fillMaxWidth(),
                             onClick = { },
                         ) {
@@ -185,7 +186,7 @@ fun MaxTemplateNativeAdViewComposable(adViewState: AdViewState) {
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(300.dp)
+                            .height(adType.height)
                     )
                 }
             }
@@ -194,10 +195,17 @@ fun MaxTemplateNativeAdViewComposable(adViewState: AdViewState) {
 
 }
 
+val AdType.height get() = if (this == AdType.MEDIUM) 300.dp else 120.dp
+
 sealed interface AdViewState {
     data class LoadAd(
         val adView: MaxNativeAdView
     ) : AdViewState
 
     data object Default : AdViewState
+}
+
+enum class AdType {
+    SMALL,
+    MEDIUM
 }
