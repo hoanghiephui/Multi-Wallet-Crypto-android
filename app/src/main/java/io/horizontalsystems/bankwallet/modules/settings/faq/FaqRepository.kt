@@ -51,15 +51,14 @@ class FaqRepository(
         faqManager.getFaqList()
             .retryWhen { errors -> // retry on error java.lang.AssertionError: No System TLS
                 errors.zipWith(
-                    Flowable.range(1, retryLimit + 1),
-                    { error: Throwable, retryCount: Int ->
-                        if (retryCount < retryLimit && (error is AssertionError)) {
-                            retryCount
-                        } else {
-                            throw error
-                        }
+                    Flowable.range(1, retryLimit + 1)
+                ) { error: Throwable, retryCount: Int ->
+                    if (retryCount < retryLimit && (error is AssertionError)) {
+                        retryCount
+                    } else {
+                        throw error
                     }
-                ).flatMap {
+                }.flatMap {
                     Flowable.timer(1, TimeUnit.SECONDS)
                 }
             }

@@ -62,7 +62,7 @@
     <string name="AccountRecovery_MigrationRecommended">Bu cüzdan, gizli sözcükler listesinde ve/veya bir şifrede standart olmayan bir karakter kullanıyor gibi görünüyor. Bir bakiye veya işlem göremiyorsanız lütfen bilgi için aşağıya bakınız.\n\nDAHA FAZLA BİLGİ ALMAK İÇİN TIKLAYINIZ</string>
     <string name="AccountRecovery_MigrationRequired">Bu standart olmayan bir cüzdandır. \n\nDAHA FAZLA BİLGİ ALMAK İÇİN TIKLAYIN</string>
     <!--Intro-->
-    <string name="Intro_Wallet_Screen1Description">Be Unstoppable</string>
+    <string name="Intro_Wallet_Screen1Description">Be CoinDex</string>
     <string name="Intro_Wallet_Screen2Title">Varlıkları Serbest Bırak</string>
     <string name="Intro_Wallet_Screen2Description">Kendinizi kilitlemeyin ve başkalarının bunu sizin için yapmasına izin vermeyin.</string>
     <string name="Intro_Wallet_Screen3Title">Sınırları Kaldırın</string>
@@ -100,7 +100,7 @@
     <string name="Language_Portuguese">Portekizce</string>
     <!--Rate App-->
     <string name="RateApp_Title_Rate_This_App">Günaydın!</string>
-    <string name="RateApp_Description_Rate_This_App">Unstoppable kullanmaktan keyif alıyor musunuz? Daha da iyi olması için görüşlerinizi paylaşın.</string>
+    <string name="RateApp_Description_Rate_This_App">CoinDex kullanmaktan keyif alıyor musunuz? Daha da iyi olması için görüşlerinizi paylaşın.</string>
     <string name="RateApp_Button_RateIt">Puanla</string>
     <string name="RateApp_Button_NotNow">Şimdi değil</string>
     <!--Restore-->
@@ -120,7 +120,7 @@
     <string name="Restore_PrivateKeyHint">EVM Özel Anahtarını, BIP32 Root Key veya Account Extended Private Key girin</string>
     <string name="Restore_PhraseHint">12, 15, 18, 21 veya 24 kelime girin</string>
     <string name="Restore_NonStandardRestore">Standart Olmayan Geri Yükleme</string>
-    <string name="Restore_NonStandard_Description">Bu sayfa, standart olmayan bir cüzdanı olan Unstoppable kullanıcıları için özel geri yükleme mekanizması sağlar. Genel olarak, bu tür cüzdanlar, İngilizce olmayan bir anımsatma kelimeleri listesi ve/veya cüzdan şifresinde özel bir karakter (yani aksan simgesi) kullanılarak Unstoppable 0.27 - 0.28 sürümünde oluşturulmuş olabilir.\n\n Bu durumdan etkilenen bir kullanıcıysanız, 0.29 sürümüne güncelledikten sonra cüzdan bakiyeniz 0 olarak görüntülenir. Bu sayfa, standart olmayan cüzdanınıza erişimi geri yüklemenizi sağlayacaktır. Geri yüklendikten sonra, yeni bir cüzdan oluşturmanız (standartlarla uyumlu) ve paranızı oraya taşımanız önerilir.</string>
+    <string name="Restore_NonStandard_Description">Bu sayfa, standart olmayan bir cüzdanı olan CoinDex kullanıcıları için özel geri yükleme mekanizması sağlar. Genel olarak, bu tür cüzdanlar, İngilizce olmayan bir anımsatma kelimeleri listesi ve/veya cüzdan şifresinde özel bir karakter (yani aksan simgesi) kullanılarak CoinDex 0.27 - 0.28 sürümünde oluşturulmuş olabilir.\n\n Bu durumdan etkilenen bir kullanıcıysanız, 0.29 sürümüne güncelledikten sonra cüzdan bakiyeniz 0 olarak görüntülenir. Bu sayfa, standart olmayan cüzdanınıza erişimi geri yüklemenizi sağlayacaktır. Geri yüklendikten sonra, yeni bir cüzdan oluşturmanız (standartlarla uyumlu) ve paranızı oraya taşımanız önerilir.</string>
     <string name="Restore_PrivateKey_InvalidKey">Geçersiz Anahtar</string>
     <string name="Select_Coins">Kripto Parayı Seç</string>
     <string name="Restore_BirthdayHeight">Oluşturulma Günü Üst Sınırı</string>
@@ -231,7 +231,7 @@
     <string name="Send_Error_MinimumAmount">Minimum miktar %s</string>
     <string name="Send_Error_MaximumAmount">Maksimum miktar %s</string>
     <string name="Send_Error_MinRequiredBalance">Min. gerekli bakiye %s</string>
-    <string name="Send_Error_TransparentAddress">Unstoppable, bir transparan adrese yapılan ödemeleri desteklemez</string>
+    <string name="Send_Error_TransparentAddress">CoinDex, bir transparan adrese yapılan ödemeleri desteklemez</string>
     <string name="Send_Error_SendToSelf">Kendine gönderme desteklenmiyor</string>
     <string name="Send_DialogAvailableBalance">Mevcut Bakiye</string>
     <string name="Send_DialogSpeed">İşlem hızı</string>
@@ -288,7 +288,7 @@
     <string name="FeeSettings_FeeRate">Ücret Oranı (SAT/BYTE)</string>
     <string name="FeeSettings_FeeRate_RecommendedInfo">İşte sonraki 2 bloğa eklenmek için önerilen değer</string>
     <string name="FeeSettings_FeeRate_Info">Blok zincirleri, kullanıcıların işlemleri gönderirken ağ ücretlerini ödemelerini gerektirir. Ağda çok sayıda işlem gerçekleştiğinde ücretler daha yüksektir.
-         \n\nUnstoppable cüzdan, mevcut blockchain etkinliğine dayalı olarak ücreti tahmin eder ve işlemin makul bir süre içinde işlenmesi için en uygun değeri önerir.
+         \n\nCoinDex cüzdan, mevcut blockchain etkinliğine dayalı olarak ücreti tahmin eder ve işlemin makul bir süre içinde işlenmesi için en uygun değeri önerir.
          \n\nSatoshi kullanıcının işlemin tek bir baytı için ödemesi gereken miktar olarak gösterilen önerilen ücret oranı. Bu nedenle toplam ücret, işlemin bayt cinsinden ölçülen toplam boyutuna bağlıdır.
          \n\nKullanıcılar, ücret oranı değerini artırmak veya azaltmak için sağlanan kontrolleri kullanabilir. Ücret oranındaki değişiklik, kullanıcının ödeyeceği işlem için toplam ücreti değiştirir.
          \n\nÜcret oranının önerilen değerin altında ayarlanması, bir işlemin saatlerce beklemede kalmasına veya reddedilmesine neden olabilir. Değer ne kadar düşük olursa, işlemin onaylanması o kadar uzun sürer. Önceliğin önemli olduğu işlemler için daha yüksek ücret oranı belirlemenizi öneririz.</string>
@@ -541,10 +541,10 @@
     <string name="StatusInfo_Processing">İşleniyor</string>
     <string name="StatusInfo_Confirmed">Tamamlandı</string>
     <string name="StatusInfo_Failed">Başarısız</string>
-    <string name="StatusInfo_PendingDescription">İşlem henüz blok zincirinde onaylanmadı. Tavsiye edilen veya daha yüksek ücret ayarı ile gönderilen işlemler genellikle birkaç dakika içerisinde işlenir. Düşük bir ücretle gönderilen işlemler birkaç saat, hatta günlerce beklemede kalabilir ve hatta reddedilebilir. Unstoppable cüzdan arayüzündeki bir işlemin durumunun genellikle kısa bir gecikmeyle güncellendiğini de unutmayın.</string>
+    <string name="StatusInfo_PendingDescription">İşlem henüz blok zincirinde onaylanmadı. Tavsiye edilen veya daha yüksek ücret ayarı ile gönderilen işlemler genellikle birkaç dakika içerisinde işlenir. Düşük bir ücretle gönderilen işlemler birkaç saat, hatta günlerce beklemede kalabilir ve hatta reddedilebilir. CoinDex cüzdan arayüzündeki bir işlemin durumunun genellikle kısa bir gecikmeyle güncellendiğini de unutmayın.</string>
     <string name="StatusInfo_ProcessingDescription">İşlem blok zincirine dahil edildi ama kalıcı bir sonuca ulaşmadı. Bu noktada, küçük ödemeler için işlemin tamamlandığını düşünebilirsiniz. Daha büyük ödemeler için ise, işlem durumu tamamlandı olarak değişene kadar beklemeniz önerilir.</string>
     <string name="StatusInfo_ConfirmedDescription">İşlem tamamlandı ve bunun kalıcı ve tersine çevrilemez olduğu kabul edilir.</string>
-    <string name="StatusInfo_FailedDescription">İşlem gerçekleşmedi ve herhangi bir değer transferi yapılmadı. Başarısız olma nedenine bağlı olarak, bazı başarısız işlemler, işlem ücreti tüketebilir. Başka bir işlemle değiştirilen veya iptal edilen işlemler, işlem ücretini tüketmez ve başarısız olarak görüntülenir. Unstoppable uygulaması başarısız işlemlerin nedenini gösteremez, ancak kullanıcılar bunu örneğin etherscan.io gibi herkese açık bir blok gezgininde kendileri arayabilirler.</string>
+    <string name="StatusInfo_FailedDescription">İşlem gerçekleşmedi ve herhangi bir değer transferi yapılmadı. Başarısız olma nedenine bağlı olarak, bazı başarısız işlemler, işlem ücreti tüketebilir. Başka bir işlemle değiştirilen veya iptal edilen işlemler, işlem ücretini tüketmez ve başarısız olarak görüntülenir. CoinDex uygulaması başarısız işlemlerin nedenini gösteremez, ancak kullanıcılar bunu örneğin etherscan.io gibi herkese açık bir blok gezgininde kendileri arayabilirler.</string>
     <!-- Transaction Info Options -->
     <string name="TransactionInfoOptions_SpeedUp_Title">Hızlandır</string>
     <string name="TransactionInfoOptions_SpeedUp_Description">Bunu yapmak, daha yüksek bir ücretle işlemi yeniden göndererek önceki işlemi geçersiz kılmaya çalışacaktır. Yeni bir işlem gönderildiğinde ilk işlem beklemede kalırsa, geçersiz olması ve değiştirilmesi olasılığı yüksektir (garanti edilmez). Bu iki işlemden sadece biri blok zincire eklenecektir.</string>
@@ -643,7 +643,7 @@
     <string name="BackupManager_AppSettingsTitle">Uygulama Ayarları</string>
     <string name="BackupManager_AppSettingsDescription">Dil, Para Birimi, Görünüm...</string>
     <!-- Privacy  -->
-    <string name="Privacy_Information">Unstoppable herhangi bir veri toplamaz veya kullanıcıları hakkında herhangi bir veriyi ifşa edebilecek analiz araçları kullanmaz. Unstoppable cüzdanı kullanıcıları için yüksek düzeyde gizlilik sağlamak üzere tasarlanmıştır.</string>
+    <string name="Privacy_Information">CoinDex herhangi bir veri toplamaz veya kullanıcıları hakkında herhangi bir veriyi ifşa edebilecek analiz araçları kullanmaz. CoinDex cüzdanı kullanıcıları için yüksek düzeyde gizlilik sağlamak üzere tasarlanmıştır.</string>
     <string name="Privacy_BulletedText1">Kullanıcı verileri her zaman kullanıcının cihazında kalır.</string>
     <string name="Privacy_BulletedText2">Bu cüzdan, kullanıcılar hakkında herhangi bir veri toplamaz.</string>
     <string name="Privacy_BulletedText3">Bu cüzdan, kullanıcılar hakkında herhangi bir veri paylaşmaz.</string>
@@ -664,12 +664,12 @@
     <string name="BtcBlockchainSettings_RestoreSourceChangeWarning">Bu değişiklikten sonra cüzdan Bitcoin blok zinciri ile kendini yeniden senkronize etmek zorunda kalacak.</string>
     <string name="BtcBlockchainSettings_RestoreSource">Geri Yükleme Kaynağı</string>
     <string name="BtcBlockchainSettings_RestoreSourceSettingsDescription">M-cüzdan geri yüklemesi için bir veri kaynağı seçin. Blok zincirinden geri yükleme çok daha fazla zaman alır.</string>
-    <string name="BtcBlockchainSettings_RestoreSourceDescription">This setting is only relevant when restoring an existing wallet. It is a process of getting transaction history for a given cryptocurrency so the wallet app is able to display past transactions and calculate the user\'s balance. This needs to happen only once when the user restores previously created wallets.\n\nAt this point, there are two potential ways for a mobile wallet like Unstoppable to do this:\n\n1. from the API Server: There is a third-party predefined server that hosts the entire blockchain and has all the data processed and optimized to provide that data in a fast manner. This method is fast but potentially (not necessarily) less private. It\'s also a centralized method to restore a wallet as it depends on the availability of a 3rd party server. This option is recommended due to its speed of getting data (5-10 minutes).\n\n2. from Blockchain: The app tries to restore directly from a network of blockchain nodes. This is a decentralized way to restore wallet balance and past transactions. The app pings many of the network nodes and requests data from them without addressing some nodes specifically. This option is slow and can easily take 2-3 hours, the app needs to be open while restoring is happening. This restore method doesn\'t depend on any entity and should work in all conditions.</string>
+    <string name="BtcBlockchainSettings_RestoreSourceDescription">This setting is only relevant when restoring an existing wallet. It is a process of getting transaction history for a given cryptocurrency so the wallet app is able to display past transactions and calculate the user\'s balance. This needs to happen only once when the user restores previously created wallets.\n\nAt this point, there are two potential ways for a mobile wallet like CoinDex to do this:\n\n1. from the API Server: There is a third-party predefined server that hosts the entire blockchain and has all the data processed and optimized to provide that data in a fast manner. This method is fast but potentially (not necessarily) less private. It\'s also a centralized method to restore a wallet as it depends on the availability of a 3rd party server. This option is recommended due to its speed of getting data (5-10 minutes).\n\n2. from Blockchain: The app tries to restore directly from a network of blockchain nodes. This is a decentralized way to restore wallet balance and past transactions. The app pings many of the network nodes and requests data from them without addressing some nodes specifically. This option is slow and can easily take 2-3 hours, the app needs to be open while restoring is happening. This restore method doesn\'t depend on any entity and should work in all conditions.</string>
     <string name="BtcBlockchainSettings_InputsOutputs">Giriş/Çıkış</string>
     <string name="BtcBlockchainSettings_TransactionSettings">İşlem Ayarları</string>
     <string name="BtcBlockchainSettings_TransactionInputsOutputs">İşlem Girdileri / Çıktıları</string>
     <string name="BtcBlockchainSettings_TransactionInputsOutputsSettingsDescription">İşlemlerin yapılandırılma şeklini değiştirerek BTC, LTC, BCH işlemlerinizin izlenilmesini zorlaştırın.</string>
-    <string name="BtcBlockchainSettings_TransactionInputsOutputsDescription">Most Bitcoin transactions, as well as transactions in alike cryptocurrencies including Bitcoin Cash, Dash, and Litecoin, generate two outputs. One output is the amount that goes to the receiver and the other is the change output that is returned to the sender. The way most wallets construct transactions makes it easy for a third party to understand which of the outputs went to the receiving party and which one was the change amount returned to the sender. As the output returned to the sender is later used in future transactions, a connection between these two transactions becomes apparent.\n\nThe Unstoppable wallet implements measures to make it harder for someone to figure out which output goes where.\n\nThere are two options available to Unstoppable users:\n\n1. Shuffle: The order of transaction outputs is randomized on every transaction. Sometimes change can be the first output, sometimes it can be the second. If a user trusts the developer of the app, then consider this a recommended option.\n\n2. Deterministic: There is a commonly agreed standard for ordering transaction outputs (known as BIP69). In open-source wallets, that standard ensures wallet users do not need to trust how developers of the app implement the ordering of the outputs. As this standard is new, not many wallets have implemented it yet. As a result, it\'s somewhat possible to see on the blockchain whether a transaction was sent from a wallet that uses that standard or not.</string>
+    <string name="BtcBlockchainSettings_TransactionInputsOutputsDescription">Most Bitcoin transactions, as well as transactions in alike cryptocurrencies including Bitcoin Cash, Dash, and Litecoin, generate two outputs. One output is the amount that goes to the receiver and the other is the change output that is returned to the sender. The way most wallets construct transactions makes it easy for a third party to understand which of the outputs went to the receiving party and which one was the change amount returned to the sender. As the output returned to the sender is later used in future transactions, a connection between these two transactions becomes apparent.\n\nThe CoinDex wallet implements measures to make it harder for someone to figure out which output goes where.\n\nThere are two options available to CoinDex users:\n\n1. Shuffle: The order of transaction outputs is randomized on every transaction. Sometimes change can be the first output, sometimes it can be the second. If a user trusts the developer of the app, then consider this a recommended option.\n\n2. Deterministic: There is a commonly agreed standard for ordering transaction outputs (known as BIP69). In open-source wallets, that standard ensures wallet users do not need to trust how developers of the app implement the ordering of the outputs. As this standard is new, not many wallets have implemented it yet. As a result, it\'s somewhat possible to see on the blockchain whether a transaction was sent from a wallet that uses that standard or not.</string>
     <!--Info screen-->
     <string name="Info_Title">Bilgi</string>
     <!--Setting_Security-->
@@ -681,9 +681,9 @@
     <string name="SettingsSecurity_EditPin">Kod Değiştir</string>
     <string name="SettingsSecurity_DisableDuressPin">Zorlama Şifresini Devre Dışı Bırak</string>
     <string name="SettingsSecurity_ManageKeys">Cüzdanları yönet</string>
-    <string name="SettingsSecurity_AppRestartWarning">Bu eylem, Unstoppable Cüzdan\'ı yeniden başlatacak.</string>
+    <string name="SettingsSecurity_AppRestartWarning">Bu eylem, CoinDex Cüzdan\'ı yeniden başlatacak.</string>
     <string name="SettingsSecurity_TorConnectionDescription">Bu uygulamayı kullanırken internetinizi tamamen anonimleştirin. Bazı durumlarda DeFi uygulamaları için WalletConnect özelliğinin çok yavaş olabileceğini veya hiç çalışmayabileceğini unutmayın.</string>
-    <string name="SettingsSecurity_NotificationsDisabledWarning">Unstoppable Cüzdan uygulaması için bildirimler devre dışı bırakıldı. Fiyat değişikliği uyarıları alabilmek için Bildirimler\'i açmanız ve arka plan uygulaması yenilemesine izin vermeniz gerekir.</string>
+    <string name="SettingsSecurity_NotificationsDisabledWarning">CoinDex Cüzdan uygulaması için bildirimler devre dışı bırakıldı. Fiyat değişikliği uyarıları alabilmek için Bildirimler\'i açmanız ve arka plan uygulaması yenilemesine izin vermeniz gerekir.</string>
     <string name="SettingsSecurity_SortingShuffle">Karıştır</string>
     <string name="SettingsSecurity_SortingShuffleDescription">Rastgele Dizinleme</string>
     <string name="SettingsSecurity_SortingBip69">BIP69</string>
@@ -709,12 +709,12 @@
     <string name="SettingsTerms_Bugs">Bu uygulamaya güç veren kodda, uygulamanın arızalanmasına neden olabilecek keşfedilmemiş yazılım sorunları olabilir.</string>
     <!--Setting_Tell Friends-->
     <string name="SettingsShare_Title">Paylaş</string>
-    <string name="SettingsShare_Text">Be Unstoppable</string>
+    <string name="SettingsShare_Text">Be CoinDex</string>
     <!--Setting_Contact-->
     <string name="SettingsContact_Title">Iletişim</string>
     <!--Setting_Notifications-->
     <string name="SettingsNotifications_Description">İzlemek istediğiniz paralar için fiyat değişikliği uyarılarını ayarlayın\n\nSon 24 saatteki fiyat değişikliği seçilen eşiği aştığında uyarı alırsınız. \n\nFiyat Trendi Uyarısı, 6 ay boyunca, 1 haftalık kısa bir süre için bir trend değişikliği durumunu uyarır.</string>
-    <string name="SettingsNotifications_NotificationsDisabledWarning">Unstoppable Cüzdan uygulaması için bildirimler devre dışı bırakıldı. Fiyat değişikliği uyarıları alabilmek için Bildirimler\'i açmanız ve arka plan uygulaması yenilemesine izin vermeniz gerekir.</string>
+    <string name="SettingsNotifications_NotificationsDisabledWarning">CoinDex Cüzdan uygulaması için bildirimler devre dışı bırakıldı. Fiyat değişikliği uyarıları alabilmek için Bildirimler\'i açmanız ve arka plan uygulaması yenilemesine izin vermeniz gerekir.</string>
     <string name="SettingsNotifications_TurnOn">Ayarlardan aç</string>
     <string name="SettingsNotifications_Off">Kapat</string>
     <string name="SettingsNotifications_DeactivateAll">Tümünü Sıfırla</string>
@@ -773,13 +773,13 @@
 \n- TYPE0 (eski) 
 \n- TYPE145 (daha yeni) 
 \n 
-\nUnstoppable cüzdan her ikisini de desteklerken, TYPE145 formatında çalışan bir Bitcoin Cash cüzdanı kullanmanızı önerir.</string>
+\nCoinDex cüzdan her ikisini de desteklerken, TYPE145 formatında çalışan bir Bitcoin Cash cüzdanı kullanmanızı önerir.</string>
     <string name="ManageCoins_ContractAddress">CONTRACT ADRESİ</string>
     <!-- Experimental Feature -->
     <string name="ExperimentalFeatures_Title">Deneysel</string>
     <string name="ExperimentalFeatures_Description">Aşağıdaki özellikler deneyseldir ve dikkatli kullanılmalıdır. Bu özellikleri kendi kripto fonlarımızı kullanarak baştan sona test etmemize rağmen, olası tüm durumlarda beklendiği gibi çalışmalarını garanti edemeyiz.</string>
     <!-- Bitcoin Hodling -->
-    <string name="BitcoinHodling_Description">Belirtilen tarihe kadar harcanmamış Bitcoin\'leri göndermenize olanak verir.\n\nBu tür bir işlemin alıcısı Unstoppable cüzdan kullanmalıdır.\n\nSadece Unstoppable cüzdan, Bitcoin ağındaki bu tür işlemleri doğru bir şekilde tanımlayabilir ve kilitleme süresi dolduktan sonra da alıcının bu Bitcoin\'leri harcamasını sağlayabilir.\n\nEğer bir HODLer iseniz, kendinize böyle bir işlem göndererek, bu özelliği Bitcoin\'lerinizi zarar etmeden uzun süre elinizde tutmaya zorlamak için kullanabilirsiniz.\n\nDeneysel bir özellik olduğundan, işlem başına maksimum tutar 0.5 BTC ile sınırlandırılmıştır.</string>
+    <string name="BitcoinHodling_Description">Belirtilen tarihe kadar harcanmamış Bitcoin\'leri göndermenize olanak verir.\n\nBu tür bir işlemin alıcısı CoinDex cüzdan kullanmalıdır.\n\nSadece CoinDex cüzdan, Bitcoin ağındaki bu tür işlemleri doğru bir şekilde tanımlayabilir ve kilitleme süresi dolduktan sonra da alıcının bu Bitcoin\'leri harcamasını sağlayabilir.\n\nEğer bir HODLer iseniz, kendinize böyle bir işlem göndererek, bu özelliği Bitcoin\'lerinizi zarar etmeden uzun süre elinizde tutmaya zorlamak için kullanabilirsiniz.\n\nDeneysel bir özellik olduğundan, işlem başına maksimum tutar 0.5 BTC ile sınırlandırılmıştır.</string>
     <!-- Testnet Settings -->
     <string name="TestnetSettings_Description">Bu seçenek, Ethereum\'un Goerli test ağını yalnızca GoerliETH belirteci için etkinleştirir ve madeni para yöneticisine ekler.\n\nDiğer tüm EVM ve Ethereum belirteçleri ana ağ üzerinden çalışırken yalnızca GoerliETH belirtecini etkiler. Başka bir deyişle, yalnızca GoerliETH\'deki işlemler Goerli testnet\'ten geçerken, ETH dahil diğer tüm EVM token transferleri ana ağdan geçer.</string>
     <!--Manage Accounts-->
@@ -895,7 +895,7 @@
     <string name="PrivateKeys_EvmPrivateKeyDescription">Ilgili cüzdan içinde EVM tabanlı kripto, yani Ethereum, Binance Smart Chain vb. Üzerinde tam kontrol sağlar.</string>
     <string name="PrivateKeys_Bip32RootKeyDescription">İlgili cüzdandaki varlıklar üzerinde tam kontrol sağlar.</string>
     <string name="PrivateKeys_AccountExtendedPrivateKeyDescription">Ilgili cüzdan içinde Bitcoin ve diğer UTXO tabanlı kriptolar üzerinde tam kontrol sağlar, yani Litecoin, Bitcoin Cash, Dash vb.</string>
-    <string name="PrivateKeys_NeverShareWarning">Kurtarma ifadenizi asla kimseyle paylaşmayın. Unstoppable ekip asla kurtarma ifadenizi istemez.</string>
+    <string name="PrivateKeys_NeverShareWarning">Kurtarma ifadenizi asla kimseyle paylaşmayın. CoinDex ekip asla kurtarma ifadenizi istemez.</string>
     <!-- Public Keys -->
     <string name="PublicKeys_Title">Genel Anahtarlar</string>
     <string name="PublicKeys_EvmAddress">EVM Adresi</string>
@@ -1097,8 +1097,8 @@
     <string name="Alert_KeysInvalidatedTitle">Android anahtar deposu hatası</string>
     <string name="Alert_KeysInvalidatedDescription">Android cihazınızın kilidi değiştirildiğinden cüzdan bilginizi tutan şifreli dosya artık geçersiz</string>
     <string name="Alert_TitleWarning">Uyarı</string>
-    <string name="Alert_CustomKeyboardIsUsed">Cihazınız varsayılan olmayan bir klavye kullanıyor gibi görünüyor. Unstoppable, üçüncü taraf klavyelerin kullanıcıların girdiği verileri toplayıp paylaşabileceği ihtimali nedeniyle, cihazınızda varsayılan klavyeyi seçmenizi önerir.\n\nTercih ettiğiniz klavyeyi kullanmaya devam etmek istiyorsanız \'Atla\' butonuna tıklayın.</string>
-    <string name="Alert_DeviceIsRootedWarning">Unstoppable ekibi, uygulamanın yalnızca root olmayan (jailbreak yapılmamış) telefonlarda çalıştırılmasını önerir.\n\nKöklü bir cihaz kullandığınızda, uygulamanın artık kripto para biriminizin kötü amaçlı yazılımlara karşı güvenliğini garanti edemeyeceğini lütfen unutmayın.</string>
+    <string name="Alert_CustomKeyboardIsUsed">Cihazınız varsayılan olmayan bir klavye kullanıyor gibi görünüyor. CoinDex, üçüncü taraf klavyelerin kullanıcıların girdiği verileri toplayıp paylaşabileceği ihtimali nedeniyle, cihazınızda varsayılan klavyeyi seçmenizi önerir.\n\nTercih ettiğiniz klavyeyi kullanmaya devam etmek istiyorsanız \'Atla\' butonuna tıklayın.</string>
+    <string name="Alert_DeviceIsRootedWarning">CoinDex ekibi, uygulamanın yalnızca root olmayan (jailbreak yapılmamış) telefonlarda çalıştırılmasını önerir.\n\nKöklü bir cihaz kullandığınızda, uygulamanın artık kripto para biriminizin kötü amaçlı yazılımlara karşı güvenliğini garanti edemeyeceğini lütfen unutmayın.</string>
     <!--OS Pin-->
     <string name="OSPin_Confirm_Title">Telefon PİN\'i</string>
     <string name="OSPin_Confirm_Desciption">Bu uygulamayı kullanabilmeniz için telefonun Ekran Kilidi (Şifre/PİN) etkinleştirilmeli.\n\nAndroid Ayarlarından etkinleştirebilirsiniz.\n\nŞifreyi kaldırdığınızda, kullanılmakta olan güvenli bilgi deposu sistem tarafından kaldırılır. Cüzdanlarınızı gizli anahtar ile geri yüklemeniz gerekecek.</string>

@@ -62,7 +62,7 @@
     <string name="AccountRecovery_MigrationRecommended">يبدو أن هذه المحفظة تستخدم حرف غير قياسي في عبارة الاسترداد و/أو عبارة المرور. إذا كنت لا ترا رصيد أو معاملات يرجى قراءة أدناه للحصول على التفاصيل.\n\nضع علامة للحصول على المزيد من المعلومات</string>
     <string name="AccountRecovery_MigrationRequired">هذه محفظة غير قياسية. \n\nاضغط للحصول على المزيد من المعلومات</string>
     <!--Intro-->
-    <string name="Intro_Wallet_Screen1Description">كن غير قابل للإيقاف؛ Unstoppable</string>
+    <string name="Intro_Wallet_Screen1Description">كن غير قابل للإيقاف؛ CoinDex</string>
     <string name="Intro_Wallet_Screen2Title">أصول خارج السلسلة</string>
     <string name="Intro_Wallet_Screen2Description">لا تقفل على نفسك ولا تدع الآخرين يفعلون ذلك بك.</string>
     <string name="Intro_Wallet_Screen3Title">اذهب بلا حدود</string>
@@ -165,7 +165,7 @@
     <!--Setting_Security-->
     <!--Setting_Terms-->
     <!--Setting_Tell Friends-->
-    <string name="SettingsShare_Text">كن غير قابل للإيقاف؛ Unstoppable</string>
+    <string name="SettingsShare_Text">كن غير قابل للإيقاف؛ CoinDex</string>
     <!--Setting_Contact-->
     <!--Setting_Notifications-->
     <!-- Settings Launch Screen -->

@@ -19,7 +19,7 @@ try {
 android {
 
     defaultConfig {
-        applicationId "com.blockchain.bitcoin.wallet"
+        applicationId "com.wallet.blockchain.bitcoin"
         compileSdk compile_sdk_version
         minSdkVersion min_sdk_version
         targetSdkVersion compile_sdk_version
@@ -41,7 +41,7 @@ android {
         resValue "string", "companyWebPageLink", "https://horizontalsystems.io"
         resValue "string", "appWebPageLink", "https://unstoppable.money"
         resValue "string", "analyticsLink", "https://unstoppable.money/analytics"
-        resValue "string", "appGithubLink", "https://github.com/horizontalsystems/unstoppable-wallet-android"
+        resValue "string", "appGithubLink", "https://github.com/hoanghiephui/unstoppable-wallet-android"
         resValue "string", "appTwitterLink", "https://twitter.com/UnstoppableByHS"
         resValue "string", "appTelegramLink", "https://t.me/unstoppable_announcements"
         resValue "string", "appRedditLink", "https://www.reddit.com/r/UNSTOPPABLEWallet/"
@@ -119,7 +119,7 @@ android {
 
         release {
             debuggable false
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             resValue "string", "twitterBearerToken", "AAAAAAAAAAAAAAAAAAAAAJgeNwEAAAAA6xVpR6xLKTrxIA3kkSyRA92LDpA%3Da6auybDwcymUyh2BcS6zZwicUdxGtrzJC0qvOSdRwKLeqBGhwB"
             resValue "string", "cryptoCompareApiKey", ""
@@ -148,6 +148,7 @@ android {
             resValue "string", "trongridApiKey", "8f5ae2c8-8012-42a8-b0ca-ffc2741f6a29"
             resValue "string", "udnApiKey", "r2phzgatt_zt9-hd_wyvdjrdsrimnxgokm7knyag1malzgcz"
             resValue "string", "oneInchApiKey", "ElyK7s22HR0JD78CEXVPnpZA8UyuUwIl"
+            signingConfig signingConfigs.debug
         }
 
         appcenterrelease {
@@ -226,7 +227,7 @@ dependencies {
     implementation 'androidx.glance:glance-appwidget:1.0.0'
 
     // Room
-    def room_version = '2.6.0'
+    def room_version = '2.6.1'
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
     implementation "androidx.room:room-rxjava2:$room_version"
@@ -272,7 +273,7 @@ dependencies {
     api 'com.journeyapps:zxing-android-embedded:4.3.0'
 
     // WorkManager Kotlin
-    def work_version = "2.8.1"
+    def work_version = "2.9.0"
     implementation "androidx.work:work-runtime-ktx:$work_version"
     // WorkManager RxJava2 support
     implementation "androidx.work:work-rxjava2:$work_version"
@@ -321,7 +322,7 @@ dependencies {
     implementation 'androidx.activity:activity-compose:1.8.1'
     // Compose Material Design
     implementation "androidx.compose.material:material"
-    implementation "androidx.compose.material3:material3:1.2.0-alpha11"
+    implementation "androidx.compose.material3:material3:1.2.0-alpha12"
     // Animations
     implementation "androidx.compose.animation:animation"
     // Tooling support (Previews, etc.)
@@ -331,7 +332,7 @@ dependencies {
 
     implementation "androidx.compose.runtime:runtime-livedata"
 
-    def coil_version = "2.4.0"
+    def coil_version = "2.5.0"
     implementation "io.coil-kt:coil-compose:$coil_version"
     implementation "io.coil-kt:coil-svg:$coil_version"
     implementation("io.coil-kt:coil-gif:$coil_version")

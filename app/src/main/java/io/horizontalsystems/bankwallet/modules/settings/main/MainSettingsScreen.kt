@@ -82,7 +82,7 @@ fun SettingsScreen(
         Column(modifier = Modifier.verticalScroll(rememberScrollState()).padding(it)) {
             Spacer(modifier = Modifier.height(12.dp))
             SettingSections(viewModel, navController)
-            SettingsFooter(viewModel.appVersion, viewModel.companyWebPage)
+            //SettingsFooter(viewModel.appVersion, viewModel.companyWebPage)
         }
     }
 }
@@ -101,7 +101,7 @@ private fun SettingSections(
     val language by viewModel.languageLiveData.observeAsState()
     val context = LocalContext.current
 
-    CellUniversalLawrenceSection(
+    /*CellUniversalLawrenceSection(
         listOf {
             HsSettingCell(
                 R.string.Settings_Donate,
@@ -113,7 +113,7 @@ private fun SettingSections(
         }
     )
 
-    VSpacer(32.dp)
+    VSpacer(32.dp)*/
 
     CellUniversalLawrenceSection(
         listOf({
@@ -256,7 +256,7 @@ private fun SettingSections(
     VSpacer(32.dp)
 
     CellUniversalLawrenceSection(
-        listOf({
+        listOf(/*{
             HsSettingCell(
                 R.string.Settings_Faq,
                 R.drawable.ic_faq_20,
@@ -264,7 +264,7 @@ private fun SettingSections(
                     navController.slideFromRight(R.id.faqListFragment)
                 }
             )
-        }, {
+        },*/ {
             HsSettingCell(
                 R.string.Guides_Title,
                 R.drawable.ic_academy_20,
