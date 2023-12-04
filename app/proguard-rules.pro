@@ -118,7 +118,6 @@
 -keep class io.horizontalsystems.feeratekit.** { *; }
 -keep class io.horizontalsystems.coinkit.** { *; }
 -keep class io.horizontalsystems.tor.** { *; }
--keep class com.trustwallet.walletconnect.** { *; }
 -keep class org.bouncycastle.** { *; }
 -keep class cash.z.** { *; }
 -keep class org.dashj.bls.** { *; }
@@ -256,44 +255,81 @@
   public protected private *;
 }
 
--keep class io.horizontalsystems.bitcoincash.** {*;}
--keep class io.horizontalsystems.bitcoincashkit.** {*;}
--keep class io.horizontalsystems.bitcoincore.** {*;}
--keep class io.horizontalsystems.bitcoinkit.** {*;}
--keep class io.horizontalsystems.dashkit.** {*;}
--keep class org.dashj.bls.** {*;}
--keep class io.horizontalsystems.hodler.** {*;}
--keep class io.horizontalsystems.litecoinkit.** {*;}
--keep class io.horizontalsystems.tools.** {*;}
--keep class io.horizontalsystems.erc20kit.** {*;}
+-keep class io.horizontalsystems.bitcoincash.** { *; }
+-keep class io.horizontalsystems.bitcoincashkit.** { *; }
+-keep class io.horizontalsystems.bitcoincore.** { *; }
+-keep class io.horizontalsystems.bitcoinkit.** { *; }
+-keep class io.horizontalsystems.dashkit.** { *; }
+-keep class org.dashj.bls.** { *; }
+-keep class io.horizontalsystems.hodler.** { *; }
+-keep class io.horizontalsystems.litecoinkit.** { *; }
+-keep class io.horizontalsystems.tools.** { *; }
+-keep class io.horizontalsystems.erc20kit.** { *; }
 -keep class in3.** {*;}
--keep class io.horizontalsystems.ethereumkit.** {*;}
--keep class io.horizontalsystems.oneinchkit.** {*;}
--keep class io.horizontalsystems.uniswapkit.** {*;}
--keep class io.horizontalsystems.binancechainkit.** {*;}
--keep class io.horizontalsystems.feeratekit.** {*;}
--keep class io.horizontalsystems.hdwalletkit.** {*;}
--keep class io.horizontalsystems.marketkit.** {*;}
--keep class io.horizontalsystems.tor.** {*;}
--keep class net.freehaven.tor.control.** {*;}
--keep class com.trustwallet.walletconnect.** {*;}
--keep class com.tradingview.lightweightcharts.** {*;}
--keep class com.twitter.** {*;}
--keep class io.horizontalsystems.bankwallet.modules.coin.tweets.** {*;}
--keep class com.walletconnect.** {*;}
--keep class io.horizontalsystems.bankwallet.core.App {*;}
+-keep class io.horizontalsystems.ethereumkit.** { *; }
+-keep class io.horizontalsystems.oneinchkit.** { *; }
+-keep class io.horizontalsystems.uniswapkit.** { *; }
+-keep class io.horizontalsystems.binancechainkit.** { *; }
+-keep class io.horizontalsystems.feeratekit.** { *; }
+-keep class io.horizontalsystems.hdwalletkit.** { *; }
+-keep class io.horizontalsystems.marketkit.** { *; }
+-keep class io.horizontalsystems.tor.** { *; }
+-keep class net.freehaven.tor.control.** { *; }
+-keep class com.trustwallet.walletconnect.** { *; }
+-keep class com.tradingview.lightweightcharts.** { *; }
+-keep class com.twitter.** { *; }
+-keep class io.horizontalsystems.bankwallet.modules.coin.tweets.** { *; }
+-keep class com.walletconnect.** { *; }
+-keep class io.horizontalsystems.bankwallet.core.App { *; }
 -keepclassmembers class * { public <init>(...); }
 -keep class org.koin.** {*;}
 -keepclassmembers public class * extends androidx.lifecycle.ViewModel { public <init>(...); }
--keep class com.squareup.sqldelight.** {*;}
+-keep class com.squareup.sqldelight.** { *; }
 -keep,includedescriptorclasses class net.sqlcipher.** { *; }
 -keep,includedescriptorclasses interface net.sqlcipher.** { *; }
--keep class io.horizontalsystems.bankwallet.modules.walletconnect.entity.** {*;}
--keep class io.horizontalsystems.bankwallet.modules.nft.** {*;}
--keep class io.horizontalsystems.bankwallet.core.providers.nft.** {*;}
--keep class io.horizontalsystems.bankwallet.modules.hsnft.** {*;}
--keep class io.horizontalsystems.bankwallet.modules.transactions.** {*;}
--keep class io.horizontalsystems.bankwallet.modules.transactionInfo.** {*;}
--keep class io.horizontalsystems.bankwallet.modules.swap.** {*;}
--keep class io.horizontalsystems.bankwallet.modules.showkey.** {*;}
--keep class io.horizontalsystems.bankwallet.modules.transactionInfo.options.** {*;}
+-keep class io.horizontalsystems.bankwallet.modules.walletconnect.entity.** { *; }
+-keep class io.horizontalsystems.bankwallet.modules.nft.** { *; }
+-keep class io.horizontalsystems.bankwallet.core.providers.nft.** { *; }
+-keep class io.horizontalsystems.bankwallet.modules.hsnft.** { *; }
+-keep class io.horizontalsystems.bankwallet.modules.transactions.** { *; }
+-keep class io.horizontalsystems.bankwallet.modules.transactionInfo.** { *; }
+-keep class io.horizontalsystems.bankwallet.modules.swap.** { *; }
+-keep class io.horizontalsystems.bankwallet.modules.showkey.** { *; }
+-keep class io.horizontalsystems.bankwallet.modules.transactionInfo.options.** { *; }
+##---------------Begin: proguard configuration for Gson  ----------
+# Gson uses generic type information stored in a class file when working with fields. Proguard
+# removes such information by default, so configure it to keep all of it.
+-keepattributes Signature
+
+# For using GSON @Expose annotation
+-keepattributes *Annotation*
+
+# Gson specific classes
+-dontwarn sun.misc.**
+#-keep class com.google.gson.stream.** { *; }
+
+# Application classes that will be serialized/deserialized over Gson
+-keep class com.google.gson.examples.android.model.** { <fields>; }
+
+# Prevent proguard from stripping interface information from TypeAdapter, TypeAdapterFactory,
+# JsonSerializer, JsonDeserializer instances (so they can be used in @JsonAdapter)
+-keep class * extends com.google.gson.TypeAdapter
+-keep class * implements com.google.gson.TypeAdapterFactory
+-keep class * implements com.google.gson.JsonSerializer
+-keep class * implements com.google.gson.JsonDeserializer
+
+# Prevent R8 from leaving Data object members always null
+-keepclassmembers,allowobfuscation class * {
+  @com.google.gson.annotations.SerializedName <fields>;
+}
+
+# Retain generic signatures of TypeToken and its subclasses with R8 version 3.0 and higher.
+-keep,allowobfuscation,allowshrinking class com.google.gson.reflect.TypeToken
+-keep,allowobfuscation,allowshrinking class * extends com.google.gson.reflect.TypeToken
+
+##---------------End: proguard configuration for Gson  ----------
+-keepnames class com.fasterxml.jackson.** { *; }
+-dontwarn com.fasterxml.jackson.databind.**
+-keep class org.spongycastle.** { *; }
+-dontwarn javax.naming.directory.SearchControls
+-dontwarn javax.naming.directory.SearchResult

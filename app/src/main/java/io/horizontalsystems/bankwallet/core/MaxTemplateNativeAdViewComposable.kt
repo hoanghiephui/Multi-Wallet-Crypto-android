@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.ViewGroup
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,6 +31,7 @@ import com.applovin.mediation.MaxError
 import com.applovin.mediation.nativeAds.MaxNativeAdListener
 import com.applovin.mediation.nativeAds.MaxNativeAdLoader
 import com.applovin.mediation.nativeAds.MaxNativeAdView
+import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.ui.compose.bold
 
 /**
@@ -80,6 +82,7 @@ class MaxTemplateNativeAdViewComposableLoader(
 
             override fun onNativeAdLoadFailed(adUnitId: String, error: MaxError) {
                 viewModel.logCallback()
+                nativeAdView.value = AdViewState.LoadFail
             }
 
             override fun onNativeAdClicked(ad: MaxAd) {
@@ -93,6 +96,7 @@ class MaxTemplateNativeAdViewComposableLoader(
         nativeAdLoader.apply {
             setNativeAdListener(adListener)
         }
+
         nativeAdLoader.loadAd()
     }
 }
@@ -101,10 +105,13 @@ class MaxTemplateNativeAdViewComposableLoader(
  * Jetpack Compose function to display MAX native ads using the Templates API.
  */
 @Composable
-fun MaxTemplateNativeAdViewComposable(adViewState: AdViewState,
-                                      adType: AdType = AdType.MEDIUM) {
+fun MaxTemplateNativeAdViewComposable(
+    adViewState: AdViewState,
+    adType: AdType = AdType.MEDIUM
+) {
     Crossfade(adViewState, label = "MaxTemplateNativeAdView") { viewState ->
         when (viewState) {
+            is AdViewState.LoadFail -> Unit
             is AdViewState.Default -> {
                 Card(
                     modifier = Modifier
@@ -112,48 +119,57 @@ fun MaxTemplateNativeAdViewComposable(adViewState: AdViewState,
                         .padding(horizontal = 16.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .statusBarsPadding()
-                            .padding(horizontal = 24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        val titleStyle = MaterialTheme.typography.headlineLarge.bold()
-                        val annotatedString = buildAnnotatedString {
-                            append("Buy ")
-
-                            withStyle(
-                                titleStyle.copy(color = MaterialTheme.colorScheme.primary)
-                                    .toSpanStyle()
-                            ) {
-                                append("Wallet+")
-                            }
-                        }
-
-                        Text(
-                            modifier = Modifier,
-                            text = annotatedString,
-                            style = titleStyle,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-
-                        Text(
-                            modifier = Modifier
-                                .padding(top = 8.dp)
-                                .fillMaxWidth(),
-                            text = "Wallet+ is a paid service that gives you access to all features for the price of a cup of coffee.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-
-                        Button(
-                            modifier = Modifier
-                                .padding(top = 24.dp, bottom = 12.dp)
-                                .fillMaxWidth(),
-                            onClick = { },
+                    if (adType == AdType.SMALL) {
+                        Box(
+                            modifier = Modifier.padding(24.dp),
+                            contentAlignment = Alignment.Center
                         ) {
-                            Text("Sub")
+                            Loading()
+                        }
+                    } else {
+                        Column(
+                            modifier = Modifier
+                                .statusBarsPadding()
+                                .padding(horizontal = 24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            val titleStyle = MaterialTheme.typography.headlineLarge.bold()
+                            val annotatedString = buildAnnotatedString {
+                                append("Buy ")
+
+                                withStyle(
+                                    titleStyle.copy(color = MaterialTheme.colorScheme.primary)
+                                        .toSpanStyle()
+                                ) {
+                                    append("Wallet+")
+                                }
+                            }
+
+                            Text(
+                                modifier = Modifier,
+                                text = annotatedString,
+                                style = titleStyle,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+
+                            Text(
+                                modifier = Modifier
+                                    .padding(top = 8.dp)
+                                    .fillMaxWidth(),
+                                text = "Wallet+ is a paid service that gives you access to all features for the price of a cup of coffee.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+
+                            Button(
+                                modifier = Modifier
+                                    .padding(top = 12.dp, bottom = 12.dp)
+                                    .fillMaxWidth(),
+                                onClick = { },
+                            ) {
+                                Text("Sub")
+                            }
                         }
                     }
                 }
@@ -195,7 +211,7 @@ fun MaxTemplateNativeAdViewComposable(adViewState: AdViewState,
 
 }
 
-val AdType.height get() = if (this == AdType.MEDIUM) 300.dp else 120.dp
+val AdType.height get() = if (this == AdType.MEDIUM) 300.dp else 125.dp
 
 sealed interface AdViewState {
     data class LoadAd(
@@ -203,6 +219,7 @@ sealed interface AdViewState {
     ) : AdViewState
 
     data object Default : AdViewState
+    data object LoadFail : AdViewState
 }
 
 enum class AdType {

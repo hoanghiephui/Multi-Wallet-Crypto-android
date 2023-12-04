@@ -25,6 +25,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
+import io.horizontalsystems.bankwallet.core.AdType
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.navigateWithTermsAccepted
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.modules.balance.BalanceAccountsViewModel
@@ -41,7 +43,7 @@ fun BalanceNoAccount(navController: NavController,
     val nativeAd by viewModel.adState
     LaunchedEffect(key1 = Unit, block = {
         viewModel.loadAds(context,
-            "YOUR_AD_UNIT_ID")
+            "028f93a51f5aeb70")
     })
     Column(
         modifier = Modifier
@@ -66,7 +68,9 @@ fun BalanceNoAccount(navController: NavController,
                 tint = ComposeAppTheme.colors.grey
             )
         }
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(15.dp))
+        MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
+        Spacer(Modifier.height(15.dp))
         ButtonPrimaryYellow(
             modifier = Modifier
                 .fillMaxWidth()
