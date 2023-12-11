@@ -150,7 +150,7 @@
         android:name="io.horizontalsystems.bankwallet.modules.coin.CoinFragment" >
         <deepLink
             app:action="android.intent.action.VIEW"
-            app:uri="unstoppable://coin-page?uid={coinUid}" />
+            app:uri="coindex://coin-page?uid={coinUid}" />
     </fragment>
     <fragment
         android:id="@+id/technicalIndicatorsDetailsFragment"
@@ -256,7 +256,7 @@
         android:name="io.horizontalsystems.bankwallet.modules.market.platform.MarketPlatformFragment">
         <deepLink
             app:action="android.intent.action.VIEW"
-            app:uri="unstoppable://top-platforms?uid={platformUid}&amp;title={platformName}" />
+            app:uri="coindex://top-platforms?uid={platformUid}&amp;title={platformName}" />
     </fragment>
     <fragment
         android:id="@+id/marketAdvancedSearchFragment"
@@ -343,7 +343,7 @@
         android:name="io.horizontalsystems.bankwallet.modules.nft.collection.NftCollectionFragment">
         <deepLink
             app:action="android.intent.action.VIEW"
-            app:uri="unstoppable://nft-collection?uid={collectionUid}" />
+            app:uri="coindex://nft-collection?uid={collectionUid}" />
     </fragment>
     <fragment
         android:id="@+id/sendXFragment"

@@ -25,6 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -106,6 +107,7 @@ fun MarketScreen(
                     state = pagerState,
                     userScrollEnabled = false,
                 ) { page ->
+                    viewModel.showSearchBar.value = false
                     when (tabs[page]) {
                         MarketModule.Tab.Overview -> MarketOverviewScreen(navController, viewModel)
                         MarketModule.Tab.Posts -> MarketPostsScreen()

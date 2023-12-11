@@ -21,6 +21,7 @@ import com.walletconnect.android.relay.ConnectionType
 import com.walletconnect.sign.client.Sign
 import com.walletconnect.sign.client.SignClient
 import io.horizontalsystems.bankwallet.BuildConfig
+import io.horizontalsystems.bankwallet.core.BaseViewModel.Companion.SHOW_ADS
 import io.horizontalsystems.bankwallet.core.factories.AccountFactory
 import io.horizontalsystems.bankwallet.core.factories.AdapterFactory
 import io.horizontalsystems.bankwallet.core.factories.AddressParserFactory
@@ -544,9 +545,11 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
     }
 
     private fun initApplovin() {
-        AppLovinSdk.getInstance(this).apply {
-            mediationProvider = "max"
-            appLoVinSdk = this
+        if (SHOW_ADS) {
+            AppLovinSdk.getInstance(this).apply {
+                mediationProvider = "max"
+                appLoVinSdk = this
+            }
         }
     }
 

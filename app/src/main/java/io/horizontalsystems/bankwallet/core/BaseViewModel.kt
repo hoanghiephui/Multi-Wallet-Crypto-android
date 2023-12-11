@@ -6,11 +6,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.applovin.mediation.nativeAds.MaxNativeAdView
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 abstract class BaseViewModel : ViewModel() {
@@ -20,12 +17,16 @@ abstract class BaseViewModel : ViewModel() {
     }
     val adState: State<AdViewState> get() = nativeAdLoader.nativeAdView
     private val _uiState = MutableStateFlow(false)
-    val uiState = _uiState.asSharedFlow()
-
+    private val loadAdState = _uiState.asSharedFlow()
+    companion object{
+        const val SHOW_ADS = false
+    }
     init {
-        App.appLoVinSdk.initializeSdk {
-            viewModelScope.launch {
-                _uiState.emit(true)
+        if (SHOW_ADS) {
+            App.appLoVinSdk.initializeSdk {
+                viewModelScope.launch {
+                    _uiState.emit(true)
+                }
             }
         }
     }
@@ -46,8 +47,8 @@ abstract class BaseViewModel : ViewModel() {
     ) {
         // Initialize ad with ad loader.
         viewModelScope.launch {
-            uiState.collect {
-                if (it) {
+            loadAdState.collect {
+                if (it && SHOW_ADS) {
                     nativeAdLoader.loadAd(context, adUnitIdentifier)
                     Log.d("Applovin", "loadAds")
                 }

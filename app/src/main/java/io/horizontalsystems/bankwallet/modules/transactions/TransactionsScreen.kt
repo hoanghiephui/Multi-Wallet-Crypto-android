@@ -17,13 +17,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import io.horizontalsystems.bankwallet.BuildConfig
 import io.horizontalsystems.bankwallet.R
+import io.horizontalsystems.bankwallet.core.AdType
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.balance.BalanceAccountsViewModel
@@ -41,7 +45,12 @@ fun TransactionsScreen(
     viewModel: TransactionsViewModel
 ) {
     val accountsViewModel = viewModel<BalanceAccountsViewModel>(factory = BalanceModule.AccountsFactory())
-
+    val context = LocalContext.current
+    val nativeAd by accountsViewModel.adState
+    LaunchedEffect(key1 = Unit, block = {
+        accountsViewModel.loadAds(context,
+            BuildConfig.TRANSACTION_NATIVE)
+    })
     val filterCoins by viewModel.filterCoinsLiveData.observeAsState()
     val filterTypes by viewModel.filterTypesLiveData.observeAsState()
     val filterBlockchains by viewModel.filterBlockchainsLiveData.observeAsState()
@@ -128,15 +137,19 @@ fun TransactionsScreen(
                     transactions?.let { transactionItems ->
                         if (transactionItems.isEmpty()) {
                             if (syncing) {
-                                ListEmptyView(
+                                ScreenMessageWithAction(
                                     text = stringResource(R.string.Transactions_WaitForSync),
                                     icon = R.drawable.ic_clock
-                                )
+                                ) {
+                                    MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
+                                }
                             } else {
-                                ListEmptyView(
+                                ScreenMessageWithAction(
                                     text = stringResource(R.string.Transactions_EmptyList),
                                     icon = R.drawable.ic_outgoingraw
-                                )
+                                ) {
+                                    MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
+                                }
                             }
                         } else {
                             val filterCoin = filterCoins?.find { it.selected }?.item
@@ -153,6 +166,9 @@ fun TransactionsScreen(
                                 LazyListState(0, 0)
                             }
                             LazyColumn(state = listState) {
+                                item {
+                                    MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
+                                }
                                 transactionList(
                                     transactionsMap = transactionItems,
                                     willShow = { viewModel.willShow(it) },

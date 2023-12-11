@@ -31,6 +31,7 @@ import com.applovin.mediation.MaxError
 import com.applovin.mediation.nativeAds.MaxNativeAdListener
 import com.applovin.mediation.nativeAds.MaxNativeAdLoader
 import com.applovin.mediation.nativeAds.MaxNativeAdView
+import io.horizontalsystems.bankwallet.core.BaseViewModel.Companion.SHOW_ADS
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.ui.compose.bold
 
@@ -109,6 +110,7 @@ fun MaxTemplateNativeAdViewComposable(
     adViewState: AdViewState,
     adType: AdType = AdType.MEDIUM
 ) {
+    if (!SHOW_ADS) return
     Crossfade(adViewState, label = "MaxTemplateNativeAdView") { viewState ->
         when (viewState) {
             is AdViewState.LoadFail -> Unit

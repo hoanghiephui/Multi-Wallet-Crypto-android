@@ -1,5 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.market.overview
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -38,6 +39,8 @@ import io.horizontalsystems.marketkit.models.*
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
@@ -52,6 +55,7 @@ class MarketOverviewViewModel(
     val viewStateLiveData = MutableLiveData<ViewState>(ViewState.Loading)
     val viewItem = MutableLiveData<MarketOverviewModule.ViewItem>()
     val isRefreshingLiveData = MutableLiveData<Boolean>()
+    val showSearchBar = mutableStateOf(false)
 
     val topNftCollectionsParams: Pair<SortingField, TimeDuration>
         get() = Pair(topNftsSortingField, topNftsTimeDuration)

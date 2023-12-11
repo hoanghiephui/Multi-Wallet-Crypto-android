@@ -1,5 +1,6 @@
 package io.horizontalsystems.bankwallet.widgets
 
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -150,12 +151,14 @@ class MarketWidget : GlanceAppWidget() {
                         )
                     } else {
                         state.items.forEach { item ->
+                            val intent =
+                                Intent(Intent.ACTION_VIEW, getDeeplinkUri(item, state.type))
                             Box(
                                 modifier = GlanceModifier
                                     .height(60.dp)
                                     .background(ImageProvider(R.drawable.widget_list_item_background))
                                     .clickable(
-                                        actionStartActivity(Intent(Intent.ACTION_VIEW, getDeeplinkUri(item, state.type)))
+                                        actionStartActivity(intent)
                                     )
                             ) {
                                 Item(item = item)
@@ -164,7 +167,7 @@ class MarketWidget : GlanceAppWidget() {
                                     GlanceModifier
                                         .fillMaxSize()
                                         .clickable(
-                                            actionStartActivity(Intent(Intent.ACTION_VIEW, getDeeplinkUri(item, state.type)))
+                                            actionStartActivity(intent)
                                         )
                                 )
                             }
@@ -174,7 +177,10 @@ class MarketWidget : GlanceAppWidget() {
                 Column {
                     Spacer(modifier = GlanceModifier.height(8.dp))
                     Text(
-                        text = "Updated: " + SimpleDateFormat("HH:mm:ss, dd-MM-yyyy", Locale.US).format(Date(state.updateTimestampMillis)),
+                        text = "Updated: " + SimpleDateFormat(
+                            "HH:mm:ss, dd-MM-yyyy",
+                            Locale.US
+                        ).format(Date(state.updateTimestampMillis)),
                         style = AppWidgetTheme.textStyles.micro()
                     )
                 }
@@ -185,13 +191,15 @@ class MarketWidget : GlanceAppWidget() {
     private fun getDeeplinkUri(item: MarketWidgetItem, type: MarketWidgetType): Uri = when (type) {
         MarketWidgetType.Watchlist,
         MarketWidgetType.TopGainers -> {
-            "unstoppable://coin-page?uid=${item.uid}".toUri()
+            "coindex://coin-page?uid=${item.uid}".toUri()
         }
+
         MarketWidgetType.TopNfts -> {
-            "unstoppable://nft-collection?uid=${item.uid}&blockchainTypeUid=${item.blockchainTypeUid}".toUri()
+            "coindex://nft-collection?uid=${item.uid}&blockchainTypeUid=${item.blockchainTypeUid}".toUri()
         }
+
         MarketWidgetType.TopPlatforms -> {
-            "unstoppable://top-platforms?uid=${item.uid}&title=${item.title}".toUri()
+            "coindex://top-platforms?uid=${item.uid}&title=${item.title}".toUri()
         }
     }
 
@@ -296,10 +304,15 @@ class MarketWidget : GlanceAppWidget() {
             diff != null -> {
                 Text(
                     text = App.numberFormatter.formatValueAsDiff(Value.Percent(diff)),
-                    style = TextStyle(color = diffColor(diff), fontSize = 14.sp, fontWeight = FontWeight.Normal),
+                    style = TextStyle(
+                        color = diffColor(diff),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal
+                    ),
                     maxLines = 1
                 )
             }
+
             marketCap != null -> {
                 Row {
                     Text(
@@ -315,6 +328,7 @@ class MarketWidget : GlanceAppWidget() {
                     )
                 }
             }
+
             volume != null -> {
                 Row {
                     Text(
@@ -340,7 +354,11 @@ class MarketWidget : GlanceAppWidget() {
                 .background(ImageProvider(R.drawable.widget_list_item_badge_background))
                 .padding(horizontal = 4.dp, vertical = 2.dp),
             text = text,
-            style = TextStyle(color = AppWidgetTheme.colors.bran, fontSize = 10.sp, fontWeight = FontWeight.Medium),
+            style = TextStyle(
+                color = AppWidgetTheme.colors.bran,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Medium
+            ),
         )
     }
 

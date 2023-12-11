@@ -61,13 +61,13 @@ object MainModule {
 
     @Parcelize
     enum class MainNavigation(val iconRes: Int, val titleRes: Int) : Parcelable {
-        Market(R.drawable.ic_market_24, R.string.Market_Title),
-        Balance(R.drawable.ic_wallet_24, R.string.Balance_Title),
+        Market(R.drawable.baseline_area_chart_24, R.string.Market_Title),
+        Balance(R.drawable.baseline_account_balance_wallet_24, R.string.Balance_Title),
         Transactions(R.drawable.ic_transactions, R.string.Transactions_Title),
         Settings(R.drawable.ic_settings, R.string.Settings_Title);
 
         companion object {
-            private val map = values().associateBy(MainNavigation::name)
+            private val map = entries.associateBy(MainNavigation::name)
 
             fun fromString(type: String?): MainNavigation? = map[type]
         }

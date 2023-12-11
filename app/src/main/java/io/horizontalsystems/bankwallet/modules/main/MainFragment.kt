@@ -27,7 +27,7 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -83,7 +83,6 @@ import io.horizontalsystems.bankwallet.ui.extensions.WalletSwitchBottomSheet
 import io.horizontalsystems.bankwallet.ui.extensions.rememberLifecycleEvent
 import io.horizontalsystems.core.findNavController
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 class MainFragment : BaseComposeFragment() {
 
@@ -142,8 +141,7 @@ private fun MainScreenWithRootedDeviceCheck(
 }
 
 @OptIn(
-    ExperimentalMaterialApi::class, ExperimentalFoundationApi::class,
-    ExperimentalMaterial3Api::class
+    ExperimentalMaterialApi::class, ExperimentalFoundationApi::class
 )
 @Composable
 private fun MainScreen(
@@ -415,18 +413,18 @@ private fun NiaBottomBar(
                 selected = selected,
                 onClick = { onNavigateToDestination(destination) },
                 icon = {
-                    androidx.compose.material3.Icon(
+                    Icon(
                         painter = painterResource(destination.mainNavItem.iconRes),
                         contentDescription = stringResource(destination.mainNavItem.titleRes)
                     )
                 },
                 selectedIcon = {
-                    androidx.compose.material3.Icon(
+                    Icon(
                         painter = painterResource(destination.mainNavItem.iconRes),
                         contentDescription = stringResource(destination.mainNavItem.titleRes)
                     )
                 },
-                label = { androidx.compose.material3.Text(stringResource(destination.mainNavItem.titleRes)) },
+                label = { Text(stringResource(destination.mainNavItem.titleRes)) },
                 modifier = Modifier,
                 enabled = destination.enabled
             )

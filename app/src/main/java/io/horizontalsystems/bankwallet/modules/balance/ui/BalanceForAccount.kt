@@ -19,6 +19,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -32,6 +33,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import io.horizontalsystems.bankwallet.BuildConfig
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.slideFromBottom
@@ -71,6 +73,11 @@ fun BalanceForAccount(navController: NavController, accountViewItem: AccountView
             viewModel.setConnectionUri(result.data?.getStringExtra(ModuleField.SCAN_ADDRESS) ?: "")
         }
     }
+    val nativeAd by viewModel.adState
+    LaunchedEffect(key1 = Unit, block = {
+        viewModel.loadAds(context,
+            BuildConfig.BALANCE_NATIVE)
+    })
 
     when (viewModel.connectionResult) {
         WalletConnectListViewModel.ConnectionResult.Error -> {
@@ -181,10 +188,11 @@ fun BalanceForAccount(navController: NavController, accountViewItem: AccountView
                                 accountViewItem,
                                 navController,
                                 uiState,
-                                viewModel.totalUiState
+                                viewModel.totalUiState,
+                                nativeAd
                             )
                         } else {
-                            BalanceItemsEmpty(navController, accountViewItem)
+                            BalanceItemsEmpty(navController, accountViewItem, nativeAd)
                         }
                     }
 
