@@ -256,7 +256,7 @@ private fun SettingSections(
     VSpacer(32.dp)
 
     CellUniversalLawrenceSection(
-        listOf(/*{
+        listOf({
             HsSettingCell(
                 R.string.Settings_Faq,
                 R.drawable.ic_faq_20,
@@ -264,7 +264,7 @@ private fun SettingSections(
                     navController.slideFromRight(R.id.faqListFragment)
                 }
             )
-        },*/ {
+        }, {
             HsSettingCell(
                 R.string.Guides_Title,
                 R.drawable.ic_academy_20,

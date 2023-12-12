@@ -28,7 +28,7 @@ fun MarkdownContent(
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
-        Crossfade(viewState) { viewState ->
+        Crossfade(viewState, label = "") { viewState ->
             when (viewState) {
                 is ViewState.Error -> {
                     ListErrorView(stringResource(id = R.string.Markdown_Error_NotFound)) {
