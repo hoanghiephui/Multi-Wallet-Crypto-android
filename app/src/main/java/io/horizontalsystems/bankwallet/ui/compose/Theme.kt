@@ -203,8 +203,8 @@ val darkPalette = Colors(
 fun ComposeAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     androidTheme: Boolean = true,
-    disableDynamicTheming: Boolean = true,
-    content: @Composable() () -> Unit
+    disableDynamicTheming: Boolean = false,
+    content: @Composable () -> Unit
 ) {
 
     // Color scheme

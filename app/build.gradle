@@ -39,7 +39,7 @@ android {
         }
 
         resValue "string", "companyWebPageLink", "https://horizontalsystems.io"
-        resValue "string", "appWebPageLink", "https://unstoppable.money"
+        resValue "string", "appWebPageLink", "http://play.google.com/store/apps/details?id=com.wallet.blockchain.bitcoin"
         resValue "string", "analyticsLink", "https://unstoppable.money/analytics"
         resValue "string", "appGithubLink", "https://github.com/hoanghiephui/unstoppable-wallet-android"
         resValue "string", "appTwitterLink", "https://twitter.com/UnstoppableByHS"

@@ -16,13 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
+import androidx.compose.material3.Button
 import androidx.compose.material.ButtonColors
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -70,8 +70,8 @@ fun ButtonSecondaryYellow(
         modifier = modifier,
         onClick = onClick,
         buttonColors = ButtonPrimaryDefaults.textButtonColors(
-            backgroundColor = ComposeAppTheme.colors.yellowD,
-            contentColor = ComposeAppTheme.colors.dark,
+            backgroundColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.surface,
             disabledBackgroundColor = ComposeAppTheme.colors.steel20,
             disabledContentColor = ComposeAppTheme.colors.grey50,
         ),
@@ -197,7 +197,7 @@ fun <T : WithTranslatableTitle> ButtonSecondaryToggle(
                             modifier = Modifier
                                 .size(3.dp)
                                 .clip(CircleShape)
-                                .background(if (select.selected == it) ComposeAppTheme.colors.jacob else ComposeAppTheme.colors.grey)
+                                .background(if (select.selected == it) MaterialTheme.colorScheme.primary else ComposeAppTheme.colors.grey)
                         )
                     }
                 }
@@ -208,7 +208,6 @@ fun <T : WithTranslatableTitle> ButtonSecondaryToggle(
 }
 
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ButtonSecondary(
     onClick: () -> Unit,

@@ -6,7 +6,14 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.ButtonColors
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -144,8 +151,8 @@ fun ButtonPrimaryYellow(
         modifier = modifier,
         onClick = onClick,
         buttonColors = ButtonPrimaryDefaults.textButtonColors(
-            backgroundColor = ComposeAppTheme.colors.yellowD,
-            contentColor = ComposeAppTheme.colors.light,
+            backgroundColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.surface,
             disabledBackgroundColor = ComposeAppTheme.colors.steel20,
             disabledContentColor = ComposeAppTheme.colors.grey50,
         ),
@@ -173,8 +180,8 @@ fun ButtonPrimaryYellowWithIcon(
         modifier = modifier,
         onClick = onClick,
         buttonColors = ButtonPrimaryDefaults.textButtonColors(
-            backgroundColor = ComposeAppTheme.colors.yellowD,
-            contentColor = ComposeAppTheme.colors.light,
+            backgroundColor = MaterialTheme.colorScheme.primary,
+            contentColor = MaterialTheme.colorScheme.surface,
             disabledBackgroundColor = ComposeAppTheme.colors.steel20,
             disabledContentColor = ComposeAppTheme.colors.grey50,
         ),
@@ -256,7 +263,6 @@ fun ButtonPrimaryYellowWithSpinner(
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ButtonPrimary(
     onClick: () -> Unit,
