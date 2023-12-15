@@ -1,6 +1,7 @@
 package io.horizontalsystems.bankwallet.modules.balance.token
 
 import io.horizontalsystems.bankwallet.core.Clearable
+import io.horizontalsystems.bankwallet.core.managers.SpamManager
 import io.horizontalsystems.bankwallet.core.subscribeIO
 import io.horizontalsystems.bankwallet.entities.CurrencyValue
 import io.horizontalsystems.bankwallet.entities.LastBlockInfo
@@ -36,7 +37,8 @@ class TokenTransactionsService(
     private val rateRepository: TransactionsRateRepository,
     private val transactionSyncStateRepository: TransactionSyncStateRepository,
     private val contactsRepository: ContactsRepository,
-    private val nftMetadataService: NftMetadataService
+    private val nftMetadataService: NftMetadataService,
+    private val spamManager: SpamManager,
 ) : Clearable {
     private val disposables = CompositeDisposable()
     private val transactionItems = CopyOnWriteArrayList<TransactionItem>()
@@ -46,16 +48,6 @@ class TokenTransactionsService(
     val itemsObservable: Observable<List<TransactionItem>> get() = itemsSubject
 
     fun start() {
-        val transactionWallet = TransactionWallet(wallet.token, wallet.transactionSource, wallet.badge)
-
-        transactionSyncStateRepository.setTransactionWallets(listOf(transactionWallet))
-        transactionRecordRepository.setWallets(
-            listOf(transactionWallet),
-            transactionWallet,
-            FilterTransactionType.All,
-            null
-        )
-
         transactionRecordRepository.itemsObservable
             .subscribeIO {
                 handleUpdatedRecords(it)
@@ -99,6 +91,16 @@ class TokenTransactionsService(
                 handleContactsUpdate()
             }
         }
+
+        val transactionWallet = TransactionWallet(wallet.token, wallet.transactionSource, wallet.badge)
+
+        transactionSyncStateRepository.setTransactionWallets(listOf(transactionWallet))
+        transactionRecordRepository.setWallets(
+            listOf(transactionWallet),
+            transactionWallet,
+            FilterTransactionType.All,
+            null
+        )
     }
 
     @Synchronized
@@ -204,7 +206,7 @@ class TokenTransactionsService(
                 newRecords.add(record)
             }
 
-            if (record.spam) return@forEach
+            if (record.spam && spamManager.hideSuspiciousTx) return@forEach
 
             transactionItem = if (transactionItem == null) {
                 val lastBlockInfo = transactionSyncStateRepository.getLastBlockInfo(record.source)

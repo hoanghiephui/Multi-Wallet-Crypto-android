@@ -76,7 +76,7 @@ import java.net.URL
 class NftAssetFragment : BaseComposeFragment() {
 
     @Composable
-    override fun GetContent() {
+    override fun GetContent(navController: NavController) {
         val collectionUid = requireArguments().getString(NftAssetModule.collectionUidKey)
         val nftUid = requireArguments().getString(NftAssetModule.nftUidKey)?.let { NftUid.fromUid(it) }
         NftAssetScreen(findNavController(), collectionUid, nftUid)
@@ -96,24 +96,22 @@ fun NftAssetScreen(
     val viewModel = viewModel<NftAssetViewModel>(factory = NftAssetModule.Factory(collectionUid, nftUid))
     val errorMessage = viewModel.errorMessage
 
-    ComposeAppTheme {
-        Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
-            AppBar(
-                menuItems = listOf(
-                    MenuItem(
-                        title = TranslatableString.ResString(R.string.Button_Close)
-                    ) {
-                        navController.popBackStack()
-                    }
-                )
+    Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
+        AppBar(
+            menuItems = listOf(
+                MenuItem(
+                    title = TranslatableString.ResString(R.string.Button_Close)
+                ) {
+                    navController.popBackStack()
+                }
             )
-            NftAsset(viewModel, navController)
-        }
+        )
+        NftAsset(viewModel, navController)
+    }
 
-        errorMessage?.let {
-            SnackbarError(it.getString())
-            viewModel.errorShown()
-        }
+    errorMessage?.let {
+        SnackbarError(it.getString())
+        viewModel.errorShown()
     }
 }
 
@@ -147,6 +145,7 @@ private fun NftAsset(
                 NftAssetModule.Tab.Overview -> {
                     NftAssetInfo(viewModel, navController, coroutineScope)
                 }
+
                 NftAssetModule.Tab.Activity -> {
                     NftAssetEvents(viewModel)
                 }
@@ -181,9 +180,11 @@ private fun NftAssetInfo(
             is ViewState.Loading -> {
                 Loading()
             }
+
             is ViewState.Error -> {
                 ListErrorView(stringResource(R.string.SyncError), viewModel::refresh)
             }
+
             else -> {
                 AssetContent(painter, viewModel.viewItem, viewModel.nftUid, navController, coroutineScope)
             }
@@ -247,7 +248,7 @@ private fun AssetContent(
                             .clickable {
                                 navController.slideFromRight(
                                     R.id.nftCollectionFragment,
-                                    NftCollectionFragment.prepareParams(asset.providerCollectionUid, asset.nftUid.blockchainType)
+                                    NftCollectionFragment.prepareParams(asset.providerCollectionUid, asset.nftUid.blockchainType.uid)
                                 )
                             },
                         verticalAlignment = Alignment.CenterVertically
@@ -447,14 +448,17 @@ private fun AssetContent(
                                 icon = painterResource(id = R.drawable.ic_globe_20)
                                 title = stringResource(id = R.string.NftAsset_Links_Website)
                             }
+
                             is NftAssetViewModel.LinkType.Provider -> {
                                 icon = painterResource(id = link.type.icon)
                                 title = link.type.title
                             }
+
                             NftAssetViewModel.LinkType.Discord -> {
                                 icon = painterResource(id = R.drawable.ic_discord_20)
                                 title = stringResource(id = R.string.NftAsset_Links_Discord)
                             }
+
                             NftAssetViewModel.LinkType.Twitter -> {
                                 icon = painterResource(id = R.drawable.ic_twitter_20)
                                 title = stringResource(id = R.string.NftAsset_Links_Twitter)
@@ -497,6 +501,7 @@ private fun AssetContent(
                                 .startChooser()
                         }
                     }
+
                     NftAssetModule.NftAssetAction.Save -> {
                         coroutineScope.launch(Dispatchers.IO) {
                             try {
@@ -554,6 +559,7 @@ private fun NftAssetEvents(nftAssetViewModel: NftAssetViewModel) {
             is ViewState.Error -> {
                 ListErrorView(stringResource(R.string.SyncError), nftAssetViewModel::refresh)
             }
+
             else -> {
                 val nftUid = nftAssetViewModel.viewItem?.nftUid ?: return@Crossfade
                 val viewModel = viewModel<NftCollectionEventsViewModel>(
@@ -667,7 +673,7 @@ private fun NftAssetSale(sale: NftAssetViewModel.SaleViewItem) {
         ) {
             val title = when (sale.type) {
                 NftAssetMetadata.SaleType.OnSale -> stringResource(R.string.Nfts_Asset_OnSale)
-                NftAssetMetadata.SaleType.OnAuction ->  stringResource(R.string.Nfts_Asset_OnAuction)
+                NftAssetMetadata.SaleType.OnAuction -> stringResource(R.string.Nfts_Asset_OnAuction)
             }
 
             body_leah(text = title)
@@ -682,7 +688,7 @@ private fun NftAssetSale(sale: NftAssetViewModel.SaleViewItem) {
     saleComposables.add {
         val title = when (sale.type) {
             NftAssetMetadata.SaleType.OnSale -> stringResource(R.string.NftAsset_Price_BuyNow)
-            NftAssetMetadata.SaleType.OnAuction ->  stringResource(R.string.NftAsset_Price_MinimumBid)
+            NftAssetMetadata.SaleType.OnAuction -> stringResource(R.string.NftAsset_Price_MinimumBid)
         }
         NftAssetPriceCell(title, sale.price)
     }

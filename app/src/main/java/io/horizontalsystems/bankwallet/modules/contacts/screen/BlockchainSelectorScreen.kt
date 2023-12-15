@@ -49,26 +49,25 @@ fun BlockchainSelectorScreen(
                 menuItems = menuItems
             )
 
-            Column(
-                Modifier.verticalScroll(rememberScrollState())
-            ) {
-                Spacer(Modifier.height(12.dp))
-                HSSectionRounded {
-                    blockchains.forEachIndexed { index, item ->
-                        BlockchainCell(
-                            item = item,
-                            selected = selectedItem == item,
-                            onCheck = {
-                                selectedItem = item
+        Column(
+            Modifier.verticalScroll(rememberScrollState())
+        ) {
+            Spacer(Modifier.height(12.dp))
+            HSSectionRounded {
+                blockchains.forEachIndexed { index, item ->
+                    BlockchainCell(
+                        item = item,
+                        selected = selectedItem == item,
+                        onCheck = {
+                            selectedItem = item
 
-                                onSelectBlockchain(it)
-                            },
-                            borderTop = index != 0
-                        )
-                    }
+                            onSelectBlockchain(it)
+                        },
+                        borderTop = index != 0
+                    )
                 }
-                Spacer(Modifier.height(32.dp))
             }
+            Spacer(Modifier.height(32.dp))
         }
     }
 }

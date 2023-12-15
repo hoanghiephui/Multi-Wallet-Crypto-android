@@ -34,15 +34,14 @@ import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 import io.horizontalsystems.bankwallet.ui.compose.components.InfoText
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
-import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.parcelable
 
 class BackupKeyFragment : BaseComposeFragment(screenshotEnabled = false) {
 
     @Composable
-    override fun GetContent() {
+    override fun GetContent(navController: NavController) {
         val account = requireArguments().parcelable<Account>(BackupKeyModule.ACCOUNT)!!
-        RecoveryPhraseScreen(findNavController(), account)
+        RecoveryPhraseScreen(navController, account)
     }
 
 }
@@ -84,31 +83,30 @@ fun RecoveryPhraseScreen(
             Column(modifier = Modifier.padding(it)) {
                 var hidden by remember { mutableStateOf(true) }
 
-                InfoText(text = stringResource(R.string.RecoveryPhrase_Description))
-                Spacer(Modifier.height(12.dp))
-                SeedPhraseList(
-                    wordsNumbered = viewModel.wordsNumbered,
-                    hidden = hidden
-                ) {
-                    hidden = !hidden
-                }
-                Spacer(Modifier.height(24.dp))
-                PassphraseCell(viewModel.passphrase, hidden)
-                Spacer(modifier = Modifier.weight(1f))
-                ButtonsGroupWithShade {
-                    ButtonPrimaryYellow(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 16.dp, end = 16.dp),
-                        title = stringResource(R.string.RecoveryPhrase_Verify),
-                        onClick = {
-                            navController.slideFromRight(
-                                R.id.backupConfirmationKeyFragment,
-                                BackupConfirmKeyModule.prepareParams(viewModel.account)
-                            )
-                        },
-                    )
-                }
+            InfoText(text = stringResource(R.string.RecoveryPhrase_Description))
+            Spacer(Modifier.height(12.dp))
+            SeedPhraseList(
+                wordsNumbered = viewModel.wordsNumbered,
+                hidden = hidden
+            ) {
+                hidden = !hidden
+            }
+            Spacer(Modifier.height(24.dp))
+            PassphraseCell(viewModel.passphrase, hidden)
+            Spacer(modifier = Modifier.weight(1f))
+            ButtonsGroupWithShade {
+                ButtonPrimaryYellow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, end = 16.dp),
+                    title = stringResource(R.string.RecoveryPhrase_Verify),
+                    onClick = {
+                        navController.slideFromRight(
+                            R.id.backupConfirmationKeyFragment,
+                            BackupConfirmKeyModule.prepareParams(viewModel.account)
+                        )
+                    },
+                )
             }
         }
     }

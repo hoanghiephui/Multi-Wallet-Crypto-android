@@ -8,7 +8,6 @@ import io.horizontalsystems.bankwallet.modules.balance.BalanceAccountsViewModel
 import io.horizontalsystems.bankwallet.modules.balance.BalanceModule
 import io.horizontalsystems.bankwallet.modules.balance.BalanceScreenState
 import io.horizontalsystems.bankwallet.modules.balance.cex.BalanceForAccountCex
-import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 
 @Composable
 fun BalanceScreen(navController: NavController) {

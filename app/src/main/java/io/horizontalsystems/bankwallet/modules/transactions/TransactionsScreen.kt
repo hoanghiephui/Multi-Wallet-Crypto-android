@@ -16,6 +16,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -25,6 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.slideFromBottom
+import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.balance.BalanceAccountsViewModel
 import io.horizontalsystems.bankwallet.modules.balance.BalanceModule
@@ -48,7 +50,6 @@ fun TransactionsScreen(
     val transactions by viewModel.transactionList.observeAsState()
     val viewState by viewModel.viewState.observeAsState()
     val syncing by viewModel.syncingLiveData.observeAsState(false)
-    val filterResetEnabled by viewModel.filterResetEnabled.collectAsState()
 
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         AppBar(
@@ -56,10 +57,10 @@ fun TransactionsScreen(
             showSpinner = syncing,
             menuItems = listOf(
                 MenuItem(
-                    title = TranslatableString.ResString(R.string.Button_Reset),
-                    enabled = filterResetEnabled,
+                    title = TranslatableString.ResString(R.string.Transactions_Filter),
+                    icon = R.drawable.ic_sort_24,
                     onClick = {
-                        viewModel.resetFilters()
+                        navController.slideFromRight(R.id.transactionFilterFragment)
                     }
                 )
             )
@@ -70,57 +71,7 @@ fun TransactionsScreen(
                 onTransactionTypeClick = viewModel::setFilterTransactionType
             )
         }
-        filterBlockchains?.let { filterBlockchains ->
-            CellHeaderSorting(borderBottom = true) {
-                var showFilterBlockchainDialog by remember { mutableStateOf(false) }
-                if (showFilterBlockchainDialog) {
-                    SelectorDialogCompose(
-                        title = stringResource(R.string.Transactions_Filter_Blockchain),
-                        items = filterBlockchains.map {
-                            SelectorItem(it.item?.name ?: stringResource(R.string.Transactions_Filter_AllBlockchains), it.selected, it)
-                        },
-                        onDismissRequest = {
-                            showFilterBlockchainDialog = false
-                        },
-                        onSelectItem = viewModel::onEnterFilterBlockchain
-                    )
-                }
 
-                val filterBlockchain = filterBlockchains.firstOrNull { it.selected }?.item
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    ButtonSecondaryTransparent(
-                        title = filterBlockchain?.name ?: stringResource(R.string.Transactions_Filter_AllBlockchains),
-                        iconRight = R.drawable.ic_down_arrow_20,
-                        onClick = {
-                            showFilterBlockchainDialog = true
-                        }
-                    )
-
-                    filterCoins?.let { filterCoins ->
-                        val filterCoin = filterCoins.find { it.selected }?.item
-
-                        val coinCode = filterCoin?.token?.coin?.code
-                        val badge = filterCoin?.badge
-                        val title = when {
-                            badge != null -> "$coinCode ($badge)"
-                            else -> coinCode
-                        }
-
-                        ButtonSecondaryTransparent(
-                            title = title ?: stringResource(R.string.Transactions_Filter_AllCoins),
-                            iconRight = R.drawable.ic_down_arrow_20,
-                            onClick = {
-                                navController.slideFromBottom(R.id.filterCoinFragment)
-                            }
-                        )
-                    }
-                }
-            }
-        }
 
         Crossfade(viewState, label = "") { viewState ->
             when (viewState) {
@@ -194,7 +145,7 @@ fun LazyListScope.transactionList(
 
     transactionsMap.forEach { (dateHeader, transactions) ->
         stickyHeader {
-            DateHeader(dateHeader)
+            HeaderStick(text = dateHeader)
         }
 
         val itemsCount = transactions.size
@@ -238,17 +189,6 @@ private fun getBottomReachedUid(transactionsMap: Map<String, List<TransactionVie
 }
 
 @Composable
-fun DateHeader(dateHeader: String) {
-    HeaderSorting {
-        subhead1_grey(
-            modifier = Modifier.padding(horizontal = 16.dp),
-            text = dateHeader,
-            maxLines = 1,
-        )
-    }
-}
-
-@Composable
 fun TransactionCell(item: TransactionViewItem, position: SectionItemPosition, onClick: () -> Unit) {
     val divider = position == SectionItemPosition.Middle || position == SectionItemPosition.Last
     SectionUniversalItem(
@@ -283,7 +223,8 @@ fun TransactionCell(item: TransactionViewItem, position: SectionItemPosition, on
             Box(
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
-                    .size(42.dp),
+                    .size(42.dp)
+                    .alpha(if (item.spam) 0.5f else 1f),
                 contentAlignment = Alignment.Center
             ) {
                 item.progress?.let { progress ->
@@ -351,7 +292,11 @@ fun TransactionCell(item: TransactionViewItem, position: SectionItemPosition, on
                     is TransactionViewItem.Icon.ImageResource -> {}
                 }
             }
-            Column(modifier = Modifier.padding(end = 16.dp)) {
+            Column(
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .alpha(if (item.spam) 0.5f else 1f)
+            ) {
                 Row {
                     body_leah(
                         modifier = Modifier.padding(end = 32.dp),
@@ -359,16 +304,14 @@ fun TransactionCell(item: TransactionViewItem, position: SectionItemPosition, on
                         maxLines = 1,
                     )
                     Spacer(Modifier.weight(1f))
-                    if (item.showAmount) {
-                        item.primaryValue?.let { coloredValue ->
-                            Text(
-                                text = coloredValue.value,
-                                style = ComposeAppTheme.typography.body,
-                                color = coloredValue.color.compose(),
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                            )
-                        }
+                    item.primaryValue?.let { coloredValue ->
+                        Text(
+                            text = if (item.showAmount) coloredValue.value else "*****",
+                            style = ComposeAppTheme.typography.body,
+                            color = coloredValue.color.compose(),
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                        )
                     }
 
                     if (item.doubleSpend) {
@@ -402,15 +345,13 @@ fun TransactionCell(item: TransactionViewItem, position: SectionItemPosition, on
                             .padding(end = 8.dp),
                         maxLines = 2,
                     )
-                    if (item.showAmount) {
-                        item.secondaryValue?.let { coloredValue ->
-                            Text(
-                                text = coloredValue.value,
-                                style = ComposeAppTheme.typography.subhead2,
-                                color = coloredValue.color.compose(),
-                                maxLines = 1,
-                            )
-                        }
+                    item.secondaryValue?.let { coloredValue ->
+                        Text(
+                            text = if (item.showAmount) coloredValue.value else "*****",
+                            style = ComposeAppTheme.typography.subhead2,
+                            color = coloredValue.color.compose(),
+                            maxLines = 1,
+                        )
                     }
                 }
             }

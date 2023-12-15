@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromRight
@@ -18,26 +19,24 @@ import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
-import io.horizontalsystems.core.findNavController
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 
 class MarkdownFragment : BaseComposeFragment() {
 
     @Composable
-    override fun GetContent() {
-        ComposeAppTheme {
-            NiaBackground {
-                MarkdownScreen(
-                    handleRelativeUrl = arguments?.getBoolean(handleRelativeUrlKey) ?: false,
-                    showAsPopup = arguments?.getBoolean(showAsPopupKey) ?: false,
-                    markdownUrl = arguments?.getString(markdownUrlKey) ?: "",
-                    onCloseClick = { findNavController().popBackStack() },
-                    onUrlClick = { url ->
-                        findNavController().slideFromRight(
-                            R.id.markdownFragment, bundleOf(markdownUrlKey to url)
-                        )
-                    }
-                )
-            }
+    override fun GetContent(navController: NavController) {
+        NiaBackground {
+            MarkdownScreen(
+                handleRelativeUrl = arguments?.getBoolean(handleRelativeUrlKey) ?: false,
+                showAsPopup = arguments?.getBoolean(showAsPopupKey) ?: false,
+                markdownUrl = arguments?.getString(markdownUrlKey) ?: "",
+                onCloseClick = { navController.popBackStack() },
+                onUrlClick = { url ->
+                    navController.slideFromRight(
+                        R.id.markdownFragment, bundleOf(markdownUrlKey to url)
+                    )
+                }
+            )
         }
     }
 

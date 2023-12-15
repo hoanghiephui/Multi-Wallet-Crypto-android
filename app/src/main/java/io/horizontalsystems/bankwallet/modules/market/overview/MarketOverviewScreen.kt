@@ -1,10 +1,8 @@
 package io.horizontalsystems.bankwallet.modules.market.overview
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -24,14 +22,16 @@ import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.market.category.MarketCategoryFragment
-import io.horizontalsystems.bankwallet.modules.market.overview.ui.*
+import io.horizontalsystems.bankwallet.modules.market.overview.ui.BoardsView
+import io.horizontalsystems.bankwallet.modules.market.overview.ui.MetricChartsView
+import io.horizontalsystems.bankwallet.modules.market.overview.ui.TopPlatformsBoardView
+import io.horizontalsystems.bankwallet.modules.market.overview.ui.TopSectorsBoardView
 import io.horizontalsystems.bankwallet.modules.market.platform.MarketPlatformFragment
 import io.horizontalsystems.bankwallet.modules.market.topcoins.MarketTopCoinsFragment
-import io.horizontalsystems.bankwallet.modules.market.topnftcollections.TopNftCollectionsFragment
 import io.horizontalsystems.bankwallet.modules.market.topplatforms.TopPlatformsFragment
-import io.horizontalsystems.bankwallet.modules.nft.collection.NftCollectionFragment
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
 import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
+import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 
 @Composable
 fun MarketOverviewScreen(
@@ -98,36 +98,6 @@ fun MarketOverviewScreen(
                                 }
                             )
 
-                            TopSectorsBoardView(
-                                board = viewItem.topSectorsBoard,
-                                onClickSeeAll = {
-                                    navController.slideFromRight(R.id.marketSearchFragment)
-                                },
-                                onItemClick = { coinCategory ->
-                                    navController.slideFromBottom(
-                                        R.id.marketCategoryFragment,
-                                        bundleOf(MarketCategoryFragment.categoryKey to coinCategory)
-                                    )
-                                }
-                            )
-
-                            TopNftCollectionsBoardView(
-                                viewItem.topNftCollectionsBoard,
-                                onSelectTimeDuration = { timeDuration ->
-                                    viewModel.onSelectTopNftsTimeDuration(timeDuration)
-                                },
-                                onClickCollection = { blockchainType, collectionUid ->
-                                    val args = NftCollectionFragment.prepareParams(collectionUid, blockchainType)
-                                    navController.slideFromBottom(R.id.nftCollectionFragment, args)
-                                },
-                                onClickSeeAll = {
-                                    val (sortingField, timeDuration) = viewModel.topNftCollectionsParams
-                                    val args = TopNftCollectionsFragment.prepareParams(sortingField, timeDuration)
-
-                                    navController.slideFromBottom(R.id.marketTopNftCollectionsFragment, args)
-                                }
-                            )
-
                             TopPlatformsBoardView(
                                 viewItem.topPlatformsBoard,
                                 onSelectTimeDuration = { timeDuration ->
@@ -144,6 +114,17 @@ fun MarketOverviewScreen(
                                     navController.slideFromBottom(R.id.marketTopPlatformsFragment, args)
                                 }
                             )
+
+                            TopSectorsBoardView(
+                                board = viewItem.topSectorsBoard
+                            ) { coinCategory ->
+                                navController.slideFromBottom(
+                                    R.id.marketCategoryFragment,
+                                    bundleOf(MarketCategoryFragment.categoryKey to coinCategory)
+                                )
+                            }
+
+                            VSpacer(height = 32.dp)
                         }
                     }
                 }

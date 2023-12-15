@@ -41,14 +41,11 @@ import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
-import io.horizontalsystems.core.findNavController
 
 class SetDuressPinIntroFragment : BaseComposeFragment() {
     @Composable
-    override fun GetContent() {
-        ComposeAppTheme {
-            SetDuressPinIntroScreen(findNavController())
-        }
+    override fun GetContent(navController: NavController) {
+        SetDuressPinIntroScreen(navController)
     }
 }
 

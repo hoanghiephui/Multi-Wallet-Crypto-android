@@ -29,7 +29,6 @@ import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.ScreenMessageWithAction
-import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.nftkit.models.NftType
 
 class SendNftFragment : BaseComposeFragment() {
@@ -37,7 +36,7 @@ class SendNftFragment : BaseComposeFragment() {
     private val vmFactory by lazy { getFactory(requireArguments()) }
 
     @Composable
-    override fun GetContent() {
+    override fun GetContent(navController: NavController) {
         val factory = vmFactory
 
         when (factory?.evmNftRecord?.nftType) {
@@ -53,7 +52,7 @@ class SendNftFragment : BaseComposeFragment() {
                 }
                 val addressParserViewModel by viewModels<AddressParserViewModel> { factory }
                 SendEip721Screen(
-                    findNavController(),
+                    navController,
                     eip721ViewModel,
                     addressViewModel,
                     addressParserViewModel,
@@ -73,7 +72,7 @@ class SendNftFragment : BaseComposeFragment() {
                 }
                 val addressParserViewModel by viewModels<AddressParserViewModel> { factory }
                 SendEip1155Screen(
-                    findNavController(),
+                    navController,
                     eip1155ViewModel,
                     addressViewModel,
                     addressParserViewModel,
@@ -82,7 +81,7 @@ class SendNftFragment : BaseComposeFragment() {
             }
 
             else -> {
-                ShowErrorMessage(findNavController())
+                ShowErrorMessage(navController)
             }
         }
     }
@@ -124,29 +123,27 @@ private fun getFactory(requireArguments: Bundle): SendNftModule.Factory? {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShowErrorMessage(navController: NavController) {
-    ComposeAppTheme {
-        Scaffold(
-            containerColor = Color.Transparent,
+    Scaffold(
+        containerColor = Color.Transparent,
             contentColor = MaterialTheme.colorScheme.background,
-            topBar = {
-                AppBar(
-                    title = stringResource(R.string.SendNft_Title),
-                    menuItems = listOf(
-                        MenuItem(
-                            title = TranslatableString.ResString(R.string.Button_Close),
-                            icon = R.drawable.ic_close,
-                            onClick = { navController.popBackStack() }
-                        )
+        topBar = {
+            AppBar(
+                title = stringResource(R.string.SendNft_Title),
+                menuItems = listOf(
+                    MenuItem(
+                        title = TranslatableString.ResString(R.string.Button_Close),
+                        icon = R.drawable.ic_close,
+                        onClick = { navController.popBackStack() }
                     )
                 )
-            }
-        ) {
-            Column(Modifier.padding(it)) {
-                ScreenMessageWithAction(
-                    text = stringResource(R.string.Error),
-                    icon = R.drawable.ic_error_48
-                )
-            }
+            )
+        }
+    ) {
+        Column(Modifier.padding(it)) {
+            ScreenMessageWithAction(
+                text = stringResource(R.string.Error),
+                icon = R.drawable.ic_error_48
+            )
         }
     }
 }

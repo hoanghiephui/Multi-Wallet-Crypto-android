@@ -57,9 +57,9 @@ class WC2SessionFragment : BaseComposeFragment() {
     }
 
     @Composable
-    override fun GetContent() {
+    override fun GetContent(navController: NavController) {
         WCSessionPage(
-            findNavController(),
+            navController,
             viewModel,
         )
     }
@@ -87,23 +87,22 @@ fun WCSessionPage(
 ) {
     val uiState = viewModel.uiState
 
-    ComposeAppTheme {
+
         Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-            AppBar(
-                title = stringResource(R.string.WalletConnect_Title),
-                showSpinner = uiState.connecting,
-                menuItems = listOf(
-                    MenuItem(
-                        title = TranslatableString.ResString(R.string.Button_Close),
-                        icon = R.drawable.ic_close,
-                        onClick = { navController.popBackStack() },
-                        enabled = uiState.closeEnabled,
-                        tint = if (uiState.closeEnabled) ComposeAppTheme.colors.jacob else ComposeAppTheme.colors.grey50
-                    )
+        AppBar(
+            title = stringResource(R.string.WalletConnect_Title),
+            showSpinner = uiState.connecting,
+            menuItems = listOf(
+                MenuItem(
+                    title = TranslatableString.ResString(R.string.Button_Close),
+                    icon = R.drawable.ic_close,
+                    onClick = { navController.popBackStack() },
+                    enabled = uiState.closeEnabled,
+                    tint = if (uiState.closeEnabled) ComposeAppTheme.colors.jacob else ComposeAppTheme.colors.grey50
                 )
             )
-            WCSessionListContent(navController, viewModel)
-        }
+        )
+        WCSessionListContent(navController, viewModel)
     }
 }
 
