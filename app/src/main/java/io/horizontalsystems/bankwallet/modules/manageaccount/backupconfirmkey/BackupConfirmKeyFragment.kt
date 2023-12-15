@@ -55,7 +55,8 @@ class BackupConfirmKeyFragment : BaseComposeFragment() {
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun RecoveryPhraseVerifyScreen(navController: NavController, account: Account) {
-    val viewModel = viewModel<BackupConfirmKeyViewModel>(factory = BackupConfirmKeyModule.Factory(account))
+    val viewModel =
+        viewModel<BackupConfirmKeyViewModel>(factory = BackupConfirmKeyModule.Factory(account))
     val uiState = viewModel.uiState
     val contenView = LocalView.current
 
@@ -77,22 +78,21 @@ fun RecoveryPhraseVerifyScreen(navController: NavController, account: Account) {
         viewModel.onErrorShown()
     }
 
-    ComposeAppTheme {
-        Scaffold(
-            containerColor = Color.Transparent,
-            contentColor = MaterialTheme.colorScheme.background,
-            topBar = {
-                AppBar(
-                    title = stringResource(R.string.RecoveryPhraseVerify_Title),
-                    navigationIcon = {
-                        HsBackButton(onClick = { navController.popBackStack() })
-                    }
-                )
-            }
-        ) {
-            Column(modifier = Modifier.padding(it)) {
-                InfoText(text = stringResource(R.string.RecoveryPhraseVerify_Description))
-                Spacer(Modifier.height(12.dp))
+    Scaffold(
+        containerColor = Color.Transparent,
+        contentColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            AppBar(
+                title = stringResource(R.string.RecoveryPhraseVerify_Title),
+                navigationIcon = {
+                    HsBackButton(onClick = { navController.popBackStack() })
+                }
+            )
+        }
+    ) {
+        Column(modifier = Modifier.padding(it)) {
+            InfoText(text = stringResource(R.string.RecoveryPhraseVerify_Description))
+            Spacer(Modifier.height(12.dp))
 
             uiState.hiddenWordItems.forEachIndexed { index, it ->
                 if (index != 0) {

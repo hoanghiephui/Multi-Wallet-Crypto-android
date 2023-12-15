@@ -53,13 +53,12 @@ import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewScr
 import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewViewModel
 import io.horizontalsystems.bankwallet.modules.market.overview.ui.MarketCoinWithBackground
 import io.horizontalsystems.bankwallet.modules.market.posts.MarketPostsScreen
-import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchModule
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchResults
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchViewModel
 import io.horizontalsystems.bankwallet.ui.compose.NiaTab
 import io.horizontalsystems.bankwallet.ui.compose.NiaTabRow
-import io.horizontalsystems.bankwallet.ui.compose.components.ListEmptyView
 import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
+import java.util.Optional
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalFoundationApi::class)
@@ -165,59 +164,34 @@ private fun DockedSearchBar(
             ) {
                 Crossfade(targetState = text.isBlank(), label = "") { isSearch ->
                     if (!isSearch) {
-                        val viewState = searchViewModel.viewState
-                        Crossfade(viewState, label = "SearchView") { state ->
-                            when (state) {
-                                ViewState.Loading -> {
-                                    Loading()
-                                }
-
-                                is ViewState.Error -> {
-                                    ListErrorView(
-                                        stringResource(R.string.SyncError),
-                                        onClick = {
-                                            searchViewModel.refresh()
-                                            active = false
-                                            text = ""
-                                        }
-                                    )
-                                }
-
-                                ViewState.Success -> {
-                                    when (val itemsData = searchViewModel.itemsData) {
-                                        is MarketSearchModule.Data.SearchResult -> {
-                                            if (itemsData.coinItems.isEmpty()) {
-                                                ListEmptyView(
-                                                    text = stringResource(R.string.EmptyResults),
-                                                    icon = R.drawable.ic_not_found
-                                                )
-                                            } else {
-                                                MarketSearchResults(
-                                                    coinResult = itemsData.coinItems,
-                                                    onCoinClick = { coin ->
-                                                        val arguments =
-                                                            CoinFragment.prepareParams(coin.uid)
-                                                        navController.slideFromRight(
-                                                            R.id.coinFragment,
-                                                            arguments
-                                                        )
-                                                        active = false
-                                                        text = ""
-                                                    }
-                                                ) { favorite, coinUid ->
-                                                    searchViewModel.onFavoriteClick(
-                                                        favorite,
-                                                        coinUid
-                                                    )
-                                                }
-                                            }
-                                        }
-
-                                        else -> Unit
-                                    }
-
-                                }
+                        val uiState = searchViewModel.uiState
+                        val itemSections = when (uiState.page) {
+                            is MarketSearchViewModel.Page.Discovery -> {
+                                mapOf(
+                                    Optional.of(stringResource(R.string.Market_Search_Sections_RecentTitle)) to uiState.page.recent,
+                                    Optional.of(stringResource(R.string.Market_Search_Sections_PopularTitle)) to uiState.page.popular,
+                                )
                             }
+
+                            is MarketSearchViewModel.Page.SearchResults -> {
+                                mapOf(
+                                    Optional.ofNullable<String>(null) to uiState.page.items
+                                )
+                            }
+                        }
+
+                        MarketSearchResults(
+                            uiState.listId,
+                            itemSections = itemSections,
+                            onCoinClick = { coin ->
+                                searchViewModel.onCoinOpened(coin)
+                                navController.slideFromRight(
+                                    R.id.coinFragment,
+                                    CoinFragment.prepareParams(coin.uid, "market_search")
+                                )
+                            }
+                        ) { favorited, coinUid ->
+                            searchViewModel.onFavoriteClick(favorited, coinUid)
                         }
                     } else {
                         val viewState by viewModel.viewStateLiveData.observeAsState()

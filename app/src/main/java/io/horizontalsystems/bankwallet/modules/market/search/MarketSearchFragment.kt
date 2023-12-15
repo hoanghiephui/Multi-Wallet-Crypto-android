@@ -19,12 +19,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,17 +52,11 @@ import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchModule.
 import io.horizontalsystems.bankwallet.modules.walletconnect.list.ui.DraggableCardSimple
 import io.horizontalsystems.bankwallet.ui.compose.ColoredTextStyle
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
-import io.horizontalsystems.bankwallet.ui.compose.Select
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
-import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryCircle
-import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryToggle
-import io.horizontalsystems.bankwallet.ui.compose.components.CategoryCard
 import io.horizontalsystems.bankwallet.ui.compose.components.CoinImage
-import io.horizontalsystems.bankwallet.ui.compose.components.HeaderSorting
-import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
-import io.horizontalsystems.bankwallet.ui.compose.components.HsIconButton
 import io.horizontalsystems.bankwallet.ui.compose.components.HeaderStick
+import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.ListEmptyView
 import io.horizontalsystems.bankwallet.ui.compose.components.MarketCoinFirstRow
 import io.horizontalsystems.bankwallet.ui.compose.components.MarketCoinSecondRow
@@ -90,11 +83,7 @@ class MarketSearchFragment : BaseComposeFragment() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MarketSearchScreen(viewModel: MarketSearchViewModel, navController: NavController) {
-    val focusRequester = remember { FocusRequester() }
-
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
+    val uiState = viewModel.uiState
 
     NiaBackground {
         Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
@@ -114,68 +103,38 @@ fun MarketSearchScreen(viewModel: MarketSearchViewModel, navController: NavContr
                     )
                 )
             )
-            Crossfade(viewState, label = "SearchView") { viewState ->
-                when (viewState) {
-                    ViewState.Loading -> {
-                        Loading()
-                    }
-                    is ViewState.Error -> {
-                        ListErrorView(stringResource(R.string.SyncError), viewModel::refresh)
-                    }
-                    ViewState.Success -> {
-                        when (val itemsData = viewModel.itemsData) {
-                            is MarketSearchModule.Data.DiscoveryItems -> {
-                                CardsGrid(
-                                    viewItems = itemsData.discoveryItems,
-                                    timePeriodSelect = viewModel.timePeriodMenu,
-                                    sortDescending = viewModel.sortDescending,
-                                    onToggleSortType = {
-                                        viewModel.toggleSortType()
-                                    },
-                                    onCategoryClick = { viewItemType ->
-                                        when (viewItemType) {
-                                            MarketSearchModule.DiscoveryItem.TopCoins -> {
-                                                navController.slideFromBottom(
-                                                    R.id.marketTopCoinsFragment
-                                                )
-                                            }
-                                            is MarketSearchModule.DiscoveryItem.Category -> {
-                                                navController.slideFromBottom(
-                                                    R.id.marketCategoryFragment,
-                                                    bundleOf(MarketCategoryFragment.categoryKey to viewItemType.coinCategory)
-                                                )
-                                            }
-                                        }
-                                    }
-                                ) { viewModel.toggleTimePeriod(it) }
-                            }
-                            is MarketSearchModule.Data.SearchResult -> {
-                                if (itemsData.coinItems.isEmpty()) {
-                                    ListEmptyView(
-                                        text = stringResource(R.string.EmptyResults),
-                                        icon = R.drawable.ic_not_found
-                                    )
-                                } else {
-                                    MarketSearchResults(
-                                        coinResult = itemsData.coinItems,
-                                        onCoinClick = { coin ->
-                                            val arguments = CoinFragment.prepareParams(coin.uid)
-                                            navController.slideFromRight(
-                                                R.id.coinFragment,
-                                                arguments
-                                            )
-                                        }
-                                    ) { favorited, coinUid ->
-                                        viewModel.onFavoriteClick(favorited, coinUid)
-                                    }
-                                }
-                            }
-                            null -> {}
-                        }
-                    }
+            val itemSections = when (uiState.page) {
+                is MarketSearchViewModel.Page.Discovery -> {
+                    mapOf(
+                        Optional.of(stringResource(R.string.Market_Search_Sections_RecentTitle)) to uiState.page.recent,
+                        Optional.of(stringResource(R.string.Market_Search_Sections_PopularTitle)) to uiState.page.popular,
+                    )
+                }
+
+                is MarketSearchViewModel.Page.SearchResults -> {
+                    mapOf(
+                        Optional.ofNullable<String>(null) to uiState.page.items
+                    )
                 }
             }
+
+            MarketSearchResults(
+                uiState.listId,
+                itemSections = itemSections,
+                onCoinClick = { coin ->
+                    viewModel.onCoinOpened(coin)
+                    navController.slideFromRight(
+                        R.id.coinFragment,
+                        CoinFragment.prepareParams(coin.uid, "market_search")
+                    )
+                }
+            ) { favorited, coinUid ->
+                viewModel.onFavoriteClick(favorited, coinUid)
+            }
         }
+    }
+}
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -269,7 +228,7 @@ fun MarketSearchResults(
                                 }
                             }
                         )
-                        Divider(
+                        HorizontalDivider(
                             thickness = 1.dp,
                             color = ComposeAppTheme.colors.steel10,
                             modifier = Modifier.align(Alignment.BottomCenter)
@@ -279,7 +238,7 @@ fun MarketSearchResults(
             }
 
             item {
-                Divider(
+                HorizontalDivider(
                     thickness = 1.dp,
                     color = ComposeAppTheme.colors.steel10,
                 )

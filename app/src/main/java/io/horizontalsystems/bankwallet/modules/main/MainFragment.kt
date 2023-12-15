@@ -93,7 +93,7 @@ class MainFragment : BaseComposeFragment() {
     private var intentUri: Uri? = null
 
     @Composable
-    override fun GetContent() {
+    override fun GetContent(navController: NavController) {
         ComposeAppTheme {
             NiaBackground {
                 MainScreenWithRootedDeviceCheck(
