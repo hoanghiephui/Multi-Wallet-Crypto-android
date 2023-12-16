@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.LocalizedException
@@ -28,29 +29,27 @@ import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.ScreenMessageWithAction
 import io.horizontalsystems.bankwallet.ui.compose.components.ScrollableTabs
 import io.horizontalsystems.bankwallet.ui.compose.components.TabItem
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_leah
-import io.horizontalsystems.core.findNavController
 import java.net.UnknownHostException
 
 class FaqListFragment : BaseComposeFragment() {
 
     @Composable
-    override fun GetContent() {
-        ComposeAppTheme {
-            NiaBackground {
-                FaqScreen(
-                    onCloseClick = { findNavController().popBackStack() },
-                    onItemClick = { faqItem ->
-                        val arguments =
-                            bundleOf(MarkdownFragment.markdownUrlKey to faqItem.markdown)
-                        findNavController().slideFromRight(R.id.markdownFragment, arguments)
-                    }
-                )
-            }
+    override fun GetContent(navController: NavController) {
+        NiaBackground {
+            FaqScreen(
+                onCloseClick = { navController.popBackStack() },
+                onItemClick = { faqItem ->
+                    val arguments =
+                        bundleOf(MarkdownFragment.markdownUrlKey to faqItem.markdown)
+                    navController.slideFromRight(R.id.markdownFragment, arguments)
+                }
+            )
         }
     }
 
@@ -76,6 +75,7 @@ private fun FaqScreen(
                 ViewState.Loading -> {
                     Loading()
                 }
+
                 is ViewState.Error -> {
                     val s = when (val error = viewState.t) {
                         is UnknownHostException -> stringResource(R.string.Hud_Text_NoInternet)
@@ -85,6 +85,7 @@ private fun FaqScreen(
 
                     ScreenMessageWithAction(s, R.drawable.ic_error_48)
                 }
+
                 ViewState.Success -> {
                     Column {
                         val tabItems =
@@ -104,7 +105,7 @@ private fun FaqScreen(
                             CellUniversalLawrenceSection(viewModel.faqItems) { faq ->
                                 RowUniversal(
                                     modifier = Modifier.padding(horizontal = 16.dp),
-                                    onClick =  { onItemClick(faq) }
+                                    onClick = { onItemClick(faq) }
                                 ) {
                                     subhead1_leah(text = faq.title)
                                 }

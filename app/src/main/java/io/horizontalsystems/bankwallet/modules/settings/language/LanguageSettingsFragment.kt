@@ -33,15 +33,14 @@ import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
-import io.horizontalsystems.core.findNavController
 
 class LanguageSettingsFragment : BaseComposeFragment() {
 
     @Composable
-    override fun GetContent() {
+    override fun GetContent(navController: NavController) {
         ComposeAppTheme {
             LanguageScreen(
-                findNavController(),
+                navController,
                 { activity?.let { MainModule.startAsNewTask(it) } }
             )
         }

@@ -50,7 +50,6 @@ import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.entities.EvmSyncSource
 import io.horizontalsystems.bankwallet.modules.btcblockchainsettings.BlockchainSettingCell
 import io.horizontalsystems.bankwallet.modules.evmnetwork.addrpc.AddRpcScreen
-import io.horizontalsystems.bankwallet.modules.info.EvmNetworkInfoScreen
 import io.horizontalsystems.bankwallet.modules.walletconnect.list.ui.ActionsRow
 import io.horizontalsystems.bankwallet.modules.walletconnect.list.ui.DraggableCardSimple
 import io.horizontalsystems.bankwallet.modules.walletconnect.list.ui.getShape
@@ -63,28 +62,25 @@ import io.horizontalsystems.bankwallet.ui.compose.components.HeaderText
 import io.horizontalsystems.bankwallet.ui.compose.components.HsIconButton
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
+import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_jacob
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
-import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.helpers.HudHelper
 
 class EvmNetworkFragment : BaseComposeFragment() {
 
     @Composable
-    override fun GetContent() {
-        ComposeAppTheme {
-            EvmNetworkNavHost(
-                requireArguments(),
-                findNavController()
-            )
-        }
+    override fun GetContent(navController: NavController) {
+        EvmNetworkNavHost(
+            requireArguments(),
+            navController
+        )
     }
 
 }
 
 private const val EvmNetworkPage = "evm_network"
-private const val EvmNetworkInfoPage = "evm_network_info"
 private const val AddRpcPage = "add_rpc"
 
 @Composable
@@ -105,7 +101,6 @@ private fun EvmNetworkNavHost(
             )
         }
         composablePopup(AddRpcPage) { AddRpcScreen(navController, arguments) }
-        composablePopup(EvmNetworkInfoPage) { EvmNetworkInfoScreen(navController) }
     }
 }
 
@@ -153,14 +148,17 @@ private fun EvmNetworkScreen(
             ) {
 
                 item {
-                    HeaderText(stringResource(R.string.AddEvmSyncSource_RpcSource)) {
-                        navController.navigate(EvmNetworkInfoPage)
-                    }
+                    VSpacer(12.dp)
+                    subhead2_grey(
+                        modifier = Modifier.padding(horizontal = 32.dp),
+                        text = stringResource(R.string.BtcBlockchainSettings_RestoreSourceSettingsDescription)
+                    )
+                    VSpacer(32.dp)
                 }
 
                 item {
                     CellUniversalLawrenceSection(viewModel.viewState.defaultItems) { item ->
-                        BlockchainSettingCell(item.name, item.url, item.selected) {
+                        BlockchainSettingCell(item.name, item.url, item.selected, null) {
                             viewModel.onSelectSyncSource(item.syncSource)
                         }
                     }

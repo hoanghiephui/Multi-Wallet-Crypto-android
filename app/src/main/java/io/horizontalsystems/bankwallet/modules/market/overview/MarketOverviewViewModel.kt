@@ -13,8 +13,13 @@ import io.horizontalsystems.bankwallet.core.subscribeIO
 import io.horizontalsystems.bankwallet.entities.CoinValue
 import io.horizontalsystems.bankwallet.entities.Currency
 import io.horizontalsystems.bankwallet.entities.ViewState
-import io.horizontalsystems.bankwallet.modules.market.*
+import io.horizontalsystems.bankwallet.modules.market.MarketField
+import io.horizontalsystems.bankwallet.modules.market.MarketItem
 import io.horizontalsystems.bankwallet.modules.market.MarketModule.ListType
+import io.horizontalsystems.bankwallet.modules.market.MarketViewItem
+import io.horizontalsystems.bankwallet.modules.market.SortingField
+import io.horizontalsystems.bankwallet.modules.market.TimeDuration
+import io.horizontalsystems.bankwallet.modules.market.TopMarket
 import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewModule.Board
 import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewModule.BoardHeader
 import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewModule.MarketMetrics
@@ -35,7 +40,11 @@ import io.horizontalsystems.bankwallet.ui.compose.Select
 import io.horizontalsystems.bankwallet.ui.extensions.MetricData
 import io.horizontalsystems.chartview.ChartData
 import io.horizontalsystems.chartview.models.ChartPoint
-import io.horizontalsystems.marketkit.models.*
+import io.horizontalsystems.marketkit.models.GlobalMarketPoint
+import io.horizontalsystems.marketkit.models.HsTimePeriod
+import io.horizontalsystems.marketkit.models.MarketOverview
+import io.horizontalsystems.marketkit.models.NftPrice
+import io.horizontalsystems.marketkit.models.TopMovers
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.delay
@@ -67,7 +76,7 @@ class MarketOverviewViewModel(
     var topNftsTimeDuration: TimeDuration = TimeDuration.SevenDay
         private set
     val topNftsSortingField: SortingField = SortingField.HighestVolume
-    var topPlatformsTimeDuration: TimeDuration = TimeDuration.OneDay
+    var topPlatformsTimeDuration: TimeDuration = TimeDuration.SevenDay
         private set
 
     var topMovers: TopMovers? = null
@@ -136,6 +145,7 @@ class MarketOverviewViewModel(
             TimeDuration.OneDay -> HsTimePeriod.Day1
             TimeDuration.SevenDay -> HsTimePeriod.Week1
             TimeDuration.ThirtyDay -> HsTimePeriod.Month1
+            TimeDuration.ThreeMonths -> HsTimePeriod.Month3
         }
         val nftCollectionItems = marketOverview.nftCollections.getOrElse(timePeriod) { listOf() }.map { it.nftCollectionItem }
 
@@ -153,7 +163,7 @@ class MarketOverviewViewModel(
 
     private fun topSectorsBoard(items: List<Category>) =
         TopSectorsBoard(
-            title = R.string.Market_Overview_TopSectors,
+            title = R.string.Market_Overview_Sectors,
             iconRes = R.drawable.ic_categories_20,
             items = items
         )

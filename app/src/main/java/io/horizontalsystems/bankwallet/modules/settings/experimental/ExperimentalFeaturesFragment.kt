@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromRight
@@ -27,16 +28,15 @@ import io.horizontalsystems.bankwallet.ui.compose.components.HsSwitch
 import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.TextImportantWarning
-import io.horizontalsystems.core.findNavController
 
 class ExperimentalFeaturesFragment : BaseComposeFragment() {
 
     @Composable
-    override fun GetContent() {
+    override fun GetContent(navController: NavController) {
         ComposeAppTheme {
             ExperimentalScreen(
-                onCloseClick = { findNavController().popBackStack() },
-                openTimeLock = { findNavController().slideFromRight(R.id.timeLockFragment) },
+                onCloseClick = { navController.popBackStack() },
+                openTimeLock = { navController.slideFromRight(R.id.timeLockFragment) },
             )
         }
     }

@@ -26,7 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.entities.ViewState
@@ -53,18 +53,16 @@ class CoinInvestmentsFragment : BaseComposeFragment() {
     }
 
     @Composable
-    override fun GetContent() {
-        ComposeAppTheme {
-            CoinInvestmentsScreen(
-                viewModel = viewModel,
-                onClickNavigation = {
-                    findNavController().popBackStack()
-                },
-                onClickFundUrl = {
-                    LinkHelper.openLinkInAppBrowser(requireContext(), it)
-                }
-            )
-        }
+    override fun GetContent(navController: NavController) {
+        CoinInvestmentsScreen(
+            viewModel = viewModel,
+            onClickNavigation = {
+                navController.popBackStack()
+            },
+            onClickFundUrl = {
+                LinkHelper.openLinkInAppBrowser(requireContext(), it)
+            }
+        )
     }
 
     companion object {

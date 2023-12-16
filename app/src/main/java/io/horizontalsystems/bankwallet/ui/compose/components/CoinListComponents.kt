@@ -401,8 +401,6 @@ fun PreviewListErrorView() {
 @Composable
 fun CardPreview() {
     ComposeAppTheme {
-        Row {
-            CategoryCard(DiscoveryItem.TopCoins, { })
-        }
+        CategoryCard(DiscoveryItem.TopCoins, { })
     }
 }

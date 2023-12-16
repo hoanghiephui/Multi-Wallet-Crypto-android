@@ -61,6 +61,7 @@ import io.horizontalsystems.bankwallet.modules.balance.TotalUIState
 import io.horizontalsystems.bankwallet.modules.manageaccount.dialogs.BackupRequiredDialog
 import io.horizontalsystems.bankwallet.modules.rateapp.RateAppModule
 import io.horizontalsystems.bankwallet.modules.rateapp.RateAppViewModel
+import io.horizontalsystems.bankwallet.modules.sendtokenselect.SendTokenSelectFragment
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryCircle
@@ -290,17 +291,18 @@ fun BalanceItems(
                             painter = painterResource(R.drawable.icon_binocule_24),
                             contentDescription = "binoculars icon"
                         )
-                    } else {
-                        ButtonSecondaryCircle(
-                            icon = R.drawable.ic_manage_2,
-                            contentDescription = stringResource(R.string.ManageCoins_title),
-                            onClick = {
-                                navController.slideFromRight(R.id.manageWalletsFragment)
-                            }
-                        )
+                        HSpacer(16.dp)
                     }
 
-                    Spacer(modifier = Modifier.width(16.dp))
+                    ButtonSecondaryCircle(
+                        icon = R.drawable.ic_manage_2,
+                        contentDescription = stringResource(R.string.ManageCoins_title),
+                        onClick = {
+                            navController.slideFromRight(R.id.manageWalletsFragment)
+                        }
+                    )
+
+                    HSpacer(16.dp)
                 }
             }
 
@@ -359,26 +361,34 @@ fun BalanceItems(
                     it.wallet.hashCode()
                 }
             ) { item ->
-                if (item.isWatchAccount) {
-                    BalanceCard(item, viewModel, navController)
-                } else {
-                    BalanceCardSwipable(
-                        viewItem = item,
-                        viewModel = viewModel,
-                        navController = navController,
-                        revealed = revealedCardId == item.wallet.hashCode(),
-                        onReveal = { walletHashCode ->
-                            if (revealedCardId != walletHashCode) {
-                                revealedCardId = walletHashCode
-                            }
-                        },
-                        onConceal = {
-                            revealedCardId = null
+                BalanceCardSwipable(
+                    viewItem = item,
+                    viewModel = viewModel,
+                    navController = navController,
+                    revealed = revealedCardId == item.wallet.hashCode(),
+                    onReveal = { walletHashCode ->
+                        if (revealedCardId != walletHashCode) {
+                            revealedCardId = walletHashCode
                         }
-                    )
-                }
+                    },
+                    onConceal = {
+                        revealedCardId = null
+                    }
+                )
             }
         }
+    }
+    uiState.openSend?.let { openSend ->
+        navController.slideFromRight(
+            R.id.sendTokenSelectFragment,
+            SendTokenSelectFragment.prepareParams(
+                openSend.blockchainTypes,
+                openSend.tokenTypes,
+                openSend.address,
+                openSend.amount
+            )
+        )
+        viewModel.onSendOpened()
     }
 }
 

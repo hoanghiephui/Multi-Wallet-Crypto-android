@@ -4,6 +4,8 @@ import android.os.Build
 import androidx.annotation.ChecksSdkIntAtLeast
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material.ripple.RippleAlpha
+import androidx.compose.material.ripple.RippleTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -265,6 +267,24 @@ fun ComposeAppTheme(
         )
     }
 
+}
+
+object AppRippleTheme : RippleTheme {
+    // Here you should return the ripple color you want
+    // and not use the defaultRippleColor extension on RippleTheme.
+    // Using that will override the ripple color set in DarkMode
+    // or when you set light parameter to false
+    @Composable
+    override fun defaultColor(): Color = RippleTheme.defaultRippleColor(
+        if (isSystemInDarkTheme()) Color.White else Color.Black,
+        lightTheme = true
+    )
+
+    @Composable
+    override fun rippleAlpha(): RippleAlpha = RippleTheme.defaultRippleAlpha(
+        Color.Black,
+        lightTheme = true
+    )
 }
 
 object ComposeAppTheme {

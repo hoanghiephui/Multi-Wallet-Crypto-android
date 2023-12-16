@@ -21,6 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
@@ -39,7 +40,6 @@ import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
 import io.horizontalsystems.bankwallet.ui.compose.Select
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.*
-import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.helpers.HudHelper
 
 class TvlFragment : BaseComposeFragment() {
@@ -49,16 +49,14 @@ class TvlFragment : BaseComposeFragment() {
     private val viewModel by viewModels<TvlViewModel> { vmFactory }
 
     @Composable
-    override fun GetContent() {
-        ComposeAppTheme {
-            TvlScreen(viewModel, tvlChartViewModel) { onCoinClick(it) }
-        }
+    override fun GetContent(navController: NavController) {
+        TvlScreen(viewModel, tvlChartViewModel, navController) { onCoinClick(it, navController) }
     }
 
-    private fun onCoinClick(coinUid: String?) {
+    private fun onCoinClick(coinUid: String?, navController: NavController) {
         if (coinUid != null) {
-            val arguments = CoinFragment.prepareParams(coinUid)
-            findNavController().slideFromRight(R.id.coinFragment, arguments)
+            val arguments = CoinFragment.prepareParams(coinUid, "market_tvl")
+            navController.slideFromRight(R.id.coinFragment, arguments)
         } else {
             HudHelper.showWarningMessage(requireView(), R.string.MarketGlobalMetrics_NoCoin)
         }
@@ -69,6 +67,7 @@ class TvlFragment : BaseComposeFragment() {
     private fun TvlScreen(
         tvlViewModel: TvlViewModel,
         chartViewModel: TvlChartViewModel,
+        navController: NavController,
         onCoinClick: (String?) -> Unit
     ) {
         val itemsViewState by tvlViewModel.viewStateLiveData.observeAsState()
@@ -85,7 +84,7 @@ class TvlFragment : BaseComposeFragment() {
                         title = TranslatableString.ResString(R.string.Button_Close),
                         icon = R.drawable.ic_close,
                         onClick = {
-                            findNavController().popBackStack()
+                            navController.popBackStack()
                         }
                     )
                 )

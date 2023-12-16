@@ -33,23 +33,22 @@ import io.horizontalsystems.bankwallet.ui.compose.components.SectionUniversalIte
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
-import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.helpers.HudHelper
 import kotlinx.coroutines.launch
 
 class ReceiveTokenSelectFragment : BaseComposeFragment() {
 
     @Composable
-    override fun GetContent() {
+    override fun GetContent(navController: NavController) {
         val viewModel = viewModel<ReceiveTokenSelectInitViewModel>()
 
         val activeAccount = viewModel.getActiveAccount()
 
         if (activeAccount == null) {
             HudHelper.showErrorMessage(LocalView.current, "No active account")
-            findNavController().popBackStack()
+            navController.popBackStack()
         } else {
-            ReceiveTokenSelectScreen(findNavController(), activeAccount)
+            ReceiveTokenSelectScreen(navController, activeAccount)
         }
     }
 }
@@ -92,28 +91,25 @@ fun ReceiveTokenSelectScreen(navController: NavController, activeAccount: Accoun
                                             CoinForReceiveType.MultipleAddressTypes -> {
                                                 navController.slideFromRight(
                                                     R.id.receiveBchAddressTypeSelectFragment,
-                                                    BchAddressTypeSelectFragment.prepareParams(coin.uid, popupDestinationId)
+                                                    BchAddressTypeSelectFragment.prepareParams(coin.uid)
                                                 )
                                             }
                                             CoinForReceiveType.MultipleDerivations -> {
                                                 navController.slideFromRight(
                                                     R.id.receiveDerivationSelectFragment,
-                                                    DerivationSelectFragment.prepareParams(coin.uid, popupDestinationId)
+                                                    DerivationSelectFragment.prepareParams(coin.uid)
                                                 )
                                             }
                                             CoinForReceiveType.MultipleBlockchains -> {
                                                 navController.slideFromRight(
                                                     R.id.receiveNetworkSelectFragment,
-                                                    NetworkSelectFragment.prepareParams(coin.uid, popupDestinationId)
+                                                    NetworkSelectFragment.prepareParams(coin.uid)
                                                 )
                                             }
                                             is CoinForReceiveType.Single -> {
                                                 navController.slideFromRight(
                                                     R.id.receiveFragment,
-                                                    bundleOf(
-                                                        ReceiveAddressFragment.WALLET_KEY to coinActiveWalletsType.wallet,
-                                                        ReceiveAddressFragment.POPUP_DESTINATION_ID_KEY to popupDestinationId,
-                                                    )
+                                                    bundleOf(ReceiveAddressFragment.WALLET_KEY to coinActiveWalletsType.wallet)
                                                 )
                                             }
 

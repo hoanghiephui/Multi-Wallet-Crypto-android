@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.*
 import io.horizontalsystems.bankwallet.entities.ViewState
@@ -32,7 +33,6 @@ import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.*
-import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.parcelable
 
 class MetricsPageFragment : BaseComposeFragment() {
@@ -42,21 +42,19 @@ class MetricsPageFragment : BaseComposeFragment() {
     }
 
     @Composable
-    override fun GetContent() {
+    override fun GetContent(navController: NavController) {
         val factory = MetricsPageModule.Factory(metricsType!!)
         val chartViewModel by viewModels<ChartViewModel> { factory }
         val viewModel by viewModels<MetricsPageViewModel> { factory }
-        ComposeAppTheme {
-            MetricsPage(viewModel, chartViewModel) {
-                onCoinClick(it)
-            }
+        MetricsPage(viewModel, chartViewModel, navController) {
+            onCoinClick(it, navController)
         }
     }
 
-    private fun onCoinClick(coinUid: String) {
-        val arguments = CoinFragment.prepareParams(coinUid)
+    private fun onCoinClick(coinUid: String, navController: NavController) {
+        val arguments = CoinFragment.prepareParams(coinUid, "market_metrics")
 
-        findNavController().slideFromRight(R.id.coinFragment, arguments)
+        navController.slideFromRight(R.id.coinFragment, arguments)
     }
 
     @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -64,6 +62,7 @@ class MetricsPageFragment : BaseComposeFragment() {
     fun MetricsPage(
         viewModel: MetricsPageViewModel,
         chartViewModel: ChartViewModel,
+        navController: NavController,
         onCoinClick: (String) -> Unit,
     ) {
         val itemsViewState by viewModel.viewStateLiveData.observeAsState()
@@ -78,7 +77,7 @@ class MetricsPageFragment : BaseComposeFragment() {
                         title = TranslatableString.ResString(R.string.Button_Close),
                         icon = R.drawable.ic_close,
                         onClick = {
-                            findNavController().popBackStack()
+                            navController.popBackStack()
                         }
                     )
                 )
@@ -95,9 +94,11 @@ class MetricsPageFragment : BaseComposeFragment() {
                         ViewState.Loading -> {
                             Loading()
                         }
+
                         is ViewState.Error -> {
                             ListErrorView(stringResource(R.string.SyncError), viewModel::onErrorClick)
                         }
+
                         ViewState.Success -> {
                             val listState = rememberSaveable(
                                 marketData?.menu?.sortDescending,
@@ -141,6 +142,7 @@ class MetricsPageFragment : BaseComposeFragment() {
                                 }
                             }
                         }
+
                         null -> {}
                     }
                 }

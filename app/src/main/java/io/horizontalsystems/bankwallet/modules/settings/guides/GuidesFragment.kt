@@ -39,23 +39,21 @@ import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.compose.components.ScreenMessageWithAction
 import io.horizontalsystems.bankwallet.ui.compose.components.ScrollableTabs
 import io.horizontalsystems.bankwallet.ui.compose.components.TabItem
 import io.horizontalsystems.bankwallet.ui.compose.components.caption_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.title3_leah
-import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.helpers.DateHelper
 import java.net.UnknownHostException
 
 class GuidesFragment : BaseComposeFragment() {
 
     @Composable
-    override fun GetContent() {
-        ComposeAppTheme {
-            NiaBackground {
-                GuidesScreen(findNavController())
-            }
+    override fun GetContent(navController: NavController) {
+        NiaBackground {
+            GuidesScreen(navController)
         }
     }
 
@@ -84,6 +82,7 @@ fun GuidesScreen(navController: NavController) {
                 ViewState.Loading -> {
                     Loading()
                 }
+
                 is ViewState.Error -> {
                     val s = when (val error = viewState.t) {
                         is UnknownHostException -> stringResource(R.string.Hud_Text_NoInternet)
@@ -93,6 +92,7 @@ fun GuidesScreen(navController: NavController) {
 
                     ScreenMessageWithAction(s, R.drawable.ic_error_48)
                 }
+
                 ViewState.Success -> {
                     if (selectedCategory != null) {
                         Column {

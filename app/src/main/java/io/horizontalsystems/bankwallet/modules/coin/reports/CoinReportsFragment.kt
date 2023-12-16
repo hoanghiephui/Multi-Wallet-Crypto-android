@@ -18,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.entities.ViewState
@@ -38,18 +38,16 @@ class CoinReportsFragment : BaseComposeFragment() {
     }
 
     @Composable
-    override fun GetContent() {
-        ComposeAppTheme {
-            CoinReportsScreen(
-                viewModel = viewModel,
-                onClickNavigation = {
-                    findNavController().popBackStack()
-                },
-                onClickReportUrl = {
-                    LinkHelper.openLinkInAppBrowser(requireContext(), it)
-                }
-            )
-        }
+    override fun GetContent(navController: NavController) {
+        CoinReportsScreen(
+            viewModel = viewModel,
+            onClickNavigation = {
+                navController.popBackStack()
+            },
+            onClickReportUrl = {
+                LinkHelper.openLinkInAppBrowser(requireContext(), it)
+            }
+        )
     }
 
     companion object {
@@ -86,9 +84,11 @@ private fun CoinReportsScreen(
                     ViewState.Loading -> {
                         Loading()
                     }
+
                     is ViewState.Error -> {
                         ListErrorView(stringResource(R.string.SyncError), viewModel::onErrorClick)
                     }
+
                     ViewState.Success -> {
                         LazyColumn(modifier = Modifier.fillMaxSize()) {
                             reportViewItems?.let {
@@ -109,6 +109,7 @@ private fun CoinReportsScreen(
                             }
                         }
                     }
+
                     null -> {}
                 }
             }

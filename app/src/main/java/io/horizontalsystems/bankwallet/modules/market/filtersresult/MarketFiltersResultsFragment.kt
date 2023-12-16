@@ -28,22 +28,19 @@ import io.horizontalsystems.bankwallet.modules.market.filters.MarketFiltersViewM
 import io.horizontalsystems.bankwallet.modules.market.topcoins.SelectorDialogState
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.*
-import io.horizontalsystems.core.findNavController
 
 class MarketFiltersResultsFragment : BaseComposeFragment() {
 
     @Composable
-    override fun GetContent() {
+    override fun GetContent(navController: NavController) {
         val viewModel = getViewModel()
 
         if (viewModel == null) {
-            findNavController().popBackStack()
+            navController.popBackStack()
             return
         }
 
-        ComposeAppTheme {
-            SearchResultsScreen(viewModel, findNavController())
-        }
+        SearchResultsScreen(viewModel, navController)
     }
 
     private fun getViewModel(): MarketFiltersResultViewModel? {
@@ -83,9 +80,11 @@ private fun SearchResultsScreen(
                     ViewState.Loading -> {
                         Loading()
                     }
+
                     is ViewState.Error -> {
                         ListErrorView(stringResource(R.string.SyncError), viewModel::onErrorClick)
                     }
+
                     ViewState.Success -> {
                         CoinList(
                             items = viewModel.viewItemsState,
@@ -97,7 +96,7 @@ private fun SearchResultsScreen(
                                 viewModel.onRemoveFavorite(uid)
                             },
                             onCoinClick = { coinUid ->
-                                val arguments = CoinFragment.prepareParams(coinUid)
+                                val arguments = CoinFragment.prepareParams(coinUid, "market_advanced_search")
                                 navController.slideFromRight(R.id.coinFragment, arguments)
                             },
                             preItems = {

@@ -34,7 +34,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_leah
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocalBackupTermsScreen(
-    onTermsAccepted: ()-> Unit,
+    onTermsAccepted: () -> Unit,
     onBackClick: () -> Unit,
 ) {
     var termChecked by rememberSaveable { mutableStateOf(false) }

@@ -34,17 +34,14 @@ import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
-import io.horizontalsystems.core.findNavController
 
 class BlockchainSettingsFragment : BaseComposeFragment() {
 
     @Composable
-    override fun GetContent() {
-        ComposeAppTheme {
-            BlockchainSettingsScreen(
-                navController = findNavController(),
-            )
-        }
+    override fun GetContent(navController: NavController) {
+        BlockchainSettingsScreen(
+            navController = navController,
+        )
     }
 
 }
@@ -111,10 +108,12 @@ private fun onClick(
             val params = BtcBlockchainSettingsModule.args(item.blockchainItem.blockchain)
             navController.slideFromBottom(R.id.btcBlockchainSettingsFragment, params)
         }
+
         is BlockchainSettingsModule.BlockchainItem.Evm -> {
             val params = EvmNetworkModule.args(item.blockchainItem.blockchain)
             navController.slideFromBottom(R.id.evmNetworkFragment, params)
         }
+
         is BlockchainSettingsModule.BlockchainItem.Solana -> {
             navController.slideFromBottom(R.id.solanaNetworkFragment, bundleOf())
         }

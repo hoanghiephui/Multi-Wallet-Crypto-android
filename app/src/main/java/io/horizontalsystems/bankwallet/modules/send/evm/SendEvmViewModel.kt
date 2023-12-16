@@ -8,28 +8,30 @@ import androidx.lifecycle.viewModelScope
 import cash.z.ecc.android.sdk.ext.collectWith
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.ISendEthereumAdapter
+import io.horizontalsystems.bankwallet.core.managers.ConnectivityManager
 import io.horizontalsystems.bankwallet.entities.Address
 import io.horizontalsystems.bankwallet.entities.Wallet
-import io.horizontalsystems.bankwallet.modules.send.SendAmountAdvancedService
+import io.horizontalsystems.bankwallet.modules.amount.SendAmountService
 import io.horizontalsystems.bankwallet.modules.send.SendUiState
 import io.horizontalsystems.bankwallet.modules.xrate.XRateService
 import io.horizontalsystems.marketkit.models.Token
 import java.math.BigDecimal
 
 class SendEvmViewModel(
-        val wallet: Wallet,
-        val sendToken: Token,
-        val adapter: ISendEthereumAdapter,
-        private val xRateService: XRateService,
-        private val amountService: SendAmountAdvancedService,
-        private val addressService: SendEvmAddressService,
-        val coinMaxAllowedDecimals: Int
+    val wallet: Wallet,
+    val sendToken: Token,
+    val adapter: ISendEthereumAdapter,
+    private val xRateService: XRateService,
+    private val amountService: SendAmountService,
+    private val addressService: SendEvmAddressService,
+    val coinMaxAllowedDecimals: Int,
+    private val showAddressInput: Boolean,
+    private val connectivityManager: ConnectivityManager
 ) : ViewModel() {
     val fiatMaxAllowedDecimals = App.appConfigProvider.fiatDecimal
 
     private var amountState = amountService.stateFlow.value
     private var addressState = addressService.stateFlow.value
-    private val showAddressInput = addressService.predefinedAddress == null
 
     var uiState by mutableStateOf(
         SendUiState(
@@ -37,7 +39,7 @@ class SendEvmViewModel(
             amountCaution = amountState.amountCaution,
             addressError = addressState.addressError,
             canBeSend = amountState.canBeSend && addressState.canBeSend,
-            showAddressInput = showAddressInput
+            showAddressInput = showAddressInput,
         )
     )
         private set
@@ -65,7 +67,7 @@ class SendEvmViewModel(
         addressService.setAddress(address)
     }
 
-    private fun handleUpdatedAmountState(amountState: SendAmountAdvancedService.State) {
+    private fun handleUpdatedAmountState(amountState: SendAmountService.State) {
         this.amountState = amountState
 
         emitState()
@@ -88,11 +90,15 @@ class SendEvmViewModel(
     }
 
     fun getSendData(): SendEvmData? {
-        val tmpEvmAmount = amountState.evmAmount ?: return null
+        val tmpAmount = amountState.amount ?: return null
         val evmAddress = addressState.evmAddress ?: return null
 
-        val transactionData = adapter.getTransactionData(tmpEvmAmount, evmAddress)
+        val transactionData = adapter.getTransactionData(tmpAmount, evmAddress)
 
         return SendEvmData(transactionData)
+    }
+
+    fun hasConnection(): Boolean {
+        return connectivityManager.isConnected
     }
 }

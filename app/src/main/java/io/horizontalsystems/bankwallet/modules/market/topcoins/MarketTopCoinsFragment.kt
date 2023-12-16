@@ -17,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromRight
@@ -29,7 +30,6 @@ import io.horizontalsystems.bankwallet.modules.market.TopMarket
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
 import io.horizontalsystems.bankwallet.ui.compose.components.*
-import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.parcelable
 
 class MarketTopCoinsFragment : BaseComposeFragment() {
@@ -49,20 +49,18 @@ class MarketTopCoinsFragment : BaseComposeFragment() {
     }
 
     @Composable
-    override fun GetContent() {
-        ComposeAppTheme {
-            TopCoinsScreen(
-                viewModel,
-                { findNavController().popBackStack() },
-                { coinUid -> onCoinClick(coinUid) }
-            )
-        }
+    override fun GetContent(navController: NavController) {
+        TopCoinsScreen(
+            viewModel,
+            { navController.popBackStack() },
+            { coinUid -> onCoinClick(coinUid, navController) }
+        )
     }
 
-    private fun onCoinClick(coinUid: String) {
-        val arguments = CoinFragment.prepareParams(coinUid)
+    private fun onCoinClick(coinUid: String, navController: NavController) {
+        val arguments = CoinFragment.prepareParams(coinUid, "market_top_coins")
 
-        findNavController().slideFromRight(R.id.coinFragment, arguments)
+        navController.slideFromRight(R.id.coinFragment, arguments)
     }
 
     companion object {
@@ -117,9 +115,11 @@ fun TopCoinsScreen(
                         ViewState.Loading -> {
                             Loading()
                         }
+
                         is ViewState.Error -> {
                             ListErrorView(stringResource(R.string.SyncError), viewModel::onErrorClick)
                         }
+
                         ViewState.Success -> {
                             viewItems?.let {
                                 CoinList(
@@ -187,6 +187,7 @@ fun TopCoinsScreen(
                                 }
                             }
                         }
+
                         null -> {}
                     }
                 }
@@ -205,8 +206,10 @@ fun TopCoinsScreen(
                     { viewModel.onSelectorDialogDismiss() }
                 )
             }
+
             SelectorDialogState.Closed,
-            null -> {}
+            null -> {
+            }
         }
     }
 }

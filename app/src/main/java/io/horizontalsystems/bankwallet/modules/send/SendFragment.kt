@@ -28,12 +28,16 @@ import io.horizontalsystems.bankwallet.modules.send.evm.confirmation.EvmKitWrapp
 import io.horizontalsystems.bankwallet.modules.send.solana.SendSolanaModule
 import io.horizontalsystems.bankwallet.modules.send.solana.SendSolanaScreen
 import io.horizontalsystems.bankwallet.modules.send.solana.SendSolanaViewModel
+import io.horizontalsystems.bankwallet.modules.send.ton.SendTonModule
+import io.horizontalsystems.bankwallet.modules.send.ton.SendTonScreen
+import io.horizontalsystems.bankwallet.modules.send.ton.SendTonViewModel
 import io.horizontalsystems.bankwallet.modules.send.tron.SendTronModule
 import io.horizontalsystems.bankwallet.modules.send.tron.SendTronScreen
 import io.horizontalsystems.bankwallet.modules.send.tron.SendTronViewModel
 import io.horizontalsystems.bankwallet.modules.send.zcash.SendZCashModule
 import io.horizontalsystems.bankwallet.modules.send.zcash.SendZCashScreen
 import io.horizontalsystems.bankwallet.modules.send.zcash.SendZCashViewModel
+import io.horizontalsystems.bankwallet.modules.sendtokenselect.PrefilledData
 import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.parcelable
 import io.horizontalsystems.marketkit.models.BlockchainType
@@ -55,6 +59,7 @@ class SendFragment : BaseFragment() {
                 val title = arguments.getString(titleKey) ?: ""
                 val sendEntryPointDestId = arguments.getInt(sendEntryPointDestIdKey)
                 val predefinedAddress = arguments.getString(predefinedAddressKey)
+                val prefilledData = arguments.getParcelable<PrefilledData>(prefilledAddressDataKey)
 
                 val amountInputModeViewModel by navGraphViewModels<AmountInputModeViewModel>(R.id.sendXFragment) {
                     AmountInputModeModule.Factory(wallet.coin.uid)
@@ -76,7 +81,8 @@ class SendFragment : BaseFragment() {
                                 findNavController(),
                                 sendBitcoinViewModel,
                                 amountInputModeViewModel,
-                                sendEntryPointDestId
+                                sendEntryPointDestId,
+                                prefilledData,
                             )
                         }
                     }
@@ -92,7 +98,8 @@ class SendFragment : BaseFragment() {
                                 findNavController(),
                                 sendBinanceViewModel,
                                 amountInputModeViewModel,
-                                sendEntryPointDestId
+                                sendEntryPointDestId,
+                                prefilledData,
                             )
                         }
                     }
@@ -108,7 +115,8 @@ class SendFragment : BaseFragment() {
                                 findNavController(),
                                 sendZCashViewModel,
                                 amountInputModeViewModel,
-                                sendEntryPointDestId
+                                sendEntryPointDestId,
+                                prefilledData,
                             )
                         }
                     }
@@ -133,7 +141,8 @@ class SendFragment : BaseFragment() {
                                 findNavController(),
                                 sendEvmViewModel,
                                 amountInputModeViewModel,
-                                sendEntryPointDestId
+                                sendEntryPointDestId,
+                                prefilledData,
                             )
                         }
                     }
@@ -147,7 +156,23 @@ class SendFragment : BaseFragment() {
                                 findNavController(),
                                 sendSolanaViewModel,
                                 amountInputModeViewModel,
-                                sendEntryPointDestId
+                                sendEntryPointDestId,
+                                prefilledData,
+                            )
+                        }
+                    }
+
+                    BlockchainType.Ton -> {
+                        val factory = SendTonModule.Factory(wallet, predefinedAddress)
+                        val sendTonViewModel by navGraphViewModels<SendTonViewModel>(R.id.sendXFragment) { factory }
+                        setContent {
+                            SendTonScreen(
+                                title,
+                                findNavController(),
+                                sendTonViewModel,
+                                amountInputModeViewModel,
+                                sendEntryPointDestId,
+                                prefilledData,
                             )
                         }
                     }
@@ -161,7 +186,8 @@ class SendFragment : BaseFragment() {
                                 findNavController(),
                                 sendTronViewModel,
                                 amountInputModeViewModel,
-                                sendEntryPointDestId
+                                sendEntryPointDestId,
+                                prefilledData,
                             )
                         }
                     }
@@ -182,6 +208,7 @@ class SendFragment : BaseFragment() {
         private const val sendEntryPointDestIdKey = "sendEntryPointDestIdKey"
         private const val titleKey = "titleKey"
         private const val predefinedAddressKey = "predefinedAddressKey"
+        private const val prefilledAddressDataKey = "predefilledAddressDataKey"
 
         fun prepareParams(wallet: Wallet, title: String) = bundleOf(
             walletKey to wallet,
@@ -192,12 +219,14 @@ class SendFragment : BaseFragment() {
             wallet: Wallet,
             sendEntryPointDestId: Int,
             title: String,
-            predefinedAddress: String? = null
+            predefinedAddress: String? = null,
+            prefilledAddressData: PrefilledData? = null,
         ) = bundleOf(
             walletKey to wallet,
             sendEntryPointDestIdKey to sendEntryPointDestId,
             titleKey to title,
-            predefinedAddressKey to predefinedAddress
+            predefinedAddressKey to predefinedAddress,
+            prefilledAddressDataKey to prefilledAddressData
         )
     }
 }

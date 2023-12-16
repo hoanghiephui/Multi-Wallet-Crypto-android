@@ -18,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.App
@@ -35,18 +36,15 @@ import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_leah
 import io.horizontalsystems.bankwallet.ui.helpers.TextHelper
-import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.helpers.HudHelper
 
 class DonateAddressesFragment : BaseComposeFragment() {
 
     @Composable
-    override fun GetContent() {
-        ComposeAppTheme {
-            DonateScreen(
-                onBackPress = { findNavController().popBackStack() }
-            )
-        }
+    override fun GetContent(navController: NavController) {
+        DonateScreen(
+            onBackPress = { navController.popBackStack() }
+        )
     }
 
 }

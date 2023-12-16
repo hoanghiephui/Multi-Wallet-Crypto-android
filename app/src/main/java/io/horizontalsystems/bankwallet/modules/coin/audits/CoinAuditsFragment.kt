@@ -26,7 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.entities.ViewState
@@ -52,18 +52,16 @@ class CoinAuditsFragment : BaseComposeFragment() {
     }
 
     @Composable
-    override fun GetContent() {
-        ComposeAppTheme {
-            CoinAuditsScreen(
-                viewModel = viewModel,
-                onClickNavigation = {
-                    findNavController().popBackStack()
-                },
-                onClickReportUrl = {
-                    LinkHelper.openLinkInAppBrowser(requireContext(), it)
-                }
-            )
-        }
+    override fun GetContent(navController: NavController) {
+        CoinAuditsScreen(
+            viewModel = viewModel,
+            onClickNavigation = {
+                navController.popBackStack()
+            },
+            onClickReportUrl = {
+                LinkHelper.openLinkInAppBrowser(requireContext(), it)
+            }
+        )
     }
 
     companion object {
@@ -100,9 +98,11 @@ private fun CoinAuditsScreen(
                     ViewState.Loading -> {
                         Loading()
                     }
+
                     is ViewState.Error -> {
                         ListErrorView(stringResource(R.string.SyncError), viewModel::onErrorClick)
                     }
+
                     ViewState.Success -> {
                         if (viewItems?.isEmpty() == true) {
                             ListEmptyView(
@@ -118,7 +118,7 @@ private fun CoinAuditsScreen(
                                     }
                                     item {
                                         CellMultilineLawrenceSection(viewItem.auditViewItems) { auditViewItem ->
-                                            CoinAudit(auditViewItem) { auditViewItem.reportUrl?.let { onClickReportUrl(it)} }
+                                            CoinAudit(auditViewItem) { auditViewItem.reportUrl?.let { onClickReportUrl(it) } }
                                         }
                                         Spacer(modifier = Modifier.height(24.dp))
                                     }
@@ -130,6 +130,7 @@ private fun CoinAuditsScreen(
                             }
                         }
                     }
+
                     null -> {}
                 }
             }
