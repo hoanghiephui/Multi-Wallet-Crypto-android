@@ -15,9 +15,6 @@ import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.AdType
 import io.horizontalsystems.bankwallet.core.AdViewState
 import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
-import io.horizontalsystems.bankwallet.core.AdType
-import io.horizontalsystems.bankwallet.core.AdViewState
-import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 import io.horizontalsystems.bankwallet.ui.compose.components.ScreenMessageWithAction

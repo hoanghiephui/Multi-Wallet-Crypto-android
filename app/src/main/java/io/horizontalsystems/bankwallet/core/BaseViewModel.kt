@@ -19,7 +19,7 @@ abstract class BaseViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(false)
     private val loadAdState = _uiState.asSharedFlow()
     companion object{
-        const val SHOW_ADS = false
+        const val SHOW_ADS = true
     }
     init {
         if (SHOW_ADS) {

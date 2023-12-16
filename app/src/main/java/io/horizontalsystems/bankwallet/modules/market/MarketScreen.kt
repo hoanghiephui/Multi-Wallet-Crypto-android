@@ -3,16 +3,11 @@ package io.horizontalsystems.bankwallet.modules.market
 import android.annotation.SuppressLint
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -25,13 +20,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -45,20 +37,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.slideFromRight
-import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
-import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.market.favorites.MarketFavoritesScreen
 import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewModule
 import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewScreen
 import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewViewModel
-import io.horizontalsystems.bankwallet.modules.market.overview.ui.MarketCoinWithBackground
 import io.horizontalsystems.bankwallet.modules.market.posts.MarketPostsScreen
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchResults
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchViewModel
 import io.horizontalsystems.bankwallet.ui.compose.NiaTab
 import io.horizontalsystems.bankwallet.ui.compose.NiaTabRow
-import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
 import java.util.Optional
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -165,86 +153,32 @@ private fun DockedSearchBar(
                 },
             ) {
                 Crossfade(targetState = text.isBlank(), label = "") { isSearch ->
-                    if (!isSearch) {
-                        val uiState = searchViewModel.uiState
-                        val itemSections = when (uiState.page) {
-                            is MarketSearchViewModel.Page.Discovery -> {
-                                mapOf(
-                                    Optional.of(stringResource(R.string.Market_Search_Sections_RecentTitle)) to uiState.page.recent,
-                                    Optional.of(stringResource(R.string.Market_Search_Sections_PopularTitle)) to uiState.page.popular,
-                                )
-                            }
+                    val uiState = searchViewModel.uiState
+                    val itemSections =
+                        if (!isSearch && uiState.page is MarketSearchViewModel.Page.SearchResults)
+                            mapOf(
+                                Optional.ofNullable<String>(null) to uiState.page.items
+                            )
+                        else if (uiState.page is MarketSearchViewModel.Page.Discovery)
+                            mapOf(
+                                Optional.of(stringResource(R.string.Market_Search_Sections_RecentTitle)) to uiState.page.recent,
+                            ) else mapOf()
 
-                            is MarketSearchViewModel.Page.SearchResults -> {
-                                mapOf(
-                                    Optional.ofNullable<String>(null) to uiState.page.items
-                                )
-                            }
+                    MarketSearchResults(
+                        uiState.listId,
+                        itemSections = itemSections,
+                        onCoinClick = { coin ->
+                            active = false
+                            text = ""
+                            uiState.page
+                            searchViewModel.onCoinOpened(coin)
+                            navController.slideFromRight(
+                                R.id.coinFragment,
+                                CoinFragment.prepareParams(coin.uid, "market_search")
+                            )
                         }
-
-                        MarketSearchResults(
-                            uiState.listId,
-                            itemSections = itemSections,
-                            onCoinClick = { coin ->
-                                searchViewModel.onCoinOpened(coin)
-                                navController.slideFromRight(
-                                    R.id.coinFragment,
-                                    CoinFragment.prepareParams(coin.uid, "market_search")
-                                )
-                            }
-                        ) { favorited, coinUid ->
-                            searchViewModel.onFavoriteClick(favorited, coinUid)
-                        }
-                    } else {
-                        val viewState by viewModel.viewStateLiveData.observeAsState()
-                        val viewItem by viewModel.viewItem.observeAsState()
-                        Crossfade(viewState, label = "MarketOverviewScreen") { state ->
-                            when (state) {
-                                ViewState.Loading -> {
-                                    Loading()
-                                }
-
-                                is ViewState.Error -> {
-                                    ListErrorView(
-                                        stringResource(R.string.SyncError),
-                                        onClick = {
-                                            viewModel.onErrorClick()
-                                            active = false
-                                            text = ""
-                                        }
-                                    )
-                                }
-
-                                ViewState.Success -> {
-                                    viewItem?.let { viewItem ->
-                                        val rememberLazyListState = rememberLazyListState()
-                                        val item = viewItem.boards.first().marketViewItems
-                                        LazyColumn(
-                                            state = rememberLazyListState,
-                                            modifier = Modifier.fillMaxWidth(),
-                                            contentPadding = PaddingValues(16.dp),
-                                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                                        ) {
-                                            items(item) {
-                                                MarketCoinWithBackground(
-                                                    it,
-                                                    navController,
-                                                    click = {
-                                                        active = false
-                                                        text = ""
-                                                    })
-                                            }
-                                        }
-                                        LaunchedEffect(rememberLazyListState) {
-                                            snapshotFlow { rememberLazyListState.isScrollInProgress }
-                                                .collect { keyboardController?.hide() }
-                                        }
-                                    }
-                                }
-
-                                else -> Unit
-                            }
-                        }
+                    ) { favorited, coinUid ->
+                        searchViewModel.onFavoriteClick(favorited, coinUid)
                     }
                 }
             }
