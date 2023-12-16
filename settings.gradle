@@ -3,3 +3,5 @@ include ':app'
 include ':core'
 include ':components:icons'
 include ':components:chartview'
+include ':in-app-update'
+project(":in-app-update").projectDir = new File("In-App-Update/inappupdatecompose")

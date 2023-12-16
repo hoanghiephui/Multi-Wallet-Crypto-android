@@ -377,6 +377,9 @@ dependencies {
     implementation("com.google.android.gms:play-services-ads-identifier:18.0.1")
     implementation("com.android.billingclient:billing:6.1.0")
     implementation("com.android.billingclient:billing-ktx:6.1.0")
+    implementation project(":in-app-update")
+    implementation("com.airbnb.android:lottie:6.1.0")
+    implementation("com.airbnb.android:lottie-compose:6.1.0")
 }
 
 configurations.configureEach {

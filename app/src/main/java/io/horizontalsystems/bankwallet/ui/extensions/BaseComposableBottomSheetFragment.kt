@@ -60,7 +60,7 @@ fun BottomSheetHeader(
     title: String,
     onCloseClick: () -> Unit,
     iconTint: ColorFilter? = null,
-    content: @Composable() (ColumnScope.() -> Unit),
+    content: @Composable (ColumnScope.() -> Unit),
 ) {
     BottomSheetHeader(
         iconPainter = iconPainter,

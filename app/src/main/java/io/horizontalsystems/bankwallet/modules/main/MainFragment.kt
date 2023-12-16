@@ -80,10 +80,12 @@ import io.horizontalsystems.bankwallet.ui.compose.DisposableLifecycleCallbacks
 import io.horizontalsystems.bankwallet.ui.compose.NiaNavigationBar
 import io.horizontalsystems.bankwallet.ui.compose.NiaNavigationBarItem
 import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
+import io.horizontalsystems.bankwallet.ui.extensions.HeaderUpdate
 import io.horizontalsystems.bankwallet.ui.extensions.WalletSwitchBottomSheet
 import io.horizontalsystems.bankwallet.ui.extensions.rememberLifecycleEvent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import se.warting.inappupdate.compose.rememberInAppUpdateState
 
 class MainFragment : BaseComposeFragment() {
 
@@ -93,15 +95,13 @@ class MainFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent(navController: NavController) {
-        ComposeAppTheme {
-            NiaBackground {
-                MainScreenWithRootedDeviceCheck(
-                    transactionsViewModel = transactionsViewModel,
-                    deepLink = intentUri,
-                    navController = navController,
-                    searchViewModel = searchViewModel
-                )
-            }
+        NiaBackground {
+            MainScreenWithRootedDeviceCheck(
+                transactionsViewModel = transactionsViewModel,
+                deepLink = intentUri,
+                navController = navController,
+                searchViewModel = searchViewModel
+            )
         }
     }
 
@@ -160,26 +160,13 @@ private fun MainScreen(
     val coroutineScope = rememberCoroutineScope()
     val modalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val lifecycleEvent = rememberLifecycleEvent()
-
+    val updateState = rememberInAppUpdateState()
     ModalBottomSheetLayout(
         sheetState = modalBottomSheetState,
         sheetBackgroundColor = ComposeAppTheme.colors.transparent,
         sheetContent = {
-            WalletSwitchBottomSheet(
-                wallets = viewModel.wallets,
-                watchingAddresses = viewModel.watchWallets,
-                selectedAccount = uiState.activeWallet,
-                onSelectListener = {
-                    coroutineScope.launch {
-                        modalBottomSheetState.hide()
-                        viewModel.onSelect(it)
-                    }
-                },
-                onCancelClick = {
-                    coroutineScope.launch {
-                        modalBottomSheetState.hide()
-                    }
-                }
+            HeaderUpdate(
+                updateState, context, modalBottomSheetState, coroutineScope
             )
         },
     ) {

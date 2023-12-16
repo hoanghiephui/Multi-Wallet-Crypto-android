@@ -1,0 +1,3 @@
+[submodule "In-App-Update"]
+	path = In-App-Update
+	url = git@github.com:hoanghiephui/In-App-Update.git

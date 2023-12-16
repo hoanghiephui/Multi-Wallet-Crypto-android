@@ -1873,4 +1873,9 @@
     <string name="CexWithdraw_Error_WithdrawTitle">Withdraw Failed</string>
 
 
+    <string name="update_content">GM free souls! Another update is here. There are a number of new features and some extensive UI improvements throughout the app.</string>
+    <string name="update_now">Upgrade now</string>
+    <string name="downloading">Downloading update…</string>
+    <string name="update_done">Update downloaded successfully</string>
+    <string name="install_now">Install now</string>
 </resources>
