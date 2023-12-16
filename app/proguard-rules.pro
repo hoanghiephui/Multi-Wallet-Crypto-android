@@ -333,3 +333,4 @@
 -keep class org.spongycastle.** { *; }
 -dontwarn javax.naming.directory.SearchControls
 -dontwarn javax.naming.directory.SearchResult
+-dontwarn org.slf4j.impl.StaticMDCBinder
