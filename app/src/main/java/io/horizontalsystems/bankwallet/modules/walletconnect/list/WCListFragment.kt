@@ -11,7 +11,7 @@ class WCListFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent(navController: NavController) {
-        val deepLinkUri = requireArguments().getString(WC_CONNECTION_URI_KEY)
+        val deepLinkUri = arguments?.getString(WC_CONNECTION_URI_KEY)
         NiaBackground {
             WCSessionsScreen(
                 navController,
