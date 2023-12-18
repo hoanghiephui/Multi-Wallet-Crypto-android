@@ -917,7 +917,7 @@
 
     <!-- Privacy  -->
 
-    <string name="Privacy_Information">CoinDex doesn\'t collect any data or use analytics tools that may expose any data about its users. The wallet is designed to ensure a high level of privacy for its users.</string>
+    <string name="Privacy_Information">CoinDex doesn\'t collect any data or use analytics tools that may expose any data about its users (if not authorized by the user). The wallet is designed to ensure a high level of privacy for its users.</string>
     <string name="Privacy_BulletedText1">User data always remains on the user\'s device.</string>
     <string name="Privacy_BulletedText2">The wallet doesn\'t collect any data about users.</string>
     <string name="Privacy_BulletedText3">The wallet doesn\'t share any data about users.</string>

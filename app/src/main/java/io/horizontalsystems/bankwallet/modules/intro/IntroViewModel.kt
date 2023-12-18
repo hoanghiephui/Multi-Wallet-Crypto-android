@@ -1,7 +1,11 @@
 package io.horizontalsystems.bankwallet.modules.intro
 
 import androidx.lifecycle.ViewModel
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import io.horizontalsystems.bankwallet.R
+import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.ILocalStorage
 
 class IntroViewModel(
@@ -31,6 +35,15 @@ class IntroViewModel(
 
     fun onStartClicked() {
         localStorage.mainShowedOnce = true
+    }
+
+    fun onSaveConfig(checkAnalytic: Boolean,
+                     checkDetectCrash: Boolean) {
+        localStorage.isAnalytic = checkAnalytic
+        localStorage.isDetectCrash = checkDetectCrash
+
+        Firebase.analytics.setAnalyticsCollectionEnabled(checkAnalytic)
+        Firebase.crashlytics.setCrashlyticsCollectionEnabled(checkDetectCrash)
     }
 
 }

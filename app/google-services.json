@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "79072325686",
+    "project_id": "coindex68",
+    "storage_bucket": "coindex68.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:79072325686:android:3bb05bea82ffd365d8e897",
+        "android_client_info": {
+          "package_name": "com.wallet.blockchain.bitcoin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAUsRekxRrH301VLhDxRmYpxrTY5M9ASkw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

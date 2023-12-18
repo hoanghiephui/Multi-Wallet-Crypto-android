@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import io.horizontalsystems.bankwallet.core.ILocalStorage
 import io.horizontalsystems.bankwallet.core.managers.BalanceHiddenManager
 import io.horizontalsystems.core.IPinComponent
@@ -23,6 +25,8 @@ class SecuritySettingsViewModel(
     private var pinEnabled = pinComponent.isPinSet
     private var duressPinEnabled = pinComponent.isDuressPinSet()
     private var balanceAutoHideEnabled = balanceHiddenManager.balanceAutoHidden
+    private var analyticLog = localStorage.isAnalytic
+    private var detectCrash = localStorage.isDetectCrash
 
     var uiState by mutableStateOf(
         SecuritySettingsUiState(
@@ -31,6 +35,8 @@ class SecuritySettingsViewModel(
             duressPinEnabled = duressPinEnabled,
             balanceAutoHideEnabled = balanceAutoHideEnabled,
             autoLockIntervalName = localStorage.autoLockInterval.title,
+            analyticLog = analyticLog,
+            detectCrash = detectCrash
         )
     )
         private set
@@ -53,6 +59,8 @@ class SecuritySettingsViewModel(
                 duressPinEnabled = duressPinEnabled,
                 balanceAutoHideEnabled = balanceAutoHideEnabled,
                 autoLockIntervalName = localStorage.autoLockInterval.title,
+                analyticLog = analyticLog,
+                detectCrash = detectCrash
             )
         }
     }
@@ -87,6 +95,20 @@ class SecuritySettingsViewModel(
     fun update() {
         emitState()
     }
+
+    fun onSetAnalytic(enabled: Boolean) {
+        analyticLog = enabled
+        emitState()
+        localStorage.isAnalytic = enabled
+        Firebase.analytics.setAnalyticsCollectionEnabled(enabled)
+    }
+
+    fun onSetCrashlytics(enabled: Boolean) {
+        detectCrash = enabled
+        emitState()
+        localStorage.isDetectCrash = enabled
+        Firebase.analytics.setAnalyticsCollectionEnabled(enabled)
+    }
 }
 
 data class SecuritySettingsUiState(
@@ -94,5 +116,7 @@ data class SecuritySettingsUiState(
     val biometricsEnabled: Boolean,
     val duressPinEnabled: Boolean,
     val balanceAutoHideEnabled: Boolean,
-    val autoLockIntervalName: Int
+    val autoLockIntervalName: Int,
+    val analyticLog: Boolean,
+    val detectCrash: Boolean
 )

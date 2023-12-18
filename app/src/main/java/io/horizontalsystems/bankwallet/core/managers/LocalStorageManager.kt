@@ -81,6 +81,8 @@ class LocalStorageManager(
     private val APP_AUTO_LOCK_INTERVAL = "app_auto_lock_interval"
     private val HIDE_SUSPICIOUS_TX = "hide_suspicious_tx"
     private val PIN_RANDOMIZED = "pin_randomized"
+    private val ANALYTIC = "ANALYTIC"
+    private val DETECT_CRASH = "DETECT_CRASH"
 
     private val gson by lazy { Gson() }
 
@@ -472,6 +474,17 @@ class LocalStorageManager(
         get() = preferences.getBoolean(PIN_RANDOMIZED, false)
         set(value) {
             preferences.edit().putBoolean(PIN_RANDOMIZED, value).apply()
+        }
+
+    override var isAnalytic: Boolean
+        get() = preferences.getBoolean(ANALYTIC, false)
+        set(value) {
+            preferences.edit().putBoolean(ANALYTIC, value).apply()
+        }
+    override var isDetectCrash: Boolean
+        get() = preferences.getBoolean(DETECT_CRASH, false)
+        set(value) {
+            preferences.edit().putBoolean(DETECT_CRASH, value).apply()
         }
 
     private val _marketsTabEnabledFlow = MutableStateFlow(marketsTabEnabled)

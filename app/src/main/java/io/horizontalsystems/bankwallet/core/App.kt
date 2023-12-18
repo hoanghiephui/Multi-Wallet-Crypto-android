@@ -15,6 +15,9 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
 import com.applovin.sdk.AppLovinSdk
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.crashlytics.ktx.crashlytics
+import com.google.firebase.ktx.Firebase
 import com.walletconnect.android.Core
 import com.walletconnect.android.CoreClient
 import com.walletconnect.android.relay.ConnectionType
@@ -443,6 +446,7 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         spamManager = SpamManager(localStorage)
 
         startTasks()
+        setAnalytic()
     }
 
     override fun newImageLoader(): ImageLoader {
@@ -497,6 +501,11 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         if (AppCompatDelegate.getDefaultNightMode() != nightMode) {
             AppCompatDelegate.setDefaultNightMode(nightMode)
         }
+    }
+
+    private fun setAnalytic() {
+        Firebase.analytics.setAnalyticsCollectionEnabled(localStorage.isAnalytic)
+        Firebase.crashlytics.setCrashlyticsCollectionEnabled(localStorage.isDetectCrash)
     }
 
     override val workManagerConfiguration: androidx.work.Configuration

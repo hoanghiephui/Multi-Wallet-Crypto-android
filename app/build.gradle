@@ -9,6 +9,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
 def localProperties = new Properties()
 try {
     localProperties.load(new FileInputStream(rootProject.file("local.properties")))
@@ -230,6 +232,8 @@ dependencies {
 
     //AppWidgets
     implementation 'androidx.glance:glance-appwidget:1.0.0'
+    implementation 'com.google.firebase:firebase-crashlytics:18.6.0'
+    implementation 'com.google.firebase:firebase-analytics:21.5.0'
 
     // Room
     def room_version = '2.6.1'
