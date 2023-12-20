@@ -13,22 +13,22 @@ class OpenSeaService(
 ) {
     private val service by lazy {
         APIClient.build(
-            baseUrl = "https://api.opensea.io/api/v1/",
+            baseUrl = "https://api.opensea.io/api/v2/",
             headers = mapOf(
                 "User-Agent" to "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36",
-                "X-API-KEY" to openSeaApiKey
+                "x-api-key" to openSeaApiKey
             )
         ).create(OpenSeaApi::class.java)
     }
 
     private val hsService by lazy {
-        APIClient.build("${hsBaseUrl}/v1/nft/", mapOf("apikey" to apiKey))
+        APIClient.build("${hsBaseUrl}/v2/nft/", mapOf("apikey" to apiKey))
             .create(HsNftApi::class.java)
     }
 
     suspend fun allCollections(address: String? = null): List<OpenSeaNftApiResponse.Collection> {
         val collections = mutableListOf<OpenSeaNftApiResponse.Collection>()
-        val limit = 300
+        val limit = 100
         do {
             val collectionsResponse = service.collections(address, limit, collections.size)
             collections.addAll(collectionsResponse)
