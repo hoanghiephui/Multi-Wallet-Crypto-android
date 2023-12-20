@@ -1,5 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.main
 
+import android.app.Activity
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
@@ -48,6 +49,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.navGraphViewModels
+import com.google.android.play.core.review.ReviewManager
+import com.google.android.play.core.review.ReviewManagerFactory
 import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.managers.RateAppManager
@@ -161,6 +164,9 @@ private fun MainScreen(
     val modalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val lifecycleEvent = rememberLifecycleEvent()
     val updateState = rememberInAppUpdateState()
+    val manager: ReviewManager = ReviewManagerFactory.create(context)
+    val request = manager.requestReviewFlow()
+
     ModalBottomSheetLayout(
         sheetState = modalBottomSheetState,
         sheetBackgroundColor = ComposeAppTheme.colors.transparent,
@@ -277,15 +283,24 @@ private fun MainScreen(
             viewModel.whatsNewShown()
         }
     }
-
-    if (uiState.showRateAppDialog) {
-        RateApp(
-            onRateClick = {
-                RateAppManager.openPlayMarket(context)
-                viewModel.closeRateDialog()
-            },
-            onCancelClick = { viewModel.closeRateDialog() }
-        )
+    try {
+        request.addOnCompleteListener { task ->
+            if (task.isSuccessful && uiState.showRateAppDialog) {
+                val reviewInfo = task.result
+                reviewInfo.let {
+                    val flow = manager.launchReviewFlow(context as Activity, it)
+                    flow.addOnCompleteListener { result ->
+                        if (result.isSuccessful) {
+                            //log
+                        } else {
+                            //log
+                        }
+                    }
+                }
+            }
+        }
+    } catch (ex: Exception) {
+        ex.printStackTrace()
     }
 
     if (uiState.wcSupportState != null) {
