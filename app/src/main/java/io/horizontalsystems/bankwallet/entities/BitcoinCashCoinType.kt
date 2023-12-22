@@ -1,6 +1,6 @@
 package io.horizontalsystems.bankwallet.entities
 
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 
 enum class BitcoinCashCoinType(val value: String) {
     type0("type0"), type145("type145");

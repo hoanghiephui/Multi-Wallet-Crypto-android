@@ -2,7 +2,7 @@ package io.horizontalsystems.bankwallet.modules.swap.confirmation.uniswap
 
 import androidx.core.os.bundleOf
 import androidx.navigation.navGraphViewModels
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.AppLogger
 import io.horizontalsystems.bankwallet.modules.evmfee.EvmFeeCellViewModel
 import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmData

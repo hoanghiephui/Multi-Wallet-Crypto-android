@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import io.horizontalsystems.bankwallet.core.ILocalStorage
 import io.horizontalsystems.bankwallet.core.managers.BalanceHiddenManager
@@ -107,7 +108,7 @@ class SecuritySettingsViewModel(
         detectCrash = enabled
         emitState()
         localStorage.isDetectCrash = enabled
-        Firebase.analytics.setAnalyticsCollectionEnabled(enabled)
+        Firebase.crashlytics.setCrashlyticsCollectionEnabled(enabled)
     }
 }
 

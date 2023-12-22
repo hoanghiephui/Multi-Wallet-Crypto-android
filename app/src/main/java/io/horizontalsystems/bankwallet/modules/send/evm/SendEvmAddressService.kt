@@ -1,6 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.send.evm
 
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.entities.Address
 import kotlinx.coroutines.flow.MutableStateFlow

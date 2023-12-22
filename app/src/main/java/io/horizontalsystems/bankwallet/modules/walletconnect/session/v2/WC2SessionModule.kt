@@ -3,7 +3,7 @@ package io.horizontalsystems.bankwallet.modules.walletconnect.session.v2
 import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.modules.walletconnect.version2.WC2RequestViewItem
 import io.horizontalsystems.ethereumkit.models.Chain

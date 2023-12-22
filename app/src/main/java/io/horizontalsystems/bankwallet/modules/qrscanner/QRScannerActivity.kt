@@ -35,7 +35,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.google.zxing.client.android.Intents
 import com.journeyapps.barcodescanner.CompoundBarcodeView
 import com.journeyapps.barcodescanner.ScanOptions
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseActivity
 import io.horizontalsystems.bankwallet.core.utils.ModuleField
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme

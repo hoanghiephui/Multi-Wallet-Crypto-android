@@ -2,7 +2,7 @@ package io.horizontalsystems.bankwallet.modules.balance
 
 import androidx.annotation.StringRes
 import com.google.gson.annotations.SerializedName
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 
 enum class BalanceViewType(@StringRes val titleResId: Int, @StringRes val subtitleResId: Int) {
     @SerializedName("coin")

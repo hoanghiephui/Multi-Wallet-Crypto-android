@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import java.net.MalformedURLException
 import java.net.URL
 

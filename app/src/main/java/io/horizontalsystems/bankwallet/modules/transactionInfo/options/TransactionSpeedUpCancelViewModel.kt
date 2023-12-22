@@ -1,7 +1,7 @@
 package io.horizontalsystems.bankwallet.modules.transactionInfo.options
 
 import androidx.lifecycle.ViewModel
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.marketkit.models.Token
 

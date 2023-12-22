@@ -1,6 +1,6 @@
 package io.horizontalsystems.bankwallet.entities
 
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 
 enum class BtcRestoreMode(val raw: String) {
     Blockchair("blockchair"),

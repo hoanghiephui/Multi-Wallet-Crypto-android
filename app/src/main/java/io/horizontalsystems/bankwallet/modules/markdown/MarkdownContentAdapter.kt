@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import io.horizontalsystems.bankwallet.R
-import io.horizontalsystems.bankwallet.databinding.*
+import com.wallet.blockchain.bitcoin.R
+import com.wallet.blockchain.bitcoin.databinding.*
 
 class MarkdownContentAdapter(
     private val handleRelativeUrl: Boolean,

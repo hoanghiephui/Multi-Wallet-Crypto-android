@@ -18,8 +18,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
-import io.horizontalsystems.bankwallet.BuildConfig
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.BuildConfig
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.AdType
 import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.slideFromBottom
@@ -50,7 +50,7 @@ fun MarketOverviewScreen(
     val scrollState = rememberScrollState()
     val context = LocalContext.current
     val nativeAd by viewModel.adState
-    LaunchedEffect(key1 = Unit, block = {
+    LaunchedEffect(key1 = BuildConfig.HOME_MARKET_NATIVE, block = {
         viewModel.loadAds(context, BuildConfig.HOME_MARKET_NATIVE)
     })
     HSSwipeRefresh(

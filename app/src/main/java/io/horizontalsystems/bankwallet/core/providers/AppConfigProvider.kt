@@ -1,7 +1,7 @@
 package io.horizontalsystems.bankwallet.core.providers
 
-import io.horizontalsystems.bankwallet.BuildConfig
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.BuildConfig
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.ILocalStorage
 import io.horizontalsystems.bankwallet.core.order
 import io.horizontalsystems.bankwallet.entities.Currency

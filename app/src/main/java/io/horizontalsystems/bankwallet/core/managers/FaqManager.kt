@@ -4,7 +4,7 @@ import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import com.google.gson.*
 import com.google.gson.reflect.TypeToken
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.entities.Faq

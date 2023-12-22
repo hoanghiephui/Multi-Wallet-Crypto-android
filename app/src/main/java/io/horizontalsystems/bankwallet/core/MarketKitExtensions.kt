@@ -1,7 +1,7 @@
 package io.horizontalsystems.bankwallet.core
 
 import androidx.compose.ui.graphics.Color
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.managers.RestoreSettingType
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.entities.AccountType

@@ -16,7 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.navGraphViewModels
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.modules.nft.collection.assets.NftCollectionAssetsScreen
 import io.horizontalsystems.bankwallet.modules.nft.collection.events.NftCollectionEventsScreen

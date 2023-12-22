@@ -7,7 +7,7 @@ import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.LayoutRes
 import androidx.fragment.app.Fragment
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 
 abstract class BaseFragment(
     @LayoutRes layoutResId: Int = 0,

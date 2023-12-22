@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import coil.request.ImageRequest
 import coil.request.SuccessResult
-import io.horizontalsystems.bankwallet.databinding.*
+import com.wallet.blockchain.bitcoin.databinding.*
 import io.horizontalsystems.bankwallet.ui.helpers.LayoutHelper
 import org.apache.commons.io.FilenameUtils
 import java.net.URL

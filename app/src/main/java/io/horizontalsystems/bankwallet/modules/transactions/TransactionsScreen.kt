@@ -25,8 +25,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import io.horizontalsystems.bankwallet.BuildConfig
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.BuildConfig
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.AdType
 import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.slideFromBottom
@@ -49,7 +49,7 @@ fun TransactionsScreen(
     val accountsViewModel = viewModel<BalanceAccountsViewModel>(factory = BalanceModule.AccountsFactory())
     val context = LocalContext.current
     val nativeAd by accountsViewModel.adState
-    LaunchedEffect(key1 = Unit, block = {
+    LaunchedEffect(key1 = BuildConfig.TRANSACTION_NATIVE, block = {
         accountsViewModel.loadAds(context,
             BuildConfig.TRANSACTION_NATIVE)
     })

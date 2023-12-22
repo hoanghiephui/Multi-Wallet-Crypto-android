@@ -1,6 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.balance
 
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 
 sealed class BalanceSortType {
     object Name : BalanceSortType()

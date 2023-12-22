@@ -1,7 +1,7 @@
 package io.horizontalsystems.bankwallet.modules.balance
 
 import androidx.compose.runtime.Immutable
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.AdapterState
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.iconPlaceholder

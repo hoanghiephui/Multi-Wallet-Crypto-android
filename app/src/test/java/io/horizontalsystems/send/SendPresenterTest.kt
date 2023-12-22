@@ -3,7 +3,7 @@
 //import com.nhaarman.mockito_kotlin.any
 //import com.nhaarman.mockito_kotlin.verify
 //import com.nhaarman.mockito_kotlin.whenever
-//import io.horizontalsystems.bankwallet.R
+//import com.wallet.blockchain.bitcoin.R
 //import io.horizontalsystems.bankwallet.core.FeeRatePriority
 //import io.horizontalsystems.bankwallet.entities.Coin
 //import io.horizontalsystems.bankwallet.entities.PaymentRequestAddress

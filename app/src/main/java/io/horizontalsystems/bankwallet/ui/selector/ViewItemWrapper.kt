@@ -1,6 +1,6 @@
 package io.horizontalsystems.bankwallet.ui.selector
 
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.providers.Translator
 
 class ViewItemWrapper<T>(val title: String, val item: T, val color: Int? = null, val subtitle: String? = null) {

@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.modules.pin.unlock.PinUnlockModule
 import io.horizontalsystems.bankwallet.modules.pin.unlock.PinUnlockViewModel
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme

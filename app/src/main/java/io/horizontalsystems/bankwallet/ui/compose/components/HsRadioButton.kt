@@ -3,7 +3,7 @@ package io.horizontalsystems.bankwallet.ui.compose.components
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 
 @Composable
 fun HsRadioButton(

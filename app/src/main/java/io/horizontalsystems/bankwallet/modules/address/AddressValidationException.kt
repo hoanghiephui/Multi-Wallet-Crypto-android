@@ -1,7 +1,7 @@
 package io.horizontalsystems.bankwallet.modules.address
 
 import android.os.Parcelable
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import kotlinx.parcelize.Parcelize
 

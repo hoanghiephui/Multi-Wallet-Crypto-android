@@ -1,6 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.backuplocal.fullbackup
 
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.providers.Translator
 
 class BackupViewItemFactory {

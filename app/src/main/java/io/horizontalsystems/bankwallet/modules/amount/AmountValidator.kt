@@ -1,6 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.amount
 
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.HSCaution
 import io.horizontalsystems.bankwallet.modules.send.SendErrorInsufficientBalance
 import io.horizontalsystems.bankwallet.modules.send.SendErrorMaximumSendAmount

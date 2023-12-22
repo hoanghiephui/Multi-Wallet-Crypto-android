@@ -3,7 +3,7 @@ package io.horizontalsystems.bankwallet.modules.coin.tweets
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.twitter.twittertext.Extractor
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.subscribeIO
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString

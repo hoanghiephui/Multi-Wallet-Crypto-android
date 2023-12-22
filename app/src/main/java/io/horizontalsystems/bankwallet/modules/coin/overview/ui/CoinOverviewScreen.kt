@@ -12,8 +12,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
@@ -27,7 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.BuildConfig
+import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.AdType
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.iconPlaceholder
 import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.core.slideFromBottom
@@ -80,6 +84,12 @@ fun CoinOverviewScreen(
 
     val view = LocalView.current
     val context = LocalContext.current
+
+    val nativeAd by viewModel.adState
+    LaunchedEffect(key1 = BuildConfig.TRANSACTION_NATIVE, block = {
+        viewModel.loadAds(context,
+            BuildConfig.TRANSACTION_NATIVE)
+    })
 
     viewModel.showHudMessage?.let {
         when (it.type) {
@@ -186,6 +196,9 @@ fun CoinOverviewScreen(
                                         }
                                     }
                                 }
+
+                                Spacer(modifier = Modifier.height(8.dp))
+                                MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
 
                                 if (overview.marketData.isNotEmpty()) {
                                     Spacer(modifier = Modifier.height(12.dp))

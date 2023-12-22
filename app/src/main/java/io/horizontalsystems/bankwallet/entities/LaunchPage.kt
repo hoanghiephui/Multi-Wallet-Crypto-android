@@ -3,7 +3,7 @@ package io.horizontalsystems.bankwallet.entities
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.google.gson.annotations.SerializedName
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.WithTranslatableTitle
 
@@ -22,7 +22,7 @@ enum class LaunchPage(@StringRes val titleRes: Int, @DrawableRes val iconRes: In
         get() = TranslatableString.ResString(titleRes)
 
     companion object {
-        private val map = values().associateBy(LaunchPage::name)
+        private val map = entries.associateBy(LaunchPage::name)
 
         fun fromString(type: String?): LaunchPage? = map[type]
     }

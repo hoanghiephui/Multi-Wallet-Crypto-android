@@ -3,7 +3,7 @@ package io.horizontalsystems.bankwallet.modules.nft.collection
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.modules.nft.collection.overview.NftCollectionOverviewService
 import io.horizontalsystems.bankwallet.modules.nft.collection.overview.NftCollectionOverviewViewModel

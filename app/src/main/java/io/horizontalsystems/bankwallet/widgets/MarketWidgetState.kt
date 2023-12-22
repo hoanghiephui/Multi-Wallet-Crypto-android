@@ -3,7 +3,7 @@ package io.horizontalsystems.bankwallet.widgets
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import java.math.BigDecimal
 
 data class MarketWidgetState(

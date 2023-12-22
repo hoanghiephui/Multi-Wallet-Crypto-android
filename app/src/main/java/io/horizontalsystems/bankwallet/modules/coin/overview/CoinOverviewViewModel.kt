@@ -5,8 +5,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.BaseViewModel
 import io.horizontalsystems.bankwallet.core.IAccountManager
 import io.horizontalsystems.bankwallet.core.IWalletManager
 import io.horizontalsystems.bankwallet.core.accountTypeDerivation
@@ -35,7 +35,7 @@ class CoinOverviewViewModel(
     private val walletManager: IWalletManager,
     private val accountManager: IAccountManager,
     private val chartIndicatorManager: ChartIndicatorManager
-) : ViewModel() {
+) : BaseViewModel() {
 
     val isRefreshingLiveData = MutableLiveData<Boolean>(false)
     val overviewLiveData = MutableLiveData<CoinOverviewViewItem>()

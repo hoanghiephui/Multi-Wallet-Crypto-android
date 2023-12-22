@@ -1,6 +1,6 @@
 package io.horizontalsystems.bankwallet.entities
 
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 
 enum class TransactionDataSortMode(val raw: String) {
     Shuffle("shuffle"),

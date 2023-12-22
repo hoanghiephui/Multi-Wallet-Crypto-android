@@ -170,7 +170,7 @@ fun MaxTemplateNativeAdViewComposable(
                                     .fillMaxWidth(),
                                 onClick = { },
                             ) {
-                                Text("Sub")
+                                Text("Buy Wallet+")
                             }
                         }
                     }

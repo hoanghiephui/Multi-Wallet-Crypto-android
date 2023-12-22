@@ -14,7 +14,7 @@
     </queries>
 
     <application
-        android:name=".core.App"
+        android:name="io.horizontalsystems.bankwallet.core.App"
         android:allowBackup="false"
         android:extractNativeLibs="true"
         android:icon="@mipmap/ic_launcher"
@@ -26,7 +26,7 @@
         tools:ignore="GoogleAppIndexingWarning">
 
         <receiver
-            android:name=".widgets.MarketWidgetReceiver"
+            android:name="io.horizontalsystems.bankwallet.widgets.MarketWidgetReceiver"
             android:exported="false">
 
             <intent-filter>
@@ -39,7 +39,7 @@
         </receiver>
 
         <activity
-            android:name=".widgets.MarketWidgetConfigurationActivity"
+            android:name="io.horizontalsystems.bankwallet.widgets.MarketWidgetConfigurationActivity"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
@@ -47,24 +47,24 @@
         </activity>
 
         <activity
-            android:name=".modules.launcher.LauncherActivity"
+            android:name="io.horizontalsystems.bankwallet.modules.launcher.LauncherActivity"
             android:theme="@style/Theme.App.Starting" />
         <activity
-            android:name=".modules.main.MainActivity"
+            android:name="io.horizontalsystems.bankwallet.modules.main.MainActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
         </activity>
         <activity
-            android:name=".modules.qrscanner.QRScannerActivity"
+            android:name="io.horizontalsystems.bankwallet.modules.qrscanner.QRScannerActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".modules.lockscreen.LockScreenActivity"
+            android:name="io.horizontalsystems.bankwallet.modules.lockscreen.LockScreenActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".modules.intro.IntroActivity"
+            android:name="io.horizontalsystems.bankwallet.modules.intro.IntroActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".modules.keystore.KeyStoreActivity"
+            android:name="io.horizontalsystems.bankwallet.modules.keystore.KeyStoreActivity"
             android:screenOrientation="portrait" />
 
         <provider
@@ -80,7 +80,7 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:label="@string/App_Name"
             android:exported="true"
-            android:targetActivity=".modules.launcher.LauncherActivity">
+            android:targetActivity="io.horizontalsystems.bankwallet.modules.launcher.LauncherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -105,7 +105,7 @@
             android:roundIcon="@mipmap/ic_launcher_dark_round"
             android:label="@string/App_Name"
             android:exported="true"
-            android:targetActivity=".modules.launcher.LauncherActivity">
+            android:targetActivity="io.horizontalsystems.bankwallet.modules.launcher.LauncherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -130,7 +130,7 @@
             android:roundIcon="@mipmap/ic_launcher_mono_round"
             android:label="@string/App_Name"
             android:exported="true"
-            android:targetActivity=".modules.launcher.LauncherActivity">
+            android:targetActivity="io.horizontalsystems.bankwallet.modules.launcher.LauncherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -154,7 +154,7 @@
             android:icon="@mipmap/launcher_leo"
             android:label="@string/App_Name"
             android:exported="true"
-            android:targetActivity=".modules.launcher.LauncherActivity">
+            android:targetActivity="io.horizontalsystems.bankwallet.modules.launcher.LauncherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -178,7 +178,7 @@
             android:icon="@mipmap/launcher_mustang"
             android:label="@string/App_Name"
             android:exported="true"
-            android:targetActivity=".modules.launcher.LauncherActivity">
+            android:targetActivity="io.horizontalsystems.bankwallet.modules.launcher.LauncherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -202,7 +202,7 @@
             android:icon="@mipmap/launcher_yak"
             android:label="@string/App_Name"
             android:exported="true"
-            android:targetActivity=".modules.launcher.LauncherActivity">
+            android:targetActivity="io.horizontalsystems.bankwallet.modules.launcher.LauncherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -226,7 +226,7 @@
             android:icon="@mipmap/launcher_punk"
             android:label="@string/App_Name"
             android:exported="true"
-            android:targetActivity=".modules.launcher.LauncherActivity">
+            android:targetActivity="io.horizontalsystems.bankwallet.modules.launcher.LauncherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -250,7 +250,7 @@
             android:icon="@mipmap/launcher_ape"
             android:label="@string/App_Name"
             android:exported="true"
-            android:targetActivity=".modules.launcher.LauncherActivity">
+            android:targetActivity="io.horizontalsystems.bankwallet.modules.launcher.LauncherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -274,7 +274,7 @@
             android:icon="@mipmap/launcher_8ball"
             android:label="@string/App_Name"
             android:exported="true"
-            android:targetActivity=".modules.launcher.LauncherActivity">
+            android:targetActivity="io.horizontalsystems.bankwallet.modules.launcher.LauncherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

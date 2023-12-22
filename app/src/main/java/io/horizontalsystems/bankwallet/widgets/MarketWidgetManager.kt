@@ -9,7 +9,7 @@ import coil.annotation.ExperimentalCoilApi
 import coil.imageLoader
 import coil.request.ErrorResult
 import coil.request.ImageRequest
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

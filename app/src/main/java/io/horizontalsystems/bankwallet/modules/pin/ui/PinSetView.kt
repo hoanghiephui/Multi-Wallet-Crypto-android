@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.modules.pin.set.PinSetModule
 import io.horizontalsystems.bankwallet.modules.pin.set.PinSetViewModel
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme

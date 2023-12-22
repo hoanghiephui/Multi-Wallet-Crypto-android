@@ -1,7 +1,7 @@
 package io.horizontalsystems.bankwallet.modules.theme
 
 import com.google.gson.annotations.SerializedName
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.WithTranslatableTitle
 

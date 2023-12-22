@@ -23,7 +23,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
 import com.twitter.twittertext.Extractor
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.modules.coin.tweets.ReferencedTweetViewItem
 import io.horizontalsystems.bankwallet.modules.coin.tweets.Tweet
 import io.horizontalsystems.bankwallet.modules.coin.tweets.TweetViewItem

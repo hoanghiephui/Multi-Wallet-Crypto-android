@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.binance.connector.client.exceptions.BinanceClientException
 import com.binance.connector.client.exceptions.BinanceConnectorException
 import com.google.gson.Gson
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.providers.BinanceCexProvider
 import io.horizontalsystems.bankwallet.core.providers.Translator

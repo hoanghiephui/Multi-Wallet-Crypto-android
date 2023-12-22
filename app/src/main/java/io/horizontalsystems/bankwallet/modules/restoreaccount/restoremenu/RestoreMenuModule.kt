@@ -3,7 +3,7 @@ package io.horizontalsystems.bankwallet.modules.restoreaccount.restoremenu
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 
 object RestoreMenuModule {
 

@@ -25,8 +25,8 @@ android {
         compileSdk compile_sdk_version
         minSdkVersion min_sdk_version
         targetSdkVersion compile_sdk_version
-        versionCode 1
-        versionName "0.0.1"
+        versionCode 2
+        versionName "0.0.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         kapt {
@@ -40,14 +40,14 @@ android {
             checkReleaseBuilds false
         }
 
-        resValue "string", "companyWebPageLink", "https://horizontalsystems.io"
+        resValue "string", "companyWebPageLink", "http://play.google.com/store/apps/details?id=com.wallet.blockchain.bitcoin"
         resValue "string", "appWebPageLink", "http://play.google.com/store/apps/details?id=com.wallet.blockchain.bitcoin"
         resValue "string", "analyticsLink", "https://unstoppable.money/analytics"
         resValue "string", "appGithubLink", "https://github.com/hoanghiephui/unstoppable-wallet-android"
         resValue "string", "appTwitterLink", "https://twitter.com/UnstoppableByHS"
         resValue "string", "appTelegramLink", "https://t.me/unstoppable_announcements"
         resValue "string", "appRedditLink", "https://www.reddit.com/r/UNSTOPPABLEWallet/"
-        resValue "string", "reportEmail", "support.unstoppable@protonmail.com"
+        resValue "string", "reportEmail", "living.solutions.vn@gmail.com"
         resValue "string", "releaseNotesUrl", "https://api.github.com/repos/horizontalsystems/unstoppable-wallet-android/releases/tags/"
         resValue "string", "walletConnectAppMetaDataName", "Unstoppable"
         resValue "string", "walletConnectAppMetaDataUrl", "unstoppable.money"
@@ -187,7 +187,7 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion '1.5.3'
     }
-    namespace 'io.horizontalsystems.bankwallet'
+    namespace 'com.wallet.blockchain.bitcoin'
     lint {
         disable 'LogNotTimber'
     }

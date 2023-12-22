@@ -1,7 +1,7 @@
 package io.horizontalsystems.bankwallet.core.managers
 
 import com.google.gson.annotations.SerializedName
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.IRestoreSettingsStorage
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.entities.Account

@@ -2,7 +2,7 @@ package io.horizontalsystems.bankwallet.modules.settings.language
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.core.helpers.LocaleType
 

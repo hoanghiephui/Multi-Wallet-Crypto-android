@@ -1,6 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.importcexaccount
 
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 
 sealed class Cex {
     abstract val name: String

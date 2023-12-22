@@ -27,7 +27,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.modules.main.MainModule
 import io.horizontalsystems.bankwallet.modules.settings.security.passcode.SecurityPasscodeSettingsModule

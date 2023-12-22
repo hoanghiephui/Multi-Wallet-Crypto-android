@@ -29,7 +29,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
 import io.horizontalsystems.bankwallet.modules.manageaccount.recoveryphrase.RecoveryPhraseModule
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
@@ -116,7 +116,7 @@ fun KeyActionItem(
                     text = title,
                 )
                 Icon(
-                    painter = painterResource(id = io.horizontalsystems.bankwallet.R.drawable.ic_arrow_right),
+                    painter = painterResource(id = com.wallet.blockchain.bitcoin.R.drawable.ic_arrow_right),
                     contentDescription = null,
                     tint = ComposeAppTheme.colors.grey
                 )
