@@ -74,8 +74,8 @@ class AddTokenService(
     }
 
     sealed class TokenError : Exception() {
-        object InvalidReference : TokenError()
-        object NotFound : TokenError()
+        data object InvalidReference : TokenError()
+        data object NotFound : TokenError()
     }
 
     data class TokenInfo(

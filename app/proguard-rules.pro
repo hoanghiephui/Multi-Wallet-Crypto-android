@@ -267,13 +267,18 @@
 -keep class io.horizontalsystems.erc20kit.** { *; }
 -keep class in3.** {*;}
 -keep class io.horizontalsystems.ethereumkit.** { *; }
+-keep class io.horizontalsystems.nftkit.** { *; }
 -keep class io.horizontalsystems.oneinchkit.** { *; }
 -keep class io.horizontalsystems.uniswapkit.** { *; }
+-keep class io.horizontalsystems.tonkit.** { *; }
 -keep class io.horizontalsystems.binancechainkit.** { *; }
 -keep class io.horizontalsystems.feeratekit.** { *; }
 -keep class io.horizontalsystems.hdwalletkit.** { *; }
 -keep class io.horizontalsystems.marketkit.** { *; }
+-keep class io.horizontalsystems.ecash.** { *; }
+-keep class io.horizontalsystems.solanakit.** { *; }
 -keep class io.horizontalsystems.tor.** { *; }
+-keep class io.horizontalsystems.tronkit.** { *; }
 -keep class net.freehaven.tor.control.** { *; }
 -keep class com.trustwallet.walletconnect.** { *; }
 -keep class com.tradingview.lightweightcharts.** { *; }
@@ -334,3 +339,7 @@
 -dontwarn javax.naming.directory.SearchControls
 -dontwarn javax.naming.directory.SearchResult
 -dontwarn org.slf4j.impl.StaticMDCBinder
+
+-keepattributes InnerClasses
+-keepnames class io.horizontalsystems.bitcoincore.network.Network
+-keepnames class io.horizontalsystems.bitcoincore.models.Checkpoint
