@@ -53,7 +53,6 @@ import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
-import io.horizontalsystems.bankwallet.core.managers.RateAppManager
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.modules.balance.ui.BalanceScreen
@@ -66,7 +65,6 @@ import io.horizontalsystems.bankwallet.modules.manageaccount.dialogs.BackupRequi
 import io.horizontalsystems.bankwallet.modules.market.MarketScreen
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchModule
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchViewModel
-import io.horizontalsystems.bankwallet.modules.rateapp.RateApp
 import io.horizontalsystems.bankwallet.modules.releasenotes.ReleaseNotesFragment
 import io.horizontalsystems.bankwallet.modules.rooteddevice.RootedDeviceModule
 import io.horizontalsystems.bankwallet.modules.rooteddevice.RootedDeviceScreen
@@ -84,7 +82,6 @@ import io.horizontalsystems.bankwallet.ui.compose.NiaNavigationBar
 import io.horizontalsystems.bankwallet.ui.compose.NiaNavigationBarItem
 import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.extensions.HeaderUpdate
-import io.horizontalsystems.bankwallet.ui.extensions.WalletSwitchBottomSheet
 import io.horizontalsystems.bankwallet.ui.extensions.rememberLifecycleEvent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -165,7 +162,7 @@ private fun MainScreen(
     val lifecycleEvent = rememberLifecycleEvent()
     val updateState = rememberInAppUpdateState()
     val manager: ReviewManager = ReviewManagerFactory.create(context)
-    val request = manager.requestReviewFlow()
+
 
     ModalBottomSheetLayout(
         sheetState = modalBottomSheetState,
@@ -283,25 +280,25 @@ private fun MainScreen(
             viewModel.whatsNewShown()
         }
     }
-    try {
-        request.addOnCompleteListener { task ->
-            if (task.isSuccessful && uiState.showRateAppDialog) {
-                val reviewInfo = task.result
-                reviewInfo.let {
-                    val flow = manager.launchReviewFlow(context as Activity, it)
-                    flow.addOnCompleteListener { result ->
-                        if (result.isSuccessful) {
-                            //log
-                        } else {
-                            //log
+    if (uiState.showRateAppDialog) {
+        try {
+            val request = manager.requestReviewFlow()
+            request.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    val reviewInfo = task.result
+                    reviewInfo.let {
+                        val flow = manager.launchReviewFlow(context as Activity, it)
+                        flow.addOnCompleteListener { _ ->
+
                         }
                     }
                 }
             }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
         }
-    } catch (ex: Exception) {
-        ex.printStackTrace()
     }
+
 
     if (uiState.wcSupportState != null) {
         when (val wcSupportState = uiState.wcSupportState) {
