@@ -43,16 +43,16 @@ class MaxTemplateNativeAdViewComposableLoader(
 ) {
     var nativeAdView = mutableStateOf<AdViewState>(AdViewState.Default)
     private var nativeAd: MaxAd? = null
-    private lateinit var nativeAdLoader: MaxNativeAdLoader
+    private var nativeAdLoader: MaxNativeAdLoader? = null
     fun destroy() {
         // Must destroy native ad or else there will be memory leaks.
         if (nativeAd != null) {
             // Call destroy on the native ad from any native ad loader.
-            nativeAdLoader.destroy(nativeAd)
+            nativeAdLoader?.destroy(nativeAd)
         }
 
         // Destroy the actual loader itself
-        nativeAdLoader.destroy()
+        nativeAdLoader?.destroy()
     }
 
     fun loadAd(
@@ -66,7 +66,7 @@ class MaxTemplateNativeAdViewComposableLoader(
                 viewModel.logCallback()
                 // Cleanup any pre-existing native ad to prevent memory leaks.
                 if (nativeAd != null) {
-                    nativeAdLoader.destroy(nativeAd)
+                    nativeAdLoader?.destroy(nativeAd)
                     nativeAdView.value.let {
                         if (it is AdViewState.LoadAd) {
                             it.adView.removeAllViews()
@@ -94,11 +94,10 @@ class MaxTemplateNativeAdViewComposableLoader(
                 viewModel.logCallback()
             }
         }
-        nativeAdLoader.apply {
+        nativeAdLoader?.apply {
             setNativeAdListener(adListener)
+            loadAd()
         }
-
-        nativeAdLoader.loadAd()
     }
 }
 
