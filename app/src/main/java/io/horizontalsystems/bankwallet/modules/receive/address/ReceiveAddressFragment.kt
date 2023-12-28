@@ -335,8 +335,10 @@ private fun ActionButtonsRow(
             .padding(horizontal = 48.dp),
         horizontalArrangement = if (watchAccount) Arrangement.Center else Arrangement.SpaceBetween,
     ) {
+        val itemModifier = if(watchAccount) Modifier else Modifier.weight(1f)
         if (!watchAccount) {
             ReceiveActionButton(
+                modifier = itemModifier,
                 icon = R.drawable.ic_edit_24px,
                 buttonText = stringResource(R.string.Button_SetAmount),
                 onClick = {
@@ -345,6 +347,7 @@ private fun ActionButtonsRow(
             )
         }
         ReceiveActionButton(
+            modifier = itemModifier,
             icon = R.drawable.ic_share_24px,
             buttonText = stringResource(R.string.Button_Share),
             onClick = {
@@ -355,6 +358,7 @@ private fun ActionButtonsRow(
             HSpacer(64.dp)
         }
         ReceiveActionButton(
+            modifier = itemModifier,
             icon = R.drawable.ic_copy_24px,
             buttonText = stringResource(R.string.Button_Copy),
             onClick = {
@@ -450,13 +454,16 @@ private fun AdditionalDataSection(
     }
 }
 
+
 @Composable
 private fun ReceiveActionButton(
+    modifier: Modifier,
     icon: Int,
     buttonText: String,
     onClick: () -> Unit,
 ) {
     Column(
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         ButtonPrimaryCircle(
@@ -466,6 +473,7 @@ private fun ReceiveActionButton(
         caption_grey(
             modifier = Modifier.padding(top = 8.dp),
             text = buttonText,
+            textAlign = TextAlign.Center,
         )
     }
 }
