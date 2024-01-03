@@ -11,6 +11,7 @@ apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.google.dagger.hilt.android'
 def localProperties = new Properties()
 try {
     localProperties.load(new FileInputStream(rootProject.file("local.properties")))
@@ -64,6 +65,7 @@ android {
         buildConfigField("String", "HOME_MARKET_NATIVE", "\"" + localProperties['homeMarketKey'] + "\"")
         buildConfigField("String", "BALANCE_NATIVE", "\"" + localProperties['balanceKey'] + "\"")
         buildConfigField("String", "TRANSACTION_NATIVE", "\"" + localProperties['transactionKey'] + "\"")
+        buildConfigField("String", "PREMIUM_MONTH", "\"" + localProperties['premiumMonth'] + "\"")
     }
 
     buildFeatures {
@@ -384,6 +386,9 @@ dependencies {
     implementation project(":in-app-update")
     implementation("com.airbnb.android:lottie:6.1.0")
     implementation("com.airbnb.android:lottie-compose:6.1.0")
+    implementation "com.google.dagger:hilt-android:2.49"
+    kapt "com.google.dagger:hilt-compiler:2.49"
+    implementation(project(":billing"))
 }
 
 configurations.configureEach {

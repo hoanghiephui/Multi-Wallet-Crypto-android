@@ -1878,4 +1878,42 @@
     <string name="downloading">Downloading update…</string>
     <string name="update_done">Update downloaded successfully</string>
     <string name="install_now">Install now</string>
+
+    <string name="error_billing">Failed to retrieve purchase information</string>
+
+    <!-- Billing -->
+    <string name="billing_plus_title">Wallet+</string>
+    <string name="billing_plus_description">Wallet+ is a paid service that gives you access to all features for the price of a cup of coffee. </string>
+    <string name="billing_plus_purchase_button">Buy for %1$s</string>
+    <string name="billing_plus_verify_button">Restore purchase</string>
+    <string name="billing_plus_consume_button">Consume Purchase</string>
+    <string name="billing_plus_toast_require_plus">This feature is only available with Wallet+</string>
+    <string name="billing_plus_toast_purchased">Purchased</string>
+    <string name="billing_plus_toast_purchased_error">Purchase failed</string>
+    <string name="billing_plus_toast_consumed">Consumed</string>
+    <string name="billing_plus_toast_consumed_error">Consumption failed</string>
+    <string name="billing_plus_toast_verify">Purchase restored</string>
+    <string name="billing_plus_toast_verify_error">Purchase information not found</string>
+    <string name="billing_plus_item_hide_ads">Hide ads</string>
+    <string name="billing_plus_item_hide_ads_description">Hide all in-app ads and enjoy smooth and comfortable music listening. </string>
+    <string name="billing_plus_item_download">Download songs</string>
+    <string name="billing_plus_item_download_description">You can download songs from video posting sites, etc. This feature is in the experimental stage and may be unstable. </string>
+    <string name="billing_plus_item_metadata">Download metadata</string>
+    <string name="billing_plus_item_metadata_description">You can automatically download the metadata of your songs and display artwork and lyrics. </string>
+    <string name="billing_plus_item_edit_lyrics">Lyrics editing function</string>
+    <string name="billing_plus_item_edit_lyrics_description">Enter lyrics in LRC format to enjoy music with synchronized lyrics. </string>
+    <string name="billing_plus_item_scan">Song scan</string>
+    <string name="billing_plus_item_scan_description">You can now scan and register songs that the app cannot recognize. </string>
+    <string name="billing_plus_item_folder">Browse folder</string>
+    <string name="billing_plus_item_folder_description">You can now play by folder. This feature will be available in the future. </string>
+    <string name="billing_plus_item_widget">Home widget</string>
+    <string name="billing_plus_item_widget_description">You can add a widget to your home screen and play music from the widget. </string>
+    <string name="billing_plus_item_material_you">Material You</string>
+    <string name="billing_plus_item_material_you_description">Custom themes by Material You will be available in all versions. </string>
+    <string name="billing_plus_item_accent_color">Accent color</string>
+    <string name="billing_plus_item_accent_color_description">You will be able to freely set the accent color of the app. </string>
+    <string name="billing_plus_item_feature">Add new features</string>
+    <string name="billing_plus_item_feature_description">Be the first to try new features as they are added. </string>
+    <string name="billing_plus_item_support">Priority support</string>
+    <string name="billing_plus_item_support_description">Wallet+ users receive priority support. </string>
 </resources>
