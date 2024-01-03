@@ -1,0 +1,10 @@
+
+syntax = "proto3";
+option java_package = "com.android.billing.datastore";
+option java_multiple_files = true;
+
+message UserPreference {
+  optional bool is_plus_mode = 1;
+
+  optional string billing_id = 999;
+}

@@ -4,6 +4,7 @@ plugins {
     id("kotlin-kapt")
     id("com.google.dagger.hilt.android")
     id("kotlin-parcelize")
+    id ("com.google.protobuf") version "0.9.4"
 }
 
 android {
@@ -33,6 +34,26 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    buildFeatures.compose = true
+    composeOptions.kotlinCompilerExtensionVersion = "1.5.3"
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.24.4"
+    }
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                register("java") {
+                    option("lite")
+                }
+                register("kotlin") {
+                    option("lite")
+                }
+            }
+        }
+    }
 }
 
 dependencies {
@@ -45,6 +66,10 @@ dependencies {
     implementation("com.google.dagger:hilt-android:2.49")
     implementation("com.jakewharton.timber:timber:5.0.1")
     kapt("com.google.dagger:hilt-android-compiler:2.49")
+    implementation("androidx.datastore:datastore:1.0.0")
+    implementation("com.google.protobuf:protobuf-kotlin-lite:3.24.4")
+    implementation(platform("androidx.compose:compose-bom:2023.10.01"))
+    implementation("androidx.compose.ui:ui-tooling-preview")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

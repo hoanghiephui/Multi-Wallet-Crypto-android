@@ -7,9 +7,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.billing.BillingClient
 import com.android.billing.ToastUtil
+import com.android.billing.UserDataRepository
 import com.android.billing.models.ProductDetails
 import com.android.billing.models.ProductId
-import com.android.billing.models.ProductItem
 import com.android.billing.models.ProductType
 import com.android.billing.models.ScreenState
 import com.android.billing.network.AppDispatcher
@@ -37,7 +37,7 @@ class BillingPlusViewModel @Inject constructor(
     private val purchasePlusUseCase: PurchasePlusUseCase,
     private val consumePlusUseCase: ConsumePlusUseCase,
     private val verifyPlusUseCase: VerifyPlusUseCase,
-    //private val userDataRepository: UserDataRepository,
+    private val userDataRepository: UserDataRepository,
     @Dispatcher(AppDispatcher.IO) private val ioDispatcher: CoroutineDispatcher,
 ) : ViewModel() {
 
@@ -50,12 +50,15 @@ class BillingPlusViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             _screenState.value = runCatching {
-                //val userData = userDataRepository.userData.firstOrNull()
+                val userData = userDataRepository.userData.firstOrNull()
 
                 BillingPlusUiState(
-                    isPlusMode = false,
-                    isDeveloperMode = false,
-                    productDetails = billingClient.queryProductDetails(PREMIUM_MONTH, ProductType.SUBS),
+                    isPlusMode = userData?.isPlusMode ?: false,
+                    isDeveloperMode = BuildConfig.DEBUG,
+                    productDetails = billingClient.queryProductDetails(
+                        PREMIUM_MONTH,
+                        ProductType.SUBS
+                    ),
                     purchase = runCatching { verifyPlusUseCase.execute() }.getOrNull(),
                 )
             }.fold(
@@ -78,7 +81,7 @@ class BillingPlusViewModel @Inject constructor(
             }
         }.fold(
             onSuccess = {
-                //userDataRepository.setPlusMode(true)
+                userDataRepository.setPlusMode(true)
                 ToastUtil.show(activity, R.string.billing_plus_toast_purchased)
                 true
             },
@@ -98,7 +101,7 @@ class BillingPlusViewModel @Inject constructor(
         }.fold(
             onSuccess = {
                 if (it != null) {
-                    //userDataRepository.setPlusMode(true)
+                    userDataRepository.setPlusMode(true)
                     ToastUtil.show(context, R.string.billing_plus_toast_verify)
                     true
                 } else {
@@ -121,7 +124,7 @@ class BillingPlusViewModel @Inject constructor(
             }
         }.fold(
             onSuccess = {
-                //userDataRepository.setPlusMode(false)
+                userDataRepository.setPlusMode(false)
                 ToastUtil.show(context, R.string.billing_plus_toast_consumed)
                 true
             },
