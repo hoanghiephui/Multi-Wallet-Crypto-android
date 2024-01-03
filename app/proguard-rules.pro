@@ -343,3 +343,8 @@
 -keepattributes InnerClasses
 -keepnames class io.horizontalsystems.bitcoincore.network.Network
 -keepnames class io.horizontalsystems.bitcoincore.models.Checkpoint
+
+-keep class androidx.datastore.*.** {*;}
+-keepclassmembers class * extends com.google.protobuf.GeneratedMessageLite* {
+   <fields>;
+}

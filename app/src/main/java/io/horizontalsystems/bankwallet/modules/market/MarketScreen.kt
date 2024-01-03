@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.android.billing.UserDataRepository
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
@@ -54,10 +55,11 @@ import java.util.Optional
 @Composable
 fun MarketScreen(
     navController: NavController,
-    searchViewModel: MarketSearchViewModel
+    searchViewModel: MarketSearchViewModel,
+    userDataRepository: UserDataRepository
 ) {
     val marketViewModel = viewModel<MarketViewModel>(factory = MarketModule.Factory())
-    val viewModel: MarketOverviewViewModel = viewModel(factory = MarketOverviewModule.Factory())
+    val viewModel: MarketOverviewViewModel = viewModel(factory = MarketOverviewModule.Factory(userDataRepository))
     val tabs = marketViewModel.tabs
     val selectedTab = marketViewModel.selectedTab
     val pagerState = rememberPagerState(initialPage = selectedTab.ordinal) { tabs.size }

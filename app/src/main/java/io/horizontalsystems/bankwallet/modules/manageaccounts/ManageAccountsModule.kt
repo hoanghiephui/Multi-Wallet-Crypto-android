@@ -6,6 +6,7 @@ import androidx.annotation.StringRes
 import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.android.billing.UserDataRepository
 import io.horizontalsystems.bankwallet.core.App
 import kotlinx.parcelize.Parcelize
 
@@ -20,10 +21,11 @@ object ManageAccountsModule {
         popOffInclusiveKey to inclusive,
     )
 
-    class Factory(private val mode: Mode) : ViewModelProvider.Factory {
+    class Factory(private val mode: Mode,
+                  private val userDataRepository: UserDataRepository,) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ManageAccountsViewModel(App.accountManager, mode) as T
+            return ManageAccountsViewModel(App.accountManager, mode, userDataRepository) as T
         }
     }
 

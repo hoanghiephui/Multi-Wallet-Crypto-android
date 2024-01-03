@@ -1,5 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.manageaccounts
 
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -10,19 +11,24 @@ import androidx.compose.material.Icon
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.android.billing.UserDataRepository
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.navigateWithTermsAccepted
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.modules.backupalert.BackupAlert
+import io.horizontalsystems.bankwallet.modules.billing.showBillingPlusDialog
 import io.horizontalsystems.bankwallet.modules.manageaccount.ManageAccountModule
 import io.horizontalsystems.bankwallet.modules.manageaccounts.ManageAccountsModule.AccountViewItem
 import io.horizontalsystems.bankwallet.modules.manageaccounts.ManageAccountsModule.ActionViewItem
@@ -37,6 +43,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_lucian
 import io.horizontalsystems.core.parcelable
+import se.warting.inappupdate.compose.findActivity
 
 class ManageAccountsFragment : BaseComposeFragment() {
 
@@ -44,7 +51,8 @@ class ManageAccountsFragment : BaseComposeFragment() {
     override fun GetContent(navController: NavController) {
         ManageAccountsScreen(
             navController,
-            arguments?.parcelable(ManageAccountsModule.MODE)!!
+            arguments?.parcelable(ManageAccountsModule.MODE)!!,
+            userDataRepository
         )
     }
 
@@ -52,14 +60,15 @@ class ManageAccountsFragment : BaseComposeFragment() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ManageAccountsScreen(navController: NavController, mode: ManageAccountsModule.Mode) {
+fun ManageAccountsScreen(navController: NavController, mode: ManageAccountsModule.Mode,
+                         userDataRepository: UserDataRepository,) {
     BackupAlert(navController)
 
-    val viewModel = viewModel<ManageAccountsViewModel>(factory = ManageAccountsModule.Factory(mode))
-
+    val viewModel = viewModel<ManageAccountsViewModel>(factory = ManageAccountsModule.Factory(mode, userDataRepository))
+    val isPlusMode by viewModel.screenState.collectAsStateWithLifecycle()
     val viewItems = viewModel.viewItems
     val finish = viewModel.finish
-
+    val context = LocalContext.current
     if (finish) {
         navController.popBackStack()
     }
@@ -93,8 +102,12 @@ fun ManageAccountsScreen(navController: NavController, mode: ManageAccountsModul
 
                 val actions = listOf(
                     ActionViewItem(R.drawable.ic_plus, R.string.ManageAccounts_CreateNewWallet) {
-                        navController.navigateWithTermsAccepted {
-                            navController.slideFromRight(R.id.createAccountFragment, args)
+                        if (isPlusMode || viewItems?.first?.isEmpty() == true) {
+                            navController.navigateWithTermsAccepted {
+                                navController.slideFromRight(R.id.createAccountFragment, args)
+                            }
+                        } else {
+                            context.findActivity().showBillingPlusDialog()
                         }
                     },
                     ActionViewItem(R.drawable.ic_download_20, R.string.ManageAccounts_ImportWallet) {

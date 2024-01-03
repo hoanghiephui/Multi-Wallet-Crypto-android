@@ -1,5 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.settings.main
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.DrawableRes
@@ -42,6 +43,7 @@ import io.horizontalsystems.bankwallet.core.managers.RateAppManager
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.modules.billing.showBillingPlusDialog
 import io.horizontalsystems.bankwallet.modules.contacts.ContactsFragment
 import io.horizontalsystems.bankwallet.modules.contacts.Mode
 import io.horizontalsystems.bankwallet.modules.manageaccount.dialogs.BackupRequiredDialog
@@ -60,6 +62,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.caption_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_grey
 import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
+import se.warting.inappupdate.compose.findActivity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -101,19 +104,19 @@ private fun SettingSections(
     val language by viewModel.languageLiveData.observeAsState()
     val context = LocalContext.current
 
-    /*CellUniversalLawrenceSection(
+    CellUniversalLawrenceSection(
         listOf {
             HsSettingCell(
-                R.string.Settings_Donate,
+                R.string.billing_plus_title,
                 R.drawable.ic_heart_jacob_48,
                 onClick = {
-                    navController.slideFromRight(R.id.donateTokenSelectFragment)
+                    context.findActivity().showBillingPlusDialog()
                 }
             )
         }
     )
 
-    VSpacer(32.dp)*/
+    VSpacer(32.dp)
 
     CellUniversalLawrenceSection(
         listOf({

@@ -4,6 +4,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.billing.UserDataRepository
+import com.android.billing.models.ScreenState
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.BaseViewModel
@@ -50,13 +52,17 @@ import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 class MarketOverviewViewModel(
     private val service: MarketOverviewService,
     private val topNftCollectionsViewItemFactory: TopNftCollectionsViewItemFactory,
-    private val currencyManager: CurrencyManager
+    private val currencyManager: CurrencyManager,
+    userDataRepository: UserDataRepository,
 ) : BaseViewModel() {
 
     private val disposables = CompositeDisposable()
@@ -65,6 +71,14 @@ class MarketOverviewViewModel(
     val viewItem = MutableLiveData<MarketOverviewModule.ViewItem>()
     val isRefreshingLiveData = MutableLiveData<Boolean>()
     val showSearchBar = mutableStateOf(false)
+
+    val screenState = userDataRepository.userData.map {
+        it.hasPrivilege
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = false,
+    )
 
     val topNftCollectionsParams: Pair<SortingField, TimeDuration>
         get() = Pair(topNftsSortingField, topNftsTimeDuration)

@@ -49,6 +49,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.navGraphViewModels
+import com.android.billing.UserDataRepository
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.wallet.blockchain.bitcoin.R
@@ -86,12 +87,15 @@ import io.horizontalsystems.bankwallet.ui.extensions.rememberLifecycleEvent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import se.warting.inappupdate.compose.rememberInAppUpdateState
+import javax.inject.Inject
 
 class MainFragment : BaseComposeFragment() {
 
     private val transactionsViewModel by navGraphViewModels<TransactionsViewModel>(R.id.mainFragment) { TransactionsModule.Factory() }
     private val searchViewModel by viewModels<MarketSearchViewModel> { MarketSearchModule.Factory() }
     private var intentUri: Uri? = null
+
+
 
     @Composable
     override fun GetContent(navController: NavController) {
@@ -100,7 +104,8 @@ class MainFragment : BaseComposeFragment() {
                 transactionsViewModel = transactionsViewModel,
                 deepLink = intentUri,
                 navController = navController,
-                searchViewModel = searchViewModel
+                searchViewModel = searchViewModel,
+                userDataRepository = userDataRepository
             )
         }
     }
@@ -127,7 +132,8 @@ private fun MainScreenWithRootedDeviceCheck(
     deepLink: Uri?,
     navController: NavController,
     rootedDeviceViewModel: RootedDeviceViewModel = viewModel(factory = RootedDeviceModule.Factory()),
-    searchViewModel: MarketSearchViewModel
+    searchViewModel: MarketSearchViewModel,
+    userDataRepository: UserDataRepository
 ) {
     if (rootedDeviceViewModel.showRootedDeviceWarning) {
         RootedDeviceScreen { rootedDeviceViewModel.ignoreRootedDeviceWarning() }
@@ -136,7 +142,8 @@ private fun MainScreenWithRootedDeviceCheck(
             transactionsViewModel,
             deepLink,
             navController,
-            searchViewModel = searchViewModel
+            searchViewModel = searchViewModel,
+            userDataRepository = userDataRepository
         )
     }
 }
@@ -151,6 +158,7 @@ private fun MainScreen(
     fragmentNavController: NavController,
     viewModel: MainViewModel = viewModel(factory = MainModule.Factory(deepLink)),
     searchViewModel: MarketSearchViewModel,
+    userDataRepository: UserDataRepository
 ) {
     val launchViewModel = viewModel<LaunchViewModel>(factory = LaunchModule.Factory())
     val uiState = viewModel.uiState
@@ -220,7 +228,8 @@ private fun MainScreen(
                         when (uiState.mainNavItems[page].mainNavItem) {
                             MainNavigation.Market -> MarketScreen(
                                 fragmentNavController,
-                                searchViewModel
+                                searchViewModel,
+                                userDataRepository
                             )
 
                             MainNavigation.Balance -> {

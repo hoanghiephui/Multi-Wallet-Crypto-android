@@ -1,5 +1,6 @@
 package io.horizontalsystems.bankwallet.core
 
+import android.app.Activity
 import android.content.Context
 import android.view.ViewGroup
 import androidx.compose.animation.Crossfade
@@ -21,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -32,8 +34,10 @@ import com.applovin.mediation.nativeAds.MaxNativeAdListener
 import com.applovin.mediation.nativeAds.MaxNativeAdLoader
 import com.applovin.mediation.nativeAds.MaxNativeAdView
 import io.horizontalsystems.bankwallet.core.BaseViewModel.Companion.SHOW_ADS
+import io.horizontalsystems.bankwallet.modules.billing.showBillingPlusDialog
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.ui.compose.bold
+import se.warting.inappupdate.compose.findActivity
 
 /**
  * Ad loader to load Max Native ads with Templates API using Jetpack Compose.
@@ -110,6 +114,7 @@ fun MaxTemplateNativeAdViewComposable(
     adType: AdType = AdType.MEDIUM
 ) {
     if (!SHOW_ADS) return
+    val context = LocalContext.current
     Crossfade(adViewState, label = "MaxTemplateNativeAdView") { viewState ->
         when (viewState) {
             is AdViewState.LoadFail -> Unit
@@ -167,7 +172,9 @@ fun MaxTemplateNativeAdViewComposable(
                                 modifier = Modifier
                                     .padding(top = 12.dp, bottom = 12.dp)
                                     .fillMaxWidth(),
-                                onClick = { },
+                                onClick = {
+                                    context.findActivity().showBillingPlusDialog()
+                                },
                             ) {
                                 Text("Buy Wallet+")
                             }

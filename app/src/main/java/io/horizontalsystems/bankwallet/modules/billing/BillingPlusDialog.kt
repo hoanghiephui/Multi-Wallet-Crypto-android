@@ -27,7 +27,9 @@ import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Scanner
+import androidx.compose.material.icons.filled.Wallet
 import androidx.compose.material.icons.filled.Widgets
+import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -51,8 +53,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.android.billing.models.UserData
 import com.android.billingclient.api.Purchase
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.ui.compose.AsyncLoadContents
 import io.horizontalsystems.bankwallet.ui.compose.bold
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @Composable
 private fun BillingPlusDialog(
@@ -64,7 +68,6 @@ private fun BillingPlusDialog(
 ) {
     val purchase = uiState.purchase
     val productDetails = uiState.productDetails
-
     Column(
         modifier = modifier
             .statusBarsPadding()
@@ -92,10 +95,13 @@ private fun BillingPlusDialog(
                 .fillMaxWidth(),
             onClick = { onClickPurchase.invoke() },
         ) {
-            Text(stringResource(R.string.billing_plus_purchase_button,
-                productDetails?.rawProductDetails?.oneTimePurchaseOfferDetails?.formattedPrice
-                    ?: "￥300"
-            )
+            Text(
+                stringResource(
+                    R.string.billing_plus_purchase_button,
+                    productDetails?.rawProductDetails?.subscriptionOfferDetails?.first()
+                        ?.pricingPhases?.pricingPhaseList?.first()?.formattedPrice
+                        ?: "1,99 USD"
+                )
             )
         }
 
@@ -130,51 +136,16 @@ private fun BillingPlusDialog(
             ) {
                 PlusItem(
                     modifier = Modifier.fillMaxWidth(),
-                    title = R.string.billing_plus_item_hide_ads,
-                    description = R.string.billing_plus_item_hide_ads_description,
-                    icon = Icons.Default.DoNotDisturb,
+                    title = R.string.billing_plus_item_metadata,
+                    description = R.string.billing_plus_item_metadata_description,
+                    icon = Icons.Default.WorkspacePremium,
                 )
 
                 PlusItem(
                     modifier = Modifier.fillMaxWidth(),
                     title = R.string.billing_plus_item_download,
                     description = R.string.billing_plus_item_download_description,
-                    icon = Icons.Default.Download,
-                )
-
-                PlusItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    title = R.string.billing_plus_item_metadata,
-                    description = R.string.billing_plus_item_metadata_description,
-                    icon = Icons.Default.Album,
-                )
-
-                PlusItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    title = R.string.billing_plus_item_edit_lyrics,
-                    description = R.string.billing_plus_item_edit_lyrics_description,
-                    icon = Icons.Default.EditNote,
-                )
-
-                PlusItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    title = R.string.billing_plus_item_scan,
-                    description = R.string.billing_plus_item_scan_description,
-                    icon = Icons.Default.Scanner,
-                )
-
-                PlusItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    title = R.string.billing_plus_item_folder,
-                    description = R.string.billing_plus_item_folder_description,
-                    icon = Icons.Default.FolderOpen,
-                )
-
-                PlusItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    title = R.string.billing_plus_item_widget,
-                    description = R.string.billing_plus_item_widget_description,
-                    icon = Icons.Default.Widgets,
+                    icon = Icons.Default.Wallet,
                 )
 
                 PlusItem(
@@ -186,9 +157,9 @@ private fun BillingPlusDialog(
 
                 PlusItem(
                     modifier = Modifier.fillMaxWidth(),
-                    title = R.string.billing_plus_item_accent_color,
-                    description = R.string.billing_plus_item_accent_color_description,
-                    icon = Icons.Default.ColorLens,
+                    title = R.string.billing_plus_item_hide_ads,
+                    description = R.string.billing_plus_item_hide_ads_description,
+                    icon = Icons.Default.DoNotDisturb,
                 )
 
                 PlusItem(
@@ -196,13 +167,6 @@ private fun BillingPlusDialog(
                     title = R.string.billing_plus_item_feature,
                     description = R.string.billing_plus_item_feature_description,
                     icon = Icons.Default.MoreHoriz,
-                )
-
-                PlusItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    title = R.string.billing_plus_item_support,
-                    description = R.string.billing_plus_item_support_description,
-                    icon = Icons.AutoMirrored.Outlined.HelpOutline,
                 )
             }
 
@@ -230,7 +194,7 @@ private fun TitleItem(modifier: Modifier = Modifier) {
         append("Buy ")
 
         withStyle(titleStyle.copy(color = MaterialTheme.colorScheme.primary).toSpanStyle()) {
-            append("Kanade+")
+            append("Wallet+")
         }
     }
 
@@ -297,10 +261,8 @@ private fun BillingPlusScreenPreview() {
     )
 }
 
-fun Activity.showBillingPlusDialog(
-    userData: UserData?,
-) {
-    showAsButtonSheet(userData, rectCorner = true, skipPartiallyExpanded = true) { onDismiss ->
+fun Activity.showBillingPlusDialog() {
+    showAsButtonSheet(rectCorner = true, skipPartiallyExpanded = true) { onDismiss ->
         val scope = rememberCoroutineScope()
         val viewModel = hiltViewModel<BillingPlusViewModel>()
         val screenState by viewModel.screenState.collectAsStateWithLifecycle()

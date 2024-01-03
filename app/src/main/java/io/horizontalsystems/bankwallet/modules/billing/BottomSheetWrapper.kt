@@ -5,7 +5,6 @@ import android.graphics.Rect
 import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,11 +22,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
+import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
+import io.horizontalsystems.bankwallet.ui.compose.LocalSystemBars
+import io.horizontalsystems.bankwallet.ui.compose.SystemBars
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -87,7 +89,6 @@ private fun BottomSheetWrapper(
 }
 
 fun Activity.showAsButtonSheet(
-    userData: UserData?,
     skipPartiallyExpanded: Boolean = true,
     rectCorner: Boolean = false,
     content: @Composable (() -> Unit) -> Unit,
@@ -97,11 +98,6 @@ fun Activity.showAsButtonSheet(
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
         setContent {
             val density = LocalDensity.current
-            val shouldUseDarkTheme = when (userData?.themeConfig) {
-                ThemeConfig.Light -> false
-                ThemeConfig.Dark -> true
-                else -> isSystemInDarkTheme()
-            }
 
             val systemBars = this@showAsButtonSheet.systemBarsInsets().let {
                 with(density) {
@@ -112,14 +108,9 @@ fun Activity.showAsButtonSheet(
                 }
             }
 
-            KanadeTheme(
-                themeColorConfig = userData?.themeColorConfig ?: ThemeColorConfig.Blue,
-                shouldUseDarkTheme = shouldUseDarkTheme,
-                enableDynamicTheme = userData?.isDynamicColor ?: false,
-            ) {
-                KanadeBackground(
+            ComposeAppTheme {
+                NiaBackground(
                     modifier = Modifier.fillMaxWidth(),
-                    background = Color.Transparent,
                 ) {
                     CompositionLocalProvider(LocalSystemBars provides systemBars) {
                         BottomSheetWrapper(
@@ -140,7 +131,8 @@ fun Activity.showAsButtonSheet(
 
 fun Activity.systemBarsInsets(): Pair<Int, Int> {
     return if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
-        val insets = windowManager.currentWindowMetrics.windowInsets.getInsetsIgnoringVisibility(android.view.WindowInsets.Type.systemBars())
+        val insets =
+            windowManager.currentWindowMetrics.windowInsets.getInsetsIgnoringVisibility(android.view.WindowInsets.Type.systemBars())
         insets.top to insets.bottom
     } else {
         val rect = Rect()

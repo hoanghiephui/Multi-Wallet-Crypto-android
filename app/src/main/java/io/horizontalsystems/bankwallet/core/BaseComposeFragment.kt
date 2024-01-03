@@ -11,14 +11,19 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
+import com.android.billing.UserDataRepository
+import dagger.hilt.android.AndroidEntryPoint
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.core.findNavController
+import javax.inject.Inject
 
+@AndroidEntryPoint
 abstract class BaseComposeFragment(
     @LayoutRes layoutResId: Int = 0,
     private val screenshotEnabled: Boolean = true
 ) : Fragment(layoutResId) {
-
+    @Inject
+    lateinit var userDataRepository: UserDataRepository
     final override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 abstract class BaseViewModel : ViewModel() {
@@ -47,7 +48,7 @@ abstract class BaseViewModel : ViewModel() {
     ) {
         // Initialize ad with ad loader.
         viewModelScope.launch {
-            loadAdState.collect {
+            loadAdState.collectLatest {
                 if (it && SHOW_ADS) {
                     nativeAdLoader.loadAd(context, adUnitIdentifier)
                     Log.d("Applovin", "loadAds")

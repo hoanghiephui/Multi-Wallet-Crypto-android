@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
@@ -46,13 +47,15 @@ fun MarketOverviewScreen(
     val isRefreshing by viewModel.isRefreshingLiveData.observeAsState(false)
     val viewState by viewModel.viewStateLiveData.observeAsState()
     val viewItem by viewModel.viewItem.observeAsState()
-
+    val isPlusMode by viewModel.screenState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
     val context = LocalContext.current
     val nativeAd by viewModel.adState
-    LaunchedEffect(key1 = BuildConfig.HOME_MARKET_NATIVE, block = {
-        viewModel.loadAds(context, BuildConfig.HOME_MARKET_NATIVE)
-    })
+    if (!isPlusMode) {
+        LaunchedEffect(key1 = BuildConfig.HOME_MARKET_NATIVE, block = {
+            viewModel.loadAds(context, BuildConfig.HOME_MARKET_NATIVE)
+        })
+    }
     HSSwipeRefresh(
         refreshing = isRefreshing,
         onRefresh = {

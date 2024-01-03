@@ -3,6 +3,7 @@ package io.horizontalsystems.bankwallet.modules.market.overview
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.android.billing.UserDataRepository
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.modules.market.MarketModule
 import io.horizontalsystems.bankwallet.modules.market.MarketViewItem
@@ -19,7 +20,7 @@ import java.math.BigDecimal
 
 object MarketOverviewModule {
 
-    class Factory : ViewModelProvider.Factory {
+    class Factory(private val userDataRepository: UserDataRepository) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             val topMarketsRepository = MarketTopMoversRepository(App.marketKit)
@@ -30,7 +31,7 @@ object MarketOverviewModule {
                 App.currencyManager
             )
             val topNftCollectionsViewItemFactory = TopNftCollectionsViewItemFactory(App.numberFormatter)
-            return MarketOverviewViewModel(service, topNftCollectionsViewItemFactory, App.currencyManager) as T
+            return MarketOverviewViewModel(service, topNftCollectionsViewItemFactory, App.currencyManager, userDataRepository) as T
         }
     }
 
