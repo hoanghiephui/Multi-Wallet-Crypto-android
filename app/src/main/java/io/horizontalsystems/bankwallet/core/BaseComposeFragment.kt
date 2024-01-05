@@ -32,6 +32,9 @@ abstract class BaseComposeFragment(
 
     @Inject
     lateinit var analyticsHelper: AnalyticsHelper
+
+    @Inject
+    lateinit var firebaseAnalytics: FirebaseAnalytics
     final override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -85,7 +88,7 @@ abstract class BaseComposeFragment(
     abstract val logScreen: String
 
     private fun setCurrentScreen(screenName: String) {
-        FirebaseAnalytics.getInstance(requireActivity()).apply {
+        firebaseAnalytics.apply {
             val bundle = bundleOf(
                 FirebaseAnalytics.Param.SCREEN_NAME to screenName,
                 FirebaseAnalytics.Param.SCREEN_NAME to screenName,

@@ -229,7 +229,7 @@ private fun SecurityCenterScreen(
                         Spacer(Modifier.width(16.dp))
                         body_leah(
                             text = "Analytics logs events for each crash",
-                            modifier = Modifier.weight(0.9f),
+                            modifier = Modifier.weight(0.8f),
                             overflow = TextOverflow.Ellipsis,
                         )
                         HsSwitch(
@@ -238,8 +238,8 @@ private fun SecurityCenterScreen(
                                 securitySettingsViewModel.onSetAnalytic(it)
                             },
                             modifier = Modifier
-                                .weight(0.1f)
-                                .padding(end = 8.dp)
+                                .weight(0.2f)
+                                .padding(end = 8.dp, start = 24.dp)
                         )
                     }
                     HorizontalDivider()

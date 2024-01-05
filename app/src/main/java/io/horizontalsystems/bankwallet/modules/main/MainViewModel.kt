@@ -52,7 +52,7 @@ class MainViewModel(
     private val launchPage: LaunchPage
         get() = localStorage.launchPage ?: LaunchPage.Auto
 
-    private var currentMainTab: MainNavigation
+    var currentMainTab: MainNavigation
         get() = localStorage.mainTab ?: MainNavigation.Balance
         set(value) {
             localStorage.mainTab = value

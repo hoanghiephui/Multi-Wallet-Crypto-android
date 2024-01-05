@@ -6,6 +6,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -27,6 +28,13 @@ abstract class BaseViewModel : ViewModel() {
             App.appLoVinSdk.initializeSdk {
                 viewModelScope.launch {
                     _uiState.emit(true)
+                }
+            }.runCatching {
+                viewModelScope.launch {
+                    delay(3000)
+                    if (!_uiState.value) {
+                        _uiState.emit(true)
+                    }
                 }
             }
         }

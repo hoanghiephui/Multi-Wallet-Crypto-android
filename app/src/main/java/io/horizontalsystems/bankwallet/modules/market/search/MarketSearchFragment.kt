@@ -34,7 +34,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.iconPlaceholder
 import io.horizontalsystems.bankwallet.core.imageUrl
@@ -153,10 +159,19 @@ fun MarketSearchResults(
             icon = R.drawable.ic_not_found
         )
     } else {
+        val keyboardController = LocalSoftwareKeyboardController.current
         val coroutineScope = rememberCoroutineScope()
         var revealedCardId by remember(*inputs) { mutableStateOf<String?>(null) }
-
+        val nestedScrollConnection = remember {
+            object : NestedScrollConnection {
+                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                    keyboardController?.hide()
+                    return Offset.Zero
+                }
+            }
+        }
         LazyColumn(
+            modifier = Modifier.nestedScroll(nestedScrollConnection),
             state = rememberSaveable(
                 *inputs,
                 saver = LazyListState.Saver
@@ -178,6 +193,7 @@ fun MarketSearchResults(
 
                     Box(
                         modifier = Modifier
+                            .background(MaterialTheme.colorScheme.background)
                             .fillMaxWidth()
                             .height(IntrinsicSize.Max)
                     ) {
@@ -251,6 +267,7 @@ fun MarketSearchResults(
             }
         }
     }
+    TrackScreenViewEvent("MarketSearchResults")
 }
 
 @Composable

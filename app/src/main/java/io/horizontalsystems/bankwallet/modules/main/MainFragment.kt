@@ -231,14 +231,14 @@ private fun MainScreen(
                             MainNavigation.Market -> MarketScreen(
                                 fragmentNavController,
                                 searchViewModel,
-                                userDataRepository
+                                userDataRepository,
+                                viewModel
                             )
 
                             MainNavigation.Balance -> {
                                 if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
                                     when (launchViewModel.getPage()) {
-                                        LaunchViewModel.Page.Unlock -> {
-                                        }
+                                        LaunchViewModel.Page.Unlock -> Unit
 
                                         LaunchViewModel.Page.NoSystemLock -> {
                                             Column(

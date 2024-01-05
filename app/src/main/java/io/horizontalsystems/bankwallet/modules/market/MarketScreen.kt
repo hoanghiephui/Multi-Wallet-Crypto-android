@@ -37,8 +37,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.android.billing.UserDataRepository
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
+import io.horizontalsystems.bankwallet.modules.main.MainModule
+import io.horizontalsystems.bankwallet.modules.main.MainViewModel
 import io.horizontalsystems.bankwallet.modules.market.favorites.MarketFavoritesScreen
 import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewModule
 import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewScreen
@@ -51,75 +54,27 @@ import io.horizontalsystems.bankwallet.ui.compose.NiaTabRow
 import java.util.Optional
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun MarketScreen(
     navController: NavController,
     searchViewModel: MarketSearchViewModel,
-    userDataRepository: UserDataRepository
+    userDataRepository: UserDataRepository,
+    mainViewModel: MainViewModel
 ) {
     val marketViewModel = viewModel<MarketViewModel>(factory = MarketModule.Factory())
     val viewModel: MarketOverviewViewModel = viewModel(factory = MarketOverviewModule.Factory(userDataRepository))
     val tabs = marketViewModel.tabs
     val selectedTab = marketViewModel.selectedTab
     val pagerState = rememberPagerState(initialPage = selectedTab.ordinal) { tabs.size }
-    DockedSearchBar(
-        navController = navController,
-        searchViewModel = searchViewModel,
-        viewModel = viewModel,
-        onSearchTextChanged = {
-            searchViewModel.searchByQuery(it)
-        },
-        content = {
-            Column(
-                Modifier
-                    .fillMaxSize()
-                    .padding(top = 92.dp)
-            ) {
-
-                LaunchedEffect(key1 = selectedTab, block = {
-                    pagerState.scrollToPage(selectedTab.ordinal)
-                })
-
-
-                NiaTabRow(selectedTabIndex = selectedTab.ordinal) {
-                    tabs.forEach { title ->
-                        NiaTab(
-                            selected = title == selectedTab,
-                            onClick = { marketViewModel.onSelect(title) },
-                            text = { Text(text = stringResource(id = title.titleResId)) },
-                        )
-                    }
-                }
-                // our list with build in nested scroll support that will notify us about its scroll
-                HorizontalPager(
-                    state = pagerState,
-                    userScrollEnabled = false,
-                ) { page ->
-                    viewModel.showSearchBar.value = false
-                    when (tabs[page]) {
-                        MarketModule.Tab.Overview -> MarketOverviewScreen(navController, viewModel)
-                        MarketModule.Tab.Posts -> MarketPostsScreen()
-                        MarketModule.Tab.Watchlist -> MarketFavoritesScreen(navController)
-                    }
-                }
-            }
-        })
-
-}
-
-@Composable
-@OptIn(ExperimentalMaterial3Api::class)
-private fun DockedSearchBar(
-    content: @Composable () -> Unit,
-    navController: NavController,
-    onSearchTextChanged: (String) -> Unit = {},
-    viewModel: MarketOverviewViewModel,
-    searchViewModel: MarketSearchViewModel
-) {
     var text by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
-    val keyboardController = LocalSoftwareKeyboardController.current
+    LaunchedEffect(key1 = mainViewModel.currentMainTab, block = {
+        if (mainViewModel.currentMainTab != MainModule.MainNavigation.Market) {
+            active = false
+        }
+    })
+
     Box(Modifier.fillMaxSize()) {
         Box(
             Modifier
@@ -135,7 +90,7 @@ private fun DockedSearchBar(
                 query = text,
                 onQueryChange = {
                     text = it
-                    onSearchTextChanged.invoke(text)
+                    searchViewModel.searchByQuery(it)
                 },
                 onSearch = {
                     active = false
@@ -163,7 +118,7 @@ private fun DockedSearchBar(
                             )
                         else if (uiState.page is MarketSearchViewModel.Page.Discovery)
                             mapOf(
-                                Optional.of(stringResource(R.string.Market_Search_Sections_RecentTitle)) to uiState.page.recent,
+                                Optional.of(stringResource(R.string.Market_Search_Sections_PopularTitle)) to uiState.page.popular.take(6)
                             ) else mapOf()
 
                     MarketSearchResults(
@@ -186,6 +141,44 @@ private fun DockedSearchBar(
             }
         }
 
-        content.invoke()
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(top = 92.dp)
+        ) {
+
+            LaunchedEffect(key1 = selectedTab, block = {
+                pagerState.scrollToPage(selectedTab.ordinal)
+            })
+
+
+            NiaTabRow(selectedTabIndex = selectedTab.ordinal) {
+                tabs.forEach { title ->
+                    NiaTab(
+                        selected = title == selectedTab,
+                        onClick = { marketViewModel.onSelect(title) },
+                        text = { Text(text = stringResource(id = title.titleResId)) },
+                    )
+                }
+            }
+            // our list with build in nested scroll support that will notify us about its scroll
+            HorizontalPager(
+                state = pagerState,
+                userScrollEnabled = false,
+            ) { page ->
+                viewModel.showSearchBar.value = false
+                when (tabs[page]) {
+                    MarketModule.Tab.Overview -> MarketOverviewScreen(navController, viewModel) {
+                        active = false
+                    }
+                    MarketModule.Tab.Posts -> MarketPostsScreen()
+                    MarketModule.Tab.Watchlist -> MarketFavoritesScreen(navController)
+                }
+            }
+        }
     }
+
+    TrackScreenViewEvent("MarketScreen")
+
+
 }

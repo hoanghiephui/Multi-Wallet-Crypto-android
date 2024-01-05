@@ -98,7 +98,7 @@ class BillingPlusViewModel @Inject constructor(
 
     fun onVerify(context: Context) {
         viewModelScope.launch {
-            delay(3000)
+            delay(5000)
             verify(context)
         }
     }

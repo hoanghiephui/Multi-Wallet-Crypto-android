@@ -12,7 +12,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -43,7 +48,8 @@ import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 @Composable
 fun MarketOverviewScreen(
     navController: NavController,
-    viewModel: MarketOverviewViewModel
+    viewModel: MarketOverviewViewModel,
+    onScroll: () -> Unit
 ) {
     val isRefreshing by viewModel.isRefreshingLiveData.observeAsState(false)
     val viewState by viewModel.viewStateLiveData.observeAsState()
@@ -56,6 +62,14 @@ fun MarketOverviewScreen(
         LaunchedEffect(key1 = BuildConfig.HOME_MARKET_NATIVE, block = {
             viewModel.loadAds(context, BuildConfig.HOME_MARKET_NATIVE)
         })
+    }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                onScroll.invoke()
+                return Offset.Zero
+            }
+        }
     }
     HSSwipeRefresh(
         refreshing = isRefreshing,
@@ -76,6 +90,7 @@ fun MarketOverviewScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
+                                .nestedScroll(nestedScrollConnection)
                                 .verticalScroll(scrollState)
                         ) {
                             Box(
