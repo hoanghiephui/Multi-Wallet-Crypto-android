@@ -45,7 +45,7 @@ fun BillingResult.toResponse(): BillingResponse {
     return when (responseCode) {
         BillingResponseCode.OK -> BillingResponse.OK(this)
         BillingResponseCode.USER_CANCELED -> BillingResponse.UserCanceled(this)
-        BillingResponseCode.SERVICE_TIMEOUT -> BillingResponse.ServiceTimeout(this)
+        BillingResponseCode.NETWORK_ERROR -> BillingResponse.ServiceTimeout(this)
         BillingResponseCode.FEATURE_NOT_SUPPORTED -> BillingResponse.FeatureNotSupported(this)
         BillingResponseCode.SERVICE_DISCONNECTED -> BillingResponse.ServiceDisconnected(this)
         BillingResponseCode.SERVICE_UNAVAILABLE -> BillingResponse.ServiceUnavailable(this)
