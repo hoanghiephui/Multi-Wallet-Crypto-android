@@ -42,4 +42,6 @@ class SwapTokenSelectFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "SwapTokenSelectFragment"
 }

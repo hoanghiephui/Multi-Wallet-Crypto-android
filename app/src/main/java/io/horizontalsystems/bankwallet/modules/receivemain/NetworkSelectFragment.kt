@@ -70,6 +70,9 @@ class NetworkSelectFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "NetworkSelectFragment"
+
     companion object {
         fun prepareParams(coinUid: String): Bundle {
             return bundleOf("coinUid" to coinUid)

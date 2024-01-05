@@ -53,6 +53,8 @@ class FaqListFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "FaqListFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

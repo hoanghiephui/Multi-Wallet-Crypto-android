@@ -31,6 +31,8 @@ class TimeLockFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "TimeLockFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

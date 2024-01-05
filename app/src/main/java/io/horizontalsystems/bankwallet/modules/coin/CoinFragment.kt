@@ -45,6 +45,9 @@ class CoinFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "CoinFragment"
+
     private fun coinViewModel(coinUid: String): CoinViewModel? = try {
         val viewModel by navGraphViewModels<CoinViewModel>(R.id.coinFragment) {
             CoinModule.Factory(coinUid)

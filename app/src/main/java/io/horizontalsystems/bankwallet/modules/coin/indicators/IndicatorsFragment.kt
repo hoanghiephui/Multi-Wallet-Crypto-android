@@ -43,6 +43,8 @@ class IndicatorsFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "IndicatorsFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

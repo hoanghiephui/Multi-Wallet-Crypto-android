@@ -63,6 +63,9 @@ class SendTokenSelectFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "SendTokenSelectFragment"
+
     companion object {
         private const val blockchainTypesKey = "blockchainTypesKey"
         private const val tokenTypesKey = "tokenTypesKey"

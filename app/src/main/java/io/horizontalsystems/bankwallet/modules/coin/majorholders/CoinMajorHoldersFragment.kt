@@ -75,6 +75,9 @@ class CoinMajorHoldersFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "CoinMajorHoldersFragment"
+
     companion object {
         private const val COIN_UID_KEY = "coin_uid_key"
         private const val BLOCKCHAIN_KEY = "blockchain_key"

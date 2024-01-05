@@ -9,9 +9,11 @@ import androidx.annotation.LayoutRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import com.android.billing.UserDataRepository
+import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.AndroidEntryPoint
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.core.findNavController
@@ -65,6 +67,23 @@ abstract class BaseComposeFragment(
 
     private fun disallowScreenshot() {
         requireActivity().window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setCurrentScreen(logScreen)
+    }
+
+    abstract val logScreen: String
+
+    private fun setCurrentScreen(screenName: String) {
+        FirebaseAnalytics.getInstance(requireActivity()).apply {
+            val bundle = bundleOf(
+                FirebaseAnalytics.Param.SCREEN_NAME to screenName,
+                FirebaseAnalytics.Param.SCREEN_NAME to screenName,
+            )
+            logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle)
+        }
     }
 
 }

@@ -9,7 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Surface
+import androidx.compose.material3.Surface
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -59,6 +59,9 @@ class TopNftCollectionsFragment : BaseComposeFragment() {
             }
         )
     }
+
+    override val logScreen: String
+        get() = "TopNftCollectionsFragment"
 
     companion object {
         private const val sortingFieldKey = "sorting_field"

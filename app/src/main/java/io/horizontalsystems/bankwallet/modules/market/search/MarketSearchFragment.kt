@@ -78,6 +78,9 @@ class MarketSearchFragment : BaseComposeFragment() {
         )
         MarketSearchScreen(viewModel, navController)
     }
+
+    override val logScreen: String
+        get() = "MarketSearchFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

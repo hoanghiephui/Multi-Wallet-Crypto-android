@@ -89,6 +89,9 @@ class TransactionSpeedUpCancelFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "TransactionSpeedUpCancelFragment"
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

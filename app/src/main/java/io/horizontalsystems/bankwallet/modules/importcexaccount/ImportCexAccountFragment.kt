@@ -27,6 +27,8 @@ class ImportCexAccountFragment : BaseComposeFragment() {
         ImportCexAccountNavHost(navController, popUpToInclusiveId, inclusive)
     }
 
+    override val logScreen: String
+        get() = "ImportCexAccountFragment"
 }
 
 

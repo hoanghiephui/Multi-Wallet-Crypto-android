@@ -17,9 +17,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.Surface
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -78,6 +78,8 @@ class EvmNetworkFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "EvmNetworkFragment"
 }
 
 private const val EvmNetworkPage = "evm_network"
@@ -297,7 +299,7 @@ fun RpcCell(
         contentAlignment = Alignment.Center
     ) {
         if (showDivider) {
-            Divider(
+            HorizontalDivider(
                 thickness = 1.dp,
                 color = ComposeAppTheme.colors.steel10,
                 modifier = Modifier.align(Alignment.TopCenter)

@@ -98,6 +98,8 @@ class RestoreLocalFragment : BaseComposeFragment() {
         ) { activity?.let { MainModule.startAsNewTask(it) } }
     }
 
+    override val logScreen: String
+        get() = "RestoreLocalFragment"
 }
 
 @Composable

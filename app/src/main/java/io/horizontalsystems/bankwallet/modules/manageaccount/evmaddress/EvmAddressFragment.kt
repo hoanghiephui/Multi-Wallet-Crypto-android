@@ -40,6 +40,8 @@ class EvmAddressFragment : BaseComposeFragment(screenshotEnabled = false) {
         EvmAddressScreen(evmAddress, navController)
     }
 
+    override val logScreen: String
+        get() = "EvmAddressFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -53,6 +53,9 @@ class TvlFragment : BaseComposeFragment() {
         TvlScreen(viewModel, tvlChartViewModel, navController) { onCoinClick(it, navController) }
     }
 
+    override val logScreen: String
+        get() = "TvlFragment"
+
     private fun onCoinClick(coinUid: String?, navController: NavController) {
         if (coinUid != null) {
             val arguments = CoinFragment.prepareParams(coinUid, "market_tvl")

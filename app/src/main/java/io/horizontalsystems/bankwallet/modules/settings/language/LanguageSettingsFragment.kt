@@ -46,6 +46,8 @@ class LanguageSettingsFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "LanguageSettingsFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

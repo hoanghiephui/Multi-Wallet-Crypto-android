@@ -48,6 +48,8 @@ class MarketFiltersFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "MarketFiltersFragment"
 }
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)

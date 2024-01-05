@@ -74,6 +74,9 @@ class AppearanceFragment : BaseComposeFragment() {
         AppearanceScreen(navController)
     }
 
+    override var logScreen: String
+        get() = "AppearanceFragment"
+        set(value) {}
 }
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)

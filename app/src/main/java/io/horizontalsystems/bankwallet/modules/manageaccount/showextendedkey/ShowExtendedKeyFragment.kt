@@ -57,6 +57,8 @@ class ShowExtendedKeyFragment : BaseComposeFragment(screenshotEnabled = false) {
         }
     }
 
+    override val logScreen: String
+        get() = "ShowExtendedKeyFragment"
 }
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)

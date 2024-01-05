@@ -40,6 +40,9 @@ class AutoLockIntervalsFragment : BaseComposeFragment() {
         )
     }
 
+    override var logScreen: String
+        get() = "AutoLockIntervalsFragment"
+        set(value) {}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

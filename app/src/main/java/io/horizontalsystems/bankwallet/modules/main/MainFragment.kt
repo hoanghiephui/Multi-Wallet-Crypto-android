@@ -124,6 +124,8 @@ class MainFragment : BaseComposeFragment() {
             })
     }
 
+    override val logScreen: String
+        get() = "MainFragment"
 }
 
 @Composable

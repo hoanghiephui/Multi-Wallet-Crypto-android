@@ -38,6 +38,9 @@ class TokenBalanceFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "TokenBalanceFragment"
+
     companion object {
         private const val WALLET_KEY = "wallet_key"
 

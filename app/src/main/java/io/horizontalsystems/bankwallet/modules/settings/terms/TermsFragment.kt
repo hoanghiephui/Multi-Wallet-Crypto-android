@@ -54,6 +54,9 @@ class TermsFragment : BaseComposeFragment() {
         TermsScreen(navController = navController)
     }
 
+    override val logScreen: String
+        get() = "TermsFragment"
+
     companion object {
         const val RESULT_OK = 1
         const val RESULT_CANCELLED = 2

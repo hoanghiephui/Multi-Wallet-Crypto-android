@@ -47,6 +47,9 @@ class IndicatorSettingsFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "IndicatorSettingsFragment"
+
     companion object {
         fun params(indicatorId: String) = bundleOf("indicatorId" to indicatorId)
     }

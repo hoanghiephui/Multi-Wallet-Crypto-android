@@ -49,6 +49,8 @@ class FilterCoinFragment : BaseComposeFragment() {
         FilterCoinScreen(navController, viewModel)
     }
 
+    override val logScreen: String
+        get() = "FilterCoinFragment"
 }
 
 

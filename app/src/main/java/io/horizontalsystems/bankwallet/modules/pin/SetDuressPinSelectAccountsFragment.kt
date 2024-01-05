@@ -45,6 +45,9 @@ class SetDuressPinSelectAccountsFragment : BaseComposeFragment() {
     override fun GetContent(navController: NavController) {
         SetDuressPinSelectAccountsScreen(navController)
     }
+
+    override val logScreen: String
+        get() = "SetDuressPinSelectAccountsFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

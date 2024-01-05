@@ -51,6 +51,8 @@ class WC2PairingsFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "WC2PairingsFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

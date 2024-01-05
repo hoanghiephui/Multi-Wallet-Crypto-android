@@ -41,6 +41,8 @@ class EvmPrivateKeyFragment : BaseComposeFragment(screenshotEnabled = false) {
         )
     }
 
+    override val logScreen: String
+        get() = "EvmPrivateKeyFragment"
 }
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)

@@ -83,6 +83,9 @@ class TechnicalIndicatorsDetailsFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "TechnicalIndicatorsDetailsFragment"
+
     companion object {
         private const val COIN_UID_KEY = "coin_uid_key"
         private const val PERIOD_KEY = "period_key"

@@ -46,6 +46,8 @@ class WatchAddressFragment : BaseComposeFragment() {
         WatchAddressScreen(navController, popUpToInclusiveId, inclusive)
     }
 
+    override val logScreen: String
+        get() = "WatchAddressFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

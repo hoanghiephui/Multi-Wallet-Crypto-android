@@ -44,6 +44,9 @@ class CoinAnalyticsInfoFragment : BaseComposeFragment() {
         ) { navController.popBackStack() }
     }
 
+    override val logScreen: String
+        get() = "CoinAnalyticsInfoFragment"
+
     companion object {
         private const val analyticsInfoKey = "analyticsInfoKey"
 

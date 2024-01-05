@@ -68,6 +68,9 @@ class OverallScoreInfoFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "OverallScoreInfoFragment"
+
     companion object {
         private const val SCORE_CATEGORY_KEY = "score_category_key"
 

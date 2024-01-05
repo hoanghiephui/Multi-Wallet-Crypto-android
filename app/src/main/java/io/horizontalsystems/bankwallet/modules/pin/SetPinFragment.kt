@@ -28,6 +28,9 @@ class SetPinFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "SetPinFragment"
+
     @Parcelize
     data class Input(val descriptionResId: Int) : Parcelable
 

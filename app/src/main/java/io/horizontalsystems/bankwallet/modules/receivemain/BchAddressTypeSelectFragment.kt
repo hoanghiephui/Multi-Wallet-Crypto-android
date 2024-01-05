@@ -32,6 +32,9 @@ class BchAddressTypeSelectFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "BchAddressTypeSelectFragment"
+
     companion object {
         fun prepareParams(coinUid: String): Bundle {
             return bundleOf("coinUid" to coinUid)

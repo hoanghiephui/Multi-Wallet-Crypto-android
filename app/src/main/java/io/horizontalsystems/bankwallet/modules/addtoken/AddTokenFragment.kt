@@ -56,6 +56,8 @@ class AddTokenFragment : BaseComposeFragment() {
         AddTokenNavHost(navController)
     }
 
+    override val logScreen: String
+        get() = "AddTokenFragment"
 }
 
 private const val AddTokenPage = "add_token"

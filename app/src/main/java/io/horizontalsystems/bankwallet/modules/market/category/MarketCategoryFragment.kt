@@ -6,7 +6,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Surface
+import androidx.compose.material3.Surface
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -49,6 +49,9 @@ class MarketCategoryFragment : BaseComposeFragment() {
             { coinUid -> onCoinClick(coinUid, navController) }
         )
     }
+
+    override val logScreen: String
+        get() = "MarketCategoryFragment"
 
     private fun onCoinClick(coinUid: String, navController: NavController) {
         val arguments = CoinFragment.prepareParams(coinUid, "market_category")

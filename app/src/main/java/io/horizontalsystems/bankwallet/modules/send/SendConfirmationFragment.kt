@@ -95,6 +95,9 @@ class SendConfirmationFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "SendConfirmationFragment"
+
     @Parcelize
     enum class Type : Parcelable {
         Bitcoin, Bep2, ZCash, Solana, Tron, Ton

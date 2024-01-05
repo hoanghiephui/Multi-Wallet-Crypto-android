@@ -1,13 +1,12 @@
 package io.horizontalsystems.bankwallet.modules.manageaccounts
 
-import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Icon
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -56,6 +55,8 @@ class ManageAccountsFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "ManageAccountsFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

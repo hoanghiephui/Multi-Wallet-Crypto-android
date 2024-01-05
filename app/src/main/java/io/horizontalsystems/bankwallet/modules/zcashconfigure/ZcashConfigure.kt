@@ -24,12 +24,13 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
+import androidx.compose.material3.Icon
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Scaffold
+import androidx.compose.material3.Scaffold
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -44,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -103,6 +105,9 @@ class ZcashConfigure : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "ZcashConfigure"
+
     private fun closeWithConfigt(config: ZCashConfig, navController: NavController) {
         navController.setNavigationResult(
             resultBundleKey,
@@ -131,7 +136,7 @@ class ZcashConfigure : BaseComposeFragment() {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ZcashConfigureScreen(
     onCloseClick: () -> Unit,
@@ -189,7 +194,8 @@ fun ZcashConfigureScreen(
         }
     ) {
         Scaffold(
-            backgroundColor = ComposeAppTheme.colors.tyler,
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.background,
             topBar = { ZcashAppBar(onCloseClick = onCloseClick) }
         ) {
             Column(modifier = Modifier.padding(it)) {

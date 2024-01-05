@@ -27,6 +27,9 @@ class BackupLocalFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "BackupLocalFragment"
+
     companion object {
         private const val ACCOUNT_ID_KEY = "coin_uid_key"
         fun prepareParams(accountId: String): Bundle {

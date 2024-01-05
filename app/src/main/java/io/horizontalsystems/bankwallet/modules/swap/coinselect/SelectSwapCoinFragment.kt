@@ -43,6 +43,9 @@ class SelectSwapCoinFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "SelectSwapCoinFragment"
+
     private fun closeWithResult(coinBalanceItem: CoinBalanceItem, requestId: Long, navController: NavController) {
         setNavigationResult(
             resultBundleKey, bundleOf(

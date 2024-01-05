@@ -31,6 +31,8 @@ class BaseCurrencySettingsFragment : BaseComposeFragment() {
         BaseCurrencyScreen(navController)
     }
 
+    override val logScreen: String
+        get() = "BaseCurrencySettingsFragment"
 }
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
@@ -99,9 +101,8 @@ private fun BaseCurrencyScreen(
                             item.currency.code,
                             item.currency.symbol,
                             item.currency.flag,
-                            item.selected,
-                            { viewModel.onSelectBaseCurrency(item.currency) }
-                        )
+                            item.selected
+                        ) { viewModel.onSelectBaseCurrency(item.currency) }
                     }
                     Spacer(Modifier.height(24.dp))
                     HeaderText(

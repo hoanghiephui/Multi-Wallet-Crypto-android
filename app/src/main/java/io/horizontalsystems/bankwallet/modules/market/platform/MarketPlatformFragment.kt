@@ -79,6 +79,9 @@ class MarketPlatformFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "MarketPlatformFragment"
+
     companion object {
         private const val platformKey = "platform_key"
 

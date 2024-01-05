@@ -78,6 +78,9 @@ class WC2RequestFragment : BaseComposeFragment() {
 
     }
 
+    override val logScreen: String
+        get() = "WC2RequestFragment"
+
     companion object {
         private const val REQUEST_ID_KEY = "request_id_key"
 

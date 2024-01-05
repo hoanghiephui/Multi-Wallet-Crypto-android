@@ -51,6 +51,9 @@ class MetricsPageFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "MetricsPageFragment"
+
     private fun onCoinClick(coinUid: String, navController: NavController) {
         val arguments = CoinFragment.prepareParams(coinUid, "market_metrics")
 

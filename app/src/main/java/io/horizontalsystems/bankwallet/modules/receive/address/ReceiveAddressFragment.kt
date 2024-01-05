@@ -126,6 +126,9 @@ class ReceiveAddressFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "ReceiveAddressFragment"
+
     companion object {
         const val WALLET_KEY = "wallet_key"
 

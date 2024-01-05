@@ -34,6 +34,9 @@ class SetDuressPinFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "SetDuressPinFragment"
+
     companion object {
         fun params(accountIds: List<String>): Bundle {
             return bundleOf("input" to Input(accountIds))

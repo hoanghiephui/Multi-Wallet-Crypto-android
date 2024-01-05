@@ -86,6 +86,8 @@ class SendNftFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "SendNftFragment"
 }
 
 private fun getFactory(requireArguments: Bundle): SendNftModule.Factory? {

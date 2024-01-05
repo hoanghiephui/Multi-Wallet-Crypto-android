@@ -38,6 +38,8 @@ class RecoveryPhraseFragment : BaseComposeFragment(screenshotEnabled = false) {
         )
     }
 
+    override val logScreen: String
+        get() = "RecoveryPhraseFragment"
 }
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)

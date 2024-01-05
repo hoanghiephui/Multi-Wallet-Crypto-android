@@ -59,6 +59,9 @@ class ChooseContactFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "ChooseContactFragment"
+
     companion object {
         const val resultKey = "chooseContactResult"
 

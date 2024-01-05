@@ -75,6 +75,9 @@ class SecuritySettingsFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "SecuritySettingsFragment"
+
     private fun showAppRestartAlert() {
         val warningTitle = if (torViewModel.torCheckEnabled) {
             getString(R.string.Tor_Connection_Enable)

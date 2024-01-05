@@ -32,6 +32,9 @@ class DerivationSelectFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "DerivationSelectFragment"
+
     companion object {
         fun prepareParams(coinUid: String): Bundle {
             return bundleOf("coinUid" to coinUid)

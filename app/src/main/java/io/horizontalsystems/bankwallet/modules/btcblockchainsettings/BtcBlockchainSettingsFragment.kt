@@ -57,6 +57,8 @@ class BtcBlockchainSettingsFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "BtcBlockchainSettingsFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

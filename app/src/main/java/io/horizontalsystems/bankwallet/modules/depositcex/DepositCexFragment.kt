@@ -76,4 +76,6 @@ class DepositCexFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "DepositCexFragment"
 }

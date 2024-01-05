@@ -40,6 +40,9 @@ class MarkdownFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "MarkdownFragment"
+
     companion object {
         const val markdownUrlKey = "urlKey"
         const val handleRelativeUrlKey = "handleRelativeUrlKey"

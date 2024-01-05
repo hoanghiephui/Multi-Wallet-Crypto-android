@@ -35,6 +35,9 @@ class ContactsFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "ContactsFragment"
+
     companion object {
         private const val modeKey = "modeKey"
 

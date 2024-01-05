@@ -18,4 +18,7 @@ class EditPinFragment : BaseComposeFragment() {
             onBackPress = { navController.popBackStack() }
         )
     }
+
+    override val logScreen: String
+        get() = "EditPinFragment"
 }

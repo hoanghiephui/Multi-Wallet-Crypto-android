@@ -16,8 +16,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -82,6 +82,8 @@ class NftAssetFragment : BaseComposeFragment() {
         NftAssetScreen(findNavController(), collectionUid, nftUid)
     }
 
+    override val logScreen: String
+        get() = "NftAssetFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

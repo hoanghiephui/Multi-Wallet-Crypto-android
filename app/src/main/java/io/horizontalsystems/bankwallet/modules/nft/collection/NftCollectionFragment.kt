@@ -52,6 +52,9 @@ class NftCollectionFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "NftCollectionFragment"
+
     companion object {
         private const val collectionUidKey = "collectionUid"
         private const val blockchainTypeUidKey = "blockchainTypeUid"

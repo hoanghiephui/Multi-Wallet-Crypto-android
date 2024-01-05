@@ -44,6 +44,9 @@ class ReleaseNotesFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "ReleaseNotesFragment"
+
     companion object {
         const val showAsClosablePopupKey = "showAsClosablePopup"
     }

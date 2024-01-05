@@ -66,6 +66,9 @@ class CoinRankFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "CoinRankFragment"
+
     companion object {
         private const val rankTypeKey = "rank_type_key"
 

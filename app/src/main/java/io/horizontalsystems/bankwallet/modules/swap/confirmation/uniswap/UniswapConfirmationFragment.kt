@@ -66,5 +66,6 @@ class UniswapConfirmationFragment(
     override val sendEvmTransactionViewModel by navGraphViewModels<SendEvmTransactionViewModel>(navGraphId) { vmFactory }
     override val feeViewModel by navGraphViewModels<EvmFeeCellViewModel>(navGraphId) { vmFactory }
     override val nonceViewModel by navGraphViewModels<SendEvmNonceViewModel>(navGraphId) { vmFactory }
-
+    override val logScreen: String
+        get() = "UniswapConfirmationFragment"
 }

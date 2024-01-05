@@ -64,6 +64,9 @@ class CoinAuditsFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "CoinAuditsFragment"
+
     companion object {
         private const val ADDRESSES_KEY = "addresses_key"
 

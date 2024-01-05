@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Divider
-import androidx.compose.material.Surface
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -51,6 +51,9 @@ class TransactionDoubleSpendInfoFragment : BaseComposeFragment() {
             onBackClick = { navController.popBackStack() }
         )
     }
+
+    override val logScreen: String
+        get() = "TransactionDoubleSpendInfoFragment"
 
     companion object {
         private const val TRANSACTION_HASH = "transaction_hash"
@@ -110,7 +113,7 @@ fun ConflictingTransactions(transactionHash: String, conflictingHash: String) {
             .clip(RoundedCornerShape(12.dp))
     ) {
         TransactionHashCell(R.string.Info_DoubleSpend_ThisTx, transactionHash)
-        Divider(
+        HorizontalDivider(
             modifier = Modifier.fillMaxWidth(),
             thickness = 1.dp,
             color = ComposeAppTheme.colors.steel10

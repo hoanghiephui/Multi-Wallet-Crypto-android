@@ -60,6 +60,8 @@ class ImportWalletFragment : BaseComposeFragment() {
         ImportWalletScreen(navController, popUpToInclusiveId, inclusive)
     }
 
+    override val logScreen: String
+        get() = "ImportWalletFragment"
 }
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)

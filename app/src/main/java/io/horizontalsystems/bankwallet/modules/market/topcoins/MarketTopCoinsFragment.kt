@@ -5,7 +5,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Surface
+import androidx.compose.material3.Surface
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
@@ -56,6 +56,9 @@ class MarketTopCoinsFragment : BaseComposeFragment() {
             { coinUid -> onCoinClick(coinUid, navController) }
         )
     }
+
+    override val logScreen: String
+        get() = "MarketTopCoinsFragment"
 
     private fun onCoinClick(coinUid: String, navController: NavController) {
         val arguments = CoinFragment.prepareParams(coinUid, "market_top_coins")

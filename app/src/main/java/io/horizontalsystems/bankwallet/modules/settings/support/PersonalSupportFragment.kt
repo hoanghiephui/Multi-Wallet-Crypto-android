@@ -58,6 +58,8 @@ class PersonalSupportFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "PersonalSupportFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

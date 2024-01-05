@@ -46,6 +46,8 @@ class SwapApproveFragment : BaseComposeFragment() {
         SwapApproveScreen(navController, approveData)
     }
 
+    override val logScreen: String
+        get() = "SwapApproveFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

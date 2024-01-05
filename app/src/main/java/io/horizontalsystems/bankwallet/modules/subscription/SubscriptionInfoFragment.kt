@@ -51,6 +51,8 @@ class SubscriptionInfoFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "SubscriptionInfoFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -101,6 +101,9 @@ class SendEvmConfirmationFragment : BaseComposeFragment() {
             })
     }
 
+    override val logScreen: String
+        get() = "SendEvmConfirmationFragment"
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

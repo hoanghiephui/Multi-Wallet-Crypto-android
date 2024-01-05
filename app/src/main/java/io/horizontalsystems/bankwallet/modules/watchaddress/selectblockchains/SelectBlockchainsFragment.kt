@@ -69,6 +69,8 @@ class SelectBlockchainsFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "SelectBlockchainsFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

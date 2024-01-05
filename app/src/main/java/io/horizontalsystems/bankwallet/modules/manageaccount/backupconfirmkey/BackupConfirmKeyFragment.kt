@@ -50,6 +50,9 @@ class BackupConfirmKeyFragment : BaseComposeFragment() {
         )
     }
 
+    override var logScreen: String
+        get() = "BackupConfirmKeyFragment"
+        set(value) {}
 }
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)

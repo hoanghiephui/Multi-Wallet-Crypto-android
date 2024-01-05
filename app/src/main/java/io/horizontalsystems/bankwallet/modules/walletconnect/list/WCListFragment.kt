@@ -20,6 +20,9 @@ class WCListFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "WCListFragment"
+
     companion object {
         private const val WC_CONNECTION_URI_KEY = "wc_connection_uri_key"
 

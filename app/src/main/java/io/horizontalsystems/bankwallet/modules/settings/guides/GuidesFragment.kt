@@ -57,6 +57,8 @@ class GuidesFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "GuidesFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

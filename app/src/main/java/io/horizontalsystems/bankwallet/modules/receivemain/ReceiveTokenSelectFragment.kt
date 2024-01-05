@@ -51,6 +51,9 @@ class ReceiveTokenSelectFragment : BaseComposeFragment() {
             ReceiveTokenSelectScreen(navController, activeAccount)
         }
     }
+
+    override val logScreen: String
+        get() = "ReceiveTokenSelectFragment"
 }
 
 @Composable

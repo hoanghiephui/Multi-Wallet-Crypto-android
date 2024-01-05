@@ -47,6 +47,9 @@ class ActivateSubscriptionFragment : BaseComposeFragment() {
         ActivateSubscriptionScreen(navController)
     }
 
+    override var logScreen: String
+        get() = "ActivateSubscriptionFragment"
+        set(value) {}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

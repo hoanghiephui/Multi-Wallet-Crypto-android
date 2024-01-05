@@ -19,4 +19,7 @@ class EditDuressPinFragment : BaseComposeFragment() {
             forDuress = true
         )
     }
+
+    override val logScreen: String
+        get() = "EditDuressPinFragment"
 }

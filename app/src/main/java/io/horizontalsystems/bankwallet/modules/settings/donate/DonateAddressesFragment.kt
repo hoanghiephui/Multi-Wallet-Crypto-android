@@ -47,6 +47,8 @@ class DonateAddressesFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "DonateAddressesFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

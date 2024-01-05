@@ -64,6 +64,8 @@ class ManageWalletsFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "ManageWalletsFragment"
 }
 
 @Composable

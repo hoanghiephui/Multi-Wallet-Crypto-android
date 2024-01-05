@@ -45,6 +45,8 @@ class PrivateKeysFragment : BaseComposeFragment() {
         ManageAccountScreen(navController, account)
     }
 
+    override val logScreen: String
+        get() = "PrivateKeysFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

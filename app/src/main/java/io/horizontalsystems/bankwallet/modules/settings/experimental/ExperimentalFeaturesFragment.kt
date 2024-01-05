@@ -41,6 +41,8 @@ class ExperimentalFeaturesFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "ExperimentalFeaturesFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

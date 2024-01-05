@@ -47,6 +47,9 @@ class SetDuressPinIntroFragment : BaseComposeFragment() {
     override fun GetContent(navController: NavController) {
         SetDuressPinIntroScreen(navController)
     }
+
+    override val logScreen: String
+        get() = "SetDuressPinIntroFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

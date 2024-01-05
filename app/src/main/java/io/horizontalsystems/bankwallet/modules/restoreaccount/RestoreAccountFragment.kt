@@ -35,6 +35,8 @@ class RestoreAccountFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "RestoreAccountFragment"
 }
 
 @Composable

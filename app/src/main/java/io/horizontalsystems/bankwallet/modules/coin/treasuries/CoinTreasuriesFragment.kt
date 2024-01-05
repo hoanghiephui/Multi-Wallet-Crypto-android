@@ -61,6 +61,9 @@ class CoinTreasuriesFragment : BaseComposeFragment() {
         CoinTreasuriesScreen(viewModel)
     }
 
+    override val logScreen: String
+        get() = "CoinTreasuriesFragment"
+
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun CoinTreasuriesScreen(

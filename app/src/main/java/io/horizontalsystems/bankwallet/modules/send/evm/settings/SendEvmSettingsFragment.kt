@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -63,6 +63,9 @@ class SendEvmSettingsFragment : BaseComposeFragment() {
             navController = navController
         )
     }
+
+    override val logScreen: String
+        get() = "SendEvmSettingsFragment"
 
     companion object {
         private const val NAV_GRAPH_ID = "nav_graph_id"

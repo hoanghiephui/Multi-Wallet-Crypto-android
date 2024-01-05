@@ -26,6 +26,9 @@ class ConfirmPinFragment : BaseComposeFragment() {
         }
     }
 
+    override val logScreen: String
+        get() = "ConfirmPinFragment"
+
     @Parcelize
     data class Result(val success: Boolean) : Parcelable
 }

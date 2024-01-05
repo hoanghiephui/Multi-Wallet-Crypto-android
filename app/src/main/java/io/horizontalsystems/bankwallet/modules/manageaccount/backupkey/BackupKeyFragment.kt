@@ -43,6 +43,9 @@ class BackupKeyFragment : BaseComposeFragment(screenshotEnabled = false) {
         RecoveryPhraseScreen(navController, account)
     }
 
+    override var logScreen: String
+        get() = "BackupKeyFragment"
+        set(value) {}
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

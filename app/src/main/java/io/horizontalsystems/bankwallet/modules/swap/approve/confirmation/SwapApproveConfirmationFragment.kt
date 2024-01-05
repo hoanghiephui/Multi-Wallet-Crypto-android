@@ -106,6 +106,9 @@ class SwapApproveConfirmationFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "SwapApproveConfirmationFragment"
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 

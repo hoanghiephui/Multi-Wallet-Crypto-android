@@ -13,6 +13,8 @@ class DepositCexChooseAssetFragment : BaseComposeFragment() {
         DepositCexChooseAssetScreen(navController)
     }
 
+    override val logScreen: String
+        get() = "DepositCexChooseAssetFragment"
 }
 
 @Composable

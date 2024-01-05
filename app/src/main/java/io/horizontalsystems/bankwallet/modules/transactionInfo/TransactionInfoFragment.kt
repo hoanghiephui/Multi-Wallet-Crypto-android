@@ -59,6 +59,8 @@ class TransactionInfoFragment : BaseComposeFragment() {
         TransactionInfoScreen(viewModel, navController)
     }
 
+    override val logScreen: String
+        get() = "TransactionInfoFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
