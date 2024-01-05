@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.annotation.LayoutRes
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.os.bundleOf
@@ -15,6 +16,8 @@ import androidx.navigation.NavController
 import com.android.billing.UserDataRepository
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.AndroidEntryPoint
+import io.horizontalsystems.bankwallet.analytics.AnalyticsHelper
+import io.horizontalsystems.bankwallet.analytics.LocalAnalyticsHelper
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.core.findNavController
 import javax.inject.Inject
@@ -26,6 +29,9 @@ abstract class BaseComposeFragment(
 ) : Fragment(layoutResId) {
     @Inject
     lateinit var userDataRepository: UserDataRepository
+
+    @Inject
+    lateinit var analyticsHelper: AnalyticsHelper
     final override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -37,8 +43,10 @@ abstract class BaseComposeFragment(
             )
 
             setContent {
-                ComposeAppTheme {
-                    GetContent(findNavController())
+                CompositionLocalProvider(LocalAnalyticsHelper provides analyticsHelper) {
+                    ComposeAppTheme {
+                        GetContent(findNavController())
+                    }
                 }
             }
         }
