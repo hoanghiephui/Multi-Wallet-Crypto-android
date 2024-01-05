@@ -26,7 +26,7 @@ private typealias ResponseListener<T> = (Result<T>) -> Unit
 
 interface BillingClientProvider {
 
-    fun initialize()
+    fun initialize(callback: (Unit) -> Unit)
     fun dispose()
 
     fun verifyFeatureSupported(featureType: FeatureType, listener: ResponseListener<Boolean>)
@@ -63,7 +63,7 @@ class BillingClientProviderImpl @Inject constructor(
 
     private var state = BillingClientProvider.State.DISCONNECTED
 
-    override fun initialize() {
+    override fun initialize(callback: (Unit) -> Unit) {
         if (state == BillingClientProvider.State.DISPOSED) {
             Timber.d("BillingClient already disposed")
             return
@@ -93,6 +93,7 @@ class BillingClientProviderImpl @Inject constructor(
                         is BillingResponse.OK -> {
                             Timber.d("BillingClient connected")
                             initializeResponseListeners.forEach { it.invoke(Result.success(Unit)) }
+                            callback.invoke(Unit)
                             BillingClientProvider.State.CONNECTED
                         }
                         is BillingResponse.BillingUnavailable -> {

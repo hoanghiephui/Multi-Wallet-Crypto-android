@@ -22,6 +22,7 @@ import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
@@ -48,29 +49,31 @@ class BillingPlusViewModel @Inject constructor(
         private val PREMIUM_MONTH = ProductId(BuildConfig.PREMIUM_MONTH)
     }
     init {
-        viewModelScope.launch {
-            _screenState.value = runCatching {
-                val userData = userDataRepository.userData.firstOrNull()
+        billingClient.initialize {
+            viewModelScope.launch {
+                _screenState.value = runCatching {
+                    val userData = userDataRepository.userData.firstOrNull()
 
-                BillingPlusUiState(
-                    isPlusMode = userData?.isPlusMode ?: false,
-                    isDeveloperMode = BuildConfig.DEBUG,
-                    productDetails = billingClient.queryProductDetails(
-                        PREMIUM_MONTH,
-                        ProductType.SUBS
-                    ),
-                    purchase = runCatching { verifyPlusUseCase.execute() }.getOrNull(),
-                )
-            }.fold(
-                onSuccess = { ScreenState.Idle(it) },
-                onFailure = {
-                    Timber.w(it)
-                    ScreenState.Error(
-                        message = R.string.error_billing,
-                        retryTitle = R.string.Button_Close,
+                    BillingPlusUiState(
+                        isPlusMode = userData?.isPlusMode ?: false,
+                        isDeveloperMode = BuildConfig.DEBUG,
+                        productDetails = billingClient.queryProductDetails(
+                            PREMIUM_MONTH,
+                            ProductType.SUBS
+                        ),
+                        purchase = runCatching { verifyPlusUseCase.execute(PREMIUM_MONTH) }.getOrNull(),
                     )
-                },
-            )
+                }.fold(
+                    onSuccess = { ScreenState.Idle(it) },
+                    onFailure = {
+                        Timber.w(it)
+                        ScreenState.Error(
+                            message = R.string.error_billing,
+                            retryTitle = R.string.Button_Close,
+                        )
+                    },
+                )
+            }
         }
     }
 
@@ -93,10 +96,17 @@ class BillingPlusViewModel @Inject constructor(
         )
     }
 
+    fun onVerify(context: Context) {
+        viewModelScope.launch {
+            delay(3000)
+            verify(context)
+        }
+    }
+
     suspend fun verify(context: Context): Boolean {
         return runCatching {
             withContext(ioDispatcher) {
-                verifyPlusUseCase.execute()
+                verifyPlusUseCase.execute(PREMIUM_MONTH)
             }
         }.fold(
             onSuccess = {
@@ -134,6 +144,11 @@ class BillingPlusViewModel @Inject constructor(
                 false
             },
         )
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        billingClient.dispose()
     }
 }
 

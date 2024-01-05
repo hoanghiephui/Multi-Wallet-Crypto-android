@@ -14,7 +14,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 interface BillingClient {
-    fun initialize()
+    fun initialize(callback: (Unit) -> Unit)
     fun dispose()
 
     suspend fun verifyFeatureSupported(featureType: FeatureType): Boolean
@@ -32,8 +32,8 @@ class BillingClientImpl @Inject constructor(
     private val provider: BillingClientProvider,
 ) : BillingClient {
 
-    override fun initialize() {
-        provider.initialize()
+    override fun initialize(callback: (Unit) -> Unit) {
+        provider.initialize(callback)
     }
 
     override fun dispose() {
