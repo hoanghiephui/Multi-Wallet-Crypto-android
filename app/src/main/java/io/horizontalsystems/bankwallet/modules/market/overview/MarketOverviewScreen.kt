@@ -75,6 +75,7 @@ fun MarketOverviewScreen(
         refreshing = isRefreshing,
         onRefresh = {
             viewModel.refresh()
+            viewModel.loadAds(context, BuildConfig.HOME_MARKET_NATIVE)
         }
     ) {
         Crossfade(viewState, label = "MarketOverviewScreen") { viewState ->

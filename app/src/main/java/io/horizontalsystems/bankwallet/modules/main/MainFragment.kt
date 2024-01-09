@@ -86,12 +86,13 @@ import io.horizontalsystems.bankwallet.ui.extensions.HeaderUpdate
 import io.horizontalsystems.bankwallet.ui.extensions.rememberLifecycleEvent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import se.warting.inappupdate.compose.findActivity
 import se.warting.inappupdate.compose.rememberInAppUpdateState
 import javax.inject.Inject
 
 class MainFragment : BaseComposeFragment() {
 
-    private val transactionsViewModel by navGraphViewModels<TransactionsViewModel>(R.id.mainFragment) { TransactionsModule.Factory() }
+    private val transactionsViewModel by viewModels<TransactionsViewModel> { TransactionsModule.Factory() }
     private val searchViewModel by viewModels<MarketSearchViewModel> { MarketSearchModule.Factory() }
     private var intentUri: Uri? = null
 
@@ -298,7 +299,7 @@ private fun MainScreen(
                 if (task.isSuccessful) {
                     val reviewInfo = task.result
                     reviewInfo.let {
-                        val flow = manager.launchReviewFlow(context as Activity, it)
+                        val flow = manager.launchReviewFlow(context.findActivity(), it)
                         flow.addOnCompleteListener { _ ->
 
                         }
