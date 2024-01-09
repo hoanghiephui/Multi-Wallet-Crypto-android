@@ -13,13 +13,13 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
 import com.android.billing.UserDataRepository
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.AndroidEntryPoint
 import io.horizontalsystems.bankwallet.analytics.AnalyticsHelper
 import io.horizontalsystems.bankwallet.analytics.LocalAnalyticsHelper
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
-import io.horizontalsystems.core.findNavController
 import javax.inject.Inject
 
 @AndroidEntryPoint

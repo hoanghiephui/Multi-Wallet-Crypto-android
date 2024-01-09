@@ -1,6 +1,5 @@
 package io.horizontalsystems.bankwallet.modules.main
 
-import android.app.Activity
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
@@ -48,7 +47,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.navGraphViewModels
 import com.android.billing.UserDataRepository
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
@@ -88,7 +86,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import se.warting.inappupdate.compose.findActivity
 import se.warting.inappupdate.compose.rememberInAppUpdateState
-import javax.inject.Inject
 
 class MainFragment : BaseComposeFragment() {
 
