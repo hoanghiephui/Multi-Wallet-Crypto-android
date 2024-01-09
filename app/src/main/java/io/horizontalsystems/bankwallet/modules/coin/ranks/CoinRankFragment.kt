@@ -9,8 +9,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.*
@@ -98,7 +100,7 @@ private fun CoinRankScreen(
                 )
             )
         )
-        Crossfade(uiState.viewState) { viewItemState ->
+        Crossfade(uiState.viewState, label = "") { viewItemState ->
             when (viewItemState) {
                 ViewState.Loading -> {
                     Loading()
@@ -110,9 +112,7 @@ private fun CoinRankScreen(
 
                 ViewState.Success -> {
                     var periodSelect by remember { mutableStateOf(uiState.periodSelect) }
-                    val listState = rememberSaveable(uiState.periodSelect?.selected, uiState.sortDescending, saver = LazyListState.Saver) {
-                        LazyListState()
-                    }
+                    val listState = rememberLazyListState()
                     LazyColumn(
                         state = listState,
                         modifier = Modifier.fillMaxSize(),
@@ -139,16 +139,6 @@ private fun CoinRankScreen(
                                         onClick = { viewModel.toggleSortType() }
                                     )
                                     Spacer(Modifier.weight(1f))
-                                    periodSelect?.let {
-                                        ButtonSecondaryToggle(
-                                            modifier = Modifier.padding(end = 16.dp),
-                                            select = it,
-                                            onSelect = { selectedDuration ->
-                                                viewModel.toggle(selectedDuration)
-                                                periodSelect = Select(selectedDuration, it.options)
-                                            }
-                                        )
-                                    }
                                 }
                             }
                             coinRankList(viewItems)
@@ -164,7 +154,7 @@ private fun LazyListScope.coinRankList(
     items: List<CoinRankModule.RankViewItem>
 ) {
     item {
-        VerticalDivider(
+        HorizontalDivider(
             thickness = 1.dp,
             color = ComposeAppTheme.colors.steel10,
         )
@@ -231,7 +221,7 @@ private fun CoinRankCell(
             }
             HSpacer(16.dp)
         }
-        VerticalDivider(
+        HorizontalDivider(
             thickness = 1.dp,
             color = ComposeAppTheme.colors.steel10,
         )
