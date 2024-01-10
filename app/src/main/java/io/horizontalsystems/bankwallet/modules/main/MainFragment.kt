@@ -47,6 +47,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.navGraphViewModels
 import com.android.billing.UserDataRepository
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
@@ -89,10 +91,22 @@ import se.warting.inappupdate.compose.rememberInAppUpdateState
 
 class MainFragment : BaseComposeFragment() {
 
-    private val transactionsViewModel by viewModels<TransactionsViewModel> { TransactionsModule.Factory() }
+    private val transactionsViewModel by navGraphViewModels<TransactionsViewModel>(R.id.mainFragment) { TransactionsModule.Factory() }
     private val searchViewModel by viewModels<MarketSearchViewModel> { MarketSearchModule.Factory() }
     private var intentUri: Uri? = null
 
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBundle("nav_state", findNavController().saveState())
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        savedInstanceState?.let {
+            findNavController().restoreState(savedInstanceState.getBundle("nav_state"))
+        }
+    }
 
 
     @Composable
