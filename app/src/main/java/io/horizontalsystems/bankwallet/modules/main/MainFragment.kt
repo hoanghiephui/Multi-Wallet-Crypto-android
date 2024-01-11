@@ -303,24 +303,21 @@ private fun MainScreen(
             viewModel.whatsNewShown()
         }
     }
-    if (uiState.showRateAppDialog) {
-        try {
+    LaunchedEffect(key1 = Unit, block = {
+        if (uiState.showRateAppDialog) {
             val request = manager.requestReviewFlow()
             request.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val reviewInfo = task.result
-                    reviewInfo.let {
-                        val flow = manager.launchReviewFlow(context.findActivity(), it)
-                        flow.addOnCompleteListener { _ ->
+                    val flow = manager.launchReviewFlow(context.findActivity(), reviewInfo)
+                    flow.addOnCompleteListener { _ ->
 
-                        }
                     }
                 }
             }
-        } catch (ex: Exception) {
-            ex.printStackTrace()
         }
-    }
+    })
+
 
 
     if (uiState.wcSupportState != null) {
