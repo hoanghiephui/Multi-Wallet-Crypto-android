@@ -2,7 +2,7 @@ buildscript {
     ext {
         compile_sdk_version = 34
         min_sdk_version = 27
-        lifecycle_version = '2.6.2'
+        lifecycle_version = '2.7.0'
 
         compose_version = '1.5.4'
         kotlin_version = '1.9.10'
@@ -27,7 +27,7 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.gms:google-services:4.4.0'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:2.9.9'
-        classpath 'com.google.dagger:hilt-android-gradle-plugin:2.49'
+        classpath 'com.google.dagger:hilt-android-gradle-plugin:2.50'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files

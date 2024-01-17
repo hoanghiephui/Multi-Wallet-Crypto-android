@@ -63,7 +63,7 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("com.android.billingclient:billing:6.1.0")
     implementation("com.android.billingclient:billing-ktx:6.1.0")
-    implementation("com.google.dagger:hilt-android:2.49")
+    implementation("com.google.dagger:hilt-android:2.50")
     implementation("com.jakewharton.timber:timber:5.0.1")
     kapt("com.google.dagger:hilt-android-compiler:2.49")
     implementation("androidx.datastore:datastore:1.0.0")
