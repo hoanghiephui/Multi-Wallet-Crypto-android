@@ -18,6 +18,7 @@ import com.android.billing.DebugTree
 import com.applovin.sdk.AppLovinSdk
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.crashlytics.crashlytics
 import com.walletconnect.android.Core
 import com.walletconnect.android.CoreClient
@@ -452,6 +453,9 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
 
         startTasks()
         setAnalytic()
+        Thread.setDefaultUncaughtExceptionHandler { _, e ->
+            FirebaseCrashlytics.getInstance().recordException(e)
+        }
     }
 
     override fun newImageLoader(): ImageLoader {

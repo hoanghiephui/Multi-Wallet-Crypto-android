@@ -5,7 +5,15 @@ import android.view.View
 import android.widget.FrameLayout
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -25,8 +33,13 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
-import io.horizontalsystems.bankwallet.ui.compose.components.*
+import io.horizontalsystems.bankwallet.ui.compose.components.HsIconButton
+import io.horizontalsystems.bankwallet.ui.compose.components.body_grey
+import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
+import io.horizontalsystems.bankwallet.ui.compose.components.headline2_leah
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 
 open class BaseComposableBottomSheetFragment : BottomSheetDialogFragment() {
 
@@ -49,7 +62,9 @@ open class BaseComposableBottomSheetFragment : BottomSheetDialogFragment() {
     }
 
     open fun close() {
-        dismiss()
+        if (activity != null || isVisible) {
+            dismissAllowingStateLoss()
+        }
     }
 
 }
@@ -78,6 +93,7 @@ fun BottomSheetHeader(
         iconTint = iconTint,
         content = content
     )
+    TrackScreenViewEvent(title)
 }
 
 @Composable
@@ -168,8 +184,8 @@ private fun BottomSheetHeader_Preview() {
             iconPainter = iconPainter,
             iconTint = ColorFilter.tint(ComposeAppTheme.colors.jacob),
             title = stringResource(R.string.ManageAccount_SwitchWallet_Title),
-            onCloseClick = {  },
-        ){
+            onCloseClick = { },
+        ) {
             body_grey(
                 modifier = Modifier.padding(horizontal = 24.dp),
                 text = "Bottom sheet content",

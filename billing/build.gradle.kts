@@ -35,7 +35,7 @@ android {
         jvmTarget = "17"
     }
     buildFeatures.compose = true
-    composeOptions.kotlinCompilerExtensionVersion = "1.5.3"
+    composeOptions.kotlinCompilerExtensionVersion = "1.5.8"
 }
 
 protobuf {
@@ -65,9 +65,9 @@ dependencies {
     implementation("com.android.billingclient:billing-ktx:6.1.0")
     implementation("com.google.dagger:hilt-android:2.50")
     implementation("com.jakewharton.timber:timber:5.0.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.49")
+    kapt("com.google.dagger:hilt-android-compiler:2.50")
     implementation("androidx.datastore:datastore:1.0.0")
-    implementation("com.google.protobuf:protobuf-kotlin-lite:3.24.4")
+    implementation("com.google.protobuf:protobuf-kotlin-lite:3.25.2")
     implementation(platform("androidx.compose:compose-bom:2023.10.01"))
     implementation("androidx.compose.ui:ui-tooling-preview")
 

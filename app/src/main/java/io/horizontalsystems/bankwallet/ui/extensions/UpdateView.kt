@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.google.android.play.core.ktx.AppUpdateResult
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryDefault
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -51,12 +52,6 @@ fun HeaderUpdate(
         }
     ) {
         when (val result = updateState.appUpdateResult) {
-            is AppUpdateResult.NotAvailable -> {
-                LaunchedEffect(key1 = Unit, block = {
-                    sheetState.hide()
-                })
-            }
-
             is AppUpdateResult.Available -> {
                 Text(
                     text = stringResource(id = R.string.update_content),
@@ -152,6 +147,13 @@ fun HeaderUpdate(
                     sheetState.show()
                 })
             }
+
+            else -> {
+                LaunchedEffect(key1 = Unit, block = {
+                    sheetState.hide()
+                })
+            }
         }
+        TrackScreenViewEvent("HeaderUpdate")
     }
 }
