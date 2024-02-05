@@ -335,7 +335,7 @@ dependencies {
     implementation 'androidx.activity:activity-compose:1.8.2'
     // Compose Material Design
     implementation "androidx.compose.material:material"
-    implementation "androidx.compose.material3:material3:1.2.0-beta02"
+    implementation "androidx.compose.material3:material3:1.2.0-rc01"
     // Animations
     implementation "androidx.compose.animation:animation"
     // Tooling support (Previews, etc.)
