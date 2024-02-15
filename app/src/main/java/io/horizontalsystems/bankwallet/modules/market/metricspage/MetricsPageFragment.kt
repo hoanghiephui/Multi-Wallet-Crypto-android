@@ -11,15 +11,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.*
 import io.horizontalsystems.bankwallet.entities.ViewState
@@ -72,7 +75,11 @@ class MetricsPageFragment : BaseComposeFragment() {
         val viewState = itemsViewState?.merge(chartViewModel.uiState.viewState)
         val marketData by viewModel.marketLiveData.observeAsState()
         val isRefreshing by viewModel.isRefreshingLiveData.observeAsState(false)
-
+        val nativeAd by viewModel.adState
+        val context = LocalContext.current
+        LaunchedEffect(key1 = BuildConfig.METRICS_NATIVE, block = {
+            viewModel.loadAds(context, BuildConfig.METRICS_NATIVE)
+        })
         Column(Modifier.background(color = MaterialTheme.colorScheme.background)) {
             AppBar(
                 menuItems = listOf(
@@ -130,6 +137,10 @@ class MetricsPageFragment : BaseComposeFragment() {
                                             viewModel::onToggleSortType,
                                             viewModel::onSelectMarketField
                                         )
+                                    }
+                                    item {
+                                        Spacer(modifier = Modifier.height(12.dp))
+                                        MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
                                     }
                                     items(marketData.marketViewItems) { marketViewItem ->
                                         MarketCoinClear(

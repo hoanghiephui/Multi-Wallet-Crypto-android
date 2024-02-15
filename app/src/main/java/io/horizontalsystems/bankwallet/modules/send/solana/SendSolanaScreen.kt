@@ -6,15 +6,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
+import io.horizontalsystems.bankwallet.core.AdType
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.Address
 import io.horizontalsystems.bankwallet.modules.address.AddressParserModule
@@ -48,7 +54,11 @@ fun SendSolanaScreen(
     val amountCaution = uiState.amountCaution
     val proceedEnabled = uiState.canBeSend
     val amountInputType = amountInputModeViewModel.inputType
-
+    val nativeAd by viewModel.adState
+    val context = LocalContext.current
+    LaunchedEffect(key1 = BuildConfig.SEND_COIN_NATIVE, block = {
+        viewModel.loadAds(context, BuildConfig.SEND_COIN_NATIVE)
+    })
     val paymentAddressViewModel = viewModel<AddressParserViewModel>(
         factory = AddressParserModule.Factory(wallet.token, prefilledData?.amount)
     )
@@ -108,6 +118,8 @@ fun SendSolanaScreen(
                     viewModel.onEnterAddress(it)
                 }
             }
+            Spacer(modifier = Modifier.height(12.dp))
+            MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
 
             ButtonPrimaryYellow(
                 modifier = Modifier
@@ -131,5 +143,5 @@ fun SendSolanaScreen(
             )
         }
     }
-
+    TrackScreenViewEvent("SendSolanaScreen")
 }

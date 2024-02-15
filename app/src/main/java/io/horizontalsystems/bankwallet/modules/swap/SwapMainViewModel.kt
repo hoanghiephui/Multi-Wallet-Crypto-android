@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import cash.z.ecc.android.sdk.ext.collectWith
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
+import io.horizontalsystems.bankwallet.core.BaseViewModel
 import io.horizontalsystems.bankwallet.core.EvmError
 import io.horizontalsystems.bankwallet.core.IAdapterManager
 import io.horizontalsystems.bankwallet.core.IBalanceAdapter
@@ -65,7 +66,7 @@ class SwapMainViewModel(
     private val timerService: TimerService,
     private val currencyManager: CurrencyManager,
     private val adapterManager: IAdapterManager,
-) : ViewModel() {
+) : BaseViewModel() {
     private val maxValidDecimals = 8
 
     private val disposable = CompositeDisposable()

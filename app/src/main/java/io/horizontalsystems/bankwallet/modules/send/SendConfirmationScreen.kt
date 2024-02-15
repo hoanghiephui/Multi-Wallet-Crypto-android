@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.entities.Address
@@ -31,7 +32,6 @@ import io.horizontalsystems.bankwallet.modules.amount.AmountInputType
 import io.horizontalsystems.bankwallet.modules.contacts.model.Contact
 import io.horizontalsystems.bankwallet.modules.fee.HSFeeInputRaw
 import io.horizontalsystems.bankwallet.modules.hodler.HSHodler
-import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.DisposableLifecycleCallbacks
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
@@ -218,6 +218,7 @@ fun SendConfirmationScreen(
             )
         }
     }
+    TrackScreenViewEvent("SendConfirmationScreen")
 }
 
 @Composable

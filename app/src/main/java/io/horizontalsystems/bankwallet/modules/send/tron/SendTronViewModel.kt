@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.AppLogger
+import io.horizontalsystems.bankwallet.core.BaseViewModel
 import io.horizontalsystems.bankwallet.core.HSCaution
 import io.horizontalsystems.bankwallet.core.ISendTronAdapter
 import io.horizontalsystems.bankwallet.core.LocalizedException
@@ -42,7 +43,7 @@ class SendTronViewModel(
     private val contactsRepo: ContactsRepository,
     private val showAddressInput: Boolean,
     private val connectivityManager: ConnectivityManager,
-) : ViewModel() {
+) : BaseViewModel() {
     val logger: AppLogger = AppLogger("send-tron")
 
     val blockchainType = wallet.token.blockchainType

@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.Address
 import io.horizontalsystems.bankwallet.modules.address.AddressParserModule
@@ -152,4 +153,5 @@ fun SendBinanceScreen(
             )
         }
     }
+    TrackScreenViewEvent("SendBinanceScreen")
 }

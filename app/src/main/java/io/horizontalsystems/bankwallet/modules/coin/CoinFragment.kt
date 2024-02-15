@@ -27,6 +27,7 @@ import androidx.navigation.NavController
 import androidx.navigation.navGraphViewModels
 import com.android.billing.UserDataRepository
 import com.applovin.mediation.ads.MaxRewardedAd
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromBottom
@@ -59,7 +60,7 @@ class CoinFragment : BaseComposeFragment(), AdRewardedCallback {
             navController,
             childFragmentManager
         ) {
-            adMaxRewardedLoader.createRewardedAd(requireActivity(), "3bb05e71678b6c5a")
+            adMaxRewardedLoader.createRewardedAd(requireActivity(), BuildConfig.COIN_REWARD)
         }
     }
 

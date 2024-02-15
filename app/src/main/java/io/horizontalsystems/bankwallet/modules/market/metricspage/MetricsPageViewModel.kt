@@ -3,6 +3,7 @@ package io.horizontalsystems.bankwallet.modules.market.metricspage
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.horizontalsystems.bankwallet.core.BaseViewModel
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.subscribeIO
 import io.horizontalsystems.bankwallet.entities.ViewState
@@ -18,10 +19,10 @@ import kotlinx.coroutines.launch
 
 class MetricsPageViewModel(
     private val service: MetricsPageService,
-) : ViewModel() {
+) : BaseViewModel() {
 
     private val disposables = CompositeDisposable()
-    private val marketFields = MarketField.values().toList()
+    private val marketFields = MarketField.entries
     private var marketField: MarketField
     private var marketItems: List<MarketItem> = listOf()
 

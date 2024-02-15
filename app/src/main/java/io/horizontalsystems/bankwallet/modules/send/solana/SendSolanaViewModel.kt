@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import cash.z.ecc.android.sdk.ext.collectWith
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
+import io.horizontalsystems.bankwallet.core.BaseViewModel
 import io.horizontalsystems.bankwallet.core.HSCaution
 import io.horizontalsystems.bankwallet.core.ISendSolanaAdapter
 import io.horizontalsystems.bankwallet.core.LocalizedException
@@ -41,7 +42,7 @@ class SendSolanaViewModel(
     private val contactsRepo: ContactsRepository,
     private val showAddressInput: Boolean,
     private val connectivityManager: ConnectivityManager,
-) : ViewModel() {
+) : BaseViewModel() {
     val blockchainType = wallet.token.blockchainType
     val feeTokenMaxAllowedDecimals = feeToken.decimals
     val fiatMaxAllowedDecimals = App.appConfigProvider.fiatDecimal

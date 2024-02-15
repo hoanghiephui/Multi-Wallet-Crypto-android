@@ -12,9 +12,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -22,7 +24,11 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
+import io.horizontalsystems.bankwallet.core.AdType
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.composablePage
 import io.horizontalsystems.bankwallet.core.composablePopup
 import io.horizontalsystems.bankwallet.core.slideFromRight
@@ -111,14 +117,16 @@ fun SendBitcoinScreen(
     val proceedEnabled = uiState.canBeSend
     val amountInputType = amountInputModeViewModel.inputType
     val feeRateCaution = uiState.feeRateCaution
-
+    val context = LocalContext.current
     val rate = viewModel.coinRate
-
+    val nativeAd by viewModel.adState
     val paymentAddressViewModel = viewModel<AddressParserViewModel>(
         factory = AddressParserModule.Factory(wallet.token, prefilledData?.amount)
     )
     val amountUnique = paymentAddressViewModel.amountUnique
-
+    LaunchedEffect(key1 = BuildConfig.SEND_COIN_NATIVE, block = {
+        viewModel.loadAds(context, BuildConfig.SEND_COIN_NATIVE)
+    })
     ComposeAppTheme {
         val focusRequester = remember { FocusRequester() }
 
@@ -208,6 +216,8 @@ fun SendBitcoinScreen(
                         feeRateCaution = feeRateCaution
                     )
                 }
+                Spacer(modifier = Modifier.height(12.dp))
+                MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
 
                 ButtonPrimaryYellow(
                     modifier = Modifier
@@ -225,4 +235,6 @@ fun SendBitcoinScreen(
             }
         }
     }
+
+    TrackScreenViewEvent("SendBitcoinScreen")
 }

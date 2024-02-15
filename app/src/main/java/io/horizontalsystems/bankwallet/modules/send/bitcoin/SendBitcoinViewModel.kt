@@ -9,6 +9,7 @@ import cash.z.ecc.android.sdk.ext.collectWith
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.AppLogger
+import io.horizontalsystems.bankwallet.core.BaseViewModel
 import io.horizontalsystems.bankwallet.core.HSCaution
 import io.horizontalsystems.bankwallet.core.ISendBitcoinAdapter
 import io.horizontalsystems.bankwallet.core.LocalizedException
@@ -39,7 +40,7 @@ class SendBitcoinViewModel constructor(
     private val btcBlockchainManager: BtcBlockchainManager,
     private val contactsRepo: ContactsRepository,
     private val showAddressInput: Boolean
-) : ViewModel() {
+) : BaseViewModel() {
     val coinMaxAllowedDecimals = wallet.token.decimals
     val fiatMaxAllowedDecimals = App.appConfigProvider.fiatDecimal
 

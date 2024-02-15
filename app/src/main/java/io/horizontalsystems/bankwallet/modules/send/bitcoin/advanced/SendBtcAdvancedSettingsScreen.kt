@@ -1,6 +1,5 @@
 package io.horizontalsystems.bankwallet.modules.send.bitcoin.advanced
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -17,6 +16,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.core.HSCaution
 import io.horizontalsystems.bankwallet.entities.TransactionDataSortMode
 import io.horizontalsystems.bankwallet.modules.amount.AmountInputType
@@ -172,6 +172,8 @@ fun SendBtcAdvancedSettingsScreen(
             }
         }
     }
+
+    TrackScreenViewEvent("SendBtcAdvancedSettingsScreen")
 }
 
 @Composable

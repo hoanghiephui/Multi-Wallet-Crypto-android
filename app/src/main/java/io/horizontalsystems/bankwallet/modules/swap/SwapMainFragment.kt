@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -21,12 +20,10 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
@@ -41,9 +38,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
+import io.horizontalsystems.bankwallet.core.AdType
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.BaseFragment
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.Address
@@ -193,6 +194,7 @@ private fun SwapMainScreen(
             }
         }
     }
+    TrackScreenViewEvent("SwapMainScreen")
 }
 
 @Composable
@@ -217,7 +219,11 @@ fun SwapCards(
     val tradePriceExpiration = viewModel.swapState.tradePriceExpiration
     val buttons = viewModel.swapState.buttons
     val hasNonZeroBalance = viewModel.swapState.hasNonZeroBalance
-
+    val nativeAd by viewModel.adState
+    val context = LocalContext.current
+    LaunchedEffect(key1 = BuildConfig.SWAP_COIN_NATIVE, block = {
+        viewModel.loadAds(context, BuildConfig.SWAP_COIN_NATIVE)
+    })
     LaunchedEffect(swapState.refocusKey) {
         focusRequester.requestFocus()
     }
@@ -313,8 +319,9 @@ fun SwapCards(
                     text = stringResource(R.string.Approve_RevokeAndApproveInfo, allowanceViewModel.uiState.allowance ?: "")
                 )
             }
-
-            VSpacer(32.dp)
+            Spacer(modifier = Modifier.height(12.dp))
+            MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
+            VSpacer(12.dp)
 
             ActionButtons(
                 buttons = buttons,
