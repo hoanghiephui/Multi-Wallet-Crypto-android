@@ -6,11 +6,17 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Icon
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -64,8 +70,13 @@ class ManageAccountsFragment : BaseComposeFragment() {
 fun ManageAccountsScreen(navController: NavController, mode: ManageAccountsModule.Mode,
                          userDataRepository: UserDataRepository,) {
     BackupAlert(navController)
-
-    val viewModel = viewModel<ManageAccountsViewModel>(factory = ManageAccountsModule.Factory(mode, userDataRepository))
+    var openAlertDialog by remember { mutableStateOf(false) }
+    val viewModel = viewModel<ManageAccountsViewModel>(
+        factory = ManageAccountsModule.Factory(
+            mode,
+            userDataRepository
+        )
+    )
     val isPlusMode by viewModel.screenState.collectAsStateWithLifecycle()
     val viewItems = viewModel.viewItems
     val finish = viewModel.finish
@@ -108,7 +119,7 @@ fun ManageAccountsScreen(navController: NavController, mode: ManageAccountsModul
                                 navController.slideFromRight(R.id.createAccountFragment, args)
                             }
                         } else {
-                            context.findActivity().showBillingPlusDialog()
+                            openAlertDialog = true
                         }
                     },
                     ActionViewItem(R.drawable.ic_download_20, R.string.ManageAccounts_ImportWallet) {
@@ -135,6 +146,25 @@ fun ManageAccountsScreen(navController: NavController, mode: ManageAccountsModul
                 Spacer(modifier = Modifier.height(32.dp))
             }
         }
+    }
+    if (openAlertDialog) {
+        AlertDialog(
+            title = {
+                body_jacob(text = stringResource(id = R.string.billing_plus_title))
+            },
+            text = {
+                Text(text = stringResource(id = R.string.billing_plus_description))
+            },
+            onDismissRequest = { openAlertDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    openAlertDialog = false
+                    context.findActivity().showBillingPlusDialog()
+                }) {
+                    Text(text = "Ok")
+                }
+            }
+        )
     }
 }
 

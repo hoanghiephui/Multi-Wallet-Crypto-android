@@ -53,6 +53,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.android.billing.models.UserData
 import com.android.billingclient.api.Purchase
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.ui.compose.AsyncLoadContents
 import io.horizontalsystems.bankwallet.ui.compose.bold
 import kotlinx.coroutines.launch
@@ -296,5 +297,6 @@ fun Activity.showBillingPlusDialog() {
                 },
             )
         }
+        TrackScreenViewEvent("showBillingPlusDialog")
     }
 }

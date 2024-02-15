@@ -3,18 +3,21 @@ package io.horizontalsystems.bankwallet.modules.coin
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.android.billing.UserDataRepository
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
 
 object CoinModule {
 
-    class Factory(private val coinUid: String) : ViewModelProvider.Factory {
+    class Factory(private val coinUid: String,
+                  private val userDataRepository: UserDataRepository
+    ) : ViewModelProvider.Factory {
 
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             val fullCoin = App.marketKit.fullCoins(coinUids = listOf(coinUid)).first()
             val service = CoinService(fullCoin, App.marketFavoritesManager)
-            return CoinViewModel(service, listOf(service), App.localStorage, App.subscriptionManager) as T
+            return CoinViewModel(service, listOf(service), App.localStorage, App.subscriptionManager, userDataRepository) as T
         }
 
     }

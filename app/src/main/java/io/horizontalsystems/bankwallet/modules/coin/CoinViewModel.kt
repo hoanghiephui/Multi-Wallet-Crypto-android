@@ -5,11 +5,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.billing.UserDataRepository
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.Clearable
 import io.horizontalsystems.bankwallet.core.ILocalStorage
 import io.horizontalsystems.bankwallet.core.managers.SubscriptionManager
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
 
@@ -17,10 +21,11 @@ class CoinViewModel(
     private val service: CoinService,
     private val clearables: List<Clearable>,
     private val localStorage: ILocalStorage,
-    private val subscriptionManager: SubscriptionManager
+    private val subscriptionManager: SubscriptionManager,
+    userDataRepository: UserDataRepository,
 ) : ViewModel() {
 
-    val tabs = CoinModule.Tab.values()
+    val tabs = CoinModule.Tab.entries.toTypedArray()
     val fullCoin by service::fullCoin
 
     val isWatchlistEnabled = localStorage.marketsTabEnabled
@@ -30,7 +35,13 @@ class CoinViewModel(
         private set
 
     private var subscriptionInfoShown: Boolean = false
-
+    val screenState = userDataRepository.userData.map {
+        it.hasPrivilege
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = false,
+    )
     init {
         viewModelScope.launch {
             val isFavoriteFlow: Flow<Boolean> = service.isFavorite.asFlow()
