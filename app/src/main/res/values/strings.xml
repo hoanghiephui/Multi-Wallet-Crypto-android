@@ -1966,4 +1966,7 @@
     <string name="error_developing_feature">Feature under development</string>
     <string name="error_billing">Failed to retrieve purchase information</string>
     <string name="common_reload">Reload</string>
+
+    <!-- Widget -->
+    <string name="widget_error_require_plus">To use the widget\nYou must subscribe to CoinDex+</string>
 </resources>

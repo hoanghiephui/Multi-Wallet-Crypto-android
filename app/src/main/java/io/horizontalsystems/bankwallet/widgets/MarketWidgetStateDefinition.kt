@@ -35,7 +35,10 @@ object MarketWidgetStateDefinition : GlanceStateDefinition<MarketWidgetState> {
                 .create()
         }
 
-        override val defaultValue = MarketWidgetState(loading = true)
+        override val defaultValue = MarketWidgetState(
+            loading = true,
+            isPlusUser = false
+        )
 
         override suspend fun readFrom(input: InputStream): MarketWidgetState = try {
             val jsonString = input.readBytes().decodeToString()

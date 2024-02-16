@@ -104,7 +104,7 @@ class MarketWidgetManager {
             }
         }
 
-        val localPath = context.imageLoader.diskCache?.get(url)?.use { snapshot ->
+        val localPath = context.imageLoader.diskCache?.openSnapshot(url)?.use { snapshot ->
             snapshot.data.toFile().path
         }
 
@@ -137,7 +137,7 @@ class MarketWidgetManager {
 
     companion object {
         fun getMarketWidgetTypes(): List<MarketWidgetType> {
-            val types = MarketWidgetType.values().toMutableList()
+            val types = MarketWidgetType.entries.toMutableList()
             // TopNfts type is hidden for now. It will be removed in next sprints
             types.remove(MarketWidgetType.TopNfts)
             if (!App.localStorage.marketsTabEnabled) {

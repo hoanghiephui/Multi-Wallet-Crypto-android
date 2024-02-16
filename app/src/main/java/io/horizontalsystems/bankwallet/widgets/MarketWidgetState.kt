@@ -12,7 +12,8 @@ data class MarketWidgetState(
     val items: List<MarketWidgetItem> = listOf(),
     val loading: Boolean = false,
     val error: String? = null,
-    val updateTimestampMillis: Long = System.currentTimeMillis()
+    val updateTimestampMillis: Long = System.currentTimeMillis(),
+    val isPlusUser: Boolean
 ) {
     override fun toString(): String {
         return "{ widgetId: $widgetId, " +
@@ -31,7 +32,7 @@ enum class MarketWidgetType(val title: Int, val id: String) {
     TopPlatforms(R.string.MarketTopPlatforms_Title, "topPlatforms");
 
     companion object {
-        val map = values().associateBy(MarketWidgetType::id)
+        val map = entries.associateBy(MarketWidgetType::id)
         fun fromId(id: String): MarketWidgetType? = map[id]
     }
 }

@@ -1,17 +1,20 @@
 package io.horizontalsystems.bankwallet.widgets
 
-import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.action.ActionParameters
@@ -27,6 +30,7 @@ import androidx.glance.appwidget.lazy.items
 import androidx.glance.appwidget.provideContent
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.background
+import androidx.glance.color.ColorProviders
 import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Alignment.Vertical.Companion.CenterVertically
@@ -53,6 +57,7 @@ import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.ln
 
 class MarketWidget : GlanceAppWidget() {
 
@@ -78,87 +83,114 @@ class MarketWidget : GlanceAppWidget() {
     private fun Content(context: Context) {
         val state = currentState<MarketWidgetState>()
         val deeplinkScheme = context.getString(R.string.DeeplinkScheme)
-
+        val plusIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
+            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            putExtra("plus", true)
+        }
+        val isPlusUser = state.isPlusUser
         AppWidgetTheme {
-            Column(
-                modifier = GlanceModifier
-                    .fillMaxSize()
-                    .background(ImageProvider(R.drawable.widget_background))
-                    .padding(16.dp),
-                verticalAlignment = Alignment.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            Box {
                 Column(
                     modifier = GlanceModifier
-                        .defaultWeight()
-                        .background(ImageProvider(R.drawable.widget_list_background))
+                        .fillMaxSize()
+                        .background(GlanceTheme.colors.surfaceColorAtElevation(context, 6.dp))
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.Top,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Row(
+                    Column(
                         modifier = GlanceModifier
-                            .height(44.dp)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
+                            .defaultWeight()
+                            .background(ImageProvider(R.drawable.widget_list_background))
                     ) {
-                        Text(
-                            modifier = GlanceModifier.defaultWeight().padding(start = 16.dp),
-                            text = context.getString(state.type.title),
-                            style = AppWidgetTheme.textStyles.d1()
-                        )
-                        Box(
+                        Row(
                             modifier = GlanceModifier
-                                .fillMaxHeight()
-                                .padding(horizontal = 16.dp)
-                                .clickable(actionRunCallback<UpdateMarketAction>()),
-                            contentAlignment = Alignment.Center
+                                .height(44.dp)
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            if (state.loading) {
-                                CircularProgressIndicator(modifier = GlanceModifier.size(20.dp))
-                            } else {
-                                Image(
-                                    modifier = GlanceModifier.size(20.dp),
-                                    provider = ImageProvider(R.drawable.ic_refresh),
-                                    contentDescription = null
-                                )
+                            Text(
+                                modifier = GlanceModifier.defaultWeight().padding(start = 16.dp),
+                                text = context.getString(state.type.title),
+                                style = AppWidgetTheme.textStyles.d1()
+                            )
+                            Box(
+                                modifier = GlanceModifier
+                                    .fillMaxHeight()
+                                    .padding(horizontal = 16.dp)
+                                    .clickable(actionRunCallback<UpdateMarketAction>()),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (state.loading) {
+                                    CircularProgressIndicator(modifier = GlanceModifier.size(20.dp))
+                                } else {
+                                    Image(
+                                        modifier = GlanceModifier.size(20.dp),
+                                        provider = ImageProvider(R.drawable.ic_refresh),
+                                        contentDescription = null
+                                    )
+                                }
                             }
                         }
-                    }
 
-                    if (!state.loading && state.type == MarketWidgetType.Watchlist && state.items.isEmpty()) {
-                        FullScreenMessage(
-                            icon = R.drawable.ic_rate_24,
-                            text = context.getString(R.string.Market_Tab_Watchlist_EmptyList),
-                        )
-                    } else if (state.error != null) {
-                        FullScreenMessage(
-                            icon = R.drawable.ic_sync_error,
-                            text = state.error,
-                        )
-                    } else {
-                        LazyColumn {
-                            items(state.items) { item ->
-                                val deeplinkUri = getDeeplinkUri(item, state.type, deeplinkScheme)
-                                Box(
-                                    modifier = GlanceModifier
-                                        .height(60.dp)
-                                        .background(ImageProvider(R.drawable.widget_list_item_background))
-                                        .clickable(
-                                            actionStartActivity(Intent(Intent.ACTION_VIEW, deeplinkUri))
-                                        )
-                                ) {
-                                    Item(item = item)
+                        if (!state.loading && state.type == MarketWidgetType.Watchlist && state.items.isEmpty()) {
+                            FullScreenMessage(
+                                icon = R.drawable.ic_rate_24,
+                                text = context.getString(R.string.Market_Tab_Watchlist_EmptyList),
+                            )
+                        } else if (state.error != null) {
+                            FullScreenMessage(
+                                icon = R.drawable.ic_sync_error,
+                                text = state.error,
+                            )
+                        } else {
+                            LazyColumn {
+                                items(state.items) { item ->
+                                    val deeplinkUri = getDeeplinkUri(item, state.type, deeplinkScheme)
+                                    Box(
+                                        modifier = GlanceModifier
+                                            .height(60.dp)
+                                            .background(ImageProvider(R.drawable.widget_list_item_background))
+                                            .clickable(
+                                                actionStartActivity(Intent(Intent.ACTION_VIEW, deeplinkUri))
+                                            )
+                                    ) {
+                                        Item(item = item)
+                                    }
                                 }
                             }
                         }
                     }
+                    Column {
+                        Spacer(modifier = GlanceModifier.height(8.dp))
+                        Text(
+                            text = "Updated: " + SimpleDateFormat(
+                                "HH:mm:ss, dd-MM-yyyy",
+                                Locale.US
+                            ).format(Date(state.updateTimestampMillis)),
+                            style = AppWidgetTheme.textStyles.micro()
+                        )
+                    }
                 }
-                Column {
-                    Spacer(modifier = GlanceModifier.height(8.dp))
+            }
+            if (!isPlusUser) {
+                Column(
+                    modifier = GlanceModifier
+                        .fillMaxSize()
+                        .background(GlanceTheme.colors.errorContainer.getColor(context).copy(alpha = 0.9f))
+                        .clickable(actionStartActivity(plusIntent ?: Intent())),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
                     Text(
-                        text = "Updated: " + SimpleDateFormat(
-                            "HH:mm:ss, dd-MM-yyyy",
-                            Locale.US
-                        ).format(Date(state.updateTimestampMillis)),
-                        style = AppWidgetTheme.textStyles.micro()
+                        modifier = GlanceModifier.padding(16.dp),
+                        text = context.getString(R.string.widget_error_require_plus),
+                        style = TextStyle(
+                            color = GlanceTheme.colors.onErrorContainer,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp,
+                            textAlign = TextAlign.Center,
+                        ),
                     )
                 }
             }
@@ -331,4 +363,10 @@ class UpdateMarketAction : ActionCallback {
 
         MarketWidgetManager().refresh(glanceId)
     }
+}
+
+internal fun ColorProviders.surfaceColorAtElevation(context: Context, elevation: Dp): Color {
+    if (elevation == 0.dp) return surface.getColor(context)
+    val alpha = ((4.5f * ln(elevation.value + 1)) + 2f) / 100f
+    return primary.getColor(context).copy(alpha = alpha).compositeOver(surface.getColor(context))
 }
