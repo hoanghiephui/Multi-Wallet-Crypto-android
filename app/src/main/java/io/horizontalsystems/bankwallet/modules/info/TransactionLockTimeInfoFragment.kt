@@ -1,5 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.info
 
+import android.os.Parcelable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,35 +14,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.requireInput
 import io.horizontalsystems.bankwallet.modules.info.ui.InfoHeader
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.InfoTextBody
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
+import kotlinx.parcelize.Parcelize
 
 class TransactionLockTimeInfoFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent(navController: NavController) {
         InfoScreen(
-            requireArguments().getString(LOCK_TIME)!!,
+            navController.requireInput<Input>().lockTime,
             navController
         )
     }
 
+    @Parcelize
+    data class Input(val lockTime: String) : Parcelable
+
     override val logScreen: String
         get() = "TransactionLockTimeInfoFragment"
-
-    companion object {
-        private const val LOCK_TIME = "lock_time"
-
-        fun prepareParams(lockTime: String) = bundleOf(LOCK_TIME to lockTime)
-    }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

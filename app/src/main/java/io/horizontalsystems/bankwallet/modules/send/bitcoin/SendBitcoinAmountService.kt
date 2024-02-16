@@ -5,6 +5,7 @@ import io.horizontalsystems.bankwallet.core.ISendBitcoinAdapter
 import io.horizontalsystems.bankwallet.entities.Address
 import io.horizontalsystems.bankwallet.modules.amount.AmountValidator
 import io.horizontalsystems.bitcoincore.core.IPluginData
+import io.horizontalsystems.bitcoincore.storage.UnspentOutputInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -16,6 +17,7 @@ class SendBitcoinAmountService(
     private val amountValidator: AmountValidator
 ) {
     private var amount: BigDecimal? = null
+    private var customUnspentOutputs: List<UnspentOutputInfo>? = null
     private var amountCaution: HSCaution? = null
 
     private var minimumSendAmount: BigDecimal? = null
@@ -53,7 +55,7 @@ class SendBitcoinAmountService(
     }
 
     private fun refreshAvailableBalance() {
-        availableBalance = feeRate?.let { adapter.availableBalance(it, validAddress?.hex, pluginData) }
+        availableBalance = feeRate?.let { adapter.availableBalance(it, validAddress?.hex, customUnspentOutputs, pluginData) }
     }
 
     private fun refreshMinimumSendAmount() {
@@ -102,6 +104,13 @@ class SendBitcoinAmountService(
         refreshAvailableBalance()
         validateAmount()
 
+        emitState()
+    }
+
+    fun setCustomUnspentOutputs(customUnspentOutputs: List<UnspentOutputInfo>?) {
+        this.customUnspentOutputs = customUnspentOutputs
+        refreshAvailableBalance()
+        validateAmount()
         emitState()
     }
 

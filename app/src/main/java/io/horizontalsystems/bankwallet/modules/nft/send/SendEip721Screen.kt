@@ -104,7 +104,7 @@ fun SendEip721Screen(
                         viewModel.getSendData()?.let { sendData ->
                             navController.slideFromRight(
                                 R.id.sendEvmConfirmationFragment,
-                                SendEvmConfirmationModule.prepareParams(sendData, parentNavId)
+                                SendEvmConfirmationModule.Input(sendData, parentNavId)
                             )
                         }
                     },

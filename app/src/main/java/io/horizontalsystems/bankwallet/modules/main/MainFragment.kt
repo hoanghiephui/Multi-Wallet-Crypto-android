@@ -76,7 +76,7 @@ import io.horizontalsystems.bankwallet.modules.transactions.TransactionsModule
 import io.horizontalsystems.bankwallet.modules.transactions.TransactionsScreen
 import io.horizontalsystems.bankwallet.modules.transactions.TransactionsViewModel
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCAccountTypeNotSupportedDialog
-import io.horizontalsystems.bankwallet.modules.walletconnect.version2.WC2Manager.SupportState
+import io.horizontalsystems.bankwallet.modules.walletconnect.WCManager.SupportState
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.DisposableLifecycleCallbacks
 import io.horizontalsystems.bankwallet.ui.compose.NiaNavigationBar
@@ -298,7 +298,7 @@ private fun MainScreen(
         LaunchedEffect(Unit) {
             fragmentNavController.slideFromBottom(
                 R.id.releaseNotesFragment,
-                bundleOf(ReleaseNotesFragment.showAsClosablePopupKey to true)
+                ReleaseNotesFragment.Input(true)
             )
             viewModel.whatsNewShown()
         }
@@ -330,14 +330,14 @@ private fun MainScreen(
                 val text = stringResource(R.string.WalletConnect_Error_NeedBackup)
                 fragmentNavController.slideFromBottom(
                     R.id.backupRequiredDialog,
-                    BackupRequiredDialog.prepareParams(wcSupportState.account, text)
+                    BackupRequiredDialog.Input(wcSupportState.account, text)
                 )
             }
 
             is SupportState.NotSupported -> {
                 fragmentNavController.slideFromBottom(
                     R.id.wcAccountTypeNotSupportedDialog,
-                    WCAccountTypeNotSupportedDialog.prepareParams(wcSupportState.accountTypeDescription)
+                    WCAccountTypeNotSupportedDialog.Input(wcSupportState.accountTypeDescription)
                 )
             }
 
@@ -351,7 +351,7 @@ private fun MainScreen(
             delay(500)
             fragmentNavController.slideFromRight(
                 deepLinkPage.navigationId,
-                deepLinkPage.bundle
+                deepLinkPage.input
             )
             viewModel.deeplinkPageHandled()
         }

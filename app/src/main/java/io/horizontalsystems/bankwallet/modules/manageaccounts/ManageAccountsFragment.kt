@@ -31,10 +31,11 @@ import com.android.billing.UserDataRepository
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.navigateWithTermsAccepted
+import io.horizontalsystems.bankwallet.core.requireInput
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.modules.backupalert.BackupAlert
 import io.horizontalsystems.bankwallet.modules.billing.showBillingPlusDialog
-import io.horizontalsystems.bankwallet.modules.manageaccount.ManageAccountModule
+import io.horizontalsystems.bankwallet.modules.manageaccount.ManageAccountFragment
 import io.horizontalsystems.bankwallet.modules.manageaccounts.ManageAccountsModule.AccountViewItem
 import io.horizontalsystems.bankwallet.modules.manageaccounts.ManageAccountsModule.ActionViewItem
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
@@ -56,7 +57,7 @@ class ManageAccountsFragment : BaseComposeFragment() {
     override fun GetContent(navController: NavController) {
         ManageAccountsScreen(
             navController,
-            arguments?.parcelable(ManageAccountsModule.MODE)!!,
+            navController.requireInput(),
             userDataRepository
         )
     }
@@ -108,8 +109,8 @@ fun ManageAccountsScreen(navController: NavController, mode: ManageAccountsModul
                 }
 
                 val args = when (mode) {
-                    ManageAccountsModule.Mode.Manage -> ManageAccountsModule.prepareParams(R.id.manageAccountsFragment, false)
-                    ManageAccountsModule.Mode.Switcher -> ManageAccountsModule.prepareParams(R.id.manageAccountsFragment, true)
+                    ManageAccountsModule.Mode.Manage -> ManageAccountsModule.Input(R.id.manageAccountsFragment, false)
+                    ManageAccountsModule.Mode.Switcher -> ManageAccountsModule.Input(R.id.manageAccountsFragment, true)
                 }
 
                 val actions = listOf(
@@ -228,7 +229,7 @@ private fun AccountsSection(accounts: List<AccountViewItem>, viewModel: ManageAc
             ) {
                 navController.slideFromRight(
                     R.id.manageAccountFragment,
-                    ManageAccountModule.prepareParams(accountViewItem.accountId)
+                    ManageAccountFragment.Input(accountViewItem.accountId)
                 )
             }
         }

@@ -131,7 +131,7 @@ fun MarketScreen(
                             searchViewModel.onCoinOpened(coin)
                             navController.slideFromRight(
                                 R.id.coinFragment,
-                                CoinFragment.prepareParams(coin.uid, "market_search")
+                                CoinFragment.Input(coin.uid, "market_search")
                             )
                         }
                     ) { favorited, coinUid ->

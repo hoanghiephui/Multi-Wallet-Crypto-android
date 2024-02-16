@@ -1,5 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.coin.audits
 
+import android.os.Parcelable
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,11 +25,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.requireInput
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
@@ -44,15 +45,16 @@ import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
+import kotlinx.parcelize.Parcelize
 
 class CoinAuditsFragment : BaseComposeFragment() {
 
-    private val viewModel by viewModels<CoinAuditsViewModel> {
-        CoinAuditsModule.Factory(requireArguments().getStringArrayList(ADDRESSES_KEY)!!)
-    }
-
     @Composable
     override fun GetContent(navController: NavController) {
+        val input = navController.requireInput<Input>()
+        val viewModel = viewModel<CoinAuditsViewModel>(
+            factory = CoinAuditsModule.Factory(input.addresses)
+        )
         CoinAuditsScreen(
             viewModel = viewModel,
             onClickNavigation = {
@@ -63,15 +65,11 @@ class CoinAuditsFragment : BaseComposeFragment() {
             }
         )
     }
-
     override val logScreen: String
         get() = "CoinAuditsFragment"
 
-    companion object {
-        private const val ADDRESSES_KEY = "addresses_key"
-
-        fun prepareParams(addresses: List<String>) = bundleOf(ADDRESSES_KEY to addresses)
-    }
+    @Parcelize
+    data class Input(val addresses: List<String>) : Parcelable
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

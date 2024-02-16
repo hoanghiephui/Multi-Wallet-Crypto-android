@@ -93,7 +93,7 @@ fun IndicatorsScreen(navController: NavController) {
                         toggleIndicator.invoke(indicator, it)
                     },
                     onEditClick = {
-                        navController.slideFromRight(R.id.indicatorSettingsFragment, IndicatorSettingsFragment.params(indicator.id))
+                        navController.slideFromRight(R.id.indicatorSettingsFragment, IndicatorSettingsFragment.Input(indicator.id))
                     }
                 )
             }
@@ -109,7 +109,7 @@ fun IndicatorsScreen(navController: NavController) {
                         toggleIndicator.invoke(indicator, it)
                     },
                     onEditClick = {
-                        navController.slideFromRight(R.id.indicatorSettingsFragment, IndicatorSettingsFragment.params(indicator.id))
+                        navController.slideFromRight(R.id.indicatorSettingsFragment, IndicatorSettingsFragment.Input(indicator.id))
                     }
                 )
             }

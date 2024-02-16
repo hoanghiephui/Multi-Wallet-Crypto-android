@@ -1,6 +1,5 @@
 package io.horizontalsystems.bankwallet.modules.evmnetwork
 
-import android.os.Bundle
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -47,6 +46,7 @@ import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.composablePopup
 import io.horizontalsystems.bankwallet.core.imageUrl
+import io.horizontalsystems.bankwallet.core.requireInput
 import io.horizontalsystems.bankwallet.entities.EvmSyncSource
 import io.horizontalsystems.bankwallet.modules.btcblockchainsettings.BlockchainSettingCell
 import io.horizontalsystems.bankwallet.modules.evmnetwork.addrpc.AddRpcScreen
@@ -67,14 +67,15 @@ import io.horizontalsystems.bankwallet.ui.compose.components.body_jacob
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.core.helpers.HudHelper
+import io.horizontalsystems.marketkit.models.Blockchain
 
 class EvmNetworkFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent(navController: NavController) {
         EvmNetworkNavHost(
-            requireArguments(),
-            navController
+            navController,
+            navController.requireInput()
         )
     }
 
@@ -87,8 +88,8 @@ private const val AddRpcPage = "add_rpc"
 
 @Composable
 private fun EvmNetworkNavHost(
-    arguments: Bundle,
-    fragmentNavController: NavController
+    fragmentNavController: NavController,
+    blockchain: Blockchain
 ) {
     val navController = rememberNavController()
     NavHost(
@@ -97,24 +98,30 @@ private fun EvmNetworkNavHost(
     ) {
         composable(EvmNetworkPage) {
             EvmNetworkScreen(
-                arguments = arguments,
                 navController = navController,
-                onBackPress = { fragmentNavController.popBackStack() }
+                blockchain = blockchain,
+                onBackPress = { fragmentNavController.popBackStack() },
             )
         }
-        composablePopup(AddRpcPage) { AddRpcScreen(navController, arguments) }
+        composablePopup(AddRpcPage) {
+            AddRpcScreen(
+                navController = navController,
+                blockchain = blockchain
+            )
+        }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EvmNetworkScreen(
-    arguments: Bundle,
     navController: NavController,
+    blockchain: Blockchain,
     onBackPress: () -> Unit,
-    viewModel: EvmNetworkViewModel = viewModel(factory = EvmNetworkModule.Factory(arguments))
 ) {
-
+    val viewModel = viewModel<EvmNetworkViewModel>(
+        factory = EvmNetworkModule.Factory(blockchain)
+    )
     var revealedCardId by remember { mutableStateOf<String?>(null) }
     val view = LocalView.current
 

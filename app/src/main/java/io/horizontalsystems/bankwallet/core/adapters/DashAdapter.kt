@@ -3,12 +3,14 @@ package io.horizontalsystems.bankwallet.core.adapters
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.ISendBitcoinAdapter
 import io.horizontalsystems.bankwallet.core.UnsupportedAccountException
+import io.horizontalsystems.bankwallet.core.UsedAddress
 import io.horizontalsystems.bankwallet.entities.AccountType
 import io.horizontalsystems.bankwallet.entities.Wallet
 import io.horizontalsystems.bankwallet.entities.transactionrecords.TransactionRecord
 import io.horizontalsystems.bitcoincore.BitcoinCore
 import io.horizontalsystems.bitcoincore.models.BalanceInfo
 import io.horizontalsystems.bitcoincore.models.BlockInfo
+import io.horizontalsystems.bitcoincore.storage.UnspentOutputInfo
 import io.horizontalsystems.core.BackgroundManager
 import io.horizontalsystems.dashkit.DashKit
 import io.horizontalsystems.dashkit.DashKit.NetworkType
@@ -76,7 +78,13 @@ class DashAdapter(
         // ignored for now
     }
 
+    override val unspentOutputs: List<UnspentOutputInfo>
+        get() = kit.unspentOutputs
+
     override val blockchainType = BlockchainType.Dash
+
+    override fun usedAddresses(change: Boolean): List<UsedAddress> =
+        kit.usedAddresses(change).map { UsedAddress(it.index, it.address, "https://insight.dash.org/insight/address/${it.address}") }
 
     companion object {
         private const val confirmationsThreshold = 3

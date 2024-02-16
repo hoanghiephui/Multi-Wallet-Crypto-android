@@ -28,6 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.requireInput
 import io.horizontalsystems.bankwallet.entities.Account
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
@@ -37,7 +38,6 @@ import io.horizontalsystems.bankwallet.ui.compose.components.InfoText
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.core.helpers.HudHelper
-import io.horizontalsystems.core.parcelable
 import kotlinx.coroutines.delay
 
 class BackupConfirmKeyFragment : BaseComposeFragment() {
@@ -46,7 +46,7 @@ class BackupConfirmKeyFragment : BaseComposeFragment() {
     override fun GetContent(navController: NavController) {
         RecoveryPhraseVerifyScreen(
             navController,
-            arguments?.parcelable(BackupConfirmKeyModule.ACCOUNT)!!,
+            navController.requireInput(),
         )
     }
 

@@ -1,6 +1,7 @@
 package io.horizontalsystems.bankwallet.modules.settings.terms
 
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.View
 import androidx.activity.addCallback
 import androidx.compose.foundation.background
@@ -19,11 +20,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.setNavigationResultX
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
@@ -35,16 +36,13 @@ import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_leah
 import io.horizontalsystems.core.findNavController
-import io.horizontalsystems.core.setNavigationResult
+import kotlinx.parcelize.Parcelize
 
 class TermsFragment : BaseComposeFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         activity?.onBackPressedDispatcher?.addCallback(this) {
-            findNavController().setNavigationResult(
-                resultBundleKey,
-                bundleOf(requestResultKey to RESULT_CANCELLED)
-            )
+            findNavController().setNavigationResultX(Result(false))
             findNavController().popBackStack()
         }
     }
@@ -54,15 +52,11 @@ class TermsFragment : BaseComposeFragment() {
         TermsScreen(navController = navController)
     }
 
+    @Parcelize
+    data class Result(val termsAccepted: Boolean) : Parcelable
+
     override val logScreen: String
         get() = "TermsFragment"
-
-    companion object {
-        const val RESULT_OK = 1
-        const val RESULT_CANCELLED = 2
-        const val resultBundleKey = "resultBundleKey"
-        const val requestResultKey = "requestResultKey"
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -75,10 +69,7 @@ fun TermsScreen(
     if (viewModel.closeWithTermsAgreed) {
         viewModel.closedWithTermsAgreed()
 
-        navController.setNavigationResult(
-            TermsFragment.resultBundleKey,
-            bundleOf(TermsFragment.requestResultKey to TermsFragment.RESULT_OK)
-        )
+        navController.setNavigationResultX(TermsFragment.Result(true))
         navController.popBackStack()
     }
 
@@ -94,10 +85,7 @@ fun TermsScreen(
                     title = TranslatableString.ResString(R.string.Button_Close),
                     icon = R.drawable.ic_close,
                     onClick = {
-                        navController.setNavigationResult(
-                            TermsFragment.resultBundleKey,
-                            bundleOf(TermsFragment.requestResultKey to TermsFragment.RESULT_CANCELLED)
-                        )
+                        navController.setNavigationResultX(TermsFragment.Result(false))
                         navController.popBackStack()
                     }
                 )

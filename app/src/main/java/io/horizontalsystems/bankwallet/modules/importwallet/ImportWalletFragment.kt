@@ -28,10 +28,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.getInput
 import io.horizontalsystems.bankwallet.core.navigateWithTermsAccepted
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.modules.backuplocal.fullbackup.BackupFileValidator
@@ -51,11 +51,9 @@ class ImportWalletFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent(navController: NavController) {
-        val popUpToInclusiveId =
-            arguments?.getInt(ManageAccountsModule.popOffOnSuccessKey, R.id.importWalletFragment) ?: R.id.importWalletFragment
-
-        val inclusive =
-            arguments?.getBoolean(ManageAccountsModule.popOffInclusiveKey) ?: true
+        val input = navController.getInput<ManageAccountsModule.Input>()
+        val popUpToInclusiveId = input?.popOffOnSuccess ?: R.id.importWalletFragment
+        val inclusive = input?.popOffInclusive ?: true
 
         ImportWalletScreen(navController, popUpToInclusiveId, inclusive)
     }
@@ -88,11 +86,11 @@ private fun ImportWalletScreen(
                             val fileName = context.getFileName(uriNonNull)
                             navController.slideFromBottom(
                                 R.id.restoreLocalFragment,
-                                bundleOf(
-                                    ManageAccountsModule.popOffOnSuccessKey to popUpToInclusiveId,
-                                    ManageAccountsModule.popOffInclusiveKey to inclusive,
-                                    RestoreLocalFragment.jsonFileKey to jsonString,
-                                    RestoreLocalFragment.fileNameKey to fileName
+                                RestoreLocalFragment.Input(
+                                    popUpToInclusiveId,
+                                    inclusive,
+                                    jsonString,
+                                    fileName
                                 )
                             )
                         }
@@ -155,11 +153,7 @@ private fun ImportWalletScreen(
                         navController.navigateWithTermsAccepted {
                             navController.slideFromBottom(
                                 R.id.restoreAccountFragment,
-                                bundleOf(
-                                    ManageAccountsModule.popOffOnSuccessKey to popUpToInclusiveId,
-                                    ManageAccountsModule.popOffInclusiveKey to inclusive,
-                                )
-                            )
+                                ManageAccountsModule.Input(popUpToInclusiveId, inclusive)                            )
                         }
                     }
                 )
@@ -180,11 +174,7 @@ private fun ImportWalletScreen(
                     onClick = {
                         navController.slideFromBottom(
                             R.id.importCexAccountFragment,
-                            bundleOf(
-                                ManageAccountsModule.popOffOnSuccessKey to popUpToInclusiveId,
-                                ManageAccountsModule.popOffInclusiveKey to inclusive,
-                            )
-                        )
+                            ManageAccountsModule.Input(popUpToInclusiveId, inclusive)                        )
                     }
                 )
                 VSpacer(12.dp)

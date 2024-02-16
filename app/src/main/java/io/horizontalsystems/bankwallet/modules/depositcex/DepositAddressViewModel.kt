@@ -8,12 +8,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
+import io.horizontalsystems.bankwallet.core.BaseViewModel
 import io.horizontalsystems.bankwallet.core.providers.CexAsset
 import io.horizontalsystems.bankwallet.core.providers.CexDepositNetwork
 import io.horizontalsystems.bankwallet.core.providers.CexProviderManager
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.entities.ViewState
-import io.horizontalsystems.bankwallet.modules.receive.address.ReceiveAddressModule
+import io.horizontalsystems.bankwallet.modules.receive.ReceiveModule
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -22,7 +23,7 @@ class DepositAddressViewModel(
     private val cexAsset: CexAsset,
     private val network: CexDepositNetwork?,
     cexProviderManager: CexProviderManager
-) : ViewModel() {
+) : BaseViewModel() {
     private val cexProvider = cexProviderManager.cexProviderFlow.value
 
     private var viewState: ViewState = ViewState.Loading
@@ -34,9 +35,11 @@ class DepositAddressViewModel(
     private val watchAccount = false
 
     var uiState by mutableStateOf(
-        ReceiveAddressModule.UiState(
+        ReceiveModule.UiState(
             viewState = viewState,
             address = address,
+            usedAddresses = listOf(),
+            usedChangeAddresses = listOf(),
             uri = uri,
             networkName = networkName,
             watchAccount = watchAccount,
@@ -75,9 +78,11 @@ class DepositAddressViewModel(
     }
 
     private fun emitState() {
-        uiState = ReceiveAddressModule.UiState(
+        uiState = ReceiveModule.UiState(
             viewState = viewState,
             address = address,
+            usedAddresses = listOf(),
+            usedChangeAddresses = listOf(),
             uri = uri,
             networkName = networkName,
             watchAccount = watchAccount,
@@ -87,12 +92,12 @@ class DepositAddressViewModel(
         )
     }
 
-    private fun getAdditionalData(): List<ReceiveAddressModule.AdditionalData> {
-        val items = mutableListOf<ReceiveAddressModule.AdditionalData>()
+    private fun getAdditionalData(): List<ReceiveModule.AdditionalData> {
+        val items = mutableListOf<ReceiveModule.AdditionalData>()
 
         memo?.let {
             items.add(
-                ReceiveAddressModule.AdditionalData.Memo(
+                ReceiveModule.AdditionalData.Memo(
                     value = it
                 )
             )
@@ -100,7 +105,7 @@ class DepositAddressViewModel(
 
         amount?.let {
             items.add(
-                ReceiveAddressModule.AdditionalData.Amount(
+                ReceiveModule.AdditionalData.Amount(
                     value = it.toString()
                 )
             )
@@ -109,16 +114,11 @@ class DepositAddressViewModel(
         return items
     }
 
-    private fun getAlertText(hasMemo: Boolean): ReceiveAddressModule.AlertText {
-        return when {
-            hasMemo -> ReceiveAddressModule.AlertText.Critical(
-                Translator.getString(R.string.Balance_Receive_AddressMemoAlert)
-            )
-
-            else -> ReceiveAddressModule.AlertText.Normal(
-                Translator.getString(R.string.Balance_Receive_AddressAlert)
-            )
-        }
+    private fun getAlertText(hasMemo: Boolean): ReceiveModule.AlertText? {
+        return if (hasMemo) ReceiveModule.AlertText.Critical(
+            Translator.getString(R.string.Balance_Receive_AddressMemoAlert)
+        )
+        else null
     }
 
     fun onErrorClick() {

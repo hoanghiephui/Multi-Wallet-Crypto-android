@@ -33,8 +33,8 @@ import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.modules.amount.AmountInputModeViewModel
 import io.horizontalsystems.bankwallet.modules.evmfee.FeeSettingsInfoDialog
-import io.horizontalsystems.bankwallet.modules.fee.HSFeeInputRaw
-import io.horizontalsystems.bankwallet.modules.fee.HSFeeInputRawWithViewState
+import io.horizontalsystems.bankwallet.modules.fee.HSFeeRaw
+import io.horizontalsystems.bankwallet.modules.fee.HSFeeRawWithViewState
 import io.horizontalsystems.bankwallet.modules.send.ConfirmAmountCell
 import io.horizontalsystems.bankwallet.modules.send.MemoCell
 import io.horizontalsystems.bankwallet.modules.send.SendResult
@@ -205,7 +205,7 @@ fun SendTronConfirmationScreen(
 
                 val bottomSectionItems = buildList<@Composable () -> Unit> {
                     add {
-                        HSFeeInputRawWithViewState(
+                        HSFeeRawWithViewState(
                             title = stringResource(R.string.FeeInfo_TronFee_Title),
                             info = stringResource(R.string.FeeInfo_TronFee_Description),
                             coinCode = feeCoin.code,
@@ -220,7 +220,7 @@ fun SendTronConfirmationScreen(
 
                     activationFee?.let {
                         add {
-                            HSFeeInputRaw(
+                            HSFeeRaw(
                                 title = stringResource(R.string.FeeInfo_TronActivationFee_Title),
                                 info = stringResource(R.string.FeeInfo_TronActivationFee_Description),
                                 coinCode = feeCoin.code,
@@ -282,7 +282,7 @@ private fun InactiveAddressWarningItem(navController: NavController) {
                 onClick = {
                     navController.slideFromBottom(
                         R.id.feeSettingsInfoDialog,
-                        FeeSettingsInfoDialog.prepareParams(title, info)
+                        FeeSettingsInfoDialog.Input(title, info)
                     )
                 },
                 interactionSource = MutableInteractionSource(),
@@ -349,7 +349,7 @@ private fun ResourcesConsumed(
             modifier = Modifier.size(20.dp),
             onClick = {
                 navController.slideFromBottom(
-                    R.id.feeSettingsInfoDialog, FeeSettingsInfoDialog.prepareParams(title, info)
+                    R.id.feeSettingsInfoDialog, FeeSettingsInfoDialog.Input(title, info)
                 )
             }
         ) {

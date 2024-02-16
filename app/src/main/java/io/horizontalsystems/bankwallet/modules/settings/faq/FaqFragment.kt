@@ -13,7 +13,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
@@ -45,9 +44,10 @@ class FaqListFragment : BaseComposeFragment() {
             FaqScreen(
                 onCloseClick = { navController.popBackStack() },
                 onItemClick = { faqItem ->
-                    val arguments =
-                        bundleOf(MarkdownFragment.markdownUrlKey to faqItem.markdown)
-                    navController.slideFromRight(R.id.markdownFragment, arguments)
+                    navController.slideFromRight(
+                    R.id.markdownFragment,
+                        MarkdownFragment.Input( faqItem.markdown)
+                    )
                 }
             )
         }

@@ -23,7 +23,7 @@ import io.horizontalsystems.bankwallet.modules.address.HSAddressInput
 import io.horizontalsystems.bankwallet.modules.amount.AmountInputModeViewModel
 import io.horizontalsystems.bankwallet.modules.amount.HSAmountInput
 import io.horizontalsystems.bankwallet.modules.availablebalance.AvailableBalance
-import io.horizontalsystems.bankwallet.modules.fee.HSFeeInput
+import io.horizontalsystems.bankwallet.modules.fee.HSFee
 import io.horizontalsystems.bankwallet.modules.memo.HSMemoInput
 import io.horizontalsystems.bankwallet.modules.send.SendConfirmationFragment
 import io.horizontalsystems.bankwallet.modules.send.SendScreen
@@ -119,7 +119,7 @@ fun SendBinanceScreen(
             }
 
             Spacer(modifier = Modifier.height(12.dp))
-            HSFeeInput(
+            HSFee(
                 coinCode = viewModel.feeToken.coin.code,
                 coinDecimal = viewModel.feeTokenMaxAllowedDecimals,
                 fee = fee,
@@ -143,7 +143,7 @@ fun SendBinanceScreen(
                 onClick = {
                     navController.slideFromRight(
                         R.id.sendConfirmation,
-                        SendConfirmationFragment.prepareParams(
+                        SendConfirmationFragment.Input(
                             SendConfirmationFragment.Type.Bep2,
                             sendEntryPointDestId
                         )

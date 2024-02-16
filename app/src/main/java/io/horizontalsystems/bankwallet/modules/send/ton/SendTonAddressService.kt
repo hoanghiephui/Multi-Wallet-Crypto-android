@@ -36,11 +36,7 @@ class SendTonAddressService(prefilledAddress: String?) {
         tonAddress = null
         val address = this.address ?: return
 
-        try {
-            tonAddress = address.hex
-        } catch (e: Exception) {
-            addressError = Throwable(Translator.getString(R.string.SwapSettings_Error_InvalidAddress))
-        }
+        tonAddress = address.hex
     }
 
     private fun emitState() {

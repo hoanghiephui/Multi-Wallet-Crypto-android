@@ -24,11 +24,15 @@ import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
-import io.horizontalsystems.bankwallet.modules.market.MarketField
-import io.horizontalsystems.bankwallet.modules.market.SortingField
+import io.horizontalsystems.bankwallet.modules.market.favorites.MarketFavoritesModule.Period
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
 import io.horizontalsystems.bankwallet.ui.compose.Select
-import io.horizontalsystems.bankwallet.ui.compose.components.*
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryCircle
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryToggle
+import io.horizontalsystems.bankwallet.ui.compose.components.CoinList
+import io.horizontalsystems.bankwallet.ui.compose.components.HeaderSorting
+import io.horizontalsystems.bankwallet.ui.compose.components.ListEmptyView
+import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -39,7 +43,6 @@ fun MarketFavoritesScreen(
     val viewState by viewModel.viewStateLiveData.observeAsState()
     val isRefreshing by viewModel.isRefreshingLiveData.observeAsState(false)
     val marketFavoritesData by viewModel.viewItemLiveData.observeAsState()
-    val sortingFieldDialogState by viewModel.sortingFieldSelectorStateLiveData.observeAsState()
     var scrollToTopAfterUpdate by rememberSaveable { mutableStateOf(false) }
 
     HSSwipeRefresh(
@@ -77,16 +80,16 @@ fun MarketFavoritesScreen(
                                 onAddFavorite = { /*not used */ },
                                 onRemoveFavorite = { uid -> viewModel.removeFromFavorites(uid) },
                                 onCoinClick = { coinUid ->
-                                    val arguments = CoinFragment.prepareParams(coinUid, "market_watchlist")
+                                    val arguments = CoinFragment.Input(coinUid, "market_watchlist")
                                     navController.slideFromRight(R.id.coinFragment, arguments)
                                 },
                                 preItems = {
                                     stickyHeader {
                                         MarketFavoritesMenu(
-                                            data.sortingFieldSelect,
-                                            data.marketFieldSelect,
-                                            viewModel::onClickSortingField,
-                                            viewModel::onSelectMarketField
+                                            sortDescending = data.sortingDescending,
+                                            periodSelect = data.periodSelect,
+                                            onSortingToggle = viewModel::onSortToggle,
+                                            onSelectPeriod = viewModel::onSelectTimeDuration
                                         )
                                     }
                                 }
@@ -102,43 +105,29 @@ fun MarketFavoritesScreen(
             }
         }
     }
-
-    when (val option = sortingFieldDialogState) {
-        is MarketFavoritesModule.SelectorDialogState.Opened -> {
-            AlertGroup(
-                R.string.Market_Sort_PopupTitle,
-                option.select,
-                { selected ->
-                    scrollToTopAfterUpdate = true
-                    viewModel.onSelectSortingField(selected)
-                },
-                { viewModel.onSortingFieldDialogDismiss() }
-            )
-        }
-
-        MarketFavoritesModule.SelectorDialogState.Closed,
-        null -> {
-        }
-    }
     TrackScreenViewEvent("MarketFavoritesScreen")
 }
 
 @Composable
 fun MarketFavoritesMenu(
-    sortingFieldSelect: Select<SortingField>,
-    marketFieldSelect: Select<MarketField>,
-    onClickSortingField: () -> Unit,
-    onSelectMarketField: (MarketField) -> Unit
+    sortDescending: Boolean,
+    periodSelect: Select<Period>,
+    onSortingToggle: () -> Unit,
+    onSelectPeriod: (Period) -> Unit
 ) {
 
     HeaderSorting(borderTop = true, borderBottom = true) {
         Box(modifier = Modifier.weight(1f)) {
-            SortMenu(sortingFieldSelect.selected.title, onClickSortingField)
+            ButtonSecondaryCircle(
+                modifier = Modifier.padding(start = 16.dp),
+                icon = if (sortDescending) R.drawable.ic_sort_h2l_20 else R.drawable.ic_sort_l2h_20,
+                onClick = onSortingToggle
+            )
         }
         ButtonSecondaryToggle(
             modifier = Modifier.padding(end = 16.dp),
-            select = marketFieldSelect,
-            onSelect = onSelectMarketField
+            select = periodSelect,
+            onSelect = onSelectPeriod
         )
     }
 }

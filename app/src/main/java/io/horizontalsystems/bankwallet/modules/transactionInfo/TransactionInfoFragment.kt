@@ -48,7 +48,7 @@ class TransactionInfoFragment : BaseComposeFragment() {
     override fun GetContent(navController: NavController) {
         val viewItem = viewModelTxs.tmpItemToShow
         if (viewItem == null) {
-            navController.popBackStack()
+            navController.popBackStack(R.id.transactionInfoFragment, true)
             return
         }
 

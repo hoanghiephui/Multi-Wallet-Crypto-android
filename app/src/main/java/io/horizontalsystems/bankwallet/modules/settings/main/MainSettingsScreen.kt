@@ -35,7 +35,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
@@ -51,7 +50,7 @@ import io.horizontalsystems.bankwallet.modules.manageaccount.dialogs.BackupRequi
 import io.horizontalsystems.bankwallet.modules.manageaccounts.ManageAccountsModule
 import io.horizontalsystems.bankwallet.modules.settings.main.MainSettingsModule.CounterType
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCAccountTypeNotSupportedDialog
-import io.horizontalsystems.bankwallet.modules.walletconnect.version2.WC2Manager
+import io.horizontalsystems.bankwallet.modules.walletconnect.WCManager
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.BadgeCount
@@ -129,7 +128,7 @@ private fun SettingSections(
                 onClick = {
                     navController.slideFromRight(
                         R.id.manageAccountsFragment,
-                        bundleOf(ManageAccountsModule.MODE to ManageAccountsModule.Mode.Manage)
+                        ManageAccountsModule.Mode.Manage
                     )
                 }
             )
@@ -164,23 +163,23 @@ private fun SettingSections(
                 counterBadge = (wcCounter as? CounterType.PendingRequestCounter)?.number?.toString(),
                 onClick = {
                     when (val state = viewModel.getWalletConnectSupportState()) {
-                        WC2Manager.SupportState.Supported -> {
-                            navController.slideFromRight(R.id.wallet_connect_graph)
+                        WCManager.SupportState.Supported -> {
+                            navController.slideFromRight(R.id.wcListFragment)
                         }
-                        WC2Manager.SupportState.NotSupportedDueToNoActiveAccount -> {
+                        WCManager.SupportState.NotSupportedDueToNoActiveAccount -> {
                             navController.slideFromBottom(R.id.wcErrorNoAccountFragment)
                         }
-                        is WC2Manager.SupportState.NotSupportedDueToNonBackedUpAccount -> {
+                        is WCManager.SupportState.NotSupportedDueToNonBackedUpAccount -> {
                             val text = Translator.getString(R.string.WalletConnect_Error_NeedBackup)
                             navController.slideFromBottom(
                                 R.id.backupRequiredDialog,
-                                BackupRequiredDialog.prepareParams(state.account, text)
+                                BackupRequiredDialog.Input(state.account, text)
                             )
                         }
-                        is WC2Manager.SupportState.NotSupported -> {
+                        is WCManager.SupportState.NotSupported -> {
                             navController.slideFromBottom(
                                 R.id.wcAccountTypeNotSupportedDialog,
-                                WCAccountTypeNotSupportedDialog.prepareParams(state.accountTypeDescription)
+                                WCAccountTypeNotSupportedDialog.Input(state.accountTypeDescription)
                             )
                         }
                     }
@@ -208,7 +207,7 @@ private fun SettingSections(
                     R.string.Contacts,
                     R.drawable.ic_user_20,
                     onClick = {
-                        navController.slideFromRight(R.id.contactsFragment, ContactsFragment.prepareParams(Mode.Full))
+                        navController.slideFromRight(R.id.contactsFragment, ContactsFragment.Input(Mode.Full))
                     }
                 )
             },

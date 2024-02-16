@@ -1,5 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.coin.investments
 
+import android.os.Parcelable
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,11 +25,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.requireInput
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.investments.CoinInvestmentsModule.FundViewItem
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
@@ -45,17 +46,17 @@ import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_remus
 import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
+import kotlinx.parcelize.Parcelize
 
 class CoinInvestmentsFragment : BaseComposeFragment() {
 
-    private val viewModel by viewModels<CoinInvestmentsViewModel> {
-        CoinInvestmentsModule.Factory(requireArguments().getString(COIN_UID_KEY)!!)
-    }
-
     @Composable
     override fun GetContent(navController: NavController) {
+        val input = navController.requireInput<Input>()
         CoinInvestmentsScreen(
-            viewModel = viewModel,
+            viewModel = viewModel(
+                factory = CoinInvestmentsModule.Factory(input.coinUid)
+            ),
             onClickNavigation = {
                 navController.popBackStack()
             },
@@ -68,11 +69,8 @@ class CoinInvestmentsFragment : BaseComposeFragment() {
     override val logScreen: String
         get() = "CoinInvestmentsFragment"
 
-    companion object {
-        private const val COIN_UID_KEY = "coin_uid_key"
-
-        fun prepareParams(coinUid: String) = bundleOf(COIN_UID_KEY to coinUid)
-    }
+    @Parcelize
+    data class Input(val coinUid: String) : Parcelable
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

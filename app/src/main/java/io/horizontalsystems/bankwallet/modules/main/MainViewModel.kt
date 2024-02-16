@@ -15,17 +15,17 @@ import io.horizontalsystems.bankwallet.core.IRateAppManager
 import io.horizontalsystems.bankwallet.core.ITermsManager
 import io.horizontalsystems.bankwallet.core.managers.ActiveAccountState
 import io.horizontalsystems.bankwallet.core.managers.ReleaseNotesManager
+import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.entities.Account
 import io.horizontalsystems.bankwallet.entities.AccountType
 import io.horizontalsystems.bankwallet.entities.LaunchPage
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
 import io.horizontalsystems.bankwallet.modules.main.MainModule.MainNavigation
-import io.horizontalsystems.bankwallet.modules.market.platform.MarketPlatformFragment
 import io.horizontalsystems.bankwallet.modules.market.topplatforms.Platform
 import io.horizontalsystems.bankwallet.modules.nft.collection.NftCollectionFragment
 import io.horizontalsystems.bankwallet.modules.walletconnect.list.WCListFragment
-import io.horizontalsystems.bankwallet.modules.walletconnect.version2.WC2Manager
-import io.horizontalsystems.bankwallet.modules.walletconnect.version2.WC2SessionManager
+import io.horizontalsystems.bankwallet.modules.walletconnect.WCManager
+import io.horizontalsystems.bankwallet.modules.walletconnect.WCSessionManager
 import io.horizontalsystems.core.IPinComponent
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.delay
@@ -39,13 +39,13 @@ class MainViewModel(
     private val accountManager: IAccountManager,
     private val releaseNotesManager: ReleaseNotesManager,
     private val localStorage: ILocalStorage,
-    wc2SessionManager: WC2SessionManager,
-    private val wc2Manager: WC2Manager,
+    wcSessionManager: WCSessionManager,
+    private val wcManager: WCManager,
     deepLink: Uri?
 ) : ViewModel() {
 
     private val disposables = CompositeDisposable()
-    private var wc2PendingRequestsCount = 0
+    private var wcPendingRequestsCount = 0
     private var marketsTabEnabled = localStorage.marketsTabEnabledFlow.value
     private var transactionsEnabled = isTransactionsTabEnabled()
     private var settingsBadge: MainModule.BadgeType? = null
@@ -87,7 +87,7 @@ class MainViewModel(
     private var contentHidden = pinComponent.isLocked
     private var showWhatsNew = false
     private var activeWallet = accountManager.activeAccount
-    private var wcSupportState: WC2Manager.SupportState? = null
+    private var wcSupportState: WCManager.SupportState? = null
     private var torEnabled = localStorage.torEnabled
 
     val wallets: List<Account>
@@ -121,8 +121,8 @@ class MainViewModel(
             updateSettingsBadge()
         }
 
-        wc2SessionManager.pendingRequestCountFlow.collectWith(viewModelScope) {
-            wc2PendingRequestsCount = it
+        wcSessionManager.pendingRequestCountFlow.collectWith(viewModelScope) {
+            wcPendingRequestsCount = it
             updateSettingsBadge()
         }
 
@@ -302,20 +302,21 @@ class MainViewModel(
         var tab = currentMainTab
         var deeplinkPage: DeeplinkPage? = null
         val deeplinkString = deepLink.toString()
+        val deeplinkScheme: String = Translator.getString(R.string.DeeplinkScheme)
         when {
-            deeplinkString.startsWith("unstoppable:") -> {
+            deeplinkString.startsWith("$deeplinkScheme:") -> {
                 val uid = deepLink.getQueryParameter("uid")
                 when {
                     deeplinkString.contains("coin-page") -> {
                         uid?.let {
-                            deeplinkPage = DeeplinkPage(R.id.coinFragment, CoinFragment.prepareParams(it, "widget_click"))
+                            deeplinkPage = DeeplinkPage(R.id.coinFragment, CoinFragment.Input(it, "widget"))
                         }
                     }
 
                     deeplinkString.contains("nft-collection") -> {
                         val blockchainTypeUid = deepLink.getQueryParameter("blockchainTypeUid")
                         if (uid != null && blockchainTypeUid != null) {
-                            deeplinkPage = DeeplinkPage(R.id.nftCollectionFragment, NftCollectionFragment.prepareParams(uid, blockchainTypeUid))
+                            deeplinkPage = DeeplinkPage(R.id.nftCollectionFragment, NftCollectionFragment.Input(uid, blockchainTypeUid))
                         }
                     }
 
@@ -323,7 +324,7 @@ class MainViewModel(
                         val title = deepLink.getQueryParameter("title")
                         if (title != null && uid != null) {
                             val platform = Platform(uid, title)
-                            deeplinkPage = DeeplinkPage(R.id.marketPlatformFragment, MarketPlatformFragment.prepareParams(platform))
+                            deeplinkPage = DeeplinkPage(R.id.marketPlatformFragment, platform)
                         }
                     }
                 }
@@ -332,9 +333,9 @@ class MainViewModel(
             }
 
             deeplinkString.startsWith("wc:") -> {
-                wcSupportState = wc2Manager.getWalletConnectSupportState()
-                if (wcSupportState == WC2Manager.SupportState.Supported) {
-                    deeplinkPage = DeeplinkPage(R.id.wallet_connect_graph, WCListFragment.prepareParams(deeplinkString))
+                wcSupportState = wcManager.getWalletConnectSupportState()
+                if (wcSupportState == WCManager.SupportState.Supported) {
+                    deeplinkPage = DeeplinkPage(R.id.wcListFragment, WCListFragment.Input(deeplinkString))
                     tab = MainNavigation.Settings
                 }
             }
@@ -366,8 +367,8 @@ class MainViewModel(
         val showDotBadge =
             !(backupManager.allBackedUp && termsManager.allTermsAccepted && pinComponent.isPinSet) || accountManager.hasNonStandardAccount
 
-        settingsBadge = if (wc2PendingRequestsCount > 0) {
-            MainModule.BadgeType.BadgeNumber(wc2PendingRequestsCount)
+        settingsBadge = if (wcPendingRequestsCount > 0) {
+            MainModule.BadgeType.BadgeNumber(wcPendingRequestsCount)
         } else if (showDotBadge) {
             MainModule.BadgeType.BadgeDot
         } else {

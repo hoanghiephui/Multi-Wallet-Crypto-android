@@ -14,9 +14,8 @@ import io.horizontalsystems.bankwallet.modules.amount.AmountInputType
 import io.horizontalsystems.bankwallet.modules.balance.BalanceSortType
 import io.horizontalsystems.bankwallet.modules.balance.BalanceViewType
 import io.horizontalsystems.bankwallet.modules.main.MainModule
-import io.horizontalsystems.bankwallet.modules.market.MarketField
 import io.horizontalsystems.bankwallet.modules.market.MarketModule
-import io.horizontalsystems.bankwallet.modules.market.SortingField
+import io.horizontalsystems.bankwallet.modules.market.favorites.MarketFavoritesModule.Period
 import io.horizontalsystems.bankwallet.modules.settings.appearance.AppIcon
 import io.horizontalsystems.bankwallet.modules.settings.security.autolock.AutoLockInterval
 import io.horizontalsystems.bankwallet.modules.theme.ThemeType
@@ -70,8 +69,8 @@ class LocalStorageManager(
     private val LAUNCH_PAGE = "launch_page"
     private val APP_ICON = "app_icon"
     private val MAIN_TAB = "main_tab"
-    private val MARKET_FAVORITES_SORTING_FIELD = "market_favorites_sorting_field"
-    private val MARKET_FAVORITES_MARKET_FIELD = "market_favorites_market_field"
+    private val MARKET_FAVORITES_SORT_DESCENDING = "market_favorites_sort_descending"
+    private val MARKET_FAVORITES_TIME_DURATION = "market_favorites_time_duration"
     private val RELAUNCH_BY_SETTING_CHANGE = "relaunch_by_setting_change"
     private val MARKETS_TAB_ENABLED = "markets_tab_enabled"
     private val BALANCE_AUTO_HIDE_ENABLED = "balance_auto_hide_enabled"
@@ -81,6 +80,11 @@ class LocalStorageManager(
     private val APP_AUTO_LOCK_INTERVAL = "app_auto_lock_interval"
     private val HIDE_SUSPICIOUS_TX = "hide_suspicious_tx"
     private val PIN_RANDOMIZED = "pin_randomized"
+    private val UTXO_EXPERT_MODE = "utxo_expert_mode"
+    private val RBF_ENABLED = "rbf_enabled"
+
+    private val _utxoExpertModeEnabledFlow = MutableStateFlow(false)
+    override val utxoExpertModeEnabledFlow = _utxoExpertModeEnabledFlow
     private val ANALYTIC = "ANALYTIC"
     private val DETECT_CRASH = "DETECT_CRASH"
 
@@ -427,20 +431,18 @@ class LocalStorageManager(
             preferences.edit().putString(MAIN_TAB, value?.name).apply()
         }
 
-    override var marketFavoritesSortingField: SortingField?
-        get() = preferences.getString(MARKET_FAVORITES_SORTING_FIELD, null)?.let {
-            SortingField.fromString(it)
-        }
+    override var marketFavoritesSortDescending: Boolean
+        get() = preferences.getBoolean(MARKET_FAVORITES_SORT_DESCENDING, true)
         set(value) {
-            preferences.edit().putString(MARKET_FAVORITES_SORTING_FIELD, value?.name).apply()
+            preferences.edit().putBoolean(MARKET_FAVORITES_SORT_DESCENDING, value).apply()
         }
 
-    override var marketFavoritesMarketField: MarketField?
-        get() = preferences.getString(MARKET_FAVORITES_MARKET_FIELD, null)?.let {
-            MarketField.fromString(it)
+    override var marketFavoritesPeriod: Period?
+        get() = preferences.getString(MARKET_FAVORITES_TIME_DURATION, null)?.let {
+            Period.valueOf(it)
         }
         set(value) {
-            preferences.edit().putString(MARKET_FAVORITES_MARKET_FIELD, value?.name).apply()
+            preferences.edit().putString(MARKET_FAVORITES_TIME_DURATION, value?.name).apply()
         }
 
     override var relaunchBySettingChange: Boolean
@@ -510,6 +512,21 @@ class LocalStorageManager(
         } ?: AutoLockInterval.AFTER_1_MIN
         set(value) {
             preferences.edit().putString(APP_AUTO_LOCK_INTERVAL, value.raw).apply()
+        }
+
+    override var utxoExpertModeEnabled: Boolean
+        get() = preferences.getBoolean(UTXO_EXPERT_MODE, false)
+        set(value) {
+            preferences.edit().putBoolean(UTXO_EXPERT_MODE, value).apply()
+            _utxoExpertModeEnabledFlow.update {
+                value
+            }
+        }
+
+    override var rbfEnabled: Boolean
+        get() = preferences.getBoolean(RBF_ENABLED, true)
+        set(value) {
+            preferences.edit().putBoolean(RBF_ENABLED, value).apply()
         }
 
     private fun getSwapProviderKey(blockchainType: BlockchainType): String {

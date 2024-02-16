@@ -25,7 +25,6 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.BuildConfig
@@ -34,7 +33,7 @@ import io.horizontalsystems.bankwallet.core.AdType
 import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.iconPlaceholder
 import io.horizontalsystems.bankwallet.core.imageUrl
-import io.horizontalsystems.bankwallet.core.slideFromBottom
+import io.horizontalsystems.bankwallet.core.slideFromBottomForResult
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.chart.ChartViewModel
@@ -44,7 +43,6 @@ import io.horizontalsystems.bankwallet.modules.coin.overview.CoinOverviewViewMod
 import io.horizontalsystems.bankwallet.modules.coin.overview.HudMessageType
 import io.horizontalsystems.bankwallet.modules.coin.ui.CoinScreenTitle
 import io.horizontalsystems.bankwallet.modules.enablecoin.restoresettings.RestoreSettingsViewModel
-import io.horizontalsystems.bankwallet.modules.enablecoin.restoresettings.ZCashConfig
 import io.horizontalsystems.bankwallet.modules.managewallets.ManageWalletsModule
 import io.horizontalsystems.bankwallet.modules.managewallets.ManageWalletsViewModel
 import io.horizontalsystems.bankwallet.modules.markdown.MarkdownFragment
@@ -61,9 +59,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
 import io.horizontalsystems.bankwallet.ui.helpers.TextHelper
-import io.horizontalsystems.core.getNavigationResult
 import io.horizontalsystems.core.helpers.HudHelper
-import io.horizontalsystems.core.parcelable
 import io.horizontalsystems.marketkit.models.FullCoin
 import io.horizontalsystems.marketkit.models.LinkType
 
@@ -118,20 +114,13 @@ fun CoinOverviewScreen(
     if (restoreSettingsViewModel.openZcashConfigure != null) {
         restoreSettingsViewModel.zcashConfigureOpened()
 
-        navController.getNavigationResult(ZcashConfigure.resultBundleKey) { bundle ->
-            val requestResult = bundle.getInt(ZcashConfigure.requestResultKey)
-
-            if (requestResult == ZcashConfigure.RESULT_OK) {
-                val zcashConfig = bundle.parcelable<ZCashConfig>(ZcashConfigure.zcashConfigKey)
-                zcashConfig?.let { config ->
-                    restoreSettingsViewModel.onEnter(config)
-                }
+        navController.slideFromBottomForResult<ZcashConfigure.Result>(R.id.zcashConfigure) {
+            if (it.config != null) {
+                restoreSettingsViewModel.onEnter(it.config)
             } else {
                 restoreSettingsViewModel.onCancelEnterBirthdayHeight()
             }
         }
-
-        navController.slideFromBottom(R.id.zcashConfigure)
     }
 
 
@@ -264,13 +253,9 @@ private fun onClick(coinLink: CoinLink, context: Context, navController: NavCont
 
     when (coinLink.linkType) {
         LinkType.Guide -> {
-            val arguments = bundleOf(
-                MarkdownFragment.markdownUrlKey to absoluteUrl,
-                MarkdownFragment.handleRelativeUrlKey to true
-            )
             navController.slideFromRight(
                 R.id.markdownFragment,
-                arguments
+                MarkdownFragment.Input(absoluteUrl, true)
             )
         }
         else -> LinkHelper.openLinkInAppBrowser(context, absoluteUrl)

@@ -2,22 +2,25 @@ package io.horizontalsystems.bankwallet.modules.market.category
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.requireInput
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.chart.ChartViewModel
@@ -27,21 +30,23 @@ import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.market.topcoins.SelectorDialogState
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
-import io.horizontalsystems.bankwallet.ui.compose.components.*
-import io.horizontalsystems.core.parcelable
+import io.horizontalsystems.bankwallet.ui.compose.components.AlertGroup
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryToggle
+import io.horizontalsystems.bankwallet.ui.compose.components.CoinList
+import io.horizontalsystems.bankwallet.ui.compose.components.DescriptionCard
+import io.horizontalsystems.bankwallet.ui.compose.components.HeaderSorting
+import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
+import io.horizontalsystems.bankwallet.ui.compose.components.SortMenu
+import io.horizontalsystems.bankwallet.ui.compose.components.TopCloseButton
 
 class MarketCategoryFragment : BaseComposeFragment() {
 
-    private val factory by lazy {
-        MarketCategoryModule.Factory(arguments?.parcelable(categoryKey)!!)
-    }
-
-    private val chartViewModel by viewModels<ChartViewModel> { factory }
-
-    private val viewModel by viewModels<MarketCategoryViewModel> { factory }
-
     @Composable
     override fun GetContent(navController: NavController) {
+        val factory = MarketCategoryModule.Factory(navController.requireInput())
+        val chartViewModel = viewModel<ChartViewModel>(factory = factory)
+        val viewModel = viewModel<MarketCategoryViewModel>(factory = factory)
+
         CategoryScreen(
             viewModel,
             chartViewModel,
@@ -54,15 +59,10 @@ class MarketCategoryFragment : BaseComposeFragment() {
         get() = "MarketCategoryFragment"
 
     private fun onCoinClick(coinUid: String, navController: NavController) {
-        val arguments = CoinFragment.prepareParams(coinUid, "market_category")
+        val arguments = CoinFragment.Input(coinUid, "market_category")
 
         navController.slideFromRight(R.id.coinFragment, arguments)
     }
-
-    companion object {
-        const val categoryKey = "coin_category"
-    }
-
 }
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -79,11 +79,9 @@ fun CategoryScreen(
     val isRefreshing by viewModel.isRefreshingLiveData.observeAsState(false)
     val selectorDialogState by viewModel.selectorDialogStateLiveData.observeAsState()
 
-    val interactionSource = remember { MutableInteractionSource() }
-
     Surface(color = ComposeAppTheme.colors.tyler) {
         Column {
-            TopCloseButton(interactionSource, onCloseButtonClick = onCloseButtonClick)
+            TopCloseButton(onCloseButtonClick = onCloseButtonClick)
 
             HSSwipeRefresh(
                 refreshing = isRefreshing,

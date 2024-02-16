@@ -46,6 +46,7 @@ import coil.request.ImageRequest
 import coil.size.Size
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.getInput
 import io.horizontalsystems.bankwallet.core.shorten
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
@@ -59,13 +60,12 @@ import io.horizontalsystems.bankwallet.modules.nft.collection.events.NftCollecti
 import io.horizontalsystems.bankwallet.modules.nft.collection.events.NftCollectionEventsViewModel
 import io.horizontalsystems.bankwallet.modules.nft.collection.events.NftEventListType
 import io.horizontalsystems.bankwallet.modules.nft.collection.events.NftEvents
-import io.horizontalsystems.bankwallet.modules.nft.send.SendNftModule
+import io.horizontalsystems.bankwallet.modules.nft.send.SendNftFragment
 import io.horizontalsystems.bankwallet.modules.nft.ui.CellLink
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.*
 import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
-import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.helpers.HudHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -77,9 +77,12 @@ class NftAssetFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent(navController: NavController) {
-        val collectionUid = requireArguments().getString(NftAssetModule.collectionUidKey)
-        val nftUid = requireArguments().getString(NftAssetModule.nftUidKey)?.let { NftUid.fromUid(it) }
-        NftAssetScreen(findNavController(), collectionUid, nftUid)
+        val input = navController.getInput<NftAssetModule.Input>()
+        NftAssetScreen(
+            navController,
+            input?.collectionUid,
+            input?.nftUid
+        )
     }
 
     override val logScreen: String
@@ -250,7 +253,7 @@ private fun AssetContent(
                             .clickable {
                                 navController.slideFromRight(
                                     R.id.nftCollectionFragment,
-                                    NftCollectionFragment.prepareParams(asset.providerCollectionUid, asset.nftUid.blockchainType.uid)
+                                    NftCollectionFragment.Input(asset.providerCollectionUid, asset.nftUid.blockchainType.uid)
                                 )
                             },
                         verticalAlignment = Alignment.CenterVertically
@@ -279,7 +282,7 @@ private fun AssetContent(
                                     onClick = {
                                         navController.slideFromBottom(
                                             R.id.nftSendFragment,
-                                            SendNftModule.prepareParams(nftUid.uid)
+                                            SendNftFragment.Input(nftUid.uid)
                                         )
                                     }
                                 )

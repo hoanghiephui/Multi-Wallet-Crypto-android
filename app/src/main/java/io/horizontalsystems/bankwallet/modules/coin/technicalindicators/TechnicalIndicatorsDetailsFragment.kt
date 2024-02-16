@@ -1,5 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.coin.technicalindicators
 
+import android.os.Parcelable
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -19,11 +20,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.getInput
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.coin.technicalindicators.TechnicalIndicatorsDetailsModule.DetailViewItem
@@ -34,51 +35,45 @@ import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawren
 import io.horizontalsystems.bankwallet.ui.compose.components.HeaderText
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
+import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.ScreenMessageWithAction
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.marketkit.models.HsPointTimePeriod
+import kotlinx.parcelize.Parcelize
 
 class TechnicalIndicatorsDetailsFragment : BaseComposeFragment() {
 
-    private val coinUid by lazy {
-        requireArguments().getString(COIN_UID_KEY)
-    }
-
-    private val period by lazy {
-        val value = requireArguments().getString(PERIOD_KEY)
-        HsPointTimePeriod.fromString(value)
-    }
-
     @Composable
     override fun GetContent(navController: NavController) {
-        ComposeAppTheme {
-            NiaBackground {
-                if (coinUid == null || period == null) {
-                    ScreenMessageWithAction(
-                        text = stringResource(R.string.Error),
-                        icon = R.drawable.ic_error_48
-                    ) {
-                        ButtonPrimaryYellow(
-                            modifier = Modifier
-                                .padding(horizontal = 48.dp)
-                                .fillMaxWidth(),
-                            title = stringResource(R.string.Button_Close),
-                            onClick = {
-                                navController.popBackStack()
-                            }
-                        )
-                    }
-                } else {
-                    TechnicalIndicatorsDetailsScreen(
-                        coinUid = coinUid!!,
-                        period = period!!,
-                        onBackPress = {
+        val input = navController.getInput<Input>()
+        val coinUid = input?.coinUid
+        val period = HsPointTimePeriod.fromString(input?.periodValue)
+        NiaBackground {
+            if (coinUid == null || period == null) {
+                ScreenMessageWithAction(
+                    text = stringResource(R.string.Error),
+                    icon = R.drawable.ic_error_48
+                ) {
+                    ButtonPrimaryYellow(
+                        modifier = Modifier
+                            .padding(horizontal = 48.dp)
+                            .fillMaxWidth(),
+                        title = stringResource(R.string.Button_Close),
+                        onClick = {
                             navController.popBackStack()
                         }
                     )
                 }
+            } else {
+                TechnicalIndicatorsDetailsScreen(
+                    coinUid = coinUid,
+                    period = period,
+                    onBackPress = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
     }
@@ -86,15 +81,9 @@ class TechnicalIndicatorsDetailsFragment : BaseComposeFragment() {
     override val logScreen: String
         get() = "TechnicalIndicatorsDetailsFragment"
 
-    companion object {
-        private const val COIN_UID_KEY = "coin_uid_key"
-        private const val PERIOD_KEY = "period_key"
-
-        fun prepareParams(coinUid: String, period: HsPointTimePeriod) =
-            bundleOf(
-                COIN_UID_KEY to coinUid,
-                PERIOD_KEY to period.value
-            )
+    @Parcelize
+    data class Input(val coinUid: String, val periodValue: String) : Parcelable {
+        constructor(coinUid: String, period: HsPointTimePeriod) : this(coinUid, period.value)
     }
 }
 

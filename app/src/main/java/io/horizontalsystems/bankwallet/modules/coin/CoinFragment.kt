@@ -1,5 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.coin
 
+import android.os.Parcelable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -20,16 +21,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
-import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.navGraphViewModels
-import com.android.billing.UserDataRepository
 import com.applovin.mediation.ads.MaxRewardedAd
+import com.android.billing.UserDataRepository
 import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.getInput
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.modules.billing.showBillingPlusDialog
 import io.horizontalsystems.bankwallet.modules.coin.analytics.CoinAnalyticsScreen
@@ -43,6 +44,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.*
 import io.horizontalsystems.core.helpers.HudHelper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import se.warting.inappupdate.compose.findActivity
 
 class CoinFragment : BaseComposeFragment(), AdRewardedCallback {
@@ -50,8 +52,9 @@ class CoinFragment : BaseComposeFragment(), AdRewardedCallback {
     private var viewModel: CoinViewModel? = null
     @Composable
     override fun GetContent(navController: NavController) {
-        val coinUid = requireArguments().getString(COIN_UID_KEY, "")
-        val apiTag = requireArguments().getString(API_TAG_KEY, "")
+        val input = navController.getInput<Input>()
+        val coinUid = input?.coinUid ?: ""
+        val apiTag = input?.apiTag ?: ""
         viewModel = coinViewModel(coinUid, userDataRepository)
         CoinScreen(
             coinUid,
@@ -92,12 +95,8 @@ class CoinFragment : BaseComposeFragment(), AdRewardedCallback {
 
     override fun onShowFail() {}
 
-    companion object {
-        private const val COIN_UID_KEY = "coin_uid_key"
-        private const val API_TAG_KEY = "api_tag_key"
-
-        fun prepareParams(coinUid: String, apiTag: String) = bundleOf(COIN_UID_KEY to coinUid, API_TAG_KEY to apiTag)
-    }
+    @Parcelize
+    data class Input(val coinUid: String, val apiTag: String) : Parcelable
 }
 
 @Composable

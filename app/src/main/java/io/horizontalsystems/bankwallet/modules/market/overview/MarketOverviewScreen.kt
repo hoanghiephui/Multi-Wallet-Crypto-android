@@ -21,7 +21,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.BuildConfig
@@ -33,17 +32,16 @@ import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
-import io.horizontalsystems.bankwallet.modules.market.category.MarketCategoryFragment
 import io.horizontalsystems.bankwallet.modules.market.overview.ui.BoardsView
 import io.horizontalsystems.bankwallet.modules.market.overview.ui.MetricChartsView
+import io.horizontalsystems.bankwallet.modules.market.overview.ui.TopPairsBoardView
 import io.horizontalsystems.bankwallet.modules.market.overview.ui.TopPlatformsBoardView
 import io.horizontalsystems.bankwallet.modules.market.overview.ui.TopSectorsBoardView
-import io.horizontalsystems.bankwallet.modules.market.platform.MarketPlatformFragment
 import io.horizontalsystems.bankwallet.modules.market.topcoins.MarketTopCoinsFragment
-import io.horizontalsystems.bankwallet.modules.market.topplatforms.TopPlatformsFragment
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
 import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
+import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
 
 @Composable
 fun MarketOverviewScreen(
@@ -51,12 +49,12 @@ fun MarketOverviewScreen(
     viewModel: MarketOverviewViewModel,
     onScroll: () -> Unit
 ) {
+    val context = LocalContext.current
     val isRefreshing by viewModel.isRefreshingLiveData.observeAsState(false)
     val viewState by viewModel.viewStateLiveData.observeAsState()
     val viewItem by viewModel.viewItem.observeAsState()
     val isPlusMode by viewModel.screenState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
-    val context = LocalContext.current
     val nativeAd by viewModel.adState
     if (!isPlusMode) {
         LaunchedEffect(key1 = BuildConfig.HOME_MARKET_NATIVE, block = {
@@ -108,18 +106,31 @@ fun MarketOverviewScreen(
                                     val (sortingField, topMarket, marketField) = viewModel.getTopCoinsParams(
                                         listType
                                     )
-                                    val args = MarketTopCoinsFragment.prepareParams(
-                                        sortingField,
-                                        topMarket,
-                                        marketField
-                                    )
 
-                                    navController.slideFromBottom(R.id.marketTopCoinsFragment, args)
+                                    navController.slideFromBottom(
+                                        R.id.marketTopCoinsFragment,
+                                        MarketTopCoinsFragment.Input(
+                                            sortingField,
+                                            topMarket,
+                                            marketField
+                                        )
+                                    )
                                 },
                                 onSelectTopMarket = { topMarket, listType ->
                                     viewModel.onSelectTopMarket(topMarket, listType)
                                 }
                             )
+
+                            TopPairsBoardView(
+                                topMarketPairs = viewItem.topMarketPairs,
+                                onItemClick = {
+                                    it.tradeUrl?.let {
+                                        LinkHelper.openLinkInAppBrowser(context, it)
+                                    }
+                                }
+                            ) {
+                                navController.slideFromBottom(R.id.topPairsFragment)
+                            }
 
                             TopPlatformsBoardView(
                                 viewItem.topPlatformsBoard,
@@ -127,14 +138,15 @@ fun MarketOverviewScreen(
                                     viewModel.onSelectTopPlatformsTimeDuration(timeDuration)
                                 },
                                 onItemClick = {
-                                    val args = MarketPlatformFragment.prepareParams(it)
-                                    navController.slideFromRight(R.id.marketPlatformFragment, args)
+                                    navController.slideFromRight(R.id.marketPlatformFragment, it)
                                 },
                                 onClickSeeAll = {
                                     val timeDuration = viewModel.topPlatformsTimeDuration
-                                    val args = TopPlatformsFragment.prepareParams(timeDuration)
 
-                                    navController.slideFromBottom(R.id.marketTopPlatformsFragment, args)
+                                    navController.slideFromBottom(
+                                        R.id.marketTopPlatformsFragment,
+                                        timeDuration
+                                    )
                                 }
                             )
 
@@ -143,7 +155,7 @@ fun MarketOverviewScreen(
                             ) { coinCategory ->
                                 navController.slideFromBottom(
                                     R.id.marketCategoryFragment,
-                                    bundleOf(MarketCategoryFragment.categoryKey to coinCategory)
+                                    coinCategory
                                 )
                             }
 

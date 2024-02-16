@@ -3,6 +3,7 @@ package io.horizontalsystems.bankwallet.modules.swap.approve.confirmation
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.Parcelable
 import android.view.View
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,26 +22,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import androidx.navigation.navGraphViewModels
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.AppLogger
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.getInputX
+import io.horizontalsystems.bankwallet.core.setNavigationResultX
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
 import io.horizontalsystems.bankwallet.modules.evmfee.EvmFeeCellViewModel
 import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmData
-import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmModule
-import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmModule.additionalInfoKey
-import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmModule.backButtonKey
-import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmModule.blockchainTypeKey
-import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmModule.transactionDataKey
 import io.horizontalsystems.bankwallet.modules.send.evm.settings.SendEvmNonceViewModel
 import io.horizontalsystems.bankwallet.modules.send.evm.settings.SendEvmSettingsFragment
 import io.horizontalsystems.bankwallet.modules.sendevmtransaction.SendEvmTransactionView
 import io.horizontalsystems.bankwallet.modules.sendevmtransaction.SendEvmTransactionViewModel
-import io.horizontalsystems.bankwallet.modules.swap.approve.SwapApproveModule
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
@@ -51,42 +47,37 @@ import io.horizontalsystems.core.CustomSnackbar
 import io.horizontalsystems.core.SnackbarDuration
 import io.horizontalsystems.core.findNavController
 import io.horizontalsystems.core.helpers.HudHelper
-import io.horizontalsystems.core.parcelable
-import io.horizontalsystems.core.setNavigationResult
-import io.horizontalsystems.ethereumkit.models.Address
 import io.horizontalsystems.ethereumkit.models.TransactionData
 import io.horizontalsystems.marketkit.models.BlockchainType
+import kotlinx.parcelize.Parcelize
 
 class SwapApproveConfirmationFragment : BaseComposeFragment() {
     private val logger = AppLogger("swap-approve")
-    private val additionalItems: SendEvmData.AdditionalInfo?
-        get() = arguments?.parcelable(additionalInfoKey)
 
-    private val blockchainType: BlockchainType?
-        get() = arguments?.parcelable(blockchainTypeKey)
+    private val input by lazy {
+        arguments?.getInputX<SwapApproveConfirmationModule.Input>()!!
+    }
+
+    private val additionalItems: SendEvmData.AdditionalInfo?
+        get() = input.additionalInfo
+
+    private val blockchainType: BlockchainType
+        get() = input.blockchainType
 
     private val backButton: Boolean
-        get() = arguments?.getBoolean(backButtonKey) ?: true
+        get() = input.backButton
 
     private val vmFactory by lazy {
         SwapApproveConfirmationModule.Factory(
             SendEvmData(transactionData, additionalItems),
-            blockchainType!!
+            blockchainType
         )
     }
     private val sendEvmTransactionViewModel by navGraphViewModels<SendEvmTransactionViewModel>(R.id.swapApproveConfirmationFragment) { vmFactory }
     private val feeViewModel by navGraphViewModels<EvmFeeCellViewModel>(R.id.swapApproveConfirmationFragment) { vmFactory }
     private val nonceViewModel by navGraphViewModels<SendEvmNonceViewModel>(R.id.swapApproveConfirmationFragment) { vmFactory }
     private val transactionData: TransactionData
-        get() {
-            val transactionDataParcelable =
-                arguments?.parcelable<SendEvmModule.TransactionDataParcelable>(transactionDataKey)!!
-            return TransactionData(
-                Address(transactionDataParcelable.toAddress),
-                transactionDataParcelable.value,
-                transactionDataParcelable.input
-            )
-        }
+        get() = input.transactionData
 
     private var snackbarInProcess: CustomSnackbar? = null
 
@@ -126,11 +117,7 @@ class SwapApproveConfirmationFragment : BaseComposeFragment() {
                 R.string.Hud_Text_Done
             )
             Handler(Looper.getMainLooper()).postDelayed({
-                findNavController().setNavigationResult(
-                    SwapApproveModule.requestKey,
-                    bundleOf(SwapApproveModule.resultKey to true),
-                    R.id.swapFragment
-                )
+                findNavController().setNavigationResultX(Result(true))
                 findNavController().popBackStack(R.id.swapFragment, false)
             }, 1200)
         }
@@ -142,6 +129,9 @@ class SwapApproveConfirmationFragment : BaseComposeFragment() {
         }
 
     }
+
+    @Parcelize
+    data class Result(val approved: Boolean) : Parcelable
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -185,8 +175,8 @@ private fun SwapApproveConfirmationScreen(
                         tint = ComposeAppTheme.colors.jacob,
                         onClick = {
                             navController.slideFromBottom(
-                                resId = R.id.sendEvmSettingsFragment,
-                                args = SendEvmSettingsFragment.prepareParams(parentNavGraphId)
+                                R.id.sendEvmSettingsFragment,
+                                SendEvmSettingsFragment.Input(parentNavGraphId)
                             )
                         }
                     )

@@ -1,6 +1,5 @@
 package io.horizontalsystems.bankwallet.modules.swap.approve
 
-import androidx.core.os.bundleOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import io.horizontalsystems.bankwallet.core.App
@@ -10,10 +9,6 @@ import io.horizontalsystems.bankwallet.modules.swap.SwapMainModule
 import io.horizontalsystems.ethereumkit.models.Address
 
 object SwapApproveModule {
-
-    const val requestKey = "approve"
-    const val resultKey = "result"
-    const val dataKey = "data_key"
 
     class Factory(private val approveData: SwapMainModule.ApproveData) :
         ViewModelProvider.Factory {
@@ -47,7 +42,4 @@ object SwapApproveModule {
             }
         }
     }
-
-    fun prepareParams(approveData: SwapMainModule.ApproveData) = bundleOf(dataKey to approveData)
-
 }

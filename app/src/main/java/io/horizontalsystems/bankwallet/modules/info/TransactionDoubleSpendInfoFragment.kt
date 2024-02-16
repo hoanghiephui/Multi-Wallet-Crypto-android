@@ -1,5 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.info
 
+import android.os.Parcelable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,10 +24,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.requireInput
 import io.horizontalsystems.bankwallet.core.shorten
 import io.horizontalsystems.bankwallet.modules.info.ui.InfoHeader
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
@@ -38,33 +39,28 @@ import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.TextImportantWarning
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.core.helpers.HudHelper
+import kotlinx.parcelize.Parcelize
 
 class TransactionDoubleSpendInfoFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent(navController: NavController) {
+        val input = navController.requireInput<Input>()
         InfoScreen(
-            txHash = requireArguments().getString(TRANSACTION_HASH)!!,
-            conflictingTxHash = requireArguments().getString(
-                CONFLICTING_TRANSACTION_HASH
-            )!!,
+            txHash = input.transactionHash,
+            conflictingTxHash = input.conflictingTransactionHash,
             onBackClick = { navController.popBackStack() }
         )
     }
 
+    @Parcelize
+    data class Input(
+        val transactionHash: String,
+        val conflictingTransactionHash: String,
+    ) : Parcelable
+
     override val logScreen: String
         get() = "TransactionDoubleSpendInfoFragment"
-
-    companion object {
-        private const val TRANSACTION_HASH = "transaction_hash"
-        private const val CONFLICTING_TRANSACTION_HASH = "conflicting_transaction_hash"
-
-        fun prepareParams(transactionHash: String, conflictingTransactionHash: String) = bundleOf(
-            TRANSACTION_HASH to transactionHash,
-            CONFLICTING_TRANSACTION_HASH to conflictingTransactionHash,
-        )
-    }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

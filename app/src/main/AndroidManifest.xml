@@ -16,7 +16,6 @@
     <application
         android:name="io.horizontalsystems.bankwallet.core.App"
         android:allowBackup="false"
-        android:extractNativeLibs="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/App_Name"
@@ -96,7 +95,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="unstoppable" />
+                <data android:scheme="@string/DeeplinkScheme" />
             </intent-filter>
         </activity-alias>
         <activity-alias
@@ -121,7 +120,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="unstoppable" />
+                <data android:scheme="@string/DeeplinkScheme" />
             </intent-filter>
         </activity-alias>
         <activity-alias
@@ -146,7 +145,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="unstoppable" />
+                <data android:scheme="@string/DeeplinkScheme" />
             </intent-filter>
         </activity-alias>
         <activity-alias
@@ -170,7 +169,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="unstoppable" />
+                <data android:scheme="@string/DeeplinkScheme" />
             </intent-filter>
         </activity-alias>
         <activity-alias
@@ -194,7 +193,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="unstoppable" />
+                <data android:scheme="@string/DeeplinkScheme" />
             </intent-filter>
         </activity-alias>
         <activity-alias
@@ -218,7 +217,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="unstoppable" />
+                <data android:scheme="@string/DeeplinkScheme" />
             </intent-filter>
         </activity-alias>
         <activity-alias
@@ -242,7 +241,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="unstoppable" />
+                <data android:scheme="@string/DeeplinkScheme" />
             </intent-filter>
         </activity-alias>
         <activity-alias
@@ -266,7 +265,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="unstoppable" />
+                <data android:scheme="@string/DeeplinkScheme" />
             </intent-filter>
         </activity-alias>
         <activity-alias
@@ -290,7 +289,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="unstoppable" />
+                <data android:scheme="@string/DeeplinkScheme" />
             </intent-filter>
         </activity-alias>
 

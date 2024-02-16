@@ -39,7 +39,6 @@ import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.modules.balance.BalanceViewItem2
 import io.horizontalsystems.bankwallet.modules.balance.BalanceViewModel
-import io.horizontalsystems.bankwallet.modules.balance.token.TokenBalanceFragment
 import io.horizontalsystems.bankwallet.modules.syncerror.SyncErrorDialog
 import io.horizontalsystems.bankwallet.modules.walletconnect.list.ui.DraggableCardSimple
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
@@ -106,7 +105,7 @@ fun BalanceCard(
         onClick = {
             navController.slideFromRight(
                 R.id.tokenBalanceFragment,
-                TokenBalanceFragment.prepareParams(viewItem.wallet)
+                viewItem.wallet
             )
         },
         shape = RoundedCornerShape(16.dp),
@@ -319,7 +318,7 @@ private fun onSyncErrorClicked(
 
             navController.slideFromBottom(
                 R.id.syncErrorDialog,
-                SyncErrorDialog.prepareParams(wallet, errorMessage)
+                SyncErrorDialog.Input(wallet, errorMessage)
             )
         }
 

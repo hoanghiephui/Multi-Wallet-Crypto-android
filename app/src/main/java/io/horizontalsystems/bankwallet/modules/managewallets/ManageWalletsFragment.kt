@@ -34,17 +34,14 @@ import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromBottom
+import io.horizontalsystems.bankwallet.core.slideFromBottomForResult
 import io.horizontalsystems.bankwallet.core.slideFromRight
-import io.horizontalsystems.bankwallet.modules.configuredtoken.ConfiguredTokenInfoDialog
 import io.horizontalsystems.bankwallet.modules.enablecoin.restoresettings.RestoreSettingsViewModel
-import io.horizontalsystems.bankwallet.modules.enablecoin.restoresettings.ZCashConfig
 import io.horizontalsystems.bankwallet.modules.restoreaccount.restoreblockchains.CoinViewItem
 import io.horizontalsystems.bankwallet.modules.zcashconfigure.ZcashConfigure
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.*
-import io.horizontalsystems.core.getNavigationResult
-import io.horizontalsystems.core.parcelable
 import io.horizontalsystems.marketkit.models.Token
 
 class ManageWalletsFragment : BaseComposeFragment() {
@@ -79,20 +76,13 @@ private fun ManageWalletsScreen(
     if (restoreSettingsViewModel.openZcashConfigure != null) {
         restoreSettingsViewModel.zcashConfigureOpened()
 
-        navController.getNavigationResult(ZcashConfigure.resultBundleKey) { bundle ->
-            val requestResult = bundle.getInt(ZcashConfigure.requestResultKey)
-
-            if (requestResult == ZcashConfigure.RESULT_OK) {
-                val zcashConfig = bundle.parcelable<ZCashConfig>(ZcashConfigure.zcashConfigKey)
-                zcashConfig?.let { config ->
-                    restoreSettingsViewModel.onEnter(config)
-                }
+        navController.slideFromBottomForResult<ZcashConfigure.Result>(R.id.zcashConfigure) {
+            if (it.config != null) {
+                restoreSettingsViewModel.onEnter(it.config)
             } else {
                 restoreSettingsViewModel.onCancelEnterBirthdayHeight()
             }
         }
-
-        navController.slideFromBottom(R.id.zcashConfigure)
     }
 
     SearchBar(
@@ -157,7 +147,7 @@ private fun Content(
                         onInfoClick = {
                             navController.slideFromBottom(
                                 R.id.configuredTokenInfo,
-                                ConfiguredTokenInfoDialog.prepareParams(viewItem.item)
+                                viewItem.item
                             )
                         }
                     )

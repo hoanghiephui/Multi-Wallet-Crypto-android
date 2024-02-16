@@ -171,10 +171,7 @@ fun NftHoldingsScreen(navController: NavController) {
                                         nftsCollectionSection(collection, viewModel) { asset ->
                                             navController.slideFromBottom(
                                                 R.id.nftAssetFragment,
-                                                NftAssetModule.prepareParams(
-                                                    asset.collectionUid,
-                                                    asset.nftUid
-                                                )
+                                                NftAssetModule.Input(asset.collectionUid, asset.nftUid)
                                             )
                                         }
                                     }

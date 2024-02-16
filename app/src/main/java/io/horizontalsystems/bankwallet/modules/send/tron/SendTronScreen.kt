@@ -132,7 +132,7 @@ fun SendTronScreen(
 
                         navController.slideFromRight(
                             R.id.sendConfirmation,
-                            SendConfirmationFragment.prepareParams(
+                            SendConfirmationFragment.Input(
                                 SendConfirmationFragment.Type.Tron,
                                 sendEntryPointDestId
                             )

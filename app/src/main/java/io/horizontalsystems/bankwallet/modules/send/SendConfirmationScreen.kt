@@ -30,7 +30,7 @@ import io.horizontalsystems.bankwallet.entities.Address
 import io.horizontalsystems.bankwallet.entities.CurrencyValue
 import io.horizontalsystems.bankwallet.modules.amount.AmountInputType
 import io.horizontalsystems.bankwallet.modules.contacts.model.Contact
-import io.horizontalsystems.bankwallet.modules.fee.HSFeeInputRaw
+import io.horizontalsystems.bankwallet.modules.fee.HSFeeRaw
 import io.horizontalsystems.bankwallet.modules.hodler.HSHodler
 import io.horizontalsystems.bankwallet.ui.compose.DisposableLifecycleCallbacks
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
@@ -42,6 +42,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.SectionTitleCell
 import io.horizontalsystems.bankwallet.ui.compose.components.TransactionInfoAddressCell
 import io.horizontalsystems.bankwallet.ui.compose.components.TransactionInfoContactCell
+import io.horizontalsystems.bankwallet.ui.compose.components.TransactionInfoRbfCell
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1Italic_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
@@ -74,6 +75,7 @@ fun SendConfirmationScreen(
     fee: BigDecimal,
     lockTimeInterval: LockTimeInterval?,
     memo: String?,
+    rbfEnabled: Boolean?,
     onClickSend: () -> Unit,
     sendEntryPointDestId: Int
 ) {
@@ -181,6 +183,12 @@ fun SendConfirmationScreen(
                             HSHodler(lockTimeInterval = lockTimeInterval)
                         }
                     }
+
+                    if (rbfEnabled == false) {
+                        add {
+                            TransactionInfoRbfCell(rbfEnabled)
+                        }
+                    }
                 }
 
                 CellUniversalLawrenceSection(topSectionItems)
@@ -189,7 +197,7 @@ fun SendConfirmationScreen(
 
                 val bottomSectionItems = buildList<@Composable () -> Unit> {
                     add {
-                        HSFeeInputRaw(
+                        HSFeeRaw(
                             coinCode = feeCoin.code,
                             coinDecimal = feeCoinMaxAllowedDecimals,
                             fee = fee,

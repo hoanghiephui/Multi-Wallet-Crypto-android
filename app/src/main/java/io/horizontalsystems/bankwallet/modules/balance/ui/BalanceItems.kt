@@ -15,16 +15,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -65,6 +64,7 @@ import io.horizontalsystems.bankwallet.modules.sendtokenselect.SendTokenSelectFr
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryCircle
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryDefaultWithIcon
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellowWithIcon
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryCircle
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryTransparent
@@ -234,14 +234,15 @@ fun BalanceItems(
                                 }
                             )
                             HSpacer(8.dp)
-                            ButtonPrimaryCircle(
+                            ButtonPrimaryDefaultWithIcon(
+                                modifier = Modifier.weight(1f),
                                 icon = R.drawable.ic_arrow_down_left_24,
-                                contentDescription = stringResource(R.string.Balance_Receive),
+                                title = stringResource(R.string.Balance_Receive),
                                 onClick = {
                                     when (val receiveAllowedState =
                                         viewModel.getReceiveAllowedState()) {
                                         ReceiveAllowedState.Allowed -> {
-                                            navController.slideFromRight(R.id.receiveTokenSelectFragment)
+                                            navController.slideFromRight(R.id.receiveFragment)
                                         }
 
                                         is ReceiveAllowedState.BackupRequired -> {
@@ -252,20 +253,20 @@ fun BalanceItems(
                                             )
                                             navController.slideFromBottom(
                                                 R.id.backupRequiredDialog,
-                                                BackupRequiredDialog.prepareParams(account, text)
+                                                BackupRequiredDialog.Input(account, text)
                                             )
                                         }
 
                                         null -> Unit
                                     }
-                                },
+                                }
                             )
                             HSpacer(8.dp)
                             ButtonPrimaryCircle(
                                 icon = R.drawable.ic_swap_24,
                                 contentDescription = stringResource(R.string.Swap),
                                 onClick = {
-                                    navController.slideFromRight(R.id.swapTokenSelectFragment)
+                                    navController.slideFromRight(R.id.swapXxx)
                                 }
                             )
                         }
@@ -381,7 +382,7 @@ fun BalanceItems(
     uiState.openSend?.let { openSend ->
         navController.slideFromRight(
             R.id.sendTokenSelectFragment,
-            SendTokenSelectFragment.prepareParams(
+            SendTokenSelectFragment.Input(
                 openSend.blockchainTypes,
                 openSend.tokenTypes,
                 openSend.address,

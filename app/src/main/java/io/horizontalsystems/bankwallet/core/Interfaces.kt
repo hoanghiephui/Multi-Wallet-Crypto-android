@@ -1,6 +1,8 @@
 package io.horizontalsystems.bankwallet.core
 
+import android.os.Parcelable
 import com.google.gson.JsonObject
+import io.horizontalsystems.bankwallet.core.adapters.BitcoinFeeInfo
 import io.horizontalsystems.bankwallet.core.adapters.zcash.ZcashAdapter
 import io.horizontalsystems.bankwallet.core.managers.ActiveAccountState
 import io.horizontalsystems.bankwallet.core.managers.Bep2TokenInfoService
@@ -24,10 +26,9 @@ import io.horizontalsystems.bankwallet.modules.amount.AmountInputType
 import io.horizontalsystems.bankwallet.modules.balance.BalanceSortType
 import io.horizontalsystems.bankwallet.modules.balance.BalanceViewType
 import io.horizontalsystems.bankwallet.modules.main.MainModule
-import io.horizontalsystems.bankwallet.modules.market.MarketField
 import io.horizontalsystems.bankwallet.modules.market.MarketModule
-import io.horizontalsystems.bankwallet.modules.market.SortingField
 import io.horizontalsystems.bankwallet.modules.market.Value
+import io.horizontalsystems.bankwallet.modules.market.favorites.MarketFavoritesModule.Period
 import io.horizontalsystems.bankwallet.modules.settings.appearance.AppIcon
 import io.horizontalsystems.bankwallet.modules.settings.security.autolock.AutoLockInterval
 import io.horizontalsystems.bankwallet.modules.settings.security.tor.TorStatus
@@ -36,6 +37,7 @@ import io.horizontalsystems.bankwallet.modules.theme.ThemeType
 import io.horizontalsystems.bankwallet.modules.transactions.FilterTransactionType
 import io.horizontalsystems.binancechainkit.BinanceChainKit
 import io.horizontalsystems.bitcoincore.core.IPluginData
+import io.horizontalsystems.bitcoincore.storage.UnspentOutputInfo
 import io.horizontalsystems.ethereumkit.models.Address
 import io.horizontalsystems.ethereumkit.models.TransactionData
 import io.horizontalsystems.marketkit.models.BlockchainType
@@ -48,6 +50,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.parcelize.Parcelize
 import java.math.BigDecimal
 import java.util.Date
 import io.horizontalsystems.solanakit.models.Address as SolanaAddress
@@ -104,8 +107,8 @@ interface ILocalStorage {
     var launchPage: LaunchPage?
     var appIcon: AppIcon?
     var mainTab: MainModule.MainNavigation?
-    var marketFavoritesSortingField: SortingField?
-    var marketFavoritesMarketField: MarketField?
+    var marketFavoritesSortDescending: Boolean
+    var marketFavoritesPeriod: Period?
     var relaunchBySettingChange: Boolean
     var marketsTabEnabled: Boolean
     val marketsTabEnabledFlow: StateFlow<Boolean>
@@ -113,6 +116,10 @@ interface ILocalStorage {
     var personalSupportEnabled: Boolean
     var hideSuspiciousTransactions: Boolean
     var pinRandomized: Boolean
+    var utxoExpertModeEnabled: Boolean
+    var rbfEnabled: Boolean
+
+    val utxoExpertModeEnabledFlow: StateFlow<Boolean>
     var isAnalytic: Boolean
     var isDetectCrash: Boolean
 
@@ -288,32 +295,48 @@ interface IReceiveAdapter {
 
     val isAccountActive: Boolean
         get() = true
+
+    fun usedAddresses(change: Boolean): List<UsedAddress> {
+        return listOf()
+    }
 }
 
+@Parcelize
+data class UsedAddress(
+    val index: Int,
+    val address: String,
+    val explorerUrl: String
+): Parcelable
+
 interface ISendBitcoinAdapter {
+    val unspentOutputs: List<UnspentOutputInfo>
     val balanceData: BalanceData
     val blockchainType: BlockchainType
     fun availableBalance(
         feeRate: Int,
         address: String?,
+        unspentOutputs: List<UnspentOutputInfo>?,
         pluginData: Map<Byte, IPluginData>?
     ): BigDecimal
 
     fun minimumSendAmount(address: String?): BigDecimal?
-    fun fee(
+    fun bitcoinFeeInfo(
         amount: BigDecimal,
         feeRate: Int,
         address: String?,
+        unspentOutputs: List<UnspentOutputInfo>?,
         pluginData: Map<Byte, IPluginData>?
-    ): BigDecimal?
+    ): BitcoinFeeInfo?
 
     fun validate(address: String, pluginData: Map<Byte, IPluginData>?)
     fun send(
         amount: BigDecimal,
         address: String,
         feeRate: Int,
+        unspentOutputs: List<UnspentOutputInfo>?,
         pluginData: Map<Byte, IPluginData>?,
         transactionSorting: TransactionDataSortMode?,
+        rbfEnabled: Boolean,
         logger: AppLogger
     ): Single<Unit>
 }
@@ -357,7 +380,7 @@ interface ISendSolanaAdapter {
 
 interface ISendTonAdapter {
     val availableBalance: BigDecimal
-    suspend fun send(amount: BigDecimal, address: String)
+    suspend fun send(amount: BigDecimal, address: String, memo: String?)
     suspend fun estimateFee() : BigDecimal
 }
 

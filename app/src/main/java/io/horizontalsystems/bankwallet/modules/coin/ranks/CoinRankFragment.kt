@@ -4,7 +4,15 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -15,8 +23,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.VerticalDivider
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
@@ -24,29 +36,43 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.os.bundleOf
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.getInput
+import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.ViewState
+import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
 import io.horizontalsystems.bankwallet.modules.coin.analytics.CoinAnalyticsModule.RankType
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.Select
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
-import io.horizontalsystems.bankwallet.ui.compose.components.*
-import io.horizontalsystems.core.parcelable
+import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryCircle
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryToggle
+import io.horizontalsystems.bankwallet.ui.compose.components.DescriptionCard
+import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
+import io.horizontalsystems.bankwallet.ui.compose.components.HeaderSorting
+import io.horizontalsystems.bankwallet.ui.compose.components.ListEmptyView
+import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
+import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
+import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
+import io.horizontalsystems.bankwallet.ui.compose.components.ScreenMessageWithAction
+import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
+import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
+import io.horizontalsystems.bankwallet.ui.compose.components.captionSB_grey
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 
 class CoinRankFragment : BaseComposeFragment() {
 
-    private val type by lazy {
-        requireArguments().parcelable<RankType>(rankTypeKey)
-    }
-
     @Composable
     override fun GetContent(navController: NavController) {
+        val type = navController.getInput<RankType>()
+
         type?.let { rankType ->
             CoinRankScreen(
                 rankType,
@@ -67,15 +93,8 @@ class CoinRankFragment : BaseComposeFragment() {
             }
         }
     }
-
     override val logScreen: String
         get() = "CoinRankFragment"
-
-    companion object {
-        private const val rankTypeKey = "rank_type_key"
-
-        fun prepareParams(coinUid: RankType) = bundleOf(rankTypeKey to coinUid)
-    }
 }
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -135,13 +154,13 @@ private fun CoinRankScreen(
                                 HeaderSorting {
                                     ButtonSecondaryCircle(
                                         modifier = Modifier.padding(start = 16.dp),
-                                        icon = if (uiState.sortDescending) R.drawable.ic_arrow_down_20 else R.drawable.ic_arrow_up_20,
+                                        icon = if (uiState.sortDescending) R.drawable.ic_sort_l2h_20 else R.drawable.ic_sort_h2l_20,
                                         onClick = { viewModel.toggleSortType() }
                                     )
                                     Spacer(Modifier.weight(1f))
                                 }
                             }
-                            coinRankList(viewItems)
+                            coinRankList(viewItems, navController)
                         }
                     }
                 }
@@ -151,7 +170,8 @@ private fun CoinRankScreen(
 }
 
 private fun LazyListScope.coinRankList(
-    items: List<CoinRankModule.RankViewItem>
+    items: List<CoinRankModule.RankViewItem>,
+    navController: NavController
 ) {
     item {
         HorizontalDivider(
@@ -161,11 +181,15 @@ private fun LazyListScope.coinRankList(
     }
     items(items) { item ->
         CoinRankCell(
-            item.rank,
-            item.title,
-            item.subTitle,
-            item.iconUrl,
-            item.value
+            rank = item.rank,
+            name = item.title,
+            subtitle = item.subTitle,
+            iconUrl = item.iconUrl,
+            value = item.value,
+            onClick = {
+                val arguments = CoinFragment.Input(item.coinUid, "coin_rank")
+                navController.slideFromRight(R.id.coinFragment, arguments)
+            }
         )
     }
     item {
@@ -180,9 +204,12 @@ private fun CoinRankCell(
     subtitle: String,
     iconUrl: String?,
     value: String? = null,
+    onClick: () -> Unit = {}
 ) {
     Column {
-        RowUniversal {
+        RowUniversal(
+            onClick = onClick,
+        ) {
             captionSB_grey(
                 modifier = Modifier.width(56.dp),
                 textAlign = TextAlign.Center,

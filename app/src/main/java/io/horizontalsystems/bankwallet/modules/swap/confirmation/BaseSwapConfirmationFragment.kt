@@ -50,16 +50,9 @@ abstract class BaseSwapConfirmationFragment : BaseComposeFragment() {
     protected abstract val feeViewModel: EvmFeeCellViewModel
     protected abstract val nonceViewModel: SendEvmNonceViewModel
     protected abstract val navGraphId: Int
+    protected abstract val swapEntryPointDestId: Int
 
     private var snackbarInProcess: CustomSnackbar? = null
-    private val closeUntilDestId by lazy {
-        val swapEntryPointDestId = arguments?.getInt(swapEntryPointDestIdKey) ?: 0
-        if (swapEntryPointDestId == 0) {
-            R.id.swapFragment
-        } else {
-            swapEntryPointDestId
-        }
-    }
 
     @Composable
     override fun GetContent(navController: NavController) {
@@ -92,7 +85,7 @@ abstract class BaseSwapConfirmationFragment : BaseComposeFragment() {
                 R.string.Hud_Text_Done
             )
             Handler(Looper.getMainLooper()).postDelayed({
-                findNavController().popBackStack(closeUntilDestId, true)
+                findNavController().popBackStack(swapEntryPointDestId, true)
             }, 1200)
         }
 
@@ -102,11 +95,6 @@ abstract class BaseSwapConfirmationFragment : BaseComposeFragment() {
             findNavController().popBackStack()
         }
     }
-
-    companion object {
-        const val swapEntryPointDestIdKey = "swapEntryPointDestIdKey"
-    }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -138,8 +126,8 @@ private fun BaseSwapConfirmationScreen(
                             tint = ComposeAppTheme.colors.jacob,
                             onClick = {
                                 navController.slideFromBottom(
-                                    resId = R.id.sendEvmSettingsFragment,
-                                    args = SendEvmSettingsFragment.prepareParams(parentNavGraphId)
+                                     R.id.sendEvmSettingsFragment,
+                                    SendEvmSettingsFragment.Input(parentNavGraphId)
                                 )
                             }
                         )

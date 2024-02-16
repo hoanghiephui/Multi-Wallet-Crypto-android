@@ -22,11 +22,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
-import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.core.requireInput
+import io.horizontalsystems.bankwallet.core.setNavigationResultX
+import io.horizontalsystems.bankwallet.core.slideFromRightForResult
 import io.horizontalsystems.bankwallet.entities.DataState
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
 import io.horizontalsystems.bankwallet.modules.swap.SwapMainModule
-import io.horizontalsystems.bankwallet.modules.swap.approve.SwapApproveModule.dataKey
+import io.horizontalsystems.bankwallet.modules.swap.approve.confirmation.SwapApproveConfirmationFragment
 import io.horizontalsystems.bankwallet.modules.swap.approve.confirmation.SwapApproveConfirmationModule
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
@@ -36,13 +38,12 @@ import io.horizontalsystems.bankwallet.ui.compose.components.FormsInput
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.TextImportantWarning
 import io.horizontalsystems.bankwallet.ui.compose.components.TextPreprocessor
-import io.horizontalsystems.core.parcelable
 
 class SwapApproveFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent(navController: NavController) {
-        val approveData = requireArguments().parcelable<SwapMainModule.ApproveData>(dataKey)!!
+        val approveData = navController.requireInput<SwapMainModule.ApproveData>()
         SwapApproveScreen(navController, approveData)
     }
 
@@ -116,10 +117,12 @@ fun SwapApproveScreen(
                 title = stringResource(R.string.Swap_Proceed),
                 onClick = {
                     swapApproveViewModel.getSendEvmData()?.let { sendEvmData ->
-                        navController.slideFromRight(
+                        navController.slideFromRightForResult<SwapApproveConfirmationFragment.Result>(
                             R.id.swapApproveConfirmationFragment,
-                            SwapApproveConfirmationModule.prepareParams(sendEvmData, swapApproveViewModel.dex.blockchainType)
-                        )
+                            SwapApproveConfirmationModule.Input(sendEvmData, swapApproveViewModel.dex.blockchainType)
+                        ) {
+                            navController.setNavigationResultX(it)
+                        }
                     }
                 },
                 enabled = approveAllowed

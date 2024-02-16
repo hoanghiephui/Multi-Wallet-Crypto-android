@@ -36,7 +36,6 @@ import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.modules.balance.AccountViewItem
 import io.horizontalsystems.bankwallet.modules.balance.BalanceModule
-import io.horizontalsystems.bankwallet.modules.balance.cex.asset.CexAssetFragment
 import io.horizontalsystems.bankwallet.modules.balance.ui.BalanceSortingSelector
 import io.horizontalsystems.bankwallet.modules.balance.ui.BalanceTitleRow
 import io.horizontalsystems.bankwallet.modules.balance.ui.TotalBalanceRow
@@ -118,7 +117,7 @@ fun BalanceForAccountCex(navController: NavController, accountViewItem: AccountV
                                     modifier = Modifier.weight(1f),
                                     title = stringResource(R.string.Balance_Deposit),
                                     onClick = {
-                                        navController.slideFromRight(R.id.depositCexChooseAssetFragment)
+                                        navController.slideFromRight(R.id.depositCexFragment)
                                     }
                                 )
                             }
@@ -175,7 +174,7 @@ fun BalanceCardCex(
                 onClick = {
                     navController.slideFromRight(
                         R.id.cexAssetFragment,
-                        CexAssetFragment.prepareParams(viewItem.cexAsset)
+                        viewItem.cexAsset
                     )
                 }
             )
