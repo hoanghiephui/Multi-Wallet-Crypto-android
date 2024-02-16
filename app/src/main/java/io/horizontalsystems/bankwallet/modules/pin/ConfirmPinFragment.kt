@@ -9,7 +9,7 @@ import io.horizontalsystems.bankwallet.modules.pin.ui.PinConfirm
 import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import kotlinx.parcelize.Parcelize
 
-class ConfirmPinFragment : BaseComposeFragment() {
+class ConfirmPinFragment : BaseComposeFragment(screenshotEnabled = false) {
 
     @Composable
     override fun GetContent(navController: NavController) {
