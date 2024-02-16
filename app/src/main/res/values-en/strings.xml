@@ -846,7 +846,7 @@
     <string name="SettingsTerms_Bugs">There may be undiscovered software issues in the code powering this app which may cause the app to malfunction.</string>
     <!--Setting_Tell Friends-->
     <string name="SettingsShare_Title">Share</string>
-    <string name="SettingsShare_Text">Be Unstoppable</string>
+    <string name="SettingsShare_Text">Be CoinDex</string>
     <!--Setting_Contact-->
     <string name="SettingsContact_Title">Contact Us</string>
     <!--Setting_Notifications-->
