@@ -1,13 +1,16 @@
 package io.horizontalsystems.bankwallet.modules.main
 
 import android.net.Uri
+import android.os.Parcelable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cash.z.ecc.android.sdk.ext.collectWith
+import com.android.billing.models.ScreenState
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.IAccountManager
 import io.horizontalsystems.bankwallet.core.IBackupManager
 import io.horizontalsystems.bankwallet.core.ILocalStorage
@@ -19,6 +22,8 @@ import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.entities.Account
 import io.horizontalsystems.bankwallet.entities.AccountType
 import io.horizontalsystems.bankwallet.entities.LaunchPage
+import io.horizontalsystems.bankwallet.modules.billing.BillingPlusUiState
+import io.horizontalsystems.bankwallet.modules.billing.showBillingPlusDialog
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
 import io.horizontalsystems.bankwallet.modules.main.MainModule.MainNavigation
 import io.horizontalsystems.bankwallet.modules.market.topplatforms.Platform
@@ -29,7 +34,10 @@ import io.horizontalsystems.bankwallet.modules.walletconnect.WCSessionManager
 import io.horizontalsystems.core.IPinComponent
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import se.warting.inappupdate.compose.findActivity
 
 class MainViewModel(
     private val pinComponent: IPinComponent,
@@ -327,6 +335,9 @@ class MainViewModel(
                             deeplinkPage = DeeplinkPage(R.id.marketPlatformFragment, platform)
                         }
                     }
+                    deeplinkString.contains("plus") -> {
+                        deeplinkPage = DeeplinkPage(R.id.BillingPlusDialog, CoinFragment.Input("", "widget"))
+                    }
                 }
 
                 tab = MainNavigation.Market
@@ -380,6 +391,14 @@ class MainViewModel(
     fun deeplinkPageHandled() {
         deeplinkPage = null
         syncState()
+    }
+    private val _openPro = MutableStateFlow(false)
+    val openPro = _openPro.asStateFlow()
+    private fun openProScreen() {
+        viewModelScope.launch {
+            delay(1000)
+            _openPro.tryEmit(true)
+        }
     }
 
 }

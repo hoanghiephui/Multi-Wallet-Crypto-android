@@ -15,6 +15,7 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
 import com.android.billing.DebugTree
+import com.android.billing.UserDataRepository
 import com.applovin.sdk.AppLovinSdk
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
@@ -127,6 +128,7 @@ import io.reactivex.plugins.RxJavaPlugins
 import timber.log.Timber
 import java.util.logging.Level
 import java.util.logging.Logger
+import javax.inject.Inject
 import androidx.work.Configuration as WorkConfiguration
 
 @HiltAndroidApp
@@ -201,7 +203,10 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         lateinit var chartIndicatorManager: ChartIndicatorManager
         lateinit var backupProvider: BackupProvider
         lateinit var spamManager: SpamManager
+        lateinit var mUserDataRepository: UserDataRepository
     }
+    @Inject
+    lateinit var userDataRepository: UserDataRepository
 
     override fun onCreate() {
         super.onCreate()
@@ -220,7 +225,7 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
 
         instance = this
         preferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-
+        mUserDataRepository = this.userDataRepository
         LocalStorageManager(preferences).apply {
             localStorage = this
             pinSettingsStorage = this

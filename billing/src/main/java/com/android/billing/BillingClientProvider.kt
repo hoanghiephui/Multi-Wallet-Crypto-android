@@ -66,7 +66,6 @@ class BillingClientProviderImpl @Inject constructor(
     override fun initialize(callback: (Unit) -> Unit) {
         if (state == BillingClientProvider.State.DISPOSED) {
             Timber.d("BillingClient already disposed")
-            return
         }
 
         if (state == BillingClientProvider.State.UNAVAILABLE) {
@@ -75,6 +74,7 @@ class BillingClientProviderImpl @Inject constructor(
         }
 
         if (state == BillingClientProvider.State.CONNECTED) {
+            callback.invoke(Unit)
             Timber.d("BillingClient already connected")
             return
         }

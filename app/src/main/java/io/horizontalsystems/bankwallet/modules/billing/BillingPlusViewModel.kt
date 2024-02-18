@@ -49,9 +49,13 @@ class BillingPlusViewModel @Inject constructor(
         private val PREMIUM_MONTH = ProductId(BuildConfig.PREMIUM_MONTH)
     }
     init {
+        connectBilling()
+    }
+
+    private fun connectBilling() {
         billingClient.initialize {
             viewModelScope.launch {
-                _screenState.value = runCatching {
+                val state = runCatching {
                     val userData = userDataRepository.userData.firstOrNull()
 
                     BillingPlusUiState(
@@ -72,6 +76,9 @@ class BillingPlusViewModel @Inject constructor(
                             retryTitle = R.string.Button_Close,
                         )
                     },
+                )
+                _screenState.emit(
+                    state
                 )
             }
         }
@@ -115,13 +122,15 @@ class BillingPlusViewModel @Inject constructor(
                     ToastUtil.show(context, R.string.billing_plus_toast_verify)
                     true
                 } else {
+                    userDataRepository.setPlusMode(false)
                     ToastUtil.show(context, R.string.billing_plus_toast_verify_error)
                     false
                 }
             },
             onFailure = {
-                Timber.w(it)
+                Timber.w("Billing Error: $it")
                 ToastUtil.show(context, R.string.error_billing)
+                connectBilling()
                 false
             },
         )
@@ -147,8 +156,7 @@ class BillingPlusViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        super.onCleared()
-        billingClient.dispose()
+        //billingClient.dispose()
     }
 }
 

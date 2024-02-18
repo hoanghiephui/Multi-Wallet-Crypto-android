@@ -1,6 +1,5 @@
 package io.horizontalsystems.bankwallet.modules.main
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
@@ -13,7 +12,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.horizontalsystems.bankwallet.core.BaseActivity
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.modules.billing.BillingPlusViewModel
-import io.horizontalsystems.bankwallet.modules.billing.showBillingPlusDialog
 import io.horizontalsystems.bankwallet.modules.walletconnect.AuthEvent
 import io.horizontalsystems.bankwallet.modules.walletconnect.SignEvent
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCViewModel
@@ -50,18 +48,6 @@ class MainActivity : BaseActivity() {
             }
         }
         billingViewModel.onVerify(this)
-        if (intent?.extras?.getBoolean("plus") == true) {
-            showBillingPlusDialog()
-            intent?.extras?.remove("plus")
-        }
-    }
-
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-
-        if (intent?.extras?.getBoolean("plus") == true) {
-            showBillingPlusDialog()
-        }
     }
 
     private fun handleWeb3WalletEvents(
@@ -74,7 +60,7 @@ class MainActivity : BaseActivity() {
                 when (event) {
                     is SignEvent.SessionProposal -> navController.slideFromBottom(R.id.wcSessionFragment)
                     is SignEvent.SessionRequest -> {
-                        navController.slideFromBottom(R.id.wcRequestFragment,)
+                        navController.slideFromBottom(R.id.wcRequestFragment)
                     }
 
                     is SignEvent.Disconnect -> {

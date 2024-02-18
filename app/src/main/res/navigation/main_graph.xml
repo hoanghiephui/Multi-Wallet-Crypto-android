@@ -415,4 +415,8 @@
     <dialog
         android:id="@+id/wcAccountTypeNotSupportedDialog"
         android:name="io.horizontalsystems.bankwallet.modules.walletconnect.WCAccountTypeNotSupportedDialog" />
+
+    <dialog
+        android:id="@+id/BillingPlusDialog"
+        android:name="io.horizontalsystems.bankwallet.modules.billing.BillingPlusDialog"/>
 </navigation>

@@ -83,10 +83,6 @@ class MarketWidget : GlanceAppWidget() {
     private fun Content(context: Context) {
         val state = currentState<MarketWidgetState>()
         val deeplinkScheme = context.getString(R.string.DeeplinkScheme)
-        val plusIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
-            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            putExtra("plus", true)
-        }
         val isPlusUser = state.isPlusUser
         AppWidgetTheme {
             Box {
@@ -146,7 +142,8 @@ class MarketWidget : GlanceAppWidget() {
                         } else {
                             LazyColumn {
                                 items(state.items) { item ->
-                                    val deeplinkUri = getDeeplinkUri(item, state.type, deeplinkScheme)
+                                    val deeplinkUri =
+                                        getDeeplinkUri(item, state.type, deeplinkScheme)
                                     Box(
                                         modifier = GlanceModifier
                                             .height(60.dp)
@@ -174,11 +171,19 @@ class MarketWidget : GlanceAppWidget() {
                 }
             }
             if (!isPlusUser) {
+                val deeplinkUri = "$deeplinkScheme://plus".toUri()
+                val plusIntent = Intent(Intent.ACTION_VIEW, deeplinkUri).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                }
                 Column(
                     modifier = GlanceModifier
                         .fillMaxSize()
-                        .background(GlanceTheme.colors.errorContainer.getColor(context).copy(alpha = 0.9f))
-                        .clickable(actionStartActivity(plusIntent ?: Intent())),
+                        .background(
+                            GlanceTheme.colors.errorContainer.getColor(context).copy(alpha = 0.9f)
+                        )
+                        .clickable(
+                            actionStartActivity(plusIntent)
+                        ),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -198,7 +203,11 @@ class MarketWidget : GlanceAppWidget() {
     }
 
     @Composable
-    private fun getDeeplinkUri(item: MarketWidgetItem, type: MarketWidgetType, deeplinkScheme: String): Uri = when (type) {
+    private fun getDeeplinkUri(
+        item: MarketWidgetItem,
+        type: MarketWidgetType,
+        deeplinkScheme: String
+    ): Uri = when (type) {
         MarketWidgetType.Watchlist,
         MarketWidgetType.TopGainers -> {
             "$deeplinkScheme://coin-page?uid=${item.uid}".toUri()
@@ -290,7 +299,11 @@ class MarketWidget : GlanceAppWidget() {
             diff?.let {
                 Text(
                     text = App.numberFormatter.formatValueAsDiff(Value.Percent(diff)),
-                    style = TextStyle(color = diffColor(diff), fontSize = 14.sp, fontWeight = FontWeight.Normal),
+                    style = TextStyle(
+                        color = diffColor(diff),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal
+                    ),
                     maxLines = 1
                 )
             }

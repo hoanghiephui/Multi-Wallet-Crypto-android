@@ -34,6 +34,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
@@ -57,6 +59,7 @@ import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.modules.balance.ui.BalanceScreen
+import io.horizontalsystems.bankwallet.modules.billing.showBillingPlusDialog
 import io.horizontalsystems.bankwallet.modules.keystore.KeyStoreActivity
 import io.horizontalsystems.bankwallet.modules.keystore.NoSystemLockWarning
 import io.horizontalsystems.bankwallet.modules.launcher.LaunchModule
@@ -184,7 +187,12 @@ private fun MainScreen(
     val lifecycleEvent = rememberLifecycleEvent()
     val updateState = rememberInAppUpdateState()
     val manager: ReviewManager = ReviewManagerFactory.create(context)
-
+    val openPro by viewModel.openPro.collectAsStateWithLifecycle()
+    LaunchedEffect(key1 = openPro, block = {
+        if (openPro) {
+            context.findActivity().showBillingPlusDialog()
+        }
+    })
 
     ModalBottomSheetLayout(
         sheetState = modalBottomSheetState,

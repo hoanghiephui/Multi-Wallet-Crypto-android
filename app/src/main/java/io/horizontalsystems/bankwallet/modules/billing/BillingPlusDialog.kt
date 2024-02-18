@@ -1,6 +1,10 @@
 package io.horizontalsystems.bankwallet.modules.billing
 
 import android.app.Activity
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,18 +21,10 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.HelpOutline
-import androidx.compose.material.icons.filled.Album
-import androidx.compose.material.icons.filled.ColorLens
 import androidx.compose.material.icons.filled.DesignServices
 import androidx.compose.material.icons.filled.DoNotDisturb
-import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.EditNote
-import androidx.compose.material.icons.filled.FolderOpen
 import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.material.icons.filled.Scanner
 import androidx.compose.material.icons.filled.Wallet
-import androidx.compose.material.icons.filled.Widgets
 import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -43,21 +39,75 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.fragment.app.activityViewModels
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.android.billing.models.UserData
 import com.android.billingclient.api.Purchase
 import com.wallet.blockchain.bitcoin.R
+import dagger.hilt.android.AndroidEntryPoint
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.ui.compose.AsyncLoadContents
 import io.horizontalsystems.bankwallet.ui.compose.bold
+import io.horizontalsystems.bankwallet.ui.extensions.BaseComposableBottomSheetFragment
 import kotlinx.coroutines.launch
-import timber.log.Timber
+
+@AndroidEntryPoint
+class BillingPlusDialog : BaseComposableBottomSheetFragment() {
+    private val viewModel by activityViewModels<BillingPlusViewModel>()
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(
+                ViewCompositionStrategy.DisposeOnLifecycleDestroyed(viewLifecycleOwner)
+            )
+            setContent {
+                val scope = rememberCoroutineScope()
+
+                val screenState by viewModel.screenState.collectAsStateWithLifecycle()
+                AsyncLoadContents(
+                    modifier = Modifier.fillMaxSize(),
+                    screenState = screenState,
+                    retryAction = { dismiss() },
+                ) { uiState ->
+                    BillingPlusDialog(
+                        modifier = Modifier.fillMaxSize(),
+                        uiState = uiState,
+                        onClickPurchase = {
+                            scope.launch {
+                                if (viewModel.purchase(requireActivity())) {
+                                    dismiss()
+                                }
+                            }
+                        },
+                        onClickVerify = {
+                            scope.launch {
+                                if (viewModel.verify(requireContext())) {
+                                    dismiss()
+                                }
+                            }
+                        },
+                        onClickConsume = {
+                            scope.launch {
+                                viewModel.consume(requireContext(), it)
+                            }
+                        },
+                    )
+                }
+                TrackScreenViewEvent("showBillingPlusDialog")
+            }
+        }
+    }
+}
 
 @Composable
 private fun BillingPlusDialog(
