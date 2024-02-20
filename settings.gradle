@@ -5,4 +5,6 @@ include ':components:icons'
 include ':components:chartview'
 include ':in-app-update'
 project(":in-app-update").projectDir = new File("In-App-Update/inappupdatecompose")
+include ':lightweightlibrary'
+project(":lightweightlibrary").projectDir = new File("lightweight-charts-android/lightweightlibrary")
 include ':billing'
