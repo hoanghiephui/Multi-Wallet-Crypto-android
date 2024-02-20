@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +18,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -53,6 +56,7 @@ import io.horizontalsystems.bankwallet.modules.markdown.MarkdownFragment
 import io.horizontalsystems.bankwallet.modules.zcashconfigure.ZcashConfigure
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
+import io.horizontalsystems.bankwallet.ui.compose.animations.CrossSlide
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryCircle
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryDefault
 import io.horizontalsystems.bankwallet.ui.compose.components.CellFooter
@@ -134,7 +138,7 @@ fun CoinOverviewScreen(
             }
         }
     }
-
+    var currentPage by remember { mutableIntStateOf(CHART_DEFAULT) }
 
     HSSwipeRefresh(
         refreshing = refreshing,
@@ -151,14 +155,23 @@ fun CoinOverviewScreen(
                     ViewState.Success -> {
                         overview?.let { overview ->
                             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                                CoinScreenTitle(
-                                    fullCoin.coin.name,
-                                    overview.marketCapRank,
-                                    fullCoin.coin.imageUrl,
-                                    fullCoin.iconPlaceholder
+                                ViewChart(currentPage,
+                                    showCandlestick = {
+
+                                    },
+                                    showChartDefault = {
+                                        CoinScreenTitle(
+                                            fullCoin.coin.name,
+                                            overview.marketCapRank,
+                                            fullCoin.coin.imageUrl,
+                                            fullCoin.iconPlaceholder
+                                        )
+
+                                        Chart(chartViewModel = chartViewModel)
+                                    }
                                 )
 
-                                Chart(chartViewModel = chartViewModel)
+
 
                                 Spacer(modifier = Modifier.height(12.dp))
 
@@ -179,9 +192,10 @@ fun CoinOverviewScreen(
                                                 is BinanceAvailable.StateBinance -> {
                                                     if ((binanceAvailable as BinanceAvailable.StateBinance).available) {
                                                         ButtonSecondaryCircle(
-                                                            icon = R.drawable.baseline_candlestick_chart_24
+                                                            icon = if (currentPage != CANDLESTICK) R.drawable.baseline_candlestick_chart_24
+                                                            else R.drawable.ic_chart_24
                                                         ) {
-
+                                                            currentPage = if (currentPage != CANDLESTICK) CANDLESTICK else CHART_DEFAULT
                                                         }
                                                     }
                                                 }
@@ -327,3 +341,28 @@ fun Loading() {
         )
     }
 }
+
+@Composable
+fun ViewChart(
+    currentPage: Int,
+    showCandlestick: @Composable (ColumnScope.() -> Unit),
+    showChartDefault: @Composable (ColumnScope.() -> Unit)
+) {
+    CrossSlide(
+        targetState = currentPage,
+        reverseAnimation = false
+    ) { screen ->
+        when (screen) {
+            CHART_DEFAULT -> {
+                Column(content = showChartDefault)
+            }
+
+            CANDLESTICK -> {
+                Column(content = showCandlestick)
+            }
+        }
+    }
+}
+
+const val CANDLESTICK = 1
+const val CHART_DEFAULT = 0
