@@ -40,7 +40,7 @@ class CoinOverviewViewModel(
     val isRefreshingLiveData = MutableLiveData<Boolean>(false)
     val overviewLiveData = MutableLiveData<CoinOverviewViewItem>()
     val viewStateLiveData = MutableLiveData<ViewState>(ViewState.Loading)
-
+    val currency by service::currency
     var tokenVariants by mutableStateOf<TokenVariants?>(null)
         private set
     var showHudMessage by mutableStateOf<HudMessage?>(null)
@@ -54,7 +54,7 @@ class CoinOverviewViewModel(
     )
 
     private val disposables = CompositeDisposable()
-
+    val currencyCode get() = currency.code
     private var hudMessage: HudMessage? = null
         set(value) {
             field = value

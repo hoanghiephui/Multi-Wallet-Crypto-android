@@ -25,10 +25,14 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.BinanceAvailable
+import io.horizontalsystems.bankwallet.BinanceViewModel
 import io.horizontalsystems.bankwallet.core.AdType
 import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.iconPlaceholder
@@ -67,7 +71,8 @@ import io.horizontalsystems.marketkit.models.LinkType
 fun CoinOverviewScreen(
     apiTag: String,
     fullCoin: FullCoin,
-    navController: NavController
+    navController: NavController,
+    binanceViewModel: BinanceViewModel = hiltViewModel()
 ) {
     val vmFactory by lazy { CoinOverviewModule.Factory(fullCoin, apiTag) }
     val viewModel = viewModel<CoinOverviewViewModel>(factory = vmFactory)
@@ -80,12 +85,19 @@ fun CoinOverviewScreen(
 
     val view = LocalView.current
     val context = LocalContext.current
-
+    val currencyCode =
+        if (viewModel.currencyCode == "USD") "B${viewModel.currencyCode}" else viewModel.currencyCode
     val nativeAd by viewModel.adState
     LaunchedEffect(key1 = BuildConfig.TRANSACTION_NATIVE, block = {
         viewModel.loadAds(context,
             BuildConfig.TRANSACTION_NATIVE)
     })
+
+    LaunchedEffect(key1 = Unit, block = {
+        val coinSymbol = fullCoin.coin.code.plus(currencyCode)
+        binanceViewModel.onBinanceAvailable(coinSymbol)
+    })
+    val binanceAvailable by binanceViewModel.binanceState.collectAsStateWithLifecycle()
 
     viewModel.showHudMessage?.let {
         when (it.type) {
@@ -159,7 +171,23 @@ fun CoinOverviewScreen(
                                     ) {
                                         subhead2_grey(text = stringResource(R.string.CoinPage_Indicators))
                                         Spacer(modifier = Modifier.weight(1f))
+                                        Box(modifier = Modifier.size(30.dp)) {
+                                            when(binanceAvailable) {
+                                                BinanceAvailable.Loading -> {
+                                                    Loading()
+                                                }
+                                                is BinanceAvailable.StateBinance -> {
+                                                    if ((binanceAvailable as BinanceAvailable.StateBinance).available) {
+                                                        ButtonSecondaryCircle(
+                                                            icon = R.drawable.baseline_candlestick_chart_24
+                                                        ) {
 
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        HSpacer(width = 8.dp)
                                         if (chartIndicatorsState.hasActiveSubscription) {
                                             if (chartIndicatorsState.enabled) {
                                                 ButtonSecondaryDefault(
