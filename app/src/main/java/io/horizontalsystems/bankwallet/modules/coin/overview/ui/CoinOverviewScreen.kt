@@ -19,16 +19,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -36,6 +39,7 @@ import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.BinanceAvailable
 import io.horizontalsystems.bankwallet.BinanceViewModel
+import io.horizontalsystems.bankwallet.CandlestickSeries
 import io.horizontalsystems.bankwallet.core.AdType
 import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.iconPlaceholder
@@ -43,6 +47,7 @@ import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.core.slideFromBottomForResult
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.ViewState
+import io.horizontalsystems.bankwallet.model.BnTimePeriod
 import io.horizontalsystems.bankwallet.modules.chart.ChartViewModel
 import io.horizontalsystems.bankwallet.modules.coin.CoinLink
 import io.horizontalsystems.bankwallet.modules.coin.overview.CoinOverviewModule
@@ -54,8 +59,11 @@ import io.horizontalsystems.bankwallet.modules.managewallets.ManageWalletsModule
 import io.horizontalsystems.bankwallet.modules.managewallets.ManageWalletsViewModel
 import io.horizontalsystems.bankwallet.modules.markdown.MarkdownFragment
 import io.horizontalsystems.bankwallet.modules.zcashconfigure.ZcashConfigure
+import io.horizontalsystems.bankwallet.ui.compose.ChartBinance
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
+import io.horizontalsystems.bankwallet.ui.compose.ListenerChart
+import io.horizontalsystems.bankwallet.ui.compose.TitlePrice
 import io.horizontalsystems.bankwallet.ui.compose.animations.CrossSlide
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryCircle
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryDefault
@@ -67,9 +75,12 @@ import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
 import io.horizontalsystems.bankwallet.ui.helpers.TextHelper
+import io.horizontalsystems.bankwallet.ui.toSymbolKlineUseSocketBinance
+import io.horizontalsystems.bankwallet.ui.toSymbolTickerUseSocketBinance
 import io.horizontalsystems.core.helpers.HudHelper
 import io.horizontalsystems.marketkit.models.FullCoin
 import io.horizontalsystems.marketkit.models.LinkType
+import kotlinx.coroutines.delay
 
 @Composable
 fun CoinOverviewScreen(
@@ -91,17 +102,45 @@ fun CoinOverviewScreen(
     val context = LocalContext.current
     val currencyCode =
         if (viewModel.currencyCode == "USD") "B${viewModel.currencyCode}" else viewModel.currencyCode
+    val coinSymbol = fullCoin.coin.code.plus(currencyCode)
     val nativeAd by viewModel.adState
     LaunchedEffect(key1 = BuildConfig.TRANSACTION_NATIVE, block = {
-        viewModel.loadAds(context,
-            BuildConfig.TRANSACTION_NATIVE)
+        viewModel.loadAds(
+            context,
+            BuildConfig.TRANSACTION_NATIVE
+        )
     })
 
     LaunchedEffect(key1 = Unit, block = {
-        val coinSymbol = fullCoin.coin.code.plus(currencyCode)
         binanceViewModel.onBinanceAvailable(coinSymbol)
     })
     val binanceAvailable by binanceViewModel.binanceState.collectAsStateWithLifecycle()
+    val isSendStream by binanceViewModel.binanceAvailable.collectAsStateWithLifecycle()
+    val priceTitle by binanceViewModel.symbolTickerStream.asLiveData().observeAsState()
+    val seriesFlow = binanceViewModel.seriesFlow
+    val volumeFlow = binanceViewModel.volumeFlow
+    val candlestickSeries by binanceViewModel.candlestickSeriesState.collectAsStateWithLifecycle()
+    val chartTabs by binanceViewModel.tabItemsLiveData.observeAsState(listOf())
+
+    LaunchedEffect(key1 = isSendStream, block = {
+        if (isSendStream) {
+            delay(1000)
+            binanceViewModel.loadCandlestickSeriesData(
+                coinSymbol,
+                BnTimePeriod.Minutes5.value
+            )
+            binanceViewModel.sendSubscribe(
+                listOf(
+                    fullCoin.coin.code.toSymbolTickerUseSocketBinance(
+                        viewModel.currencyCode
+                    ),
+                    fullCoin.coin.code.toSymbolKlineUseSocketBinance(
+                        viewModel.currencyCode, BnTimePeriod.Minutes5.value
+                    )
+                )
+            )
+        }
+    })
 
     viewModel.showHudMessage?.let {
         when (it.type) {
@@ -139,7 +178,7 @@ fun CoinOverviewScreen(
         }
     }
     var currentPage by remember { mutableIntStateOf(CHART_DEFAULT) }
-
+    var scrollingEnabled by remember { mutableStateOf(true) }
     HSSwipeRefresh(
         refreshing = refreshing,
         onRefresh = {
@@ -154,9 +193,56 @@ fun CoinOverviewScreen(
                     }
                     ViewState.Success -> {
                         overview?.let { overview ->
-                            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                                ViewChart(currentPage,
+                            Column(
+                                modifier = Modifier.verticalScroll(
+                                    rememberScrollState(),
+                                    scrollingEnabled
+                                )
+                            ) {
+                                ViewChart(
+                                    currentPage,
                                     showCandlestick = {
+                                        TitlePrice(viewModel.currency, priceTitle?.data)
+                                        CrossSlide(targetState = candlestickSeries) { state ->
+                                            when (state) {
+                                                CandlestickSeries.Loading -> {
+
+                                                }
+                                                is CandlestickSeries.CandlestickSeriesData -> {
+                                                    val seriesData = state.seriesData
+                                                    val volumeData = state.volumeData
+                                                    ChartBinance(
+                                                        seriesData,
+                                                        volumeData,
+                                                        seriesFlow,
+                                                        volumeFlow,
+                                                        LocalLifecycleOwner.current,
+                                                        object : ListenerChart {
+                                                            override fun onChartTouchDown() {
+                                                                scrollingEnabled = false
+                                                            }
+
+                                                            override fun onChartTouchUp() {
+                                                                scrollingEnabled = true
+                                                            }
+
+                                                        },
+                                                        binanceViewModel.onClear,
+                                                        tabItems = chartTabs,
+                                                        onSelectTab = {
+                                                            /*binanceViewModel.onSelectChartInterval(
+                                                                it,
+                                                                coinSymbol,
+                                                                viewModel.currencyCode,
+                                                                currencyCode
+                                                            )*/
+                                                        },
+                                                        binanceViewModel.remove
+                                                    )
+                                                }
+                                            }
+
+                                        }
 
                                     },
                                     showChartDefault = {

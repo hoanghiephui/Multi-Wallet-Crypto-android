@@ -8,6 +8,9 @@ import javax.inject.Inject
 interface BinanceDataSource {
     @AnyThread
     suspend fun getSymbolPriceTicker(symbol: String): SymbolPriceTickerResponse
+
+    @AnyThread
+    suspend fun getCandlestickData(symbol: String, interval: String): List<List<Any>>
 }
 
 class DefaultBinanceDataSource @Inject constructor(
@@ -15,4 +18,7 @@ class DefaultBinanceDataSource @Inject constructor(
 ): BinanceDataSource {
     override suspend fun getSymbolPriceTicker(symbol: String): SymbolPriceTickerResponse =
         executor.execute { it.getSymbolPriceTicker(symbol) }
+
+    override suspend fun getCandlestickData(symbol: String, interval: String): List<List<Any>> =
+        executor.execute { it.getCandlestickData(symbol, interval) }
 }

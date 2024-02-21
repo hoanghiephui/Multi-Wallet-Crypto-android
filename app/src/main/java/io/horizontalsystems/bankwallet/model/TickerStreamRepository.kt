@@ -40,7 +40,7 @@ data class Data(
     val eventTime: Long? = null,
 
     @Json(name = "F")
-    val firstTradeId: Int? = null,
+    val firstTradeId: Long? = null,
 
     @Json(name = "h")
     val highPrice: String? = null,
@@ -49,10 +49,10 @@ data class Data(
     val lowPrice: String? = null,
 
     @Json(name = "L")
-    val lastTradeId: Int? = null,
+    val lastTradeId: Long? = null,
 
     @Json(name = "n")
-    val totalNumberOfTrade: Int? = null,
+    val totalNumberOfTrade: Long? = null,
 
     @Json(name = "o")
     val openPrice: String? = null,

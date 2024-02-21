@@ -34,9 +34,9 @@ data class Candlestick(
     @Json(name = "i")
     val interval: String,
     @Json(name = "f")
-    val firstTradeId: Int,
+    val firstTradeId: Long,
     @Json(name = "L")
-    val lastTradeId: Int,
+    val lastTradeId: Long,
     @Json(name = "o")
     val openPrice: String,
     @Json(name = "c")
@@ -48,7 +48,7 @@ data class Candlestick(
     @Json(name = "v")
     val baseVolume: String,
     @Json(name = "n")
-    val numberOfTrade: Int,
+    val numberOfTrade: Long,
     @Json(name = "x")
     val klineClosed: Boolean,
     @Json(name = "q")

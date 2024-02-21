@@ -1969,4 +1969,12 @@
 
     <!-- Widget -->
     <string name="widget_error_require_plus">To use the widget\nYou must subscribe to CoinDex+</string>
+
+    <string name="last_trade_price">Last trade price</string>
+    <string name="time">Time</string>
+    <string name="open">Open</string>
+    <string name="high">High</string>
+    <string name="low">Low</string>
+    <string name="close">Close</string>
+    <string name="volume">Volume</string>
 </resources>

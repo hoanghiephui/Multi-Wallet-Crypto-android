@@ -117,7 +117,6 @@ object NetworkModule {
     @Singleton
     fun createBinanceService(
         scarlet: Scarlet.Builder,
-        @Named("okHttpWebSocket")
         okHttpClient: OkHttpClient
     ): BinanceStream {
         return scarlet

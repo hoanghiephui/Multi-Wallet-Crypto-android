@@ -9,4 +9,11 @@ interface BinanceEndpoint {
     suspend fun getSymbolPriceTicker(
         @Query("symbol") symbol: String
     ): SymbolPriceTickerResponse
+
+    @GET("api/v3/klines")
+    suspend fun getCandlestickData(
+        @Query("symbol") symbol: String,
+        @Query("interval") interval: String = "5m",
+        @Query("limit") limit: Int = 1000
+    ): List<List<Any>>
 }
