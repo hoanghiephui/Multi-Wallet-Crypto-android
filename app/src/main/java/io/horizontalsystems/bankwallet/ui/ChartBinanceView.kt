@@ -15,6 +15,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.asLiveData
 import com.applovin.sdk.AppLovinSdkUtils.dpToPx
 import com.tradingview.lightweightcharts.api.chart.models.color.IntColor
+import com.tradingview.lightweightcharts.api.chart.models.color.surface.SolidColor
 import com.tradingview.lightweightcharts.api.chart.models.color.toIntColor
 import com.tradingview.lightweightcharts.api.interfaces.ChartApi
 import com.tradingview.lightweightcharts.api.interfaces.SeriesApi
@@ -36,6 +37,7 @@ import com.tradingview.lightweightcharts.api.series.models.PriceScaleId
 import com.tradingview.lightweightcharts.api.series.models.Time
 import com.tradingview.lightweightcharts.view.ChartsView
 import com.tradingview.lightweightcharts.view.gesture.TouchDelegate
+import com.wallet.blockchain.bitcoin.R
 import com.wallet.blockchain.bitcoin.databinding.ViewChartBinanceBinding
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.model.DataChart
@@ -174,6 +176,7 @@ class ChartBinanceView @JvmOverloads constructor(
             layout = layoutOptions {
                 textColor =
                     if (!isSystemInDarkTheme) IntColor(Color.BLACK) else IntColor(Color.WHITE)
+                background = SolidColor(resources.getColor(R.color.transparent))
             }
             timeScale = timeScaleOptions {
                 timeVisible = true

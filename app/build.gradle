@@ -387,7 +387,7 @@ dependencies {
 
     api 'com.jaredrummler:android-shell:1.0.0'
     api 'com.offbynull.portmapper:portmapper:2.0.5'
-    implementation("com.applovin:applovin-sdk:12.1.0")
+    implementation("com.applovin:applovin-sdk:12.2.0")
     implementation("com.google.android.gms:play-services-ads-identifier:18.0.1")
     implementation("com.android.billingclient:billing:6.1.0")
     implementation("com.android.billingclient:billing-ktx:6.1.0")
@@ -398,7 +398,7 @@ dependencies {
     kapt "com.google.dagger:hilt-compiler:2.50"
     implementation(project(":billing"))
     implementation("androidx.compose.material:material-icons-extended")
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
     implementation project(":lightweightlibrary")
 }

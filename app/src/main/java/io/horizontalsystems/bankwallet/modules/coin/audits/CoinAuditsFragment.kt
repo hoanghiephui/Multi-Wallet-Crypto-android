@@ -10,12 +10,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -26,13 +27,11 @@ import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.requireInput
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
-import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.CellFooter
 import io.horizontalsystems.bankwallet.ui.compose.components.CellMultilineLawrenceSection
 import io.horizontalsystems.bankwallet.ui.compose.components.CoinImage
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
-import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
@@ -57,6 +56,7 @@ class CoinAuditsFragment : BaseComposeFragment() {
             }
         )
     }
+
     override val logScreen: String
         get() = "CoinAuditsFragment"
 
@@ -74,7 +74,8 @@ private fun CoinAuditsScreen(
     val uiState = viewModel.uiState
 
     Scaffold(
-        backgroundColor = ComposeAppTheme.colors.tyler,
+        containerColor = Color.Transparent,
+        contentColor = MaterialTheme.colorScheme.background,
         topBar = {
             AppBar(
                 title = stringResource(R.string.SendNft_Title),
@@ -116,7 +117,7 @@ private fun CoinAuditsScreen(
 
 @Composable
 fun CoinAuditHeader(name: String, logoUrl: String) {
-    Divider(
+    HorizontalDivider(
         thickness = 1.dp,
         color = ComposeAppTheme.colors.steel10,
     )
