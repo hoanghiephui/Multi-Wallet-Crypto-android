@@ -191,7 +191,11 @@ fun SearchBar(
                         showClearButton = it.isNotEmpty()
                     },
                     placeholder = {
-                        body_grey50(text = searchHintText)
+                        body_grey50(
+                            text = searchHintText,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     },
                     textStyle = ComposeAppTheme.typography.body,
                     colors = TextFieldDefaults.textFieldColors(

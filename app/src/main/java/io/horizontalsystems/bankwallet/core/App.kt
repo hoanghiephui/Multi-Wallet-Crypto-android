@@ -245,7 +245,6 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
             hsApiBaseUrl = appConfig.marketApiBaseUrl,
             hsApiKey = appConfig.marketApiKey,
             cryptoCompareApiKey = appConfig.cryptoCompareApiKey,
-            defiYieldApiKey = appConfig.defiyieldProviderApiKey,
             appConfigProvider = appConfigProvider,
             subscriptionManager = subscriptionManager
         )

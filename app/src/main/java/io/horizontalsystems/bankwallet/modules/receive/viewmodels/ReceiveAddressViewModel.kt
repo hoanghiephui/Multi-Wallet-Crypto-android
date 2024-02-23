@@ -20,8 +20,10 @@ import io.horizontalsystems.bankwallet.entities.Wallet
 import io.horizontalsystems.bankwallet.modules.receive.ReceiveModule
 import io.horizontalsystems.bankwallet.modules.receive.ReceiveModule.AdditionalData
 import io.horizontalsystems.marketkit.models.TokenType
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 
 class ReceiveAddressViewModel(
@@ -58,13 +60,15 @@ class ReceiveAddressViewModel(
         private set
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             adapterManager.adaptersReadyObservable.asFlow()
                 .collect {
                     setData()
                 }
         }
-        setData()
+        viewModelScope.launch(Dispatchers.IO) {
+            setData()
+        }
         setNetworkName()
     }
 
@@ -98,20 +102,22 @@ class ReceiveAddressViewModel(
         else null
     }
 
-    private fun setData() {
+    private suspend fun setData() {
         val adapter = adapterManager.getReceiveAdapterForWallet(wallet)
         if (adapter != null) {
             address = adapter.receiveAddress
             usedAddresses = adapter.usedAddresses(false)
             usedChangeAddresses = adapter.usedAddresses(true)
             uri = getUri()
-            accountActive = adapter.isAccountActive
+            accountActive = adapter.isAddressActive(adapter.receiveAddress)
             mainNet = adapter.isMainNet
             viewState = ViewState.Success
         } else {
             viewState = ViewState.Error(NullPointerException())
         }
-        syncState()
+        withContext(Dispatchers.Main) {
+            syncState()
+        }
     }
 
     private fun getUri(): String {
@@ -165,7 +171,9 @@ class ReceiveAddressViewModel(
     }
 
     fun onErrorClick() {
-        setData()
+        viewModelScope.launch(Dispatchers.IO) {
+            setData()
+        }
     }
 
     fun setAmount(amount: BigDecimal?) {
