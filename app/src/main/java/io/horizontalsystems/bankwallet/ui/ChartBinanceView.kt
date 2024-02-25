@@ -8,6 +8,7 @@ import android.view.MotionEvent
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -176,7 +177,7 @@ class ChartBinanceView @JvmOverloads constructor(
             layout = layoutOptions {
                 textColor =
                     if (!isSystemInDarkTheme) IntColor(Color.BLACK) else IntColor(Color.WHITE)
-                background = SolidColor(resources.getColor(R.color.transparent))
+                background = SolidColor(ContextCompat.getColor(context, R.color.transparent))
             }
             timeScale = timeScaleOptions {
                 timeVisible = true
@@ -377,12 +378,12 @@ fun Float.toValueString(maxDigit: Int = 2): String {
     )
 }
 
-fun String.toSymbolTickerUseSocketBinance(currency: String): String {
-    val mCurrency = currency.lowercase()
+fun String.toSymbolTickerUseSocketBinance(): String {
+    val mCurrency = "USD"
     return this.plus("${mCurrency}t@ticker").lowercase()
 }
 
-fun String.toSymbolKlineUseSocketBinance(currency: String, time: String = "5m"): String {
-    val mCurrency = currency.lowercase()
+fun String.toSymbolKlineUseSocketBinance(time: String = "5m"): String {
+    val mCurrency = "USD"
     return this.plus("${mCurrency}t@kline_$time").lowercase()
 }

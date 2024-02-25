@@ -101,8 +101,8 @@ fun CoinOverviewScreen(
     val view = LocalView.current
     val context = LocalContext.current
     val currencyCode =
-        if (viewModel.currencyCode == "USD") "B${viewModel.currencyCode}" else viewModel.currencyCode
-    val coinSymbol = fullCoin.coin.code.plus(currencyCode)
+        if (viewModel.currencyCode == "USD") viewModel.currencyCode else viewModel.currencyCode
+    val coinSymbol = "${fullCoin.coin.code}USDT"
     val nativeAd by viewModel.adState
     LaunchedEffect(key1 = BuildConfig.TRANSACTION_NATIVE, block = {
         viewModel.loadAds(
@@ -131,12 +131,8 @@ fun CoinOverviewScreen(
             )
             binanceViewModel.sendSubscribe(
                 listOf(
-                    fullCoin.coin.code.toSymbolTickerUseSocketBinance(
-                        viewModel.currencyCode
-                    ),
-                    fullCoin.coin.code.toSymbolKlineUseSocketBinance(
-                        viewModel.currencyCode, BnTimePeriod.Minutes5.value
-                    )
+                    fullCoin.coin.code.toSymbolTickerUseSocketBinance(),
+                    fullCoin.coin.code.toSymbolKlineUseSocketBinance(BnTimePeriod.Minutes5.value)
                 )
             )
         }
@@ -206,7 +202,9 @@ fun CoinOverviewScreen(
                                         CrossSlide(targetState = candlestickSeries) { state ->
                                             when (state) {
                                                 CandlestickSeries.Loading -> {
-
+                                                    Box(modifier = Modifier.height(300.dp)) {
+                                                        Loading()
+                                                    }
                                                 }
                                                 is CandlestickSeries.CandlestickSeriesData -> {
                                                     val seriesData = state.seriesData
@@ -230,12 +228,11 @@ fun CoinOverviewScreen(
                                                         binanceViewModel.onClear,
                                                         tabItems = chartTabs,
                                                         onSelectTab = {
-                                                            /*binanceViewModel.onSelectChartInterval(
+                                                            binanceViewModel.onSelectChartInterval(
                                                                 it,
                                                                 coinSymbol,
-                                                                viewModel.currencyCode,
-                                                                currencyCode
-                                                            )*/
+                                                                fullCoin.coin.code
+                                                            )
                                                         },
                                                         binanceViewModel.remove
                                                     )

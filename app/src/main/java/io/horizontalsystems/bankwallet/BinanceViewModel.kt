@@ -20,6 +20,7 @@ import io.horizontalsystems.bankwallet.model.Subscribe
 import io.horizontalsystems.bankwallet.repository.BinanceRepository
 import io.horizontalsystems.bankwallet.repository.convertToTimeUTC
 import io.horizontalsystems.bankwallet.ui.compose.components.TabItem
+import io.horizontalsystems.bankwallet.ui.toSymbolKlineUseSocketBinance
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -99,6 +100,7 @@ class BinanceViewModel @Inject constructor(
     fun loadCandlestickSeriesData(
         symbol: String,
         interval: String,
+        callBack: (() -> Unit)? = null
     ) {
         viewModelScope.launch(defaultDispatcher) {
             asFlowResult {
@@ -133,6 +135,7 @@ class BinanceViewModel @Inject constructor(
                             volumeData = DataChart(dataVolume, SeriesType.HISTOGRAM)
                         )
                     )
+                    callBack?.invoke()
                 },
                 onError = {
                     Timber.e(it)
@@ -163,7 +166,7 @@ class BinanceViewModel @Inject constructor(
         onClear.update { true }
     }
 
-    private var paramsSendSub = listOf<String>()
+    private var paramsSendSub = mutableListOf<String>()
     fun sendSubscribe(params: List<String>) {
         repository.sendSubscribe(
             Subscribe(
@@ -172,7 +175,7 @@ class BinanceViewModel @Inject constructor(
                 params = params//listOf("btcusdt@kline_5m", "btcusdt@ticker")
             )
         )
-        paramsSendSub = params
+        paramsSendSub.addAll(params)
     }
 
     private fun sendUnSubscribe(params: List<String>) {
@@ -184,6 +187,34 @@ class BinanceViewModel @Inject constructor(
                 params = params
             )
         )
+    }
+
+    fun onSelectChartInterval(
+        time: BnTimePeriod,
+        coinSymbol: String,
+        coinCode: String,
+    ) {
+        val oldChartInterval = chartInterval
+        this.chartInterval = time
+        val tmpChartInterval = chartInterval ?: return
+
+        remove.update { true }
+        loadCandlestickSeriesData(
+            coinSymbol,
+            tmpChartInterval.value
+        ) {
+            id++
+            sendUnSubscribe(
+                listOf(
+                    coinCode.toSymbolKlineUseSocketBinance(oldChartInterval!!.value)
+                )
+            )
+            sendSubscribe(
+                listOf(
+                    coinCode.toSymbolKlineUseSocketBinance(tmpChartInterval.value)
+                )
+            )
+        }
     }
 
     private fun onConnectStream() {
