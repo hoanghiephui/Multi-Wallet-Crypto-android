@@ -156,7 +156,7 @@ private fun StaticContent(
         Spacer(Modifier.weight(2f))
         val (crashCheckedState, crashOnStateChange) = remember { mutableStateOf(true) }
         val (analyticCheckedState, analyticOnStateChange) = remember { mutableStateOf(true) }
-        if (pagerState.currentPage == 2) {
+        if (pagerState.currentPage == 0) {
             Column {
                 Row(
                     Modifier
@@ -214,17 +214,10 @@ private fun StaticContent(
                 .fillMaxWidth(),
             title = stringResource(R.string.Button_Next),
             onClick = {
-                if (pagerState.currentPage + 1 < pageCount) {
-                    coroutineScope.launch {
-                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                    }
-                } else {
-                    viewModel.onStartClicked()
-                    viewModel.onSaveConfig(analyticCheckedState, crashCheckedState)
-                    MainModule.start(context)
-                    closeActivity()
-
-                }
+                viewModel.onStartClicked()
+                viewModel.onSaveConfig(analyticCheckedState, crashCheckedState)
+                MainModule.start(context)
+                closeActivity()
             })
         Spacer(Modifier.height(60.dp))
     }

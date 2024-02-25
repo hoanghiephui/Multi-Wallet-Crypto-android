@@ -94,6 +94,7 @@
     <string name="Intro_Wallet_Screen3Description">Bypass conditional barriers and access markets globally.</string>
     <string name="Intro_Wallet_Screen4Title">Stay Private</string>
     <string name="Intro_Wallet_Screen4Description">Do not leak your private and financial data to the world.</string>
+    <string name="Intro_Wallet_Screen5Description">The app multi-wallet that supports Bitcoin, Ethereum, and fully shielded Zcash, as well as other coins, and it has a strong, user-centric architecture in which the users own their own keys and their own privacy.</string>
 
     <!--Rooted Device-->
 
