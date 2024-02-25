@@ -1,16 +1,20 @@
 package io.horizontalsystems.bankwallet.modules.billing
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -31,6 +35,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -40,6 +45,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
@@ -108,7 +114,8 @@ class BillingPlusDialog : BaseComposableBottomSheetFragment() {
         }
     }
 }
-
+const val PLAY_STORE_SUBSCRIPTION_URL =
+    "https://play.google.com/store/account/subscriptions"
 @Composable
 private fun BillingPlusDialog(
     uiState: BillingPlusUiState,
@@ -119,6 +126,7 @@ private fun BillingPlusDialog(
 ) {
     val purchase = uiState.purchase
     val productDetails = uiState.productDetails
+    val context = LocalContext.current
     Column(
         modifier = modifier
             .statusBarsPadding()
@@ -140,20 +148,15 @@ private fun BillingPlusDialog(
             color = MaterialTheme.colorScheme.onSurface,
         )
 
+        val price = productDetails?.rawProductDetails?.subscriptionOfferDetails?.first()
+            ?.pricingPhases?.pricingPhaseList?.first()?.formattedPrice ?: "1,99 USD"
         Button(
             modifier = Modifier
                 .padding(top = 24.dp)
                 .fillMaxWidth(),
             onClick = { onClickPurchase.invoke() },
         ) {
-            Text(
-                stringResource(
-                    R.string.billing_plus_purchase_button,
-                    productDetails?.rawProductDetails?.subscriptionOfferDetails?.first()
-                        ?.pricingPhases?.pricingPhaseList?.first()?.formattedPrice
-                        ?: "1,99 USD"
-                )
-            )
+            Text(stringResource(R.string.billing_plus_purchase_button, "$price **"))
         }
 
         OutlinedButton(
@@ -185,6 +188,27 @@ private fun BillingPlusDialog(
                     .navigationBarsPadding(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(R.string.billing_policy),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Row {
+                    Spacer(modifier = Modifier.weight(1f))
+                    TextButton(onClick = {
+                        try {
+                            val intent = Intent(Intent.ACTION_VIEW)
+                            intent.data = Uri.parse(PLAY_STORE_SUBSCRIPTION_URL)
+                            context.startActivity(intent)
+                        } catch (ex: Exception) {
+                            Toast.makeText(context, "Something went wrong, please try again later.", Toast.LENGTH_SHORT).show()
+                        }
+                    }) {
+                        Text(text = "Open Payment & subscriptions")
+                    }
+                }
+
                 PlusItem(
                     modifier = Modifier.fillMaxWidth(),
                     title = R.string.billing_plus_item_metadata,
