@@ -1,9 +1,23 @@
 package io.horizontalsystems.bankwallet.modules.transactions
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,7 +25,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -36,10 +51,23 @@ import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.balance.BalanceAccountsViewModel
 import io.horizontalsystems.bankwallet.modules.balance.BalanceModule
 import io.horizontalsystems.bankwallet.modules.balance.BalanceScreenState
-import io.horizontalsystems.bankwallet.modules.settings.about.*
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
-import io.horizontalsystems.bankwallet.ui.compose.components.*
+import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
+import io.horizontalsystems.bankwallet.ui.compose.components.CoinImage
+import io.horizontalsystems.bankwallet.ui.compose.components.HSCircularProgressIndicator
+import io.horizontalsystems.bankwallet.ui.compose.components.HeaderStick
+import io.horizontalsystems.bankwallet.ui.compose.components.ListEmptyView
+import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
+import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
+import io.horizontalsystems.bankwallet.ui.compose.components.ScreenMessageWithAction
+import io.horizontalsystems.bankwallet.ui.compose.components.ScrollableTabs
+import io.horizontalsystems.bankwallet.ui.compose.components.SectionItemPosition
+import io.horizontalsystems.bankwallet.ui.compose.components.SectionUniversalItem
+import io.horizontalsystems.bankwallet.ui.compose.components.TabItem
+import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
+import io.horizontalsystems.bankwallet.ui.compose.components.sectionItemBorder
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,12 +82,12 @@ fun TransactionsScreen(
         accountsViewModel.loadAds(context,
             BuildConfig.TRANSACTION_NATIVE)
     })
-    val filterCoins by viewModel.filterCoinsLiveData.observeAsState()
+
     val filterTypes by viewModel.filterTypesLiveData.observeAsState()
-    val filterBlockchains by viewModel.filterBlockchainsLiveData.observeAsState()
-    val transactions by viewModel.transactionList.observeAsState()
-    val viewState by viewModel.viewState.observeAsState()
-    val syncing by viewModel.syncingLiveData.observeAsState(false)
+
+    val uiState = viewModel.uiState
+    val syncing = uiState.syncing
+    val transactions = uiState.transactions
 
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         AppBar(
@@ -82,10 +110,8 @@ fun TransactionsScreen(
             )
         }
 
-
-        Crossfade(viewState, label = "") { viewState ->
-            when (viewState) {
-                ViewState.Success -> {
+            Crossfade(uiState.viewState, label = "") { viewState ->
+                if (viewState == ViewState.Success) {
                     transactions?.let { transactionItems ->
                         if (transactionItems.isEmpty()) {
                             if (syncing) {
@@ -104,14 +130,8 @@ fun TransactionsScreen(
                                 }
                             }
                         } else {
-                            val filterCoin = filterCoins?.find { it.selected }?.item
-                            val filterType = filterTypes?.find { it.selected }?.item
-                            val filterBlockchain = filterBlockchains?.find { it.selected }?.item
-
                             val listState = rememberSaveable(
-                                filterCoin,
-                                filterType,
-                                filterBlockchain,
+                                uiState.transactionListId,
                                 (accountsViewModel.balanceScreenState as? BalanceScreenState.HasAccount)?.accountViewItem?.id,
                                 saver = LazyListState.Saver
                             ) {
@@ -131,9 +151,6 @@ fun TransactionsScreen(
                         }
                     }
                 }
-                is ViewState.Error,
-                ViewState.Loading,
-                null -> {}
             }
         }
     }

@@ -260,7 +260,8 @@ interface ITransactionsAdapter {
         from: TransactionRecord?,
         token: Token?,
         limit: Int,
-        transactionType: FilterTransactionType
+        transactionType: FilterTransactionType,
+        address: String?,
     ): Single<List<TransactionRecord>>
 
     fun getRawTransaction(transactionHash: String): String? = null
@@ -269,6 +270,15 @@ interface ITransactionsAdapter {
         token: Token?,
         transactionType: FilterTransactionType
     ): Flowable<List<TransactionRecord>>
+
+    fun getTransactionRecordsFlowable(
+        token: Token?,
+        transactionType: FilterTransactionType,
+        address: String?
+    ): Flowable<List<TransactionRecord>> = when (address) {
+        null -> getTransactionRecordsFlowable(token, transactionType)
+        else -> Flowable.empty()
+    }
 
     fun getTransactionUrl(transactionHash: String): String
 }

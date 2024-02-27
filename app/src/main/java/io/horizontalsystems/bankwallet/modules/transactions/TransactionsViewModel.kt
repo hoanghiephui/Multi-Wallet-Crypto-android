@@ -4,18 +4,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.IWalletManager
+import io.horizontalsystems.bankwallet.core.ViewModelUiState
 import io.horizontalsystems.bankwallet.core.managers.BalanceHiddenManager
+import io.horizontalsystems.bankwallet.core.managers.SpamManager
+import io.horizontalsystems.bankwallet.core.managers.TransactionAdapterManager
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.subscribeIO
 import io.horizontalsystems.bankwallet.entities.CurrencyValue
 import io.horizontalsystems.bankwallet.entities.LastBlockInfo
 import io.horizontalsystems.bankwallet.entities.ViewState
+import io.horizontalsystems.bankwallet.entities.Wallet
 import io.horizontalsystems.bankwallet.entities.nft.NftAssetBriefMetadata
 import io.horizontalsystems.bankwallet.entities.nft.NftUid
 import io.horizontalsystems.bankwallet.entities.transactionrecords.TransactionRecord
+import io.horizontalsystems.bankwallet.modules.contacts.model.Contact
 import io.horizontalsystems.bankwallet.modules.transactionInfo.ColoredValue
 import io.horizontalsystems.core.helpers.DateHelper
 import io.horizontalsystems.marketkit.models.Blockchain
@@ -29,59 +34,82 @@ import java.util.Date
 class TransactionsViewModel(
     private val service: TransactionsService,
     private val transactionViewItem2Factory: TransactionViewItemFactory,
-    private val balanceHiddenManager: BalanceHiddenManager
-) : ViewModel() {
+    private val balanceHiddenManager: BalanceHiddenManager,
+    private val transactionAdapterManager: TransactionAdapterManager,
+    private val walletManager: IWalletManager,
+    private val transactionFilterService: TransactionFilterService,
+    private val spamManager: SpamManager
+) : ViewModelUiState<TransactionsUiState>() {
 
     var tmpItemToShow: TransactionItem? = null
 
-    val syncingLiveData = MutableLiveData<Boolean>()
-    val filterResetEnabled by service::filterResetEnabled
+    val filterResetEnabled = MutableLiveData<Boolean>()
     val filterCoinsLiveData = MutableLiveData<List<Filter<TransactionWallet?>>>()
     val filterTypesLiveData = MutableLiveData<List<Filter<FilterTransactionType>>>()
     val filterBlockchainsLiveData = MutableLiveData<List<Filter<Blockchain?>>>()
-    val transactionList = MutableLiveData<Map<String, List<TransactionViewItem>>>()
-    val viewState = MutableLiveData<ViewState>(ViewState.Loading)
-    var filterHideSuspiciousTx by mutableStateOf(service.filterHideSuspiciousTx)
+    val filterContactLiveData = MutableLiveData<Contact?>()
+    var filterHideSuspiciousTx by mutableStateOf(spamManager.hideSuspiciousTx)
+
+    private var transactionListId: String? = null
+    private var transactions: Map<String, List<TransactionViewItem>>? = null
+    private var viewState: ViewState = ViewState.Loading
+    private var syncing = false
 
     private val disposables = CompositeDisposable()
 
     init {
-        service.syncingObservable
-            .subscribeIO {
-                syncingLiveData.postValue(it)
-            }
-            .let {
-                disposables.add(it)
-            }
+        viewModelScope.launch(Dispatchers.Default) {
+            service.start()
+        }
 
-        service.typesObservable
-            .subscribeIO { (types, selectedType) ->
-                val filterTypes = types.map {
-                    Filter(it, it == selectedType)
-                }
+        viewModelScope.launch(Dispatchers.Default) {
+            transactionAdapterManager.adaptersReadyFlow.collect {
+                handleUpdatedWallets(walletManager.activeWallets)
+            }
+        }
+
+        viewModelScope.launch(Dispatchers.Default) {
+            transactionFilterService.stateFlow.collect { state ->
+                service.set(
+                    state.transactionWallets.filterNotNull(),
+                    state.selectedWallet,
+                    state.selectedTransactionType,
+                    state.selectedBlockchain,
+                    state.contact,
+                )
+
+                filterResetEnabled.postValue(state.resetEnabled)
+
+                val types = state.transactionTypes
+                val selectedType = state.selectedTransactionType
+                val filterTypes = types.map { Filter(it, it == selectedType) }
                 filterTypesLiveData.postValue(filterTypes)
-            }
-            .let {
-                disposables.add(it)
-            }
 
-        service.blockchainObservable
-            .subscribeIO { (blockchains, selectedType) ->
-                val filterBlockchains = blockchains.map {
-                    Filter(it, it == selectedType)
-                }
+                val blockchains = state.blockchains
+                val selectedBlockchain = state.selectedBlockchain
+                val filterBlockchains = blockchains.map { Filter(it, it == selectedBlockchain) }
                 filterBlockchainsLiveData.postValue(filterBlockchains)
-            }
-            .let {
-                disposables.add(it)
-            }
 
-        service.walletsObservable
-            .subscribeIO { (wallets, selected) ->
+                val wallets = state.transactionWallets
+                val selectedWallet = state.selectedWallet
+
                 val filterCoins = wallets.map {
-                    Filter(it, it == selected)
+                    Filter(it, it == selectedWallet)
                 }
                 filterCoinsLiveData.postValue(filterCoins)
+
+                filterContactLiveData.postValue(state.contact)
+
+                transactionListId = state.selectedWallet?.hashCode().toString() +
+                    state.selectedTransactionType.name +
+                    state.selectedBlockchain?.uid
+            }
+        }
+
+        service.syncingObservable
+            .subscribeIO {
+                syncing = it
+                emitState()
             }
             .let {
                 disposables.add(it)
@@ -93,14 +121,15 @@ class TransactionsViewModel(
                     .map { transactionViewItem2Factory.convertToViewItemCached(it) }
                     .groupBy { it.formattedDate }
 
-                transactionList.postValue(viewItems)
-                viewState.postValue(ViewState.Success)
+                transactions = viewItems
+                viewState = ViewState.Success
+                emitState()
             }
             .let {
                 disposables.add(it)
             }
 
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.Default) {
             balanceHiddenManager.balanceHiddenFlow.collect {
                 transactionViewItem2Factory.updateCache()
                 service.refreshList()
@@ -108,20 +137,35 @@ class TransactionsViewModel(
         }
     }
 
+    override fun createState() = TransactionsUiState(
+        transactions = transactions,
+        viewState = viewState,
+        transactionListId = transactionListId,
+        syncing = syncing
+    )
+
+    private fun handleUpdatedWallets(wallets: List<Wallet>) {
+        transactionFilterService.setWallets(wallets)
+    }
+
     fun setFilterTransactionType(filterType: FilterTransactionType) {
-        service.setFilterType(filterType)
+        transactionFilterService.setSelectedTransactionType(filterType)
     }
 
     fun setFilterCoin(w: TransactionWallet?) {
-        service.setFilterCoin(w)
+        transactionFilterService.setSelectedWallet(w)
     }
 
     fun onEnterFilterBlockchain(filterBlockchain: Filter<Blockchain?>) {
-        service.setFilterBlockchain(filterBlockchain.item)
+        transactionFilterService.setSelectedBlockchain(filterBlockchain.item)
+    }
+
+    fun onEnterContact(contact: Contact?) {
+        transactionFilterService.setContact(contact)
     }
 
     fun resetFilters() {
-        service.resetFilters()
+        transactionFilterService.reset()
     }
 
     fun onBottomReached() {
@@ -140,7 +184,10 @@ class TransactionsViewModel(
     fun getTransactionItem(viewItem: TransactionViewItem) = service.getTransactionItem(viewItem.uid)
 
     fun updateFilterHideSuspiciousTx(checked: Boolean) {
-        service.updateFilterHideSuspiciousTx(checked)
+        spamManager.updateFilterHideSuspiciousTx(checked)
+
+        service.reload()
+
         filterHideSuspiciousTx = checked
     }
 

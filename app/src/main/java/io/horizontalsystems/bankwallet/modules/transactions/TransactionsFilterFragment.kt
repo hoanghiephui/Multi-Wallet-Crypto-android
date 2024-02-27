@@ -15,7 +15,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -30,6 +29,8 @@ import androidx.navigation.navGraphViewModels
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.core.slideFromRightForResult
+import io.horizontalsystems.bankwallet.modules.contacts.SelectContactFragment
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
@@ -66,10 +67,11 @@ fun FilterScreen(
     navController: NavController,
     viewModel: TransactionsViewModel,
 ) {
-    val filterResetEnabled by viewModel.filterResetEnabled.collectAsState()
+    val filterResetEnabled by viewModel.filterResetEnabled.observeAsState(false)
     val filterCoins by viewModel.filterCoinsLiveData.observeAsState()
     val filterBlockchains by viewModel.filterBlockchainsLiveData.observeAsState()
     val filterHideUnknownTokens = viewModel.filterHideSuspiciousTx
+    val filterContact by viewModel.filterContactLiveData.observeAsState()
 
     val filterCoin = filterCoins?.find { it.selected }?.item
     val coinCode = filterCoin?.token?.coin?.code
@@ -130,6 +132,24 @@ fun FilterScreen(
                             valueColor = if (filterBlockchain != null) ComposeAppTheme.colors.leah else ComposeAppTheme.colors.grey,
                             onClick = {
                                 navController.slideFromRight(R.id.filterCoinFragment)
+                            }
+                        )
+                    }
+                )
+                VSpacer(32.dp)
+                CellSingleLineLawrenceSection(
+                    listOf {
+                        FilterDropdownCell(
+                            title = stringResource(R.string.Transactions_Filter_Contacts),
+                            value = filterContact?.name ?: stringResource(id = R.string.Transactions_Filter_AllContacts) ,
+                            valueColor = if (filterContact != null) ComposeAppTheme.colors.leah else ComposeAppTheme.colors.grey,
+                            onClick = {
+                                navController.slideFromRightForResult<SelectContactFragment.Result>(
+                                    R.id.selectContact,
+                                    filterContact
+                                ) {
+                                    viewModel.onEnterContact(it.contact)
+                                }
                             }
                         )
                     }
