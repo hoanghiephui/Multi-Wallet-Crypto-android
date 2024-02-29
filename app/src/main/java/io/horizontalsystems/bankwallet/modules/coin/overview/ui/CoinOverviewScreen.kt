@@ -100,8 +100,7 @@ fun CoinOverviewScreen(
 
     val view = LocalView.current
     val context = LocalContext.current
-    val currencyCode =
-        if (viewModel.currencyCode == "USD") viewModel.currencyCode else viewModel.currencyCode
+
     val coinSymbol = "${fullCoin.coin.code}USDT"
     val nativeAd by viewModel.adState
     LaunchedEffect(key1 = BuildConfig.TRANSACTION_NATIVE, block = {
@@ -269,7 +268,7 @@ fun CoinOverviewScreen(
                                         Spacer(modifier = Modifier.weight(1f))
                                         Box(modifier = Modifier.size(30.dp)) {
                                             when(binanceAvailable) {
-                                                BinanceAvailable.Loading -> {
+                                                is BinanceAvailable.Loading -> {
                                                     Loading()
                                                 }
                                                 is BinanceAvailable.StateBinance -> {

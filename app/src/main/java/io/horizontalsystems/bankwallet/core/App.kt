@@ -215,7 +215,9 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
             //Disable logging for lower levels in Release build
             Logger.getLogger("").level = Level.SEVERE
         }
-        Timber.plant(DebugTree())
+        if (BuildConfig.DEBUG) {
+            Timber.plant(DebugTree())
+        }
 
         RxJavaPlugins.setErrorHandler { e: Throwable? ->
             Log.w("RxJava ErrorHandler", e)
