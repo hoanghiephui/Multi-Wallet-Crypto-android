@@ -84,6 +84,7 @@ fun TransactionsScreen(
     })
 
     val filterTypes by viewModel.filterTypesLiveData.observeAsState()
+    val showFilterAlertDot by viewModel.filterResetEnabled.observeAsState(false)
 
     val uiState = viewModel.uiState
     val syncing = uiState.syncing
@@ -96,10 +97,11 @@ fun TransactionsScreen(
             menuItems = listOf(
                 MenuItem(
                     title = TranslatableString.ResString(R.string.Transactions_Filter),
-                    icon = R.drawable.ic_sort_24,
+                    icon = R.drawable.ic_manage_2_24,
+                        showAlertDot = showFilterAlertDot,
                     onClick = {
                         navController.slideFromRight(R.id.transactionFilterFragment)
-                    }
+                    },
                 )
             )
         )

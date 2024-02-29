@@ -1,13 +1,12 @@
 package io.horizontalsystems.bankwallet.modules.market.search
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,7 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -56,7 +54,6 @@ import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
 import io.horizontalsystems.bankwallet.modules.market.MarketDataValue
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchModule.CoinItem
 import io.horizontalsystems.bankwallet.modules.walletconnect.list.ui.DraggableCardSimple
-import io.horizontalsystems.bankwallet.ui.compose.ColoredTextStyle
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
@@ -69,7 +66,6 @@ import io.horizontalsystems.bankwallet.ui.compose.components.MarketCoinSecondRow
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.compose.components.SectionItemBorderedRowUniversalClear
-import io.horizontalsystems.bankwallet.ui.compose.components.body_grey50
 import io.horizontalsystems.marketkit.models.Coin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -271,64 +267,6 @@ fun MarketSearchResults(
 }
 
 @Composable
-fun SearchView(
-    focusRequester: FocusRequester = remember { FocusRequester() },
-    onSearchTextChange: (String) -> Unit,
-    leftIcon: Int,
-    onBackButtonClick: () -> Unit,
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    var searchText by rememberSaveable { mutableStateOf("") }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier.clickable(
-                interactionSource = interactionSource,
-                indication = null
-            ) {
-                onBackButtonClick.invoke()
-            }
-        ) {
-            Icon(
-                painter = painterResource(id = leftIcon),
-                contentDescription = "back icon",
-                modifier = Modifier
-                    .padding(vertical = 8.dp, horizontal = 16.dp)
-                    .size(24.dp),
-                tint = ComposeAppTheme.colors.jacob
-            )
-        }
-        BasicTextField(
-            value = searchText,
-            onValueChange = { value ->
-                searchText = value
-                onSearchTextChange(value)
-            },
-            modifier = Modifier
-                .focusRequester(focusRequester)
-                .weight(1f),
-            singleLine = true,
-            textStyle = ColoredTextStyle(
-                color = ComposeAppTheme.colors.leah,
-                textStyle = ComposeAppTheme.typography.body
-            ),
-            decorationBox = { innerTextField ->
-                if (searchText.isEmpty()) {
-                    body_grey50(stringResource(R.string.Market_Search_Hint))
-                }
-                innerTextField()
-            },
-            cursorBrush = SolidColor(ComposeAppTheme.colors.jacob),
-        )
-    }
-}
-
-@Composable
 private fun MarketCoin(
     coinCode: String,
     coinName: String,
@@ -372,16 +310,5 @@ fun MarketCoinPreview() {
             R.drawable.coin_placeholder,
             {},
         )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SearchViewPreview() {
-    ComposeAppTheme {
-        SearchView(
-            onSearchTextChange = { },
-            leftIcon = R.drawable.ic_back
-        ) { }
     }
 }

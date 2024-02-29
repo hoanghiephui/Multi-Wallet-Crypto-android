@@ -140,12 +140,15 @@ fun SearchBar(
 fun SearchBar(
     title: String,
     searchHintText: String = "",
+    searchOnlyMode: Boolean = false,
+    searchModeInitial: Boolean = false,
+    focusRequester: FocusRequester = remember { FocusRequester() },
     menuItems: List<MenuItem> = listOf(),
     onClose: () -> Unit,
     onSearchTextChanged: (String) -> Unit = {},
 ) {
 
-    var searchMode by remember { mutableStateOf(false) }
+    var searchMode by remember { mutableStateOf(searchModeInitial) }
     var showClearButton by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
     var searchText by remember { mutableStateOf("") }
@@ -161,8 +164,8 @@ fun SearchBar(
         },
         colors = backgroundColor,
         navigationIcon = {
-                HsIconButton(onClick = {
-                    if (searchMode) {
+            HsIconButton(onClick = {
+                if (searchMode && !searchOnlyMode) {
                         searchText = ""
                         onSearchTextChanged.invoke("")
                         searchMode = false
@@ -178,7 +181,6 @@ fun SearchBar(
             },
         actions = {
             if (searchMode) {
-                val focusRequester = remember { FocusRequester() }
                 OutlinedTextField(
                     modifier = Modifier
                         .weight(1f)
