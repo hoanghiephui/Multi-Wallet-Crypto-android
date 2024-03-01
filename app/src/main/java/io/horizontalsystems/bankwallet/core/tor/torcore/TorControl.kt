@@ -51,7 +51,7 @@ class TorControl(
                 it.shutdownTor("HALT")
                 return true
             }
-        } catch (e: java.lang.Exception) {
+        } catch (_: java.lang.Exception) {
         }
         return false
     }

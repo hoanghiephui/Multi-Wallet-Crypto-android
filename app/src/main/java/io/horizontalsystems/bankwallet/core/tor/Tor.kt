@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import io.horizontalsystems.bankwallet.core.tor.torcore.TorConstants
 import java.io.File
+import java.util.Locale
 
 enum class EntityStatus(val processId: Int) {
     STARTING(-1),
@@ -13,7 +14,7 @@ enum class EntityStatus(val processId: Int) {
     companion object {
 
         fun getByProcessId(procId: Int): EntityStatus {
-            return values()
+            return entries
                 .find { it.processId == procId } ?: RUNNING
         }
     }
@@ -33,8 +34,8 @@ enum class ConnectionStatus {
     companion object {
 
         fun getByName(typName: String): ConnectionStatus {
-            return values()
-                .find { it.name.contentEquals(typName.toUpperCase()) } ?: CLOSED
+            return entries
+                .find { it.name.contentEquals(typName.uppercase(Locale.ROOT)) } ?: CLOSED
         }
     }
 
