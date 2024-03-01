@@ -1,4 +1,4 @@
-package io.horizontalsystems.bankwallet.modules.contacts
+package io.horizontalsystems.bankwallet.modules.transactions
 
 import android.os.Parcelable
 import androidx.compose.foundation.layout.Column
@@ -27,10 +27,13 @@ import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.HFillSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
+import io.horizontalsystems.bankwallet.ui.compose.components.InfoErrorMessageDefault
+import io.horizontalsystems.bankwallet.ui.compose.components.InfoText
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.cell.CellUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.title3_leah
+import io.horizontalsystems.marketkit.models.BlockchainType
 import kotlinx.parcelize.Parcelize
 
 class SelectContactFragment : BaseComposeFragment() {
@@ -41,6 +44,9 @@ class SelectContactFragment : BaseComposeFragment() {
     }
 
     @Parcelize
+    data class Input(val selected: Contact?, val blockchainType: BlockchainType?) : Parcelable
+
+    @Parcelize
     data class Result(val contact: Contact?) : Parcelable
 
     override val logScreen: String
@@ -49,12 +55,9 @@ class SelectContactFragment : BaseComposeFragment() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SelectContactScreen(navController: NavController, selected: Contact?) {
-
-    val viewModel = viewModel<SelectContactViewModel>(factory = SelectContactViewModel.Factory())
-
+fun SelectContactScreen(navController: NavController, input: SelectContactFragment.Input?) {
+    val viewModel = viewModel<SelectContactViewModel>(initializer = SelectContactViewModel.init(input?.selected, input?.blockchainType))
     val uiState = viewModel.uiState
-
 
     Scaffold(
         containerColor = Color.Transparent,
@@ -70,10 +73,21 @@ fun SelectContactScreen(navController: NavController, selected: Contact?) {
             )
         }
     ) {
-        Column(modifier = Modifier.padding(it)) {
-            LazyColumn {
+        if (uiState.items.isEmpty()) {
+            Column(modifier = Modifier.padding(it)) {
+                InfoText(text = stringResource(id = R.string.Transactions_Filter_ChooseContact_Hint))
+                InfoErrorMessageDefault(
+                    painter = painterResource(id = R.drawable.ic_user_24),
+                    text = stringResource(R.string.Transactions_Filter_ChooseContact_NoSuitableContact)
+                )
+            }
+        } else {
+            LazyColumn(modifier = Modifier.padding(it)) {
+                item {
+                    InfoText(text = stringResource(id = R.string.Transactions_Filter_ChooseContact_Hint))
+                }
                 items(uiState.items) { contact ->
-                    CellContact(contact, selected) {
+                    CellContact(contact, uiState.selected) {
                         navController.setNavigationResultX(SelectContactFragment.Result(contact))
                         navController.popBackStack()
                     }
@@ -97,7 +111,7 @@ private fun CellContact(
     ) {
         Icon(
             painter = if (contact == null) {
-                painterResource(id = R.drawable.ic_qr_scan_24px)
+                painterResource(id = R.drawable.icon_paper_contract_24)
             } else {
                 painterResource(id = R.drawable.ic_user_24)
             },

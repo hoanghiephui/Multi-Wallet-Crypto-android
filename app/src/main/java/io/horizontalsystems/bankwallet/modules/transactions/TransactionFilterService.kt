@@ -79,12 +79,16 @@ class TransactionFilterService {
         selectedWallet = wallet
         selectedBlockchain = selectedWallet?.source?.blockchain
 
+        refreshContact()
+
         emitState()
     }
 
     fun setSelectedBlockchain(blockchain: Blockchain?) {
         selectedBlockchain = blockchain
         selectedWallet = null
+
+        refreshContact()
 
         emitState()
     }
@@ -115,6 +119,17 @@ class TransactionFilterService {
             || selectedBlockchain != null
             || selectedTransactionType != FilterTransactionType.All
             || contact != null
+    }
+
+    private fun refreshContact() {
+        val tmpBlockchain = selectedBlockchain ?: return
+        val tmpContact = contact ?: return
+
+        if (!SelectContactViewModel.supportedBlockchainTypes.contains(tmpBlockchain.type)) {
+            contact = null
+        } else if (tmpContact.addresses.none { it.blockchain.type == tmpBlockchain.type }) {
+            contact = null
+        }
     }
 
     data class State(
