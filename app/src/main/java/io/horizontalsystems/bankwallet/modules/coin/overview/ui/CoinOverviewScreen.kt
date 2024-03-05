@@ -35,6 +35,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.tradingview.lightweightcharts.api.series.common.SeriesData
 import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.BinanceAvailable
@@ -48,6 +49,7 @@ import io.horizontalsystems.bankwallet.core.slideFromBottomForResult
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.model.BnTimePeriod
+import io.horizontalsystems.bankwallet.model.TickerStreamRepository
 import io.horizontalsystems.bankwallet.modules.chart.ChartViewModel
 import io.horizontalsystems.bankwallet.modules.coin.CoinLink
 import io.horizontalsystems.bankwallet.modules.coin.overview.CoinOverviewModule
@@ -72,6 +74,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawren
 import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
+import io.horizontalsystems.bankwallet.ui.compose.components.TabItem
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
 import io.horizontalsystems.bankwallet.ui.helpers.TextHelper
@@ -81,6 +84,7 @@ import io.horizontalsystems.core.helpers.HudHelper
 import io.horizontalsystems.marketkit.models.FullCoin
 import io.horizontalsystems.marketkit.models.LinkType
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun CoinOverviewScreen(
@@ -121,21 +125,7 @@ fun CoinOverviewScreen(
     val candlestickSeries by binanceViewModel.candlestickSeriesState.collectAsStateWithLifecycle()
     val chartTabs by binanceViewModel.tabItemsLiveData.observeAsState(listOf())
 
-    LaunchedEffect(key1 = isSendStream, block = {
-        if (isSendStream) {
-            delay(1000)
-            binanceViewModel.loadCandlestickSeriesData(
-                coinSymbol,
-                BnTimePeriod.Minutes5.value
-            )
-            binanceViewModel.sendSubscribe(
-                listOf(
-                    fullCoin.coin.code.toSymbolTickerUseSocketBinance(),
-                    fullCoin.coin.code.toSymbolKlineUseSocketBinance(BnTimePeriod.Minutes5.value)
-                )
-            )
-        }
-    })
+    LoadStream(isSendStream, binanceViewModel, coinSymbol, fullCoin)
 
     viewModel.showHudMessage?.let {
         when (it.type) {
@@ -197,49 +187,20 @@ fun CoinOverviewScreen(
                                 ViewChart(
                                     currentPage,
                                     showCandlestick = {
-                                        TitlePrice(viewModel.currency, priceTitle?.data)
-                                        CrossSlide(targetState = candlestickSeries) { state ->
-                                            when (state) {
-                                                CandlestickSeries.Loading -> {
-                                                    Box(modifier = Modifier.height(300.dp)) {
-                                                        Loading()
-                                                    }
-                                                }
-                                                is CandlestickSeries.CandlestickSeriesData -> {
-                                                    val seriesData = state.seriesData
-                                                    val volumeData = state.volumeData
-                                                    ChartBinance(
-                                                        seriesData,
-                                                        volumeData,
-                                                        seriesFlow,
-                                                        volumeFlow,
-                                                        LocalLifecycleOwner.current,
-                                                        object : ListenerChart {
-                                                            override fun onChartTouchDown() {
-                                                                scrollingEnabled = false
-                                                            }
-
-                                                            override fun onChartTouchUp() {
-                                                                scrollingEnabled = true
-                                                            }
-
-                                                        },
-                                                        binanceViewModel.onClear,
-                                                        tabItems = chartTabs,
-                                                        onSelectTab = {
-                                                            binanceViewModel.onSelectChartInterval(
-                                                                it,
-                                                                coinSymbol,
-                                                                fullCoin.coin.code
-                                                            )
-                                                        },
-                                                        binanceViewModel.remove
-                                                    )
-                                                }
-                                            }
-
-                                        }
-
+                                        CandlestickChart(
+                                            viewModel,
+                                            priceTitle,
+                                            candlestickSeries,
+                                            seriesFlow,
+                                            volumeFlow,
+                                            scrollingEnabled = {
+                                                scrollingEnabled = it
+                                            },
+                                            binanceViewModel,
+                                            chartTabs,
+                                            coinSymbol,
+                                            fullCoin
+                                        )
                                     },
                                     showChartDefault = {
                                         CoinScreenTitle(
@@ -252,9 +213,6 @@ fun CoinOverviewScreen(
                                         Chart(chartViewModel = chartViewModel)
                                     }
                                 )
-
-
-
                                 Spacer(modifier = Modifier.height(12.dp))
 
                                 CellUniversalLawrenceSection {
@@ -267,17 +225,19 @@ fun CoinOverviewScreen(
                                         subhead2_grey(text = stringResource(R.string.CoinPage_Indicators))
                                         Spacer(modifier = Modifier.weight(1f))
                                         Box(modifier = Modifier.size(30.dp)) {
-                                            when(binanceAvailable) {
+                                            when (binanceAvailable) {
                                                 is BinanceAvailable.Loading -> {
                                                     Loading()
                                                 }
+
                                                 is BinanceAvailable.StateBinance -> {
                                                     if ((binanceAvailable as BinanceAvailable.StateBinance).available) {
                                                         ButtonSecondaryCircle(
                                                             icon = if (currentPage != CANDLESTICK) R.drawable.baseline_candlestick_chart_24
                                                             else R.drawable.ic_chart_24
                                                         ) {
-                                                            currentPage = if (currentPage != CANDLESTICK) CANDLESTICK else CHART_DEFAULT
+                                                            currentPage =
+                                                                if (currentPage != CANDLESTICK) CANDLESTICK else CHART_DEFAULT
                                                         }
                                                     }
                                                 }
@@ -335,7 +295,10 @@ fun CoinOverviewScreen(
                                         },
                                         onClickCopy = {
                                             TextHelper.copyText(it)
-                                            HudHelper.showSuccessMessage(view, R.string.Hud_Text_Copied)
+                                            HudHelper.showSuccessMessage(
+                                                view,
+                                                R.string.Hud_Text_Copied
+                                            )
                                         },
                                         onClickExplorer = {
                                             LinkHelper.openLinkInAppBrowser(context, it)
@@ -359,17 +322,103 @@ fun CoinOverviewScreen(
                         }
 
                     }
+
                     is ViewState.Error -> {
-                        ListErrorView(stringResource(id = R.string.BalanceSyncError_Title), onClick = {
-                            viewModel.retry()
-                            chartViewModel.refresh()
-                        })
+                        ListErrorView(
+                            stringResource(id = R.string.BalanceSyncError_Title),
+                            onClick = {
+                                viewModel.retry()
+                                chartViewModel.refresh()
+                            })
                     }
+
                     null -> {}
                 }
             }
         },
     )
+}
+
+@Composable
+private fun LoadStream(
+    isSendStream: Boolean,
+    binanceViewModel: BinanceViewModel,
+    coinSymbol: String,
+    fullCoin: FullCoin
+) {
+    LaunchedEffect(key1 = isSendStream, block = {
+        if (isSendStream) {
+            delay(1000)
+            binanceViewModel.loadCandlestickSeriesData(
+                coinSymbol,
+                BnTimePeriod.Minutes5.value
+            )
+            binanceViewModel.sendSubscribe(
+                listOf(
+                    fullCoin.coin.code.toSymbolTickerUseSocketBinance(),
+                    fullCoin.coin.code.toSymbolKlineUseSocketBinance(BnTimePeriod.Minutes5.value)
+                )
+            )
+        }
+    })
+}
+
+@Composable
+private fun CandlestickChart(
+    viewModel: CoinOverviewViewModel,
+    priceTitle: TickerStreamRepository?,
+    candlestickSeries: CandlestickSeries,
+    seriesFlow: Flow<SeriesData>,
+    volumeFlow: Flow<SeriesData>,
+    scrollingEnabled: (Boolean) -> Unit,
+    binanceViewModel: BinanceViewModel,
+    chartTabs: List<TabItem<BnTimePeriod>>,
+    coinSymbol: String,
+    fullCoin: FullCoin,
+) {
+    TitlePrice(viewModel.currency, priceTitle?.data)
+    CrossSlide(targetState = candlestickSeries) { state ->
+        when (state) {
+            CandlestickSeries.Loading -> {
+                Box(modifier = Modifier.height(300.dp)) {
+                    Loading()
+                }
+            }
+
+            is CandlestickSeries.CandlestickSeriesData -> {
+                val seriesData = state.seriesData
+                val volumeData = state.volumeData
+                ChartBinance(
+                    seriesData,
+                    volumeData,
+                    seriesFlow,
+                    volumeFlow,
+                    LocalLifecycleOwner.current,
+                    object : ListenerChart {
+                        override fun onChartTouchDown() {
+                            scrollingEnabled(false)
+                        }
+
+                        override fun onChartTouchUp() {
+                            scrollingEnabled(true)
+                        }
+
+                    },
+                    binanceViewModel.onClear,
+                    tabItems = chartTabs,
+                    onSelectTab = {
+                        binanceViewModel.onSelectChartInterval(
+                            it,
+                            coinSymbol,
+                            fullCoin.coin.code
+                        )
+                    },
+                    binanceViewModel.remove
+                )
+            }
+        }
+
+    }
 }
 
 private fun onClick(coinLink: CoinLink, context: Context, navController: NavController) {
@@ -382,6 +431,7 @@ private fun onClick(coinLink: CoinLink, context: Context, navController: NavCont
                 MarkdownFragment.Input(absoluteUrl, true)
             )
         }
+
         else -> LinkHelper.openLinkInAppBrowser(context, absoluteUrl)
     }
 }
