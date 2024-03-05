@@ -157,12 +157,14 @@ fun CoinList(
 @Composable
 fun ListErrorView(
     errorText: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    adComposable: (@Composable () -> Unit)? = null
 ) {
     ListErrorView(
         errorText = errorText,
         icon = R.drawable.ic_sync_error,
         onClick = onClick,
+        adComposable = adComposable
     )
 }
 
@@ -170,19 +172,23 @@ fun ListErrorView(
 fun ListErrorView(
     errorText: String,
     @DrawableRes icon: Int = R.drawable.ic_sync_error,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    adComposable: (@Composable () -> Unit)? = null
 ) {
     ScreenMessageWithAction(
         text = errorText,
         icon = icon,
     ) {
-        ButtonPrimaryYellow(
-            modifier = Modifier
-                .padding(horizontal = 48.dp)
-                .fillMaxWidth(),
-            title = stringResource(R.string.Button_Retry),
-            onClick = onClick
-        )
+        Column {
+            adComposable?.invoke()
+            ButtonPrimaryYellow(
+                modifier = Modifier
+                    .padding(horizontal = 48.dp)
+                    .fillMaxWidth(),
+                title = stringResource(R.string.Button_Retry),
+                onClick = onClick
+            )
+        }
     }
 }
 
@@ -411,7 +417,7 @@ fun CategoryCard(
 @Composable
 fun PreviewListErrorView() {
     ComposeAppTheme {
-        ListErrorView(errorText = "Sync error. Try again") {
+        ListErrorView(errorText = "Sync error. Try again", onClick = {}) {
         }
     }
 }

@@ -360,10 +360,10 @@ fun CoinOverviewScreen(
 
                     }
                     is ViewState.Error -> {
-                        ListErrorView(stringResource(id = R.string.BalanceSyncError_Title)) {
+                        ListErrorView(stringResource(id = R.string.BalanceSyncError_Title), onClick = {
                             viewModel.retry()
                             chartViewModel.refresh()
-                        }
+                        })
                     }
                     null -> {}
                 }

@@ -31,9 +31,9 @@ fun MarkdownContent(
         Crossfade(viewState, label = "") { viewState ->
             when (viewState) {
                 is ViewState.Error -> {
-                    ListErrorView(stringResource(id = R.string.Markdown_Error_NotFound)) {
+                    ListErrorView(stringResource(id = R.string.Markdown_Error_NotFound), onClick = {
                         onRetryClick()
-                    }
+                    })
                 }
                 ViewState.Loading -> {
                     Loading()

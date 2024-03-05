@@ -1,11 +1,14 @@
 package io.horizontalsystems.bankwallet.modules.market.overview
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -13,6 +16,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -20,6 +24,8 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -39,8 +45,9 @@ import io.horizontalsystems.bankwallet.modules.market.overview.ui.TopPlatformsBo
 import io.horizontalsystems.bankwallet.modules.market.overview.ui.TopSectorsBoardView
 import io.horizontalsystems.bankwallet.modules.market.topcoins.MarketTopCoinsFragment
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
-import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
 
 @Composable
@@ -81,9 +88,30 @@ fun MarketOverviewScreen(
                 ViewState.Loading -> {
                     Loading()
                 }
+
                 is ViewState.Error -> {
-                    ListErrorView(stringResource(R.string.SyncError), viewModel::onErrorClick)
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        MaxTemplateNativeAdViewComposable(nativeAd, AdType.MEDIUM)
+                        subhead2_grey(
+                            modifier = Modifier.padding(horizontal = 48.dp, vertical = 16.dp),
+                            text = stringResource(R.string.SyncError),
+                            textAlign = TextAlign.Center,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                        ButtonPrimaryYellow(
+                            modifier = Modifier
+                                .padding(horizontal = 48.dp)
+                                .fillMaxWidth(),
+                            title = stringResource(R.string.Button_Retry),
+                            onClick = viewModel::onErrorClick
+                        )
+                    }
                 }
+
                 ViewState.Success -> {
                     viewItem?.let { viewItem ->
                         Column(
@@ -163,6 +191,7 @@ fun MarketOverviewScreen(
                         }
                     }
                 }
+
                 null -> {}
             }
         }

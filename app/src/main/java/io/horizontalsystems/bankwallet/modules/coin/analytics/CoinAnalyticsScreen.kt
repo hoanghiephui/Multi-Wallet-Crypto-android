@@ -105,7 +105,7 @@ fun CoinAnalyticsScreen(
                 }
 
                 is ViewState.Error -> {
-                    ListErrorView(stringResource(R.string.SyncError), viewModel::refresh)
+                    ListErrorView(stringResource(R.string.SyncError), onClick = viewModel::refresh)
                 }
             }
         }

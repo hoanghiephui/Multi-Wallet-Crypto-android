@@ -112,10 +112,11 @@ fun ActivateSubscriptionScreen(navController: NavController) {
                 } else {
                     ListErrorView(
                         errorText = error.message ?: error.javaClass.simpleName,
-                        icon = R.drawable.ic_error_48
-                    ) {
-                        viewModel.retry()
-                    }
+                        icon = R.drawable.ic_error_48,
+                        onClick = {
+                            viewModel.retry()
+                        }
+                    )
                 }
             }
             uiState.subscriptionInfo?.let { subscriptionInfo ->

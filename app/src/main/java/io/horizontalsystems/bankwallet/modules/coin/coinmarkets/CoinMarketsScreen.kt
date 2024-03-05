@@ -66,7 +66,7 @@ fun CoinMarketsScreen(
                     Loading()
                 }
                 is ViewState.Error -> {
-                    ListErrorView(stringResource(R.string.SyncError), viewModel::onErrorClick)
+                    ListErrorView(stringResource(R.string.SyncError), onClick = viewModel::onErrorClick)
                 }
                 ViewState.Success -> {
                     viewItems?.let { items ->
