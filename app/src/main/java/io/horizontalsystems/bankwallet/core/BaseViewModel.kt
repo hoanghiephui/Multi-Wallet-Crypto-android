@@ -55,13 +55,9 @@ abstract class BaseViewModel : ViewModel() {
         adUnitIdentifier: String
     ) {
         // Initialize ad with ad loader.
-        viewModelScope.launch {
-            loadAdState.collectLatest {
-                if (it && SHOW_ADS) {
-                    nativeAdLoader.loadAd(context, adUnitIdentifier)
-                    Log.d("Applovin", "loadAds")
-                }
-            }
+        if (SHOW_ADS) {
+            nativeAdLoader.loadAd(context, adUnitIdentifier)
+            Log.d("Applovin", "loadAds")
         }
 
     }

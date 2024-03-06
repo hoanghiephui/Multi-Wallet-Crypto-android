@@ -385,7 +385,9 @@ dependencies {
 
     api 'com.jaredrummler:android-shell:1.0.0'
     api 'com.offbynull.portmapper:portmapper:2.0.5'
-    implementation("com.applovin:applovin-sdk:12.2.0")
+    implementation("com.applovin:applovin-sdk:12.3.0")
+    implementation 'com.applovin.mediation:bytedance-adapter:5.8.0.8.0'
+    implementation 'com.google.android.exoplayer:exoplayer:2.19.1'
     implementation("com.google.android.gms:play-services-ads-identifier:18.0.1")
     implementation("com.android.billingclient:billing:6.1.0")
     implementation("com.android.billingclient:billing-ktx:6.1.0")
