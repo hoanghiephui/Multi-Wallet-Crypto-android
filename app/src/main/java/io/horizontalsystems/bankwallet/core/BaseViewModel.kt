@@ -5,12 +5,6 @@ import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
 abstract class BaseViewModel : ViewModel() {
     private val callbacks = mutableStateListOf<String>()
@@ -18,26 +12,8 @@ abstract class BaseViewModel : ViewModel() {
         MaxTemplateNativeAdViewComposableLoader(this)
     }
     val adState: State<AdViewState> get() = nativeAdLoader.nativeAdView
-    private val _uiState = MutableStateFlow(false)
-    private val loadAdState = _uiState.asSharedFlow()
     companion object{
         const val SHOW_ADS = true
-    }
-    init {
-        if (SHOW_ADS) {
-            App.appLoVinSdk.initializeSdk {
-                viewModelScope.launch {
-                    _uiState.emit(true)
-                }
-            }.runCatching {
-                viewModelScope.launch {
-                    delay(3000)
-                    if (!_uiState.value) {
-                        _uiState.emit(true)
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -56,8 +32,10 @@ abstract class BaseViewModel : ViewModel() {
     ) {
         // Initialize ad with ad loader.
         if (SHOW_ADS) {
-            nativeAdLoader.loadAd(context, adUnitIdentifier)
-            Log.d("Applovin", "loadAds")
+            App.appLoVinSdk.initializeSdk {
+                nativeAdLoader.loadAd(context, adUnitIdentifier)
+                Log.d("Applovin", "loadAds")
+            }
         }
 
     }
