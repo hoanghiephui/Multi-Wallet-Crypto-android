@@ -39,10 +39,12 @@ class SwapSettingsFragment : BaseComposeFragment() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SwapProviderSettingsScreen(navController: NavController) {
-    val viewModel = viewModel<SwapViewModel>(
+    val swapViewModel = viewModel<SwapViewModel>(
         viewModelStoreOwner = navController.previousBackStackEntry!!,
         factory = SwapViewModel.Factory()
     )
+
+    val viewModel = viewModel<SwapSettingsViewModel>(factory = SwapSettingsViewModel.Factory())
 
     Scaffold(
         topBar = {
@@ -71,6 +73,7 @@ private fun SwapProviderSettingsScreen(navController: NavController) {
                     enabled = viewModel.saveSettingsEnabled,
                     onClick = {
                         viewModel.saveSettings()
+                        swapViewModel.onUpdateSettings(viewModel.getSettings())
                         navController.popBackStack()
                     }
                 )
@@ -86,7 +89,7 @@ private fun SwapProviderSettingsScreen(navController: NavController) {
                 VSpacer(height = 12.dp)
             }
 
-            viewModel.uiState.quote?.swapQuote?.let { swapQuote ->
+            swapViewModel.uiState.quote?.swapQuote?.let { swapQuote ->
                 items(swapQuote.settings) { setting ->
                     val settingId = setting.id
 

@@ -25,7 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +49,7 @@ import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromBottomForResult
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.CoinValue
+import io.horizontalsystems.bankwallet.entities.Currency
 import io.horizontalsystems.bankwallet.modules.swap.SwapMainModule
 import io.horizontalsystems.bankwallet.modules.swap.getPriceImpactColor
 import io.horizontalsystems.bankwallet.modules.swapxxx.providers.ISwapXxxProvider
@@ -64,10 +64,11 @@ import io.horizontalsystems.bankwallet.ui.compose.components.CoinImage
 import io.horizontalsystems.bankwallet.ui.compose.components.HFillSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.HSRow
 import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
+import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_grey
-import io.horizontalsystems.bankwallet.ui.compose.components.body_grey50
+import io.horizontalsystems.bankwallet.ui.compose.components.cell.CellUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.headline1_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_jacob
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_leah
@@ -76,8 +77,6 @@ import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_lucian
 import io.horizontalsystems.marketkit.models.Token
 import java.math.BigDecimal
-import java.math.RoundingMode
-import java.util.UUID
 
 class SwapFragment : BaseComposeFragment() {
     @Composable
@@ -117,11 +116,15 @@ fun SwapScreen(navController: NavController) {
         },
         onSwitchPairs = viewModel::onSwitchPairs,
         onEnterAmount = viewModel::onEnterAmount,
+        onEnterFiatAmount = viewModel::onEnterFiatAmount,
         onClickProvider = {
             navController.slideFromBottom(R.id.swapSelectProvider)
         },
         onClickProviderSettings = {
             navController.slideFromRight(R.id.swapSettings)
+        },
+        onClickTransactionSettings = {
+            navController.slideFromRight(R.id.swapTransactionSettings)
         },
         onClickNext = {
             navController.slideFromRight(R.id.swapConfirm)
@@ -138,7 +141,9 @@ private fun SwapScreenInner(
     onClickCoinTo: () -> Unit,
     onSwitchPairs: () -> Unit,
     onEnterAmount: (BigDecimal?) -> Unit,
+    onEnterFiatAmount: (BigDecimal?) -> Unit,
     onClickProvider: () -> Unit,
+    onClickTransactionSettings: () -> Unit,
     onClickProviderSettings: () -> Unit,
     onClickNext: () -> Unit,
 ) {
@@ -146,11 +151,14 @@ private fun SwapScreenInner(
         topBar = {
             AppBar(
                 title = stringResource(R.string.Swap),
+                navigationIcon = {
+                    HsBackButton(onClick = onClickClose)
+                },
                 menuItems = listOf(
                     MenuItem(
-                        title = TranslatableString.ResString(R.string.Button_Close),
-                        icon = R.drawable.ic_close,
-                        onClick = onClickClose
+                        title = TranslatableString.ResString(R.string.Settings_Title),
+                        icon = R.drawable.ic_manage_2_24,
+                        onClick = onClickTransactionSettings
                     )
                 ),
             )
@@ -166,13 +174,18 @@ private fun SwapScreenInner(
             VSpacer(height = 12.dp)
             SwapInput(
                 amountIn = uiState.amountIn,
+                fiatAmountIn = uiState.fiatAmountIn,
+                fiatAmountInputEnabled = uiState.fiatAmountInputEnabled,
                 onSwitchPairs = onSwitchPairs,
                 amountOut = uiState.quote?.amountOut,
+                fiatAmountOut = uiState.fiatAmountOut,
                 onValueChange = onEnterAmount,
+                onFiatValueChange = onEnterFiatAmount,
                 onClickCoinFrom = onClickCoinFrom,
                 onClickCoinTo = onClickCoinTo,
                 tokenIn = uiState.tokenIn,
-                tokenOut = uiState.tokenOut
+                tokenOut = uiState.tokenOut,
+                currency = uiState.currency,
             )
 
             VSpacer(height = 12.dp)
@@ -345,11 +358,8 @@ private fun ProviderField(
 @Composable
 private fun PriceField(tokenIn: Token, tokenOut: Token, amountIn: BigDecimal, amountOut: BigDecimal) {
     var showRegularPrice by remember { mutableStateOf(true) }
-    val price = amountOut.divide(amountIn, tokenOut.decimals, RoundingMode.HALF_EVEN).stripTrailingZeros()
-    val priceInv = BigDecimal.ONE.divide(price, tokenIn.decimals, RoundingMode.HALF_EVEN).stripTrailingZeros()
+    val swapPriceUIHelper = SwapPriceUIHelper(tokenIn, tokenOut, amountIn, amountOut)
 
-    val priceStr = "${CoinValue(tokenIn, BigDecimal.ONE).getFormattedFull()} = ${CoinValue(tokenOut, price).getFormattedFull()}"
-    val priceInvStr = "${CoinValue(tokenOut, BigDecimal.ONE).getFormattedFull()} = ${CoinValue(tokenIn, priceInv).getFormattedFull()}"
     QuoteInfoRow(
         title = {
             subhead2_grey(text = stringResource(R.string.Swap_Price))
@@ -364,7 +374,7 @@ private fun PriceField(tokenIn: Token, tokenOut: Token, amountIn: BigDecimal, am
                             showRegularPrice = !showRegularPrice
                         }
                     ),
-                text = if (showRegularPrice) priceStr else priceInvStr
+                text = if (showRegularPrice) swapPriceUIHelper.priceStr else swapPriceUIHelper.priceInvStr
             )
             HSpacer(width = 8.dp)
             Icon(
@@ -381,10 +391,7 @@ fun QuoteInfoRow(
     title: @Composable() (RowScope.() -> Unit),
     value: @Composable() (RowScope.() -> Unit),
 ) {
-    Row(
-        modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+    CellUniversal(borderTop = false) {
         title.invoke(this)
         HFillSpacer(minWidth = 8.dp)
         value.invoke(this)
@@ -394,13 +401,18 @@ fun QuoteInfoRow(
 @Composable
 private fun SwapInput(
     amountIn: BigDecimal?,
+    fiatAmountIn: BigDecimal?,
+    fiatAmountInputEnabled: Boolean,
     onSwitchPairs: () -> Unit,
     amountOut: BigDecimal?,
+    fiatAmountOut: BigDecimal?,
     onValueChange: (BigDecimal?) -> Unit,
+    onFiatValueChange: (BigDecimal?) -> Unit,
     onClickCoinFrom: () -> Unit,
     onClickCoinTo: () -> Unit,
     tokenIn: Token?,
     tokenOut: Token?,
+    currency: Currency,
 ) {
     Box {
         Column(
@@ -413,14 +425,23 @@ private fun SwapInput(
         ) {
             SwapCoinInput(
                 coinAmount = amountIn,
+                fiatAmount = fiatAmountIn,
+                currency = currency,
                 onValueChange = onValueChange,
+                onFiatValueChange = onFiatValueChange,
+                enabled = true,
+                fiatAmountInputEnabled = fiatAmountInputEnabled,
                 token = tokenIn,
                 onClickCoin = onClickCoinFrom
             )
             SwapCoinInput(
                 coinAmount = amountOut,
+                fiatAmount = fiatAmountOut,
+                currency = currency,
                 onValueChange = { },
+                onFiatValueChange = {},
                 enabled = false,
+                fiatAmountInputEnabled = false,
                 token = tokenOut,
                 onClickCoin = onClickCoinTo
             )
@@ -441,22 +462,15 @@ private fun SwapInput(
 @Composable
 private fun SwapCoinInput(
     coinAmount: BigDecimal?,
+    fiatAmount: BigDecimal?,
+    currency: Currency,
     onValueChange: (BigDecimal?) -> Unit,
-    enabled: Boolean = true,
+    onFiatValueChange: (BigDecimal?) -> Unit,
+    enabled: Boolean,
+    fiatAmountInputEnabled: Boolean,
     token: Token?,
     onClickCoin: () -> Unit,
 ) {
-    val uuid = remember { UUID.randomUUID().toString() }
-    val fiatViewModel = viewModel<FiatViewModel>(key = uuid, factory = FiatViewModel.Factory())
-    val currencyAmount = fiatViewModel.fiatAmountString
-
-    LaunchedEffect(token) {
-        fiatViewModel.setCoin(token?.coin)
-    }
-    LaunchedEffect(coinAmount) {
-        fiatViewModel.setAmount(coinAmount)
-    }
-
     Row(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 20.dp),
@@ -465,11 +479,7 @@ private fun SwapCoinInput(
         Column(modifier = Modifier.weight(1f)) {
             AmountInput(coinAmount, onValueChange, enabled)
             VSpacer(height = 3.dp)
-            if (currencyAmount != null) {
-                body_grey(text = currencyAmount)
-            } else {
-                body_grey50(text = fiatViewModel.currencyAmountHint)
-            }
+            FiatAmountInput(fiatAmount, currency, onFiatValueChange, fiatAmountInputEnabled)
         }
         HSpacer(width = 8.dp)
         Selector(
@@ -488,6 +498,53 @@ private fun SwapCoinInput(
                 }
             },
             onClickSelect = onClickCoin
+        )
+    }
+}
+
+@Composable
+private fun FiatAmountInput(
+    value: BigDecimal?,
+    currency: Currency,
+    onValueChange: (BigDecimal?) -> Unit,
+    enabled: Boolean,
+) {
+    var text by remember(value) {
+        mutableStateOf(value?.toPlainString() ?: "")
+    }
+    Row {
+        body_grey(text = currency.symbol)
+        BasicTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = text,
+            onValueChange = {
+                try {
+                    val amount = if (it.isBlank()) {
+                        null
+                    } else {
+                        it.toBigDecimal()
+                    }
+                    text = it
+                    onValueChange.invoke(amount)
+                } catch (e: Exception) {
+
+                }
+            },
+            enabled = enabled,
+            textStyle = ColoredTextStyle(
+                color = ComposeAppTheme.colors.grey, textStyle = ComposeAppTheme.typography.body
+            ),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Decimal
+            ),
+            cursorBrush = SolidColor(ComposeAppTheme.colors.jacob),
+            decorationBox = { innerTextField ->
+                if (text.isEmpty()) {
+                    body_grey(text = "0")
+                }
+                innerTextField()
+            },
         )
     }
 }

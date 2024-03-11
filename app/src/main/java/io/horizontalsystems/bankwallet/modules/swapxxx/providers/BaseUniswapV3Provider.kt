@@ -6,7 +6,6 @@ import io.horizontalsystems.bankwallet.modules.swapxxx.SwapQuoteUniswapV3
 import io.horizontalsystems.bankwallet.modules.swapxxx.settings.SwapSettingDeadline
 import io.horizontalsystems.bankwallet.modules.swapxxx.settings.SwapSettingRecipient
 import io.horizontalsystems.bankwallet.modules.swapxxx.settings.SwapSettingSlippage
-import io.horizontalsystems.bankwallet.modules.swapxxx.ui.SwapDataFieldFee
 import io.horizontalsystems.bankwallet.modules.swapxxx.ui.SwapDataFieldSlippage
 import io.horizontalsystems.ethereumkit.models.Chain
 import io.horizontalsystems.marketkit.models.BlockchainType
@@ -19,6 +18,25 @@ import java.math.BigDecimal
 
 abstract class BaseUniswapV3Provider(dexType: DexType) : ISwapXxxProvider {
     private val uniswapV3Kit by lazy { UniswapV3Kit.getInstance(dexType) }
+
+    override suspend fun swap(swapQuote: ISwapQuote) {
+        check(swapQuote is SwapQuoteUniswapV3)
+
+        val blockchainType = swapQuote.tokenIn.blockchainType
+        val evmBlockchainHelper = EvmBlockchainHelper(blockchainType)
+        val evmKitWrapper = evmBlockchainHelper.evmKitWrapper ?: return
+
+        val transactionData = evmBlockchainHelper.receiveAddress?.let { receiveAddress ->
+            uniswapV3Kit.transactionData(receiveAddress, evmBlockchainHelper.chain, swapQuote.tradeDataV3)
+        }
+
+//        try {
+//            val transaction = evmKitWrapper.sendSingle(transactionData, gasPrice, gasLimit, nonce).await()
+////            logger.info("success")
+//        } catch (e: Throwable) {
+////            logger.warning("failed", error)
+//        }
+    }
 
     final override suspend fun fetchQuote(
         tokenIn: Token,
@@ -53,30 +71,20 @@ abstract class BaseUniswapV3Provider(dexType: DexType) : ISwapXxxProvider {
             amountIn,
             tradeOptions
         )
-        val amountOut = tradeDataV3.tokenAmountOut.decimalAmount!!
-
-        val transactionData = evmBlockchainHelper.receiveAddress?.let { receiveAddress ->
-            uniswapV3Kit.transactionData(receiveAddress, chain, tradeDataV3)
-        }
-        val feeAmountData = transactionData?.let {
-            evmBlockchainHelper.getFeeAmountData(it)
-        }
 
         val fields = buildList {
-            feeAmountData?.let {
-                add(SwapDataFieldFee(it))
-            }
             settingSlippage.value?.let {
                 add(SwapDataFieldSlippage(it))
             }
         }
 
         return SwapQuoteUniswapV3(
-            amountOut,
-            tradeDataV3.priceImpact,
+            tradeDataV3,
             fields,
-            feeAmountData,
-            listOf(settingRecipient, settingSlippage, settingDeadline)
+            listOf(settingRecipient, settingSlippage, settingDeadline),
+            tokenIn,
+            tokenOut,
+            amountIn
         )
     }
 

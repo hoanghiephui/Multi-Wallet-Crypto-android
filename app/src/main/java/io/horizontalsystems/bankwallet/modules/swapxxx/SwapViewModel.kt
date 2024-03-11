@@ -1,16 +1,15 @@
 package io.horizontalsystems.bankwallet.modules.swapxxx
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.HSCaution
+import io.horizontalsystems.bankwallet.core.ViewModelUiState
+import io.horizontalsystems.bankwallet.core.managers.CurrencyManager
+import io.horizontalsystems.bankwallet.entities.Currency
 import io.horizontalsystems.bankwallet.modules.swap.SwapMainModule
 import io.horizontalsystems.bankwallet.modules.swapxxx.providers.ISwapXxxProvider
-import io.horizontalsystems.bankwallet.modules.swapxxx.settings.SwapSettingsService
 import io.horizontalsystems.marketkit.models.Token
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -18,33 +17,20 @@ import java.math.BigDecimal
 class SwapViewModel(
     private val quoteService: SwapQuoteService,
     private val balanceService: TokenBalanceService,
-    private val settingsService: SwapSettingsService,
-    private val priceImpactService: PriceImpactService
-) : ViewModel() {
+    private val priceImpactService: PriceImpactService,
+    private val quoteExpirationService: SwapQuoteExpirationService,
+    private val currencyManager: CurrencyManager,
+    private val fiatServiceIn: FiatService,
+    private val fiatServiceOut: FiatService
+) : ViewModelUiState<SwapUiState>() {
 
     private var quoteState = quoteService.stateFlow.value
     private var availableBalance = balanceService.balanceFlow.value
     private var priceImpactState = priceImpactService.stateFlow.value
-
-    var uiState: SwapUiState by mutableStateOf(
-        SwapUiState(
-            amountIn = quoteState.amountIn,
-            tokenIn = quoteState.tokenIn,
-            tokenOut = quoteState.tokenOut,
-            quoting = quoteState.quoting,
-            swapEnabled = isSwapEnabled(),
-            quotes = quoteState.quotes,
-            preferredProvider = quoteState.preferredProvider,
-            quoteLifetime = quoteState.quoteLifetime,
-            quote = quoteState.quote,
-            error = quoteState.error,
-            availableBalance = availableBalance,
-            priceImpact = priceImpactState.priceImpact,
-            priceImpactLevel = priceImpactState.priceImpactLevel,
-            priceImpactCaution = priceImpactState.priceImpactCaution,
-        )
-    )
-        private set
+    private var fiatAmountIn: BigDecimal? = null
+    private var fiatAmountOut: BigDecimal? = null
+    private var fiatAmountInputEnabled = false
+    private val currency = currencyManager.baseCurrency
 
     init {
         viewModelScope.launch {
@@ -62,7 +48,51 @@ class SwapViewModel(
                 handleUpdatedPriceImpactState(it)
             }
         }
+        viewModelScope.launch {
+            quoteExpirationService.quoteExpiredFlow.collect {
+                handleUpdatedQuoteExpiredState(it)
+            }
+        }
+        viewModelScope.launch {
+            fiatServiceIn.stateFlow.collect {
+                fiatAmountInputEnabled = it.coinPrice != null
+                fiatAmountIn = it.fiatAmount
+                quoteService.setAmount(it.amount)
+
+                emitState()
+            }
+        }
+        viewModelScope.launch {
+            fiatServiceOut.stateFlow.collect {
+                fiatAmountOut = it.fiatAmount
+                emitState()
+            }
+        }
+
+        fiatServiceIn.setCurrency(currency)
+        fiatServiceOut.setCurrency(currency)
     }
+
+    override fun createState() = SwapUiState(
+        amountIn = quoteState.amountIn,
+        tokenIn = quoteState.tokenIn,
+        tokenOut = quoteState.tokenOut,
+        quoting = quoteState.quoting,
+        swapEnabled = isSwapEnabled(),
+        quotes = quoteState.quotes,
+        preferredProvider = quoteState.preferredProvider,
+        quoteLifetime = quoteState.quoteLifetime,
+        quote = quoteState.quote,
+        error = quoteState.error,
+        availableBalance = availableBalance,
+        priceImpact = priceImpactState.priceImpact,
+        priceImpactLevel = priceImpactState.priceImpactLevel,
+        priceImpactCaution = priceImpactState.priceImpactCaution,
+        fiatAmountIn = fiatAmountIn,
+        fiatAmountOut = fiatAmountOut,
+        currency = currency,
+        fiatAmountInputEnabled = fiatAmountInputEnabled
+    )
 
     private fun handleUpdatedBalance(balance: BigDecimal?) {
         this.availableBalance = balance
@@ -75,8 +105,20 @@ class SwapViewModel(
 
         balanceService.setToken(quoteState.tokenIn)
         priceImpactService.setPriceImpact(quoteState.quote?.priceImpact, quoteState.quote?.provider?.title)
+        quoteExpirationService.setQuote(quoteState.quote)
+
+        fiatServiceIn.setToken(quoteState.tokenIn)
+        fiatServiceIn.setAmount(quoteState.amountIn)
+        fiatServiceOut.setToken(quoteState.tokenOut)
+        fiatServiceOut.setAmount(quoteState.quote?.amountOut)
 
         emitState()
+    }
+
+    private fun handleUpdatedQuoteExpiredState(quoteExpired: Boolean) {
+        if (quoteExpired) {
+            quoteService.reQuote()
+        }
     }
 
     private fun handleUpdatedPriceImpactState(priceImpactState: PriceImpactService.State) {
@@ -85,83 +127,38 @@ class SwapViewModel(
         emitState()
     }
 
-    fun onEnterAmount(v: BigDecimal?) {
-        quoteService.setAmount(v)
-    }
-
-    fun onSelectTokenIn(token: Token) {
-        quoteService.setTokenIn(token)
-    }
-
-    fun onSelectTokenOut(token: Token) {
-        quoteService.setTokenOut(token)
-    }
-
-    fun onSwitchPairs() {
-        quoteService.switchPairs()
-    }
-
     fun onSelectQuote(quote: SwapProviderQuote) {
         quoteService.selectQuote(quote)
     }
 
-    private fun emitState() {
-        viewModelScope.launch {
-            uiState = SwapUiState(
-                amountIn = quoteState.amountIn,
-                tokenIn = quoteState.tokenIn,
-                tokenOut = quoteState.tokenOut,
-                quoting = quoteState.quoting,
-                swapEnabled = isSwapEnabled(),
-                quotes = quoteState.quotes,
-                preferredProvider = quoteState.preferredProvider,
-                quoteLifetime = quoteState.quoteLifetime,
-                quote = quoteState.quote,
-                error = quoteState.error,
-                availableBalance = availableBalance,
-                priceImpact = priceImpactState.priceImpact,
-                priceImpactLevel = priceImpactState.priceImpactLevel,
-                priceImpactCaution = priceImpactState.priceImpactCaution
-            )
-        }
-    }
-
     private fun isSwapEnabled() = quoteState.quote != null
 
+    fun onEnterAmount(v: BigDecimal?) = quoteService.setAmount(v)
+    fun onSelectTokenIn(token: Token) = quoteService.setTokenIn(token)
+    fun onSelectTokenOut(token: Token) = quoteService.setTokenOut(token)
+    fun onSwitchPairs() = quoteService.switchPairs()
+    fun onUpdateSettings(settings: Map<String, Any?>) = quoteService.setSwapSettings(settings)
+    fun onEnterFiatAmount(v: BigDecimal?) = fiatServiceIn.setFiatAmount(v)
 
-    var saveSettingsEnabled by mutableStateOf(settingsService.saveEnabledFlow.value)
-
-    init {
-        viewModelScope.launch {
-            settingsService.saveEnabledFlow.collect {
-                saveSettingsEnabled = it
-            }
-        }
-    }
-
-    fun onSettingError(id: String, error: Throwable?) {
-        settingsService.onSettingError(id, error)
-    }
-
-    fun onSettingEnter(id: String, value: Any?) {
-        settingsService.setSetting(id, value)
-    }
-
-    fun saveSettings() {
-        settingsService.save()
-        quoteService.setSwapSettings(settingsService.getSettings())
-    }
+    fun getCurrentQuote() = quoteState.quote
+    fun getSettings() = quoteService.getSwapSettings()
 
     class Factory : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            val swapQuoteService = SwapQuoteService(SwapProvidersManager())
+            val swapQuoteService = SwapQuoteService()
             val tokenBalanceService = TokenBalanceService(App.adapterManager)
             val priceImpactService = PriceImpactService()
 
-            val swapSettingsService = SwapSettingsService()
-
-            return SwapViewModel(swapQuoteService, tokenBalanceService, swapSettingsService, priceImpactService) as T
+            return SwapViewModel(
+                swapQuoteService,
+                tokenBalanceService,
+                priceImpactService,
+                SwapQuoteExpirationService(),
+                App.currencyManager,
+                FiatService(),
+                FiatService(),
+            ) as T
         }
     }
 }
@@ -180,5 +177,9 @@ data class SwapUiState(
     val availableBalance: BigDecimal?,
     val priceImpact: BigDecimal?,
     val priceImpactLevel: SwapMainModule.PriceImpactLevel?,
-    val priceImpactCaution: HSCaution?
+    val priceImpactCaution: HSCaution?,
+    val fiatAmountIn: BigDecimal?,
+    val fiatAmountOut: BigDecimal?,
+    val currency: Currency,
+    val fiatAmountInputEnabled: Boolean
 )
