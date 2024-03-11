@@ -11,6 +11,9 @@ class SwapTransactionSettingsFragment : BaseComposeFragment() {
     override fun GetContent(navController: NavController) {
         SwapTransactionSettingsScreen(navController)
     }
+
+    override val logScreen: String
+        get() = "SwapTransactionSettingsFragment"
 }
 
 @Composable
