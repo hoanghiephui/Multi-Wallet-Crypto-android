@@ -96,7 +96,7 @@ class ChartBinanceView @JvmOverloads constructor(
         if (dataVolume != null) {
             createVolumeSeriesWithData(
                 dataVolume,
-                PriceScaleId.RIGHT,
+                PriceScaleId.LEFT,
                 binding.chart.api
             ) { series ->
                 loadRealTimeVolume(series)
@@ -256,7 +256,7 @@ class ChartBinanceView @JvmOverloads constructor(
                     precision = count,
                     minMove = 1f,
                 ),
-                priceScaleId = PriceScaleId(""),
+                priceScaleId = priceScale,
                 lastValueVisible = true,
                 priceLineVisible = true
             ),
@@ -342,10 +342,6 @@ class ChartBinanceView @JvmOverloads constructor(
                 realtimeVolumeDataJob?.cancel()
             }
         }
-    }
-
-    fun onRemove() {
-
     }
 }
 

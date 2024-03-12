@@ -277,30 +277,6 @@ private fun SettingSections(
     CellUniversalLawrenceSection(
         listOf({
             HsSettingCell(
-                R.string.Settings_Telegram,
-                R.drawable.ic_telegram_20,
-                showAlert = showAlertAboutApp,
-                onClick = {
-                    LinkHelper.openLinkInAppBrowser(context, App.appConfigProvider.appTelegramLink)
-                }
-            )
-        }, {
-            HsSettingCell(
-                R.string.Settings_Twitter,
-                R.drawable.ic_twitter_20,
-                showAlert = showAlertAboutApp,
-                onClick = {
-                    LinkHelper.openLinkInAppBrowser(context, App.appConfigProvider.appTwitterLink)
-                }
-            )
-        })
-    )
-
-    VSpacer(32.dp)
-
-    CellUniversalLawrenceSection(
-        listOf({
-            HsSettingCell(
                 R.string.SettingsAboutApp_Title,
                 R.drawable.ic_about_app_20,
                 showAlert = showAlertAboutApp,
