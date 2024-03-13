@@ -131,7 +131,13 @@ private fun CoinRankScreen(
 
                 ViewState.Success -> {
                     var periodSelect by remember { mutableStateOf(uiState.periodSelect) }
-                    val listState = rememberLazyListState()
+                    val listState = rememberSaveable(
+                        uiState.periodSelect?.selected,
+                        uiState.sortDescending,
+                        saver = LazyListState.Saver
+                    ) {
+                        LazyListState()
+                    }
                     LazyColumn(
                         state = listState,
                         modifier = Modifier.fillMaxSize(),
@@ -142,26 +148,28 @@ private fun CoinRankScreen(
                                 DescriptionCard(header.title, header.description, header.icon)
                             }
                         }
-                        if (viewItems.isEmpty()) {
-                            item {
-                                ListEmptyView(
-                                    text = stringResource(R.string.CoinPage_NoDataAvailable),
-                                    icon = R.drawable.ic_no_data
+
+                        stickyHeader {
+                            HeaderSorting {
+                                ButtonSecondaryCircle(
+                                    modifier = Modifier.padding(start = 16.dp),
+                                    icon = if (uiState.sortDescending) R.drawable.ic_sort_l2h_20 else R.drawable.ic_sort_h2l_20,
+                                    onClick = { viewModel.toggleSortType() }
                                 )
-                            }
-                        } else {
-                            stickyHeader {
-                                HeaderSorting {
-                                    ButtonSecondaryCircle(
-                                        modifier = Modifier.padding(start = 16.dp),
-                                        icon = if (uiState.sortDescending) R.drawable.ic_sort_l2h_20 else R.drawable.ic_sort_h2l_20,
-                                        onClick = { viewModel.toggleSortType() }
+                                Spacer(Modifier.weight(1f))
+                                periodSelect?.let {
+                                    ButtonSecondaryToggle(
+                                        modifier = Modifier.padding(end = 16.dp),
+                                        select = it,
+                                        onSelect = { selectedDuration ->
+                                            viewModel.toggle(selectedDuration)
+                                            periodSelect = Select(selectedDuration, it.options)
+                                        }
                                     )
-                                    Spacer(Modifier.weight(1f))
                                 }
                             }
-                            coinRankList(viewItems, navController)
                         }
+                        coinRankList(viewItems, navController)
                     }
                 }
             }
