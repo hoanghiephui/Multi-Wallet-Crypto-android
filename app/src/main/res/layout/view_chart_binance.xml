@@ -9,7 +9,7 @@
     <com.tradingview.lightweightcharts.view.ChartsView
         android:id="@+id/chart"
         android:layout_width="match_parent"
-        android:layout_height="284dp"
+        android:layout_height="300dp"
         android:background="@color/transparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="H,1:1"

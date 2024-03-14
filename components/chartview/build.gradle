@@ -2,7 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion compile_sdk_version
+    compileSdk compile_sdk_version
 
     defaultConfig {
         minSdkVersion min_sdk_version
@@ -43,5 +43,5 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:$constraint_version"
     implementation "androidx.core:core-ktx:$core_ktx_version"
 
-    implementation "androidx.compose.runtime:runtime:1.5.4"
+    implementation "androidx.compose.runtime:runtime:1.6.3"
 }

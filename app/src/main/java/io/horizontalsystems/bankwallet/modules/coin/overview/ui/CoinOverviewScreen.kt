@@ -245,22 +245,24 @@ fun CoinOverviewScreen(
                                         }
                                         HSpacer(width = 8.dp)
                                         if (chartIndicatorsState.hasActiveSubscription) {
-                                            if (chartIndicatorsState.enabled) {
-                                                ButtonSecondaryDefault(
-                                                    title = stringResource(id = R.string.Button_Hide),
-                                                    onClick = {
-                                                        viewModel.disableChartIndicators()
-                                                    }
-                                                )
-                                            } else {
-                                                ButtonSecondaryDefault(
-                                                    title = stringResource(id = R.string.Button_Show),
-                                                    onClick = {
-                                                        viewModel.enableChartIndicators()
-                                                    }
-                                                )
+                                            if (currentPage == CHART_DEFAULT) {
+                                                if (chartIndicatorsState.enabled) {
+                                                    ButtonSecondaryDefault(
+                                                        title = stringResource(id = R.string.Button_Hide),
+                                                        onClick = {
+                                                            viewModel.disableChartIndicators()
+                                                        }
+                                                    )
+                                                } else {
+                                                    ButtonSecondaryDefault(
+                                                        title = stringResource(id = R.string.Button_Show),
+                                                        onClick = {
+                                                            viewModel.enableChartIndicators()
+                                                        }
+                                                    )
+                                                }
+                                                HSpacer(width = 8.dp)
                                             }
-                                            HSpacer(width = 8.dp)
                                             ButtonSecondaryCircle(
                                                 icon = R.drawable.ic_setting_20
                                             ) {
