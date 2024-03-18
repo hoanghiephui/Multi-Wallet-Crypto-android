@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <queries>
         <package android:name="org.telegram.messenger" />
     </queries>
@@ -301,6 +302,13 @@
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
         <meta-data android:name="firebase_analytics_collection_enabled" android:value="false" />
+
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            android:process="joda"
+            tools:node="merge" />
     </application>
 
 </manifest>

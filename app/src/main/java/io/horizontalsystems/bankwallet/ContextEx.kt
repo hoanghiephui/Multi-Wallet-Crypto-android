@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import com.airbnb.lottie.LottieAnimationView
 import com.wallet.blockchain.bitcoin.R
 
@@ -21,3 +22,5 @@ fun dialogLoading(context: Context): AlertDialog {
             window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         }
 }
+
+fun Context.getColorCompat(id: Int): Int = ContextCompat.getColor(this, id)

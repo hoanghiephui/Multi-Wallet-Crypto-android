@@ -1995,4 +1995,11 @@
     <string name="low">Low</string>
     <string name="close">Close</string>
     <string name="volume">Volume</string>
+
+    <string name="sync_work_notification_title">Bitcoin Wallet</string>
+    <string name="sync_work_notification_channel_name">Sync</string>
+    <string name="sync_work_notification_channel_description">Background tasks for Bitcoin Wallet</string>
+    <string name="Notification_Title1">📈 Price alert</string>
+    <string name="Notification_PriceUp1">%s is ⬆️ %s, %s is ⬆️ %s, %s is ⬆️ %s in the last 24h️</string>
+    <string name="Notification_PriceDown1">%s is ⬇️ %s, %s is ⬇️ %s, %s is ⬇️ %s in the last 24h</string>
 </resources>

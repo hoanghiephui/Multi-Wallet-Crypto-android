@@ -17,6 +17,17 @@ object ApiServiceFactory {
             moshi = moshi,
         ).create(BinanceEndpoint::class.java)
 
+    fun createCoinBase(
+        baseUrl: String,
+        okHttpClient: OkHttpClient,
+        moshi: Moshi,
+    ): CoinBaseEndpoint =
+        setupRetrofit(
+            baseUrl = baseUrl,
+            okHttpClient = okHttpClient,
+            moshi = moshi,
+        ).create(CoinBaseEndpoint::class.java)
+
     private fun setupRetrofit(
         baseUrl: String,
         okHttpClient: OkHttpClient,

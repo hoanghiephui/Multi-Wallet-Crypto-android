@@ -1,6 +1,5 @@
 package io.horizontalsystems.bankwallet.di
 
-import android.content.Context
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.Rfc3339DateJsonAdapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -12,13 +11,13 @@ import com.wallet.blockchain.bitcoin.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import io.horizontalsystems.bankwallet.FlowStreamAdapter
 import io.horizontalsystems.bankwallet.endpoint.ApiServiceFactory
 import io.horizontalsystems.bankwallet.endpoint.BinanceEndpoint
 import io.horizontalsystems.bankwallet.endpoint.BinanceStream
+import io.horizontalsystems.bankwallet.endpoint.CoinBaseEndpoint
 import io.horizontalsystems.bankwallet.endpoint.OkHttpClientFactory
 import io.horizontalsystems.bankwallet.endpoint.StatusCodeAdapter
 import okhttp3.Interceptor
@@ -97,6 +96,18 @@ object NetworkModule {
     ): BinanceEndpoint =
         ApiServiceFactory.create(
             baseUrl = "https://www.binance.com/",
+            okHttpClient = okHttpClient,
+            moshi = moshi,
+        )
+
+    @Provides
+    @Singleton
+    fun provideCoinBaseService(
+        okHttpClient: OkHttpClient,
+        @MoshiApiService moshi: Moshi,
+    ): CoinBaseEndpoint =
+        ApiServiceFactory.createCoinBase(
+            baseUrl = "https://api.coinbase.com/",
             okHttpClient = okHttpClient,
             moshi = moshi,
         )

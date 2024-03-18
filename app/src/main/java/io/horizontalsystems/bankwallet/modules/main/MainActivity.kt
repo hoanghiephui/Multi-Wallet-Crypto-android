@@ -15,6 +15,7 @@ import io.horizontalsystems.bankwallet.modules.billing.BillingPlusViewModel
 import io.horizontalsystems.bankwallet.modules.walletconnect.AuthEvent
 import io.horizontalsystems.bankwallet.modules.walletconnect.SignEvent
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCViewModel
+import io.horizontalsystems.bankwallet.worker.Sync
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -48,6 +49,7 @@ class MainActivity : BaseActivity() {
             }
         }
         billingViewModel.onVerify(this)
+        Sync.initialize(this)
     }
 
     private fun handleWeb3WalletEvents(
