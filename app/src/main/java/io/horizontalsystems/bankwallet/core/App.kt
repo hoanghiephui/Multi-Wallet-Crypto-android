@@ -126,7 +126,6 @@ import io.horizontalsystems.core.security.KeyStoreManager
 import io.horizontalsystems.ethereumkit.core.EthereumKit
 import io.horizontalsystems.hdwalletkit.Mnemonic
 import io.reactivex.plugins.RxJavaPlugins
-import net.danlew.android.joda.JodaTimeInitializer
 import timber.log.Timber
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -226,7 +225,6 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         }
         initApplovin()
         EthereumKit.init()
-        AppInitializer.getInstance(this).initializeComponent(JodaTimeInitializer::class.java)
         instance = this
         preferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         mUserDataRepository = this.userDataRepository
