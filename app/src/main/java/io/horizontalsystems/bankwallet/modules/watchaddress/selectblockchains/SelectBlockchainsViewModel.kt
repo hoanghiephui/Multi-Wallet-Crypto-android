@@ -1,7 +1,7 @@
 package io.horizontalsystems.bankwallet.modules.watchaddress.selectblockchains
 
-import io.horizontalsystems.bankwallet.R
-import com.wallet.blockchain.bitcoin.core.ViewModelUiState
+import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.ViewModelUiState
 import io.horizontalsystems.bankwallet.core.badge
 import io.horizontalsystems.bankwallet.core.description
 import io.horizontalsystems.bankwallet.core.imageUrl

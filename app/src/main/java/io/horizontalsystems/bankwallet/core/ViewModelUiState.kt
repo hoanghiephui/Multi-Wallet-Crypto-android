@@ -1,11 +1,10 @@
 package io.horizontalsystems.bankwallet.core
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
-abstract class ViewModelUiState<T> : ViewModel() {
+abstract class ViewModelUiState<T> : BaseViewModel() {
 
     private val _uiState by lazy {
         mutableStateOf(createState())

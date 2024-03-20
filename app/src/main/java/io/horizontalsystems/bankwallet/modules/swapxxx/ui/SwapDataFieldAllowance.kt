@@ -2,7 +2,7 @@ package io.horizontalsystems.bankwallet.modules.swapxxx.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.entities.CoinValue
 import io.horizontalsystems.bankwallet.modules.swapxxx.QuoteInfoRow
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey

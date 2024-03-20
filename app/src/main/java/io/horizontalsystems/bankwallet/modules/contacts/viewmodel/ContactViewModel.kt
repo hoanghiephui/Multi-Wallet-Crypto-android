@@ -1,7 +1,7 @@
 package io.horizontalsystems.bankwallet.modules.contacts.viewmodel
 
-import io.horizontalsystems.bankwallet.R
-import com.wallet.blockchain.bitcoin.core.ViewModelUiState
+import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.ViewModelUiState
 import io.horizontalsystems.bankwallet.core.order
 import io.horizontalsystems.bankwallet.modules.contacts.ContactsModule.ContactValidationException
 import io.horizontalsystems.bankwallet.modules.contacts.ContactsRepository
