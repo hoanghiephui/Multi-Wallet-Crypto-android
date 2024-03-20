@@ -5,12 +5,18 @@ import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.convertedError
 import io.horizontalsystems.bankwallet.modules.swap.scaleUp
 import io.horizontalsystems.bankwallet.modules.swapxxx.EvmBlockchainHelper
+import io.horizontalsystems.bankwallet.modules.swapxxx.ISwapFinalQuote
 import io.horizontalsystems.bankwallet.modules.swapxxx.ISwapQuote
+import io.horizontalsystems.bankwallet.modules.swapxxx.SwapFinalQuoteOneInch
 import io.horizontalsystems.bankwallet.modules.swapxxx.SwapQuoteOneInch
+import io.horizontalsystems.bankwallet.modules.swapxxx.sendtransaction.SendTransactionData
+import io.horizontalsystems.bankwallet.modules.swapxxx.sendtransaction.SendTransactionSettings
 import io.horizontalsystems.bankwallet.modules.swapxxx.settings.SwapSettingRecipient
 import io.horizontalsystems.bankwallet.modules.swapxxx.settings.SwapSettingSlippage
+import io.horizontalsystems.bankwallet.modules.swapxxx.ui.SwapDataFieldAllowance
 import io.horizontalsystems.bankwallet.modules.swapxxx.ui.SwapDataFieldSlippage
 import io.horizontalsystems.ethereumkit.models.Address
+import io.horizontalsystems.ethereumkit.models.TransactionData
 import io.horizontalsystems.marketkit.models.BlockchainType
 import io.horizontalsystems.marketkit.models.Token
 import io.horizontalsystems.marketkit.models.TokenType
@@ -19,7 +25,7 @@ import io.reactivex.Single
 import kotlinx.coroutines.rx2.await
 import java.math.BigDecimal
 
-object OneInchProvider : ISwapXxxProvider {
+object OneInchProvider : EvmSwapProvider() {
     override val id = "oneinch"
     override val title = "1inch"
     override val url = "https://app.1inch.io/"
@@ -64,10 +70,13 @@ object OneInchProvider : ISwapXxxProvider {
             Single.error(it.convertedError)
         }.await()
 
-        val amountOut = quote.toTokenAmount.abs().toBigDecimal().movePointLeft(quote.toToken.decimals).stripTrailingZeros()
+        val amountOut = quote.toTokenAmount.toBigDecimal().movePointLeft(quote.toToken.decimals).stripTrailingZeros()
         val fields = buildList {
             settingSlippage.value?.let {
                 add(SwapDataFieldSlippage(it))
+            }
+            getAllowance(tokenIn, OneInchKit.routerAddress(evmBlockchainHelper.chain))?.let {
+                add(SwapDataFieldAllowance(it, tokenIn))
             }
         }
 
@@ -86,5 +95,52 @@ object OneInchProvider : ISwapXxxProvider {
         TokenType.Native -> evmCoinAddress
         is TokenType.Eip20 -> Address(tokenType.address)
         else -> throw IllegalStateException("Unsupported tokenType: $tokenType")
+    }
+
+    override suspend fun fetchFinalQuote(
+        tokenIn: Token,
+        tokenOut: Token,
+        amountIn: BigDecimal,
+        swapSettings: Map<String, Any?>,
+        sendTransactionSettings: SendTransactionSettings?,
+    ): ISwapFinalQuote {
+        check(sendTransactionSettings is SendTransactionSettings.Evm)
+        checkNotNull(sendTransactionSettings.gasPriceInfo)
+
+        val blockchainType = tokenIn.blockchainType
+        val evmBlockchainHelper = EvmBlockchainHelper(blockchainType)
+
+        val gasPrice = sendTransactionSettings.gasPriceInfo.gasPrice
+
+        val evmKitWrapper = evmBlockchainHelper.evmKitWrapper ?: throw NullPointerException()
+
+        val settingRecipient = SwapSettingRecipient(swapSettings, blockchainType)
+        val settingSlippage = SwapSettingSlippage(swapSettings, BigDecimal("1"))
+        val slippage = settingSlippage.valueOrDefault()
+
+        val swap = oneInchKit.getSwapAsync(
+            chain = evmBlockchainHelper.chain,
+            receiveAddress = evmKitWrapper.evmKit.receiveAddress,
+            fromToken = getTokenAddress(tokenIn),
+            toToken = getTokenAddress(tokenOut),
+            amount = amountIn.scaleUp(tokenIn.decimals),
+            slippagePercentage = slippage.toFloat(),
+            recipient = settingRecipient.value?.hex?.let { Address(it) },
+            gasPrice = gasPrice
+        ).await()
+
+        val swapTx = swap.transaction
+
+        val amountOut = swap.toTokenAmount.toBigDecimal().movePointLeft(swap.toToken.decimals).stripTrailingZeros()
+        val amountOutMin = amountOut - amountOut / BigDecimal(100) * slippage
+
+        return SwapFinalQuoteOneInch(
+            tokenIn,
+            tokenOut,
+            amountIn,
+            amountOut,
+            amountOutMin,
+            SendTransactionData.Evm(TransactionData(swapTx.to, swapTx.value, swapTx.data), swapTx.gasLimit)
+        )
     }
 }

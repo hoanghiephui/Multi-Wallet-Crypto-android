@@ -2,13 +2,13 @@ package io.horizontalsystems.bankwallet.modules.swapxxx
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -28,21 +28,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.badge
 import io.horizontalsystems.bankwallet.core.iconPlaceholder
 import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.core.slideFromBottom
@@ -52,29 +59,32 @@ import io.horizontalsystems.bankwallet.entities.CoinValue
 import io.horizontalsystems.bankwallet.entities.Currency
 import io.horizontalsystems.bankwallet.modules.swap.SwapMainModule
 import io.horizontalsystems.bankwallet.modules.swap.getPriceImpactColor
+import io.horizontalsystems.bankwallet.modules.swap.ui.SuggestionsBar
 import io.horizontalsystems.bankwallet.modules.swapxxx.providers.ISwapXxxProvider
 import io.horizontalsystems.bankwallet.ui.compose.ColoredTextStyle
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
-import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
+import io.horizontalsystems.bankwallet.ui.compose.Keyboard
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellowWithSpinner
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryCircle
+import io.horizontalsystems.bankwallet.ui.compose.components.CardsSwapInfo
 import io.horizontalsystems.bankwallet.ui.compose.components.CoinImage
 import io.horizontalsystems.bankwallet.ui.compose.components.HFillSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.HSRow
 import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
-import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.cell.CellUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.headline1_grey
+import io.horizontalsystems.bankwallet.ui.compose.components.headline1_leah
+import io.horizontalsystems.bankwallet.ui.compose.components.micro_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_jacob
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_leah
-import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_lucian
+import io.horizontalsystems.bankwallet.ui.compose.observeKeyboardState
 import io.horizontalsystems.marketkit.models.Token
 import java.math.BigDecimal
 
@@ -116,15 +126,13 @@ fun SwapScreen(navController: NavController) {
         },
         onSwitchPairs = viewModel::onSwitchPairs,
         onEnterAmount = viewModel::onEnterAmount,
+        onEnterAmountPercentage = viewModel::onEnterAmountPercentage,
         onEnterFiatAmount = viewModel::onEnterFiatAmount,
         onClickProvider = {
             navController.slideFromBottom(R.id.swapSelectProvider)
         },
         onClickProviderSettings = {
             navController.slideFromRight(R.id.swapSettings)
-        },
-        onClickTransactionSettings = {
-            navController.slideFromRight(R.id.swapTransactionSettings)
         },
         onClickNext = {
             navController.slideFromRight(R.id.swapConfirm)
@@ -142,135 +150,172 @@ private fun SwapScreenInner(
     onSwitchPairs: () -> Unit,
     onEnterAmount: (BigDecimal?) -> Unit,
     onEnterFiatAmount: (BigDecimal?) -> Unit,
+    onEnterAmountPercentage: (Int) -> Unit,
     onClickProvider: () -> Unit,
-    onClickTransactionSettings: () -> Unit,
     onClickProviderSettings: () -> Unit,
     onClickNext: () -> Unit,
 ) {
+    val quote = uiState.quote
+
     Scaffold(
         topBar = {
             AppBar(
                 title = stringResource(R.string.Swap),
                 navigationIcon = {
                     HsBackButton(onClick = onClickClose)
-                },
-                menuItems = listOf(
-                    MenuItem(
-                        title = TranslatableString.ResString(R.string.Settings_Title),
-                        icon = R.drawable.ic_manage_2_24,
-                        onClick = onClickTransactionSettings
-                    )
-                ),
+                }
             )
         },
         containerColor = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.background,
     ) {
-        Column(
-            modifier = Modifier
-                .padding(it)
-                .verticalScroll(rememberScrollState())
-        ) {
-            VSpacer(height = 12.dp)
-            SwapInput(
-                amountIn = uiState.amountIn,
-                fiatAmountIn = uiState.fiatAmountIn,
-                fiatAmountInputEnabled = uiState.fiatAmountInputEnabled,
-                onSwitchPairs = onSwitchPairs,
-                amountOut = uiState.quote?.amountOut,
-                fiatAmountOut = uiState.fiatAmountOut,
-                onValueChange = onEnterAmount,
-                onFiatValueChange = onEnterFiatAmount,
-                onClickCoinFrom = onClickCoinFrom,
-                onClickCoinTo = onClickCoinTo,
-                tokenIn = uiState.tokenIn,
-                tokenOut = uiState.tokenOut,
-                currency = uiState.currency,
-            )
+        val focusManager = LocalFocusManager.current
+        val keyboardState by observeKeyboardState()
+        var showSuggestions by remember { mutableStateOf(false) }
 
-            VSpacer(height = 12.dp)
-
-            if (uiState.quoting) {
-                ButtonPrimaryYellowWithSpinner(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth(),
-                    title = stringResource(R.string.Alert_Loading),
-                    enabled = false,
-                    onClick = { /*TODO*/ }
-                )
-            } else {
-                ButtonPrimaryYellow(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth(),
-                    title = stringResource(R.string.Swap_Proceed),
-                    enabled = uiState.swapEnabled,
-                    onClick = onClickNext
-                )
-            }
-
-            VSpacer(height = 12.dp)
-
-            uiState.error?.let { error ->
+        Box(modifier = Modifier
+            .padding(it)
+            .fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .padding(it)
+                    .verticalScroll(rememberScrollState())
+            ) {
                 VSpacer(height = 12.dp)
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .border(1.dp, ComposeAppTheme.colors.steel20, RoundedCornerShape(12.dp)),
-                ) {
-                    QuoteInfoRow(
-                        title = {
-                            val errorText = if (error is SwapRouteNotFound) {
-                                stringResource(id = R.string.Swap_SwapRouteNotFound)
-                            } else {
-                                error.javaClass.simpleName
-                            }
-                            subhead2_lucian(text = errorText)
-                        },
-                        value = {
+                SwapInput(
+                    amountIn = uiState.amountIn,
+                    fiatAmountIn = uiState.fiatAmountIn,
+                    fiatAmountInputEnabled = uiState.fiatAmountInputEnabled,
+                    onSwitchPairs = onSwitchPairs,
+                    amountOut = quote?.amountOut,
+                    fiatAmountOut = uiState.fiatAmountOut,
+                    fiatPriceImpact = uiState.fiatPriceImpact,
+                    fiatPriceImpactLevel = uiState.fiatPriceImpactLevel,
+                    onValueChange = onEnterAmount,
+                    onFiatValueChange = onEnterFiatAmount,
+                    onClickCoinFrom = onClickCoinFrom,
+                    onClickCoinTo = onClickCoinTo,
+                    tokenIn = uiState.tokenIn,
+                    tokenOut = uiState.tokenOut,
+                    currency = uiState.currency,
+                    onFocusChanged = {
+                        showSuggestions = it.hasFocus
+                    },
+                )
+
+                VSpacer(height = 12.dp)
+
+                when (val currentStep = uiState.currentStep) {
+                    is SwapStep.InputRequired -> {
+                        val title = when (currentStep.inputType) {
+                            InputType.TokenIn -> stringResource(R.string.Swap_SelectTokenIn)
+                            InputType.TokenOut -> stringResource(R.string.Swap_SelectTokenOut)
+                            InputType.Amount -> stringResource(R.string.Swap_EnterAmount)
                         }
-                    )
-                }
-            }
 
-            uiState.quote?.let { quote ->
-                VSpacer(height = 12.dp)
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .border(1.dp, ComposeAppTheme.colors.steel20, RoundedCornerShape(12.dp))
-                        .padding(vertical = 2.dp),
-                ) {
-                    ProviderField(quote.provider, onClickProvider, onClickProviderSettings)
-                    AvailableBalanceField(uiState.tokenIn, uiState.availableBalance)
-                    PriceField(quote.tokenIn, quote.tokenOut, quote.amountIn, quote.amountOut)
-                    quote.fields.forEach {
-                        it.GetContent()
+                        ButtonPrimaryYellow(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .fillMaxWidth(),
+                            title = title,
+                            enabled = false,
+                            onClick = onClickNext
+                        )
                     }
-                    PriceImpactField(uiState.priceImpact, uiState.priceImpactLevel)
+
+                    SwapStep.Quoting -> {
+                        ButtonPrimaryYellowWithSpinner(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .fillMaxWidth(),
+                            title = stringResource(R.string.Alert_Loading),
+                            enabled = false,
+                            onClick = { /*TODO*/ }
+                        )
+                    }
+
+                    is SwapStep.Error -> {
+                        val errorText = when (val error = currentStep.error) {
+                            SwapMainModule.SwapError.InsufficientBalanceFrom -> stringResource(id = R.string.Swap_ErrorInsufficientBalance)
+                            is NoSupportedSwapProvider -> stringResource(id = R.string.Swap_ErrorNoProviders)
+                            is SwapRouteNotFound -> stringResource(id = R.string.Swap_ErrorNoQuote)
+                            else -> error.message ?: error.javaClass.simpleName
+                        }
+
+                        ButtonPrimaryYellow(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .fillMaxWidth(),
+                            title = errorText,
+                            enabled = false,
+                            onClick = onClickNext
+                        )
+                    }
+
+                    SwapStep.Proceed -> {
+                        ButtonPrimaryYellow(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .fillMaxWidth(),
+                            title = stringResource(R.string.Swap_Proceed),
+                            onClick = onClickNext
+                        )
+                    }
                 }
+
+                VSpacer(height = 12.dp)
+                if (quote != null) {
+                    CardsSwapInfo {
+                        ProviderField(quote.provider, onClickProvider, onClickProviderSettings)
+                        PriceField(quote.tokenIn, quote.tokenOut, quote.amountIn, quote.amountOut)
+                        quote.fields.forEach {
+                            it.GetContent()
+                        }
+                        PriceImpactField(uiState.priceImpact, uiState.priceImpactLevel)
+                    }
+                } else {
+                    CardsSwapInfo {
+                        AvailableBalanceField(uiState.tokenIn, uiState.availableBalance)
+                    }
+                }
+
+                VSpacer(height = 32.dp)
             }
 
-            VSpacer(height = 32.dp)
+
+            if (
+                uiState.availableBalance != null &&
+                uiState.availableBalance > BigDecimal.ZERO &&
+                showSuggestions &&
+                keyboardState == Keyboard.Opened
+            ) {
+                SuggestionsBar(
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                ) {
+                    focusManager.clearFocus()
+                    onEnterAmountPercentage.invoke(it)
+                }
+            }
         }
     }
 }
 
 @Composable
 private fun AvailableBalanceField(tokenIn: Token?, availableBalance: BigDecimal?) {
-    if (tokenIn != null && availableBalance != null) {
-        QuoteInfoRow(
-            title = {
-                subhead2_grey(text = stringResource(R.string.Swap_AvailableBalance))
-            },
-            value = {
-                subhead2_leah(text = CoinValue(tokenIn, availableBalance).getFormattedFull())
+    QuoteInfoRow(
+        title = {
+            subhead2_grey(text = stringResource(R.string.Swap_AvailableBalance))
+        },
+        value = {
+            val text = if (tokenIn != null && availableBalance != null) {
+                CoinValue(tokenIn, availableBalance).getFormattedFull()
+            } else {
+                "-"
             }
-        )
-    }
+
+            subhead2_leah(text = text)
+        }
+    )
 }
 
 @Composable
@@ -307,7 +352,7 @@ private fun PriceImpactField(
         },
         value = {
             Text(
-                text = stringResource(R.string.Swap_Percent, priceImpact * BigDecimal.valueOf(-1)),
+                text = stringResource(R.string.Swap_Percent, (priceImpact * BigDecimal.valueOf(-1)).toPlainString()),
                 style = ComposeAppTheme.typography.subhead2,
                 color = getPriceImpactColor(priceImpactLevel),
                 maxLines = 1,
@@ -356,7 +401,7 @@ private fun ProviderField(
 }
 
 @Composable
-private fun PriceField(tokenIn: Token, tokenOut: Token, amountIn: BigDecimal, amountOut: BigDecimal) {
+fun PriceField(tokenIn: Token, tokenOut: Token, amountIn: BigDecimal, amountOut: BigDecimal) {
     var showRegularPrice by remember { mutableStateOf(true) }
     val swapPriceUIHelper = SwapPriceUIHelper(tokenIn, tokenOut, amountIn, amountOut)
 
@@ -406,6 +451,8 @@ private fun SwapInput(
     onSwitchPairs: () -> Unit,
     amountOut: BigDecimal?,
     fiatAmountOut: BigDecimal?,
+    fiatPriceImpact: BigDecimal?,
+    fiatPriceImpactLevel: SwapMainModule.PriceImpactLevel?,
     onValueChange: (BigDecimal?) -> Unit,
     onFiatValueChange: (BigDecimal?) -> Unit,
     onClickCoinFrom: () -> Unit,
@@ -413,6 +460,7 @@ private fun SwapInput(
     tokenIn: Token?,
     tokenOut: Token?,
     currency: Currency,
+    onFocusChanged: (FocusState) -> Unit,
 ) {
     Box {
         Column(
@@ -423,25 +471,23 @@ private fun SwapInput(
                 .background(ComposeAppTheme.colors.lawrence)
                 .padding()
         ) {
-            SwapCoinInput(
+            SwapCoinInputIn(
                 coinAmount = amountIn,
                 fiatAmount = fiatAmountIn,
                 currency = currency,
                 onValueChange = onValueChange,
                 onFiatValueChange = onFiatValueChange,
-                enabled = true,
                 fiatAmountInputEnabled = fiatAmountInputEnabled,
                 token = tokenIn,
-                onClickCoin = onClickCoinFrom
+                onClickCoin = onClickCoinFrom,
+                onFocusChanged = onFocusChanged
             )
-            SwapCoinInput(
+            SwapCoinInputTo(
                 coinAmount = amountOut,
                 fiatAmount = fiatAmountOut,
+                fiatPriceImpact = fiatPriceImpact,
+                fiatPriceImpactLevel = fiatPriceImpactLevel,
                 currency = currency,
-                onValueChange = { },
-                onFiatValueChange = {},
-                enabled = false,
-                fiatAmountInputEnabled = false,
                 token = tokenOut,
                 onClickCoin = onClickCoinTo
             )
@@ -460,14 +506,48 @@ private fun SwapInput(
 }
 
 @Composable
-private fun SwapCoinInput(
+private fun SwapCoinInputIn(
     coinAmount: BigDecimal?,
     fiatAmount: BigDecimal?,
     currency: Currency,
     onValueChange: (BigDecimal?) -> Unit,
     onFiatValueChange: (BigDecimal?) -> Unit,
-    enabled: Boolean,
     fiatAmountInputEnabled: Boolean,
+    token: Token?,
+    onClickCoin: () -> Unit,
+    onFocusChanged: (FocusState) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .onFocusChanged(onFocusChanged)
+            .padding(horizontal = 16.dp, vertical = 20.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            AmountInput(
+                value = coinAmount,
+                onValueChange = onValueChange
+            )
+            VSpacer(height = 3.dp)
+            FiatAmountInput(
+                value = fiatAmount,
+                currency = currency,
+                onValueChange = onFiatValueChange,
+                enabled = fiatAmountInputEnabled
+            )
+        }
+        HSpacer(width = 8.dp)
+        CoinSelector(token, onClickCoin)
+    }
+}
+
+@Composable
+private fun SwapCoinInputTo(
+    coinAmount: BigDecimal?,
+    fiatAmount: BigDecimal?,
+    fiatPriceImpact: BigDecimal?,
+    fiatPriceImpactLevel: SwapMainModule.PriceImpactLevel?,
+    currency: Currency,
     token: Token?,
     onClickCoin: () -> Unit,
 ) {
@@ -477,29 +557,65 @@ private fun SwapCoinInput(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            AmountInput(coinAmount, onValueChange, enabled)
+            if (coinAmount == null) {
+                headline1_grey(text = "0")
+            } else {
+                headline1_leah(
+                    text = coinAmount.toPlainString(),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
             VSpacer(height = 3.dp)
-            FiatAmountInput(fiatAmount, currency, onFiatValueChange, fiatAmountInputEnabled)
+            if (fiatAmount == null) {
+                body_grey(text = "${currency.symbol}0")
+            } else {
+                Row {
+                    body_grey(text = "${currency.symbol}${fiatAmount.toPlainString()}")
+                    fiatPriceImpact?.let { diff ->
+                        HSpacer(width = 4.dp)
+                        Text(
+                            text = stringResource(R.string.Swap_FiatPriceImpact, diff.toPlainString()),
+                            style = ComposeAppTheme.typography.body,
+                            color = getPriceImpactColor(fiatPriceImpactLevel),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+            }
         }
         HSpacer(width = 8.dp)
-        Selector(
-            icon = {
-                CoinImage(
-                    iconUrl = token?.coin?.imageUrl,
-                    placeholder = token?.iconPlaceholder,
-                    modifier = Modifier.size(32.dp)
-                )
-            },
-            text = {
-                if (token != null) {
-                    subhead1_leah(text = token.coin.code)
-                } else {
-                    subhead1_jacob(text = stringResource(R.string.Swap_TokenSelectorTitle))
-                }
-            },
-            onClickSelect = onClickCoin
-        )
+        CoinSelector(token, onClickCoin)
     }
+}
+
+@Composable
+private fun CoinSelector(
+    token: Token?,
+    onClickCoin: () -> Unit,
+) {
+    Selector(
+        icon = {
+            CoinImage(
+                iconUrl = token?.coin?.imageUrl,
+                placeholder = token?.iconPlaceholder,
+                modifier = Modifier.size(32.dp)
+            )
+        },
+        text = {
+            if (token != null) {
+                Column {
+                    subhead1_leah(text = token.coin.code)
+                    VSpacer(height = 1.dp)
+                    micro_grey(text = token.badge ?: stringResource(id = R.string.CoinPlatforms_Native))
+                }
+            } else {
+                subhead1_jacob(text = stringResource(R.string.Swap_TokenSelectorTitle))
+            }
+        },
+        onClickSelect = onClickCoin
+    )
 }
 
 @Composable
@@ -579,28 +695,51 @@ private fun Selector(
 private fun AmountInput(
     value: BigDecimal?,
     onValueChange: (BigDecimal?) -> Unit,
-    enabled: Boolean,
 ) {
-    var text by remember(value) {
-        mutableStateOf(value?.toPlainString() ?: "")
+    var textFieldValue by rememberSaveable(value, stateSaver = TextFieldValue.Saver) {
+        val valueStr = value?.toPlainString()
+        val cursorPosition = valueStr?.length ?: 0
+
+        mutableStateOf(
+            TextFieldValue(
+                text = valueStr ?: "",
+                selection = TextRange(cursorPosition)
+            )
+        )
     }
+
+    var setCursorToEnd by remember {
+        mutableStateOf(false)
+    }
+
     BasicTextField(
-        modifier = Modifier.fillMaxWidth(),
-        value = text,
-        onValueChange = {
+        modifier = Modifier
+            .fillMaxWidth()
+            .onFocusChanged {
+                setCursorToEnd = it.isFocused
+            },
+        value = textFieldValue,
+        onValueChange = { newValue ->
             try {
-                val amount = if (it.isBlank()) {
+                val text = newValue.text
+                val amount = if (text.isBlank()) {
                     null
                 } else {
-                    it.toBigDecimal()
+                    text.toBigDecimal()
                 }
-                text = it
+
+                textFieldValue = if (setCursorToEnd) {
+                    setCursorToEnd = false
+                    newValue.copy(selection = TextRange(text.length))
+                } else {
+                    newValue
+                }
+
                 onValueChange.invoke(amount)
             } catch (e: Exception) {
 
             }
         },
-        enabled = enabled,
         textStyle = ColoredTextStyle(
             color = ComposeAppTheme.colors.leah, textStyle = ComposeAppTheme.typography.headline1
         ),
@@ -610,7 +749,7 @@ private fun AmountInput(
         ),
         cursorBrush = SolidColor(ComposeAppTheme.colors.jacob),
         decorationBox = { innerTextField ->
-            if (text.isEmpty()) {
+            if (textFieldValue.text.isEmpty()) {
                 headline1_grey(text = "0")
             }
             innerTextField()

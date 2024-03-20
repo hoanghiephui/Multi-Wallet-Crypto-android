@@ -1,14 +1,11 @@
 package io.horizontalsystems.bankwallet.modules.depositcex
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
-import io.horizontalsystems.bankwallet.core.BaseViewModel
+import io.horizontalsystems.bankwallet.core.ViewModelUiState
 import io.horizontalsystems.bankwallet.core.providers.CexAsset
 import io.horizontalsystems.bankwallet.core.providers.CexDepositNetwork
 import io.horizontalsystems.bankwallet.core.providers.CexProviderManager
@@ -23,7 +20,7 @@ class DepositAddressViewModel(
     private val cexAsset: CexAsset,
     private val network: CexDepositNetwork?,
     cexProviderManager: CexProviderManager
-) : BaseViewModel() {
+) : ViewModelUiState<ReceiveModule.UiState>() {
     private val cexProvider = cexProviderManager.cexProviderFlow.value
 
     private var viewState: ViewState = ViewState.Loading
@@ -34,24 +31,22 @@ class DepositAddressViewModel(
     private val networkName = network?.name ?: cexAsset.depositNetworks.firstOrNull()?.name ?: ""
     private val watchAccount = false
 
-    var uiState by mutableStateOf(
-        ReceiveModule.UiState(
-            viewState = viewState,
-            address = address,
-            usedAddresses = listOf(),
-            usedChangeAddresses = listOf(),
-            uri = uri,
-            networkName = networkName,
-            watchAccount = watchAccount,
-            additionalItems = getAdditionalData(),
-            amount = amount,
-            alertText = getAlertText(memo != null)
-        )
-    )
-
     init {
         setInitialData()
     }
+
+    override fun createState() = ReceiveModule.UiState(
+        viewState = viewState,
+        address = address,
+        usedAddresses = listOf(),
+        usedChangeAddresses = listOf(),
+        uri = uri,
+        networkName = networkName,
+        watchAccount = watchAccount,
+        additionalItems = getAdditionalData(),
+        amount = amount,
+        alertText = getAlertText(memo != null)
+    )
 
     private fun setInitialData() {
         viewState = ViewState.Loading
@@ -75,21 +70,6 @@ class DepositAddressViewModel(
             }
             emitState()
         }
-    }
-
-    private fun emitState() {
-        uiState = ReceiveModule.UiState(
-            viewState = viewState,
-            address = address,
-            usedAddresses = listOf(),
-            usedChangeAddresses = listOf(),
-            uri = uri,
-            networkName = networkName,
-            watchAccount = watchAccount,
-            additionalItems = getAdditionalData(),
-            amount = amount,
-            alertText = getAlertText(memo != null)
-        )
     }
 
     private fun getAdditionalData(): List<ReceiveModule.AdditionalData> {

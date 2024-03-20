@@ -3,15 +3,14 @@ package io.horizontalsystems.bankwallet.modules.send.tron
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.AppLogger
-import io.horizontalsystems.bankwallet.core.BaseViewModel
 import io.horizontalsystems.bankwallet.core.HSCaution
 import io.horizontalsystems.bankwallet.core.ISendTronAdapter
 import io.horizontalsystems.bankwallet.core.LocalizedException
+import io.horizontalsystems.bankwallet.core.ViewModelUiState
 import io.horizontalsystems.bankwallet.core.managers.ConnectivityManager
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.entities.Address
@@ -43,7 +42,7 @@ class SendTronViewModel(
     private val contactsRepo: ContactsRepository,
     private val showAddressInput: Boolean,
     private val connectivityManager: ConnectivityManager,
-) : BaseViewModel() {
+) : ViewModelUiState<SendUiState>() {
     val logger: AppLogger = AppLogger("send-tron")
 
     val blockchainType = wallet.token.blockchainType
@@ -54,20 +53,6 @@ class SendTronViewModel(
     private var addressState = addressService.stateFlow.value
     private var feeState: FeeState = FeeState.Loading
     private var cautions: List<HSCaution> = listOf()
-
-    var uiState by mutableStateOf(
-        SendUiState(
-            availableBalance = amountState.availableBalance,
-            amountCaution = amountState.amountCaution,
-            addressError = addressState.addressError,
-            proceedEnabled = amountState.canBeSend && addressState.canBeSend,
-            sendEnabled = feeState is FeeState.Success,
-            feeViewState = feeState.viewState,
-            cautions = listOf(),
-            showAddressInput = showAddressInput,
-        )
-    )
-        private set
 
     var coinRate by mutableStateOf(xRateService.getRate(sendToken.coin.uid))
         private set
@@ -100,6 +85,17 @@ class SendTronViewModel(
             }
         }
     }
+
+    override fun createState() = SendUiState(
+        availableBalance = amountState.availableBalance,
+        amountCaution = amountState.amountCaution,
+        addressError = addressState.addressError,
+        proceedEnabled = amountState.canBeSend && addressState.canBeSend,
+        sendEnabled = feeState is FeeState.Success && cautions.isEmpty(),
+        feeViewState = feeState.viewState,
+        cautions = cautions,
+        showAddressInput = showAddressInput,
+    )
 
     fun onEnterAmount(amount: BigDecimal?) {
         amountService.setAmount(amount)
@@ -276,19 +272,6 @@ class SendTronViewModel(
         this.addressState = addressState
 
         emitState()
-    }
-
-    private fun emitState() {
-        uiState = SendUiState(
-            availableBalance = amountState.availableBalance,
-            amountCaution = amountState.amountCaution,
-            addressError = addressState.addressError,
-            proceedEnabled = amountState.canBeSend && addressState.canBeSend,
-            sendEnabled = feeState is FeeState.Success && cautions.isEmpty(),
-            feeViewState = feeState.viewState,
-            cautions = cautions,
-            showAddressInput = showAddressInput,
-        )
     }
 }
 

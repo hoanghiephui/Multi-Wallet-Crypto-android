@@ -1,14 +1,11 @@
 package io.horizontalsystems.bankwallet.modules.settings.security.passcode
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
 import io.horizontalsystems.bankwallet.core.ILocalStorage
+import io.horizontalsystems.bankwallet.core.ViewModelUiState
 import io.horizontalsystems.bankwallet.core.managers.BalanceHiddenManager
 import io.horizontalsystems.core.IPinComponent
 import io.horizontalsystems.core.ISystemInfoManager
@@ -20,7 +17,7 @@ class SecuritySettingsViewModel(
     private val pinComponent: IPinComponent,
     private val balanceHiddenManager: BalanceHiddenManager,
     private val localStorage: ILocalStorage
-) : ViewModel() {
+) : ViewModelUiState<SecuritySettingsUiState>() {
     val biometricSettingsVisible = systemInfoManager.biometricAuthSupported
 
     private var pinEnabled = pinComponent.isPinSet
@@ -28,19 +25,6 @@ class SecuritySettingsViewModel(
     private var balanceAutoHideEnabled = balanceHiddenManager.balanceAutoHidden
     private var analyticLog = localStorage.isAnalytic
     private var detectCrash = localStorage.isDetectCrash
-
-    var uiState by mutableStateOf(
-        SecuritySettingsUiState(
-            pinEnabled = pinEnabled,
-            biometricsEnabled = pinComponent.isBiometricAuthEnabled,
-            duressPinEnabled = duressPinEnabled,
-            balanceAutoHideEnabled = balanceAutoHideEnabled,
-            autoLockIntervalName = localStorage.autoLockInterval.title,
-            analyticLog = analyticLog,
-            detectCrash = detectCrash
-        )
-    )
-        private set
 
     init {
         viewModelScope.launch {
@@ -52,19 +36,15 @@ class SecuritySettingsViewModel(
         }
     }
 
-    private fun emitState() {
-        viewModelScope.launch {
-            uiState = SecuritySettingsUiState(
-                pinEnabled = pinEnabled,
-                biometricsEnabled = pinComponent.isBiometricAuthEnabled,
-                duressPinEnabled = duressPinEnabled,
-                balanceAutoHideEnabled = balanceAutoHideEnabled,
-                autoLockIntervalName = localStorage.autoLockInterval.title,
-                analyticLog = analyticLog,
-                detectCrash = detectCrash
-            )
-        }
-    }
+    override fun createState() = SecuritySettingsUiState(
+        pinEnabled = pinEnabled,
+        biometricsEnabled = pinComponent.isBiometricAuthEnabled,
+        duressPinEnabled = duressPinEnabled,
+        balanceAutoHideEnabled = balanceAutoHideEnabled,
+        autoLockIntervalName = localStorage.autoLockInterval.title,
+        analyticLog = analyticLog,
+        detectCrash = detectCrash
+    )
 
     fun enableBiometrics() {
         pinComponent.isBiometricAuthEnabled = true

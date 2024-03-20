@@ -1,11 +1,16 @@
 package io.horizontalsystems.bankwallet.modules.swapxxx.providers
 
 import io.horizontalsystems.bankwallet.modules.swapxxx.EvmBlockchainHelper
+import io.horizontalsystems.bankwallet.modules.swapxxx.ISwapFinalQuote
 import io.horizontalsystems.bankwallet.modules.swapxxx.ISwapQuote
+import io.horizontalsystems.bankwallet.modules.swapxxx.SwapFinalQuoteUniswapV3
 import io.horizontalsystems.bankwallet.modules.swapxxx.SwapQuoteUniswapV3
+import io.horizontalsystems.bankwallet.modules.swapxxx.sendtransaction.SendTransactionData
+import io.horizontalsystems.bankwallet.modules.swapxxx.sendtransaction.SendTransactionSettings
 import io.horizontalsystems.bankwallet.modules.swapxxx.settings.SwapSettingDeadline
 import io.horizontalsystems.bankwallet.modules.swapxxx.settings.SwapSettingRecipient
 import io.horizontalsystems.bankwallet.modules.swapxxx.settings.SwapSettingSlippage
+import io.horizontalsystems.bankwallet.modules.swapxxx.ui.SwapDataFieldAllowance
 import io.horizontalsystems.bankwallet.modules.swapxxx.ui.SwapDataFieldSlippage
 import io.horizontalsystems.ethereumkit.models.Chain
 import io.horizontalsystems.marketkit.models.BlockchainType
@@ -16,27 +21,8 @@ import io.horizontalsystems.uniswapkit.models.DexType
 import io.horizontalsystems.uniswapkit.models.TradeOptions
 import java.math.BigDecimal
 
-abstract class BaseUniswapV3Provider(dexType: DexType) : ISwapXxxProvider {
+abstract class BaseUniswapV3Provider(dexType: DexType) : EvmSwapProvider() {
     private val uniswapV3Kit by lazy { UniswapV3Kit.getInstance(dexType) }
-
-    override suspend fun swap(swapQuote: ISwapQuote) {
-        check(swapQuote is SwapQuoteUniswapV3)
-
-        val blockchainType = swapQuote.tokenIn.blockchainType
-        val evmBlockchainHelper = EvmBlockchainHelper(blockchainType)
-        val evmKitWrapper = evmBlockchainHelper.evmKitWrapper ?: return
-
-        val transactionData = evmBlockchainHelper.receiveAddress?.let { receiveAddress ->
-            uniswapV3Kit.transactionData(receiveAddress, evmBlockchainHelper.chain, swapQuote.tradeDataV3)
-        }
-
-//        try {
-//            val transaction = evmKitWrapper.sendSingle(transactionData, gasPrice, gasLimit, nonce).await()
-////            logger.info("success")
-//        } catch (e: Throwable) {
-////            logger.warning("failed", error)
-//        }
-    }
 
     final override suspend fun fetchQuote(
         tokenIn: Token,
@@ -76,6 +62,9 @@ abstract class BaseUniswapV3Provider(dexType: DexType) : ISwapXxxProvider {
             settingSlippage.value?.let {
                 add(SwapDataFieldSlippage(it))
             }
+            getAllowance(tokenIn, uniswapV3Kit.routerAddress(chain))?.let {
+                add(SwapDataFieldAllowance(it, tokenIn))
+            }
         }
 
         return SwapQuoteUniswapV3(
@@ -103,5 +92,37 @@ abstract class BaseUniswapV3Provider(dexType: DexType) : ISwapXxxProvider {
                 tokenType.address
             ), token.decimals)
         else -> throw Exception("Invalid coin for swap: $token")
+    }
+
+    override suspend fun fetchFinalQuote(
+        tokenIn: Token,
+        tokenOut: Token,
+        amountIn: BigDecimal,
+        swapSettings: Map<String, Any?>,
+        sendTransactionSettings: SendTransactionSettings?,
+    ): ISwapFinalQuote {
+        val blockchainType = tokenIn.blockchainType
+        val evmBlockchainHelper = EvmBlockchainHelper(blockchainType)
+
+        val swapQuote = fetchQuote(tokenIn, tokenOut, amountIn, swapSettings) as SwapQuoteUniswapV3
+
+        val transactionData = evmBlockchainHelper.receiveAddress?.let { receiveAddress ->
+            uniswapV3Kit.transactionData(receiveAddress, evmBlockchainHelper.chain, swapQuote.tradeDataV3)
+        } ?: throw Exception("Yahoo")
+
+        val settingSlippage = SwapSettingSlippage(swapSettings, TradeOptions.defaultAllowedSlippage)
+        val slippage = settingSlippage.valueOrDefault()
+
+        val amountOut = swapQuote.amountOut
+        val amountOutMin = amountOut - amountOut / BigDecimal(100) * slippage
+
+        return SwapFinalQuoteUniswapV3(
+            tokenIn,
+            tokenOut,
+            amountIn,
+            amountOut,
+            amountOutMin,
+            SendTransactionData.Evm(transactionData, null)
+        )
     }
 }

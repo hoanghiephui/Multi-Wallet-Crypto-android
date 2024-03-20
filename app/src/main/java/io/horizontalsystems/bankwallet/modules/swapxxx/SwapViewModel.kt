@@ -13,6 +13,7 @@ import io.horizontalsystems.bankwallet.modules.swapxxx.providers.ISwapXxxProvide
 import io.horizontalsystems.marketkit.models.Token
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 class SwapViewModel(
     private val quoteService: SwapQuoteService,
@@ -25,7 +26,7 @@ class SwapViewModel(
 ) : ViewModelUiState<SwapUiState>() {
 
     private var quoteState = quoteService.stateFlow.value
-    private var availableBalance = balanceService.balanceFlow.value
+    private var balanceState = balanceService.stateFlow.value
     private var priceImpactState = priceImpactService.stateFlow.value
     private var fiatAmountIn: BigDecimal? = null
     private var fiatAmountOut: BigDecimal? = null
@@ -39,8 +40,8 @@ class SwapViewModel(
             }
         }
         viewModelScope.launch {
-            balanceService.balanceFlow.collect {
-                handleUpdatedBalance(it)
+            balanceService.stateFlow.collect {
+                handleUpdatedBalanceState(it)
             }
         }
         viewModelScope.launch {
@@ -58,6 +59,7 @@ class SwapViewModel(
                 fiatAmountInputEnabled = it.coinPrice != null
                 fiatAmountIn = it.fiatAmount
                 quoteService.setAmount(it.amount)
+                priceImpactService.setFiatAmountIn(fiatAmountIn)
 
                 emitState()
             }
@@ -65,6 +67,9 @@ class SwapViewModel(
         viewModelScope.launch {
             fiatServiceOut.stateFlow.collect {
                 fiatAmountOut = it.fiatAmount
+
+                priceImpactService.setFiatAmountOut(fiatAmountOut)
+
                 emitState()
             }
         }
@@ -78,24 +83,25 @@ class SwapViewModel(
         tokenIn = quoteState.tokenIn,
         tokenOut = quoteState.tokenOut,
         quoting = quoteState.quoting,
-        swapEnabled = isSwapEnabled(),
         quotes = quoteState.quotes,
         preferredProvider = quoteState.preferredProvider,
         quoteLifetime = quoteState.quoteLifetime,
         quote = quoteState.quote,
-        error = quoteState.error,
-        availableBalance = availableBalance,
+        error = quoteState.error ?: balanceState.error,
+        availableBalance = balanceState.balance,
         priceImpact = priceImpactState.priceImpact,
         priceImpactLevel = priceImpactState.priceImpactLevel,
         priceImpactCaution = priceImpactState.priceImpactCaution,
+        fiatPriceImpact = priceImpactState.fiatPriceImpact,
+        fiatPriceImpactLevel = priceImpactState.fiatPriceImpactLevel,
         fiatAmountIn = fiatAmountIn,
         fiatAmountOut = fiatAmountOut,
         currency = currency,
         fiatAmountInputEnabled = fiatAmountInputEnabled
     )
 
-    private fun handleUpdatedBalance(balance: BigDecimal?) {
-        this.availableBalance = balance
+    private fun handleUpdatedBalanceState(balanceState: TokenBalanceService.State) {
+        this.balanceState = balanceState
 
         emitState()
     }
@@ -104,6 +110,8 @@ class SwapViewModel(
         this.quoteState = quoteState
 
         balanceService.setToken(quoteState.tokenIn)
+        balanceService.setAmount(quoteState.amountIn)
+
         priceImpactService.setPriceImpact(quoteState.quote?.priceImpact, quoteState.quote?.provider?.title)
         quoteExpirationService.setQuote(quoteState.quote)
 
@@ -131,9 +139,18 @@ class SwapViewModel(
         quoteService.selectQuote(quote)
     }
 
-    private fun isSwapEnabled() = quoteState.quote != null
-
     fun onEnterAmount(v: BigDecimal?) = quoteService.setAmount(v)
+    fun onEnterAmountPercentage(percentage: Int) {
+        val tokenIn = quoteState.tokenIn ?: return
+        val availableBalance = balanceState.balance ?: return
+
+        val amount = availableBalance
+            .times(BigDecimal(percentage / 100.0))
+            .setScale(tokenIn.decimals, RoundingMode.DOWN)
+            .stripTrailingZeros()
+
+        quoteService.setAmount(amount)
+    }
     fun onSelectTokenIn(token: Token) = quoteService.setTokenIn(token)
     fun onSelectTokenOut(token: Token) = quoteService.setTokenOut(token)
     fun onSwitchPairs() = quoteService.switchPairs()
@@ -156,8 +173,8 @@ class SwapViewModel(
                 priceImpactService,
                 SwapQuoteExpirationService(),
                 App.currencyManager,
-                FiatService(),
-                FiatService(),
+                FiatService(App.marketKit),
+                FiatService(App.marketKit),
             ) as T
         }
     }
@@ -168,7 +185,6 @@ data class SwapUiState(
     val tokenIn: Token?,
     val tokenOut: Token?,
     val quoting: Boolean,
-    val swapEnabled: Boolean,
     val quotes: List<SwapProviderQuote>,
     val preferredProvider: ISwapXxxProvider?,
     val quoteLifetime: Long,
@@ -180,6 +196,31 @@ data class SwapUiState(
     val priceImpactCaution: HSCaution?,
     val fiatAmountIn: BigDecimal?,
     val fiatAmountOut: BigDecimal?,
+    val fiatPriceImpact: BigDecimal?,
     val currency: Currency,
-    val fiatAmountInputEnabled: Boolean
-)
+    val fiatAmountInputEnabled: Boolean,
+    val fiatPriceImpactLevel: SwapMainModule.PriceImpactLevel?
+) {
+    val currentStep: SwapStep
+        get() = when {
+            quoting -> SwapStep.Quoting
+            error != null -> SwapStep.Error(error)
+            tokenIn == null -> SwapStep.InputRequired(InputType.TokenIn)
+            tokenOut == null -> SwapStep.InputRequired(InputType.TokenOut)
+            amountIn == null -> SwapStep.InputRequired(InputType.Amount)
+            else -> SwapStep.Proceed
+        }
+}
+
+sealed class SwapStep {
+    data class InputRequired(val inputType: InputType) : SwapStep()
+    object Quoting : SwapStep()
+    data class Error(val error: Throwable) : SwapStep()
+    object Proceed : SwapStep()
+}
+
+enum class InputType {
+    TokenIn,
+    TokenOut,
+    Amount
+}
