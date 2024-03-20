@@ -14,7 +14,7 @@ object Sync {
             // Run sync on app startup and ensure only one sync worker runs at any time
             enqueueUniquePeriodicWork(
                 MORNING_SYNC_WORK_NAME,
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 morningWork,
             )
         }
@@ -22,7 +22,7 @@ object Sync {
             // Run sync on app startup and ensure only one sync worker runs at any time
             enqueueUniquePeriodicWork(
                 EVENING_SYNC_WORK_NAME,
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 eveningWork,
             )
         }

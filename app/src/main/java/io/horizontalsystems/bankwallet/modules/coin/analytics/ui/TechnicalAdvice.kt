@@ -23,7 +23,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.caption_grey
@@ -58,7 +58,7 @@ fun TechnicalAdviceBlock(
             contentAlignment = Alignment.Center
         ) {
             headline2_leah(
-                text = stringResource(if (showDetails) R.string.TechnicalAdvice_ShowDetails else R.string.TechnicalAdvice_HideDetails),
+                text = stringResource(if (showDetails) R.string.TechnicalAdvice_HideDetails else R.string.TechnicalAdvice_ShowDetails),
                 modifier = Modifier
                     .clickable {
                         showDetails = !showDetails
