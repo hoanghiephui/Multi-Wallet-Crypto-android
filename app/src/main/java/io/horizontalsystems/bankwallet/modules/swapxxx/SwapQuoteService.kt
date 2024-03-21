@@ -199,6 +199,14 @@ class SwapQuoteService {
         runQuotation()
     }
 
+    fun onActionStarted() {
+        preferredProvider = quote?.provider
+    }
+
+    fun onActionCompleted() {
+        reQuote()
+    }
+
     fun getSwapSettings() = settings
 
     data class State(

@@ -25,6 +25,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +40,7 @@ import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
@@ -45,6 +48,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
@@ -64,7 +68,9 @@ import io.horizontalsystems.bankwallet.modules.swapxxx.providers.ISwapXxxProvide
 import io.horizontalsystems.bankwallet.ui.compose.ColoredTextStyle
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.Keyboard
+import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryDefault
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellowWithSpinner
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryCircle
@@ -74,6 +80,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.HFillSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.HSRow
 import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
+import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.cell.CellUniversal
@@ -134,9 +141,17 @@ fun SwapScreen(navController: NavController) {
         onClickProviderSettings = {
             navController.slideFromRight(R.id.swapSettings)
         },
+        onTimeout = viewModel::reQuote,
         onClickNext = {
             navController.slideFromRight(R.id.swapConfirm)
-        }
+        },
+        onActionStarted = {
+            viewModel.onActionStarted()
+        },
+        onActionCompleted = {
+            viewModel.onActionCompleted()
+        },
+        navController = navController
     )
 }
 
@@ -153,8 +168,21 @@ private fun SwapScreenInner(
     onEnterAmountPercentage: (Int) -> Unit,
     onClickProvider: () -> Unit,
     onClickProviderSettings: () -> Unit,
+    onTimeout: () -> Unit,
     onClickNext: () -> Unit,
+    onActionStarted: () -> Unit,
+    onActionCompleted: () -> Unit,
+    navController: NavController,
 ) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
+
+    LaunchedEffect(uiState.timeout, lifecycleState) {
+        if (uiState.timeout && lifecycleState == Lifecycle.State.RESUMED) {
+            onTimeout.invoke()
+        }
+    }
+
     val quote = uiState.quote
 
     Scaffold(
@@ -163,6 +191,16 @@ private fun SwapScreenInner(
                 title = stringResource(R.string.Swap),
                 navigationIcon = {
                     HsBackButton(onClick = onClickClose)
+                },
+                menuItems = buildList {
+                    uiState.timeRemaining?.let<Long, Unit> { timeRemaining ->
+                        add(
+                            MenuItem(
+                                title = TranslatableString.PlainString(timeRemaining.toString()),
+                                onClick = {}
+                            )
+                        )
+                    }
                 }
             )
         },
@@ -230,7 +268,7 @@ private fun SwapScreenInner(
                                 .fillMaxWidth(),
                             title = stringResource(R.string.Alert_Loading),
                             enabled = false,
-                            onClick = { /*TODO*/ }
+                            onClick = {}
                         )
                     }
 
@@ -248,7 +286,21 @@ private fun SwapScreenInner(
                                 .fillMaxWidth(),
                             title = errorText,
                             enabled = false,
-                            onClick = onClickNext
+                            onClick = {}
+                        )
+                    }
+
+                    is SwapStep.ActionRequired -> {
+                        val action = currentStep.action
+                        ButtonPrimaryDefault(
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .fillMaxWidth(),
+                            title = action.getTitle(),
+                            onClick = {
+                                onActionStarted.invoke()
+                                action.execute(navController, onActionCompleted)
+                            }
                         )
                     }
 
