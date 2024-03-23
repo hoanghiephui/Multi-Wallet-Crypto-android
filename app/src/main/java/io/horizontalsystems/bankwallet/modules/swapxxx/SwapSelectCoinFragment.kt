@@ -1,16 +1,21 @@
 package io.horizontalsystems.bankwallet.modules.swapxxx
 
+import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.getInput
+import io.horizontalsystems.bankwallet.core.requireInput
 import io.horizontalsystems.bankwallet.core.setNavigationResultX
 import io.horizontalsystems.bankwallet.modules.swap.coinselect.SelectSwapCoinDialogScreen
+import io.horizontalsystems.marketkit.models.Token
+import kotlinx.parcelize.Parcelize
 
 class SwapSelectCoinFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
-        SwapSelectCoinScreen(navController)
+        SwapSelectCoinScreen(navController, navController.getInput())
     }
 
     override val logScreen: String
@@ -18,8 +23,10 @@ class SwapSelectCoinFragment : BaseComposeFragment() {
 }
 
 @Composable
-private fun SwapSelectCoinScreen(navController: NavController) {
-    val viewModel = viewModel<SwapSelectCoinViewModel>(factory = SwapSelectCoinViewModel.Factory())
+private fun SwapSelectCoinScreen(navController: NavController, otherSelectedToken: Token?) {
+    val viewModel = viewModel<SwapSelectCoinViewModel>(
+        factory = SwapSelectCoinViewModel.Factory(otherSelectedToken)
+    )
     val uiState = viewModel.uiState
 
     SelectSwapCoinDialogScreen(

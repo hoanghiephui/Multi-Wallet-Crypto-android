@@ -7,7 +7,6 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -144,9 +143,6 @@ class SwapMainFragment : BaseFragment() {
                     }
                 }
             } catch (t: Throwable) {
-                Toast.makeText(
-                    App.instance, t.message ?: t.javaClass.simpleName, Toast.LENGTH_SHORT
-                ).show()
                 navController.popBackStack()
             }
         }
@@ -419,11 +415,19 @@ fun SwapCards(
         }
 
         VSpacer(32.dp)
-        if (hasNonZeroBalance == true && fromState.inputState.amount.isEmpty() && showSuggestions && keyboardState == Opened) {
-            SuggestionsBar(modifier = Modifier.align(Alignment.BottomCenter)) {
-                focusManager.clearFocus()
-                viewModel.onSetAmountInBalancePercent(it)
-            }
+        if (showSuggestions && keyboardState == Opened) {
+            SuggestionsBar(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                onDelete = {
+                    viewModel.onFromAmountChange(null)
+                },
+                onSelect = {
+                    focusManager.clearFocus()
+                    viewModel.onSetAmountInBalancePercent(it)
+                },
+                selectEnabled = hasNonZeroBalance ?: false,
+                deleteEnabled = fromState.inputState.amount.isNotBlank()
+            )
         }
     }
 }

@@ -59,8 +59,10 @@ import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromBottomForResult
 import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.core.slideFromRightForResult
 import io.horizontalsystems.bankwallet.entities.CoinValue
 import io.horizontalsystems.bankwallet.entities.Currency
+import io.horizontalsystems.bankwallet.modules.evmfee.FeeSettingsInfoDialog
 import io.horizontalsystems.bankwallet.modules.swap.SwapMainModule
 import io.horizontalsystems.bankwallet.modules.swap.getPriceImpactColor
 import io.horizontalsystems.bankwallet.modules.swap.ui.SuggestionsBar
@@ -72,7 +74,6 @@ import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryDefault
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
-import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellowWithSpinner
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryCircle
 import io.horizontalsystems.bankwallet.ui.compose.components.CardsSwapInfo
 import io.horizontalsystems.bankwallet.ui.compose.components.CoinImage
@@ -81,6 +82,8 @@ import io.horizontalsystems.bankwallet.ui.compose.components.HSRow
 import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
+import io.horizontalsystems.bankwallet.ui.compose.components.TextImportantError
+import io.horizontalsystems.bankwallet.ui.compose.components.TextImportantWarning
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.cell.CellUniversal
@@ -114,20 +117,22 @@ fun SwapScreen(navController: NavController) {
     )
     val uiState = viewModel.uiState
 
-    val selectToken = { onResult: (Token) -> Unit ->
-        navController.slideFromBottomForResult(R.id.swapSelectCoinFragment, onResult = onResult)
-    }
-
     SwapScreenInner(
         uiState = uiState,
         onClickClose = navController::popBackStack,
         onClickCoinFrom = {
-            selectToken {
+            navController.slideFromBottomForResult<Token>(
+                R.id.swapSelectCoinFragment,
+                uiState.tokenOut
+            ) {
                 viewModel.onSelectTokenIn(it)
             }
         },
         onClickCoinTo = {
-            selectToken {
+            navController.slideFromBottomForResult<Token>(
+                R.id.swapSelectCoinFragment,
+                uiState.tokenIn
+            ) {
                 viewModel.onSelectTokenOut(it)
             }
         },
@@ -143,7 +148,11 @@ fun SwapScreen(navController: NavController) {
         },
         onTimeout = viewModel::reQuote,
         onClickNext = {
-            navController.slideFromRight(R.id.swapConfirm)
+            navController.slideFromRightForResult<SwapConfirmFragment.Result>(R.id.swapConfirm) {
+                if (it.success) {
+                    navController.popBackStack()
+                }
+            }
         },
         onActionStarted = {
             viewModel.onActionStarted()
@@ -209,7 +218,7 @@ private fun SwapScreenInner(
     ) {
         val focusManager = LocalFocusManager.current
         val keyboardState by observeKeyboardState()
-        var showSuggestions by remember { mutableStateOf(false) }
+        var amountInputHasFocus by remember { mutableStateOf(false) }
 
         Box(modifier = Modifier
             .padding(it)
@@ -237,7 +246,7 @@ private fun SwapScreenInner(
                     tokenOut = uiState.tokenOut,
                     currency = uiState.currency,
                     onFocusChanged = {
-                        showSuggestions = it.hasFocus
+                        amountInputHasFocus = it.hasFocus
                     },
                 )
 
@@ -257,17 +266,18 @@ private fun SwapScreenInner(
                                 .fillMaxWidth(),
                             title = title,
                             enabled = false,
-                            onClick = onClickNext
+                            onClick = {}
                         )
                     }
 
                     SwapStep.Quoting -> {
-                        ButtonPrimaryYellowWithSpinner(
+                        ButtonPrimaryYellow(
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
                                 .fillMaxWidth(),
-                            title = stringResource(R.string.Alert_Loading),
+                            title = stringResource(R.string.Swap_Quoting),
                             enabled = false,
+                            loadingIndicator = true,
                             onClick = {}
                         )
                     }
@@ -277,6 +287,7 @@ private fun SwapScreenInner(
                             SwapMainModule.SwapError.InsufficientBalanceFrom -> stringResource(id = R.string.Swap_ErrorInsufficientBalance)
                             is NoSupportedSwapProvider -> stringResource(id = R.string.Swap_ErrorNoProviders)
                             is SwapRouteNotFound -> stringResource(id = R.string.Swap_ErrorNoQuote)
+                            is PriceImpactTooHigh -> stringResource(id = R.string.Swap_ErrorHighPriceImpact)
                             else -> error.message ?: error.javaClass.simpleName
                         }
 
@@ -292,11 +303,18 @@ private fun SwapScreenInner(
 
                     is SwapStep.ActionRequired -> {
                         val action = currentStep.action
+                        val title = if (action.inProgress) {
+                            action.getTitleInProgress()
+                        } else {
+                            action.getTitle()
+                        }
+
                         ButtonPrimaryDefault(
                             modifier = Modifier
                                 .padding(horizontal = 16.dp)
                                 .fillMaxWidth(),
-                            title = action.getTitle(),
+                            title = title,
+                            enabled = !action.inProgress,
                             onClick = {
                                 onActionStarted.invoke()
                                 action.execute(navController, onActionCompleted)
@@ -320,10 +338,10 @@ private fun SwapScreenInner(
                     CardsSwapInfo {
                         ProviderField(quote.provider, onClickProvider, onClickProviderSettings)
                         PriceField(quote.tokenIn, quote.tokenOut, quote.amountIn, quote.amountOut)
+                        PriceImpactField(uiState.priceImpact, uiState.priceImpactLevel, navController)
                         quote.fields.forEach {
-                            it.GetContent()
+                            it.GetContent(navController)
                         }
-                        PriceImpactField(uiState.priceImpact, uiState.priceImpactLevel)
                     }
                 } else {
                     CardsSwapInfo {
@@ -331,22 +349,44 @@ private fun SwapScreenInner(
                     }
                 }
 
+                if (uiState.error is PriceImpactTooHigh) {
+                    VSpacer(height = 12.dp)
+                    TextImportantError(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        icon = R.drawable.ic_attention_20,
+                        title = stringResource(id = R.string.Swap_PriceImpact),
+                        text = stringResource(id = R.string.Swap_PriceImpactTooHigh, uiState.error.providerTitle ?: "")
+                    )
+                } else if (uiState.currentStep is SwapStep.ActionRequired) {
+                    uiState.currentStep.action.getDescription()?.let { actionDescription ->
+                        VSpacer(height = 12.dp)
+                        TextImportantWarning(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            text = actionDescription
+                        )
+                    }
+                }
+
                 VSpacer(height = 32.dp)
             }
 
 
-            if (
-                uiState.availableBalance != null &&
-                uiState.availableBalance > BigDecimal.ZERO &&
-                showSuggestions &&
-                keyboardState == Keyboard.Opened
-            ) {
+            if (amountInputHasFocus && keyboardState == Keyboard.Opened) {
+                val hasNonZeroBalance =
+                    uiState.availableBalance != null && uiState.availableBalance > BigDecimal.ZERO
+
                 SuggestionsBar(
-                    modifier = Modifier.align(Alignment.BottomCenter)
-                ) {
-                    focusManager.clearFocus()
-                    onEnterAmountPercentage.invoke(it)
-                }
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    onDelete = {
+                        onEnterAmount.invoke(null)
+                    },
+                    onSelect = {
+                        focusManager.clearFocus()
+                        onEnterAmountPercentage.invoke(it)
+                    },
+                    selectEnabled = hasNonZeroBalance,
+                    deleteEnabled = uiState.amountIn != null,
+                )
             }
         }
     }
@@ -373,7 +413,8 @@ private fun AvailableBalanceField(tokenIn: Token?, availableBalance: BigDecimal?
 @Composable
 private fun PriceImpactField(
     priceImpact: BigDecimal?,
-    priceImpactLevel: SwapMainModule.PriceImpactLevel?
+    priceImpactLevel: SwapMainModule.PriceImpactLevel?,
+    navController: NavController
 ) {
     if (priceImpact == null || priceImpactLevel == null) return
 
@@ -389,10 +430,10 @@ private fun PriceImpactField(
                     .padding(horizontal = 8.dp)
                     .clickable(
                         onClick = {
-//                            navController.slideFromBottom(
-//                                R.id.feeSettingsInfoDialog,
-//                                FeeSettingsInfoDialog.Input(infoTitle, infoText)
-//                            )
+                            navController.slideFromBottom(
+                                R.id.feeSettingsInfoDialog,
+                                FeeSettingsInfoDialog.Input(infoTitle, infoText)
+                            )
                         },
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null

@@ -9,6 +9,7 @@ import io.horizontalsystems.bankwallet.core.ViewModelUiState
 import io.horizontalsystems.bankwallet.core.managers.CurrencyManager
 import io.horizontalsystems.bankwallet.entities.Currency
 import io.horizontalsystems.bankwallet.modules.swap.SwapMainModule
+import io.horizontalsystems.bankwallet.modules.swapxxx.action.ISwapProviderAction
 import io.horizontalsystems.bankwallet.modules.swapxxx.providers.ISwapXxxProvider
 import io.horizontalsystems.marketkit.models.Token
 import kotlinx.coroutines.launch
@@ -88,9 +89,8 @@ class SwapViewModel(
         quoting = quoteState.quoting,
         quotes = quoteState.quotes,
         preferredProvider = quoteState.preferredProvider,
-        quoteLifetime = quoteState.quoteLifetime,
         quote = quoteState.quote,
-        error = quoteState.error ?: balanceState.error,
+        error = quoteState.error ?: balanceState.error ?: priceImpactState.error,
         availableBalance = balanceState.balance,
         priceImpact = priceImpactState.priceImpact,
         priceImpactLevel = priceImpactState.priceImpactLevel,
@@ -198,7 +198,6 @@ data class SwapUiState(
     val quoting: Boolean,
     val quotes: List<SwapProviderQuote>,
     val preferredProvider: ISwapXxxProvider?,
-    val quoteLifetime: Long,
     val quote: SwapProviderQuote?,
     val error: Throwable?,
     val availableBalance: BigDecimal?,
@@ -214,16 +213,15 @@ data class SwapUiState(
     val timeRemaining: Long?,
     val timeout: Boolean
 ) {
-    val currentStep: SwapStep
-        get() = when {
-            quoting -> SwapStep.Quoting
-            error != null -> SwapStep.Error(error)
-            tokenIn == null -> SwapStep.InputRequired(InputType.TokenIn)
-            tokenOut == null -> SwapStep.InputRequired(InputType.TokenOut)
-            amountIn == null -> SwapStep.InputRequired(InputType.Amount)
-            quote?.actionRequired != null -> SwapStep.ActionRequired(quote.actionRequired!!)
-            else -> SwapStep.Proceed
-        }
+    val currentStep: SwapStep = when {
+        quoting -> SwapStep.Quoting
+        error != null -> SwapStep.Error(error)
+        tokenIn == null -> SwapStep.InputRequired(InputType.TokenIn)
+        tokenOut == null -> SwapStep.InputRequired(InputType.TokenOut)
+        amountIn == null -> SwapStep.InputRequired(InputType.Amount)
+        quote?.actionRequired != null -> SwapStep.ActionRequired(quote.actionRequired!!)
+        else -> SwapStep.Proceed
+    }
 }
 
 sealed class SwapStep {
