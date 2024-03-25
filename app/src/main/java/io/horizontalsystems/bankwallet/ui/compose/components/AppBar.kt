@@ -151,18 +151,18 @@ fun AppBar(
                                 contentAlignment = Alignment.Center
                             ) {
                                 CircularProgressIndicator(
-                                    progress = 1f,
+                                    progress = { 1f },
                                     modifier = Modifier.size(16.dp),
                                     color = ComposeAppTheme.colors.steel20,
-                                    strokeWidth = 1.5.dp
+                                    strokeWidth = 1.5.dp,
                                 )
                                 CircularProgressIndicator(
-                                    progress = menuItem.progress,
+                                    progress = { menuItem.progress },
                                     modifier = Modifier
                                         .size(16.dp)
                                         .scale(scaleX = -1f, scaleY = 1f),
                                     color = ComposeAppTheme.colors.jacob,
-                                    strokeWidth = 1.5.dp
+                                    strokeWidth = 1.5.dp,
                                 )
                             }
                         }
@@ -170,7 +170,6 @@ fun AppBar(
                 }
             }
         },
-        elevation = 0.dp
     )
 }
 
