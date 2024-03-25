@@ -20,6 +20,7 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.intl.Locale
@@ -29,6 +30,12 @@ import androidx.compose.ui.unit.dp
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 
+sealed class IMenuItem
+
+data class MenuItemTimeoutIndicator(
+    val progress: Float
+) : IMenuItem()
+
 data class MenuItem(
     val title: TranslatableString,
     @DrawableRes val icon: Int? = null,
@@ -36,7 +43,7 @@ data class MenuItem(
     val tint: Color = Color.Unspecified,
     val showAlertDot: Boolean = false,
     val onClick: () -> Unit,
-)
+) : IMenuItem()
 
 @Composable
 fun AppBarMenuButton(
@@ -77,7 +84,7 @@ fun AppBarMenuButton(
 fun AppBar(
     title: String? = null,
     navigationIcon: @Composable (() -> Unit)? = null,
-    menuItems: List<MenuItem> = listOf(),
+    menuItems: List<IMenuItem> = listOf(),
     showSpinner: Boolean = false,
     colors: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent),
     scrollBehavior: TopAppBarScrollBehavior? = null
@@ -107,7 +114,7 @@ fun AppBar(
 fun AppBar(
     title: @Composable () -> Unit,
     navigationIcon: @Composable (() -> Unit)? = null,
-    menuItems: List<MenuItem> = listOf(),
+    menuItems: List<IMenuItem> = listOf(),
     showSpinner: Boolean = false,
     colors: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent),
     scrollBehavior: TopAppBarScrollBehavior? = null
@@ -125,43 +132,81 @@ fun AppBar(
                     modifier = Modifier
                         .padding(start = 24.dp, end = 16.dp)
                         .size(24.dp),
-                    color = ComposeAppTheme.colors.grey,
+                    color = ComposeAppTheme.colors.jacob,
                     strokeWidth = 2.dp
                 )
             }
             menuItems.forEach { menuItem ->
-                val color = if (menuItem.enabled) {
-                    if (menuItem.tint == Color.Unspecified)
-                        MaterialTheme.colorScheme.onSurface
-                    else
-                        menuItem.tint
-                } else {
-                    ComposeAppTheme.colors.grey50
-                }
+                when (menuItem) {
+                    is MenuItem -> {
+                        MenuItemSimple(menuItem)
+                    }
 
-                if (menuItem.icon != null) {
-                    AppBarMenuButton(
-                        icon = menuItem.icon,
-                        onClick = menuItem.onClick,
-                        enabled = menuItem.enabled,
-                        tint = color,
-                        description = menuItem.title.getString(),
-                        showAlertDot = menuItem.showAlertDot,
-                    )
-                } else {
-                    Text(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .clickable(
-                                enabled = menuItem.enabled,
-                                onClick = menuItem.onClick
-                            ),
-                        text = menuItem.title.getString().toUpperCase(Locale.current),
-                        style = ComposeAppTheme.typography.headline2,
-                        color = color
-                    )
+                    is MenuItemTimeoutIndicator -> {
+                        HsIconButton(
+                            onClick = { }
+                        ) {
+                            Box(
+                                modifier = Modifier.size(30.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    progress = 1f,
+                                    modifier = Modifier.size(16.dp),
+                                    color = ComposeAppTheme.colors.steel20,
+                                    strokeWidth = 1.5.dp
+                                )
+                                CircularProgressIndicator(
+                                    progress = menuItem.progress,
+                                    modifier = Modifier
+                                        .size(16.dp)
+                                        .scale(scaleX = -1f, scaleY = 1f),
+                                    color = ComposeAppTheme.colors.jacob,
+                                    strokeWidth = 1.5.dp
+                                )
+                            }
+                        }
+                    }
                 }
             }
         },
+        elevation = 0.dp
     )
 }
+
+@Composable
+private fun MenuItemSimple(menuItem: MenuItem) {
+    val color = if (menuItem.enabled) {
+        if (menuItem.tint == Color.Unspecified)
+            MaterialTheme.colorScheme.onSurface
+        else
+            menuItem.tint
+    } else {
+        ComposeAppTheme.colors.grey50
+    }
+    val icon = menuItem.icon
+    if (icon != null) {
+        AppBarMenuButton(
+            icon = icon,
+            onClick = menuItem.onClick,
+            enabled = menuItem.enabled,
+            tint = color,
+            description = menuItem.title.getString(),
+            showAlertDot = menuItem.showAlertDot,
+        )
+    } else {
+        Text(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .clickable(
+                    enabled = menuItem.enabled,
+                    onClick = menuItem.onClick
+                ),
+            text = menuItem.title.getString().toUpperCase(Locale.current),
+            style = ComposeAppTheme.typography.headline2,
+            color = color
+        )
+    }
+}
+
+

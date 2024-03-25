@@ -1,6 +1,7 @@
 package io.horizontalsystems.bankwallet.modules.swapxxx
 
 import io.horizontalsystems.bankwallet.modules.swapxxx.sendtransaction.SendTransactionData
+import io.horizontalsystems.bankwallet.modules.swapxxx.ui.SwapDataField
 import io.horizontalsystems.marketkit.models.Token
 import java.math.BigDecimal
 
@@ -11,6 +12,8 @@ interface ISwapFinalQuote {
     val amountOut: BigDecimal
     val amountOutMin: BigDecimal
     val sendTransactionData: SendTransactionData
+    val priceImpact: BigDecimal?
+    val fields: List<SwapDataField>
 }
 
 data class SwapFinalQuoteUniswapV3(
@@ -20,6 +23,8 @@ data class SwapFinalQuoteUniswapV3(
     override val amountOut: BigDecimal,
     override val amountOutMin: BigDecimal,
     override val sendTransactionData: SendTransactionData.Evm,
+    override val priceImpact: BigDecimal?,
+    override val fields: List<SwapDataField>
 ) : ISwapFinalQuote
 
 data class SwapFinalQuoteOneInch(
@@ -29,4 +34,6 @@ data class SwapFinalQuoteOneInch(
     override val amountOut: BigDecimal,
     override val amountOutMin: BigDecimal,
     override val sendTransactionData: SendTransactionData.Evm,
+    override val priceImpact: BigDecimal?,
+    override val fields: List<SwapDataField>
 ) : ISwapFinalQuote

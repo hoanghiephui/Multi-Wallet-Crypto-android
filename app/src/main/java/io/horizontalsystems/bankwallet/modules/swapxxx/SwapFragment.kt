@@ -70,7 +70,6 @@ import io.horizontalsystems.bankwallet.modules.swapxxx.providers.ISwapXxxProvide
 import io.horizontalsystems.bankwallet.ui.compose.ColoredTextStyle
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.Keyboard
-import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryDefault
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
@@ -81,7 +80,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.HFillSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.HSRow
 import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
-import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
+import io.horizontalsystems.bankwallet.ui.compose.components.MenuItemTimeoutIndicator
 import io.horizontalsystems.bankwallet.ui.compose.components.TextImportantError
 import io.horizontalsystems.bankwallet.ui.compose.components.TextImportantWarning
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
@@ -97,6 +96,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_leah
 import io.horizontalsystems.bankwallet.ui.compose.observeKeyboardState
 import io.horizontalsystems.marketkit.models.Token
 import java.math.BigDecimal
+import java.net.UnknownHostException
 
 class SwapFragment : BaseComposeFragment() {
     @Composable
@@ -202,12 +202,9 @@ private fun SwapScreenInner(
                     HsBackButton(onClick = onClickClose)
                 },
                 menuItems = buildList {
-                    uiState.timeRemaining?.let<Long, Unit> { timeRemaining ->
+                    uiState.timeRemainingProgress?.let { timeRemainingProgress ->
                         add(
-                            MenuItem(
-                                title = TranslatableString.PlainString(timeRemaining.toString()),
-                                onClick = {}
-                            )
+                            MenuItemTimeoutIndicator(timeRemainingProgress)
                         )
                     }
                 }
@@ -288,6 +285,10 @@ private fun SwapScreenInner(
                             is NoSupportedSwapProvider -> stringResource(id = R.string.Swap_ErrorNoProviders)
                             is SwapRouteNotFound -> stringResource(id = R.string.Swap_ErrorNoQuote)
                             is PriceImpactTooHigh -> stringResource(id = R.string.Swap_ErrorHighPriceImpact)
+                            is UnknownHostException -> stringResource(id = R.string.Hud_Text_NoInternet)
+                            is TokenNotEnabled -> stringResource(id = R.string.Swap_ErrorTokenNotEnabled)
+                            is WalletSyncing -> stringResource(id = R.string.Swap_ErrorWalletSyncing)
+                            is WalletNotSynced -> stringResource(id = R.string.Swap_ErrorWalletNotSynced)
                             else -> error.message ?: error.javaClass.simpleName
                         }
 
@@ -411,7 +412,7 @@ private fun AvailableBalanceField(tokenIn: Token?, availableBalance: BigDecimal?
 }
 
 @Composable
-private fun PriceImpactField(
+fun PriceImpactField(
     priceImpact: BigDecimal?,
     priceImpactLevel: SwapMainModule.PriceImpactLevel?,
     navController: NavController

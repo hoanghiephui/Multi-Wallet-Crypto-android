@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Scaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
@@ -34,6 +35,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.TextImportantWarning
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_green50
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_leah
 
 class SwapSelectProviderFragment : BaseComposeFragment() {
@@ -48,19 +50,23 @@ class SwapSelectProviderFragment : BaseComposeFragment() {
 
 @Composable
 fun SwapSelectProviderScreen(navController: NavController) {
-    val viewModel = viewModel<SwapViewModel>(
+    val swapViewModel = viewModel<SwapViewModel>(
         viewModelStoreOwner = navController.previousBackStackEntry!!,
         factory = SwapViewModel.Factory()
     )
+    val viewModel = viewModel<SwapSelectProviderViewModel>(
+        factory = SwapSelectProviderViewModel.Factory(swapViewModel.uiState.quotes)
+    )
 
     val uiState = viewModel.uiState
+    val currentQuote = swapViewModel.uiState.quote
 
     SwapSelectProviderScreenInner(
         onClickClose = navController::popBackStack,
-        quotes = uiState.quotes,
-        preferredProviderId = uiState.preferredProvider?.id,
+        quotes = uiState.quoteViewItems,
+        currentQuote = currentQuote,
     ) {
-        viewModel.onSelectQuote(it)
+        swapViewModel.onSelectQuote(it)
         navController.popBackStack()
     }
 }
@@ -69,14 +75,14 @@ fun SwapSelectProviderScreen(navController: NavController) {
 @Composable
 private fun SwapSelectProviderScreenInner(
     onClickClose: () -> Unit,
-    quotes: List<SwapProviderQuote>,
-    preferredProviderId: String?,
+    quotes: List<QuoteViewItem>,
+    currentQuote: SwapProviderQuote?,
     onSelectQuote: (SwapProviderQuote) -> Unit
 ) {
     Scaffold(
         topBar = {
             AppBar(
-                title = stringResource(R.string.Swap),
+                title = stringResource(R.string.Swap_Providers),
                 menuItems = listOf(
                     MenuItem(
                         title = TranslatableString.ResString(R.string.Button_Done),
@@ -94,8 +100,8 @@ private fun SwapSelectProviderScreenInner(
             item {
                 VSpacer(height = 12.dp)
             }
-            itemsIndexed(quotes) { i, quote ->
-                val borderColor = if (quote.provider.id == preferredProviderId) {
+            itemsIndexed(quotes) { i, viewItem ->
+                val borderColor = if (viewItem.quote == currentQuote) {
                     ComposeAppTheme.colors.yellow50
                 } else {
                     ComposeAppTheme.colors.steel20
@@ -107,9 +113,9 @@ private fun SwapSelectProviderScreenInner(
                         .clip(RoundedCornerShape(12.dp))
                         .border(1.dp, borderColor, RoundedCornerShape(12.dp))
                         .padding(horizontal = 16.dp),
-                    onClick = { onSelectQuote.invoke(quote) }
+                    onClick = { onSelectQuote.invoke(viewItem.quote) }
                 ) {
-                    val provider = quote.provider
+                    val provider = viewItem.quote.provider
                     Image(
                         modifier = Modifier.size(32.dp),
                         painter = painterResource(provider.icon),
@@ -130,7 +136,16 @@ private fun SwapSelectProviderScreenInner(
                         }
                     }
                     HFillSpacer(minWidth = 8.dp)
-                    subhead2_leah(text = quote.amountOut.toPlainString())
+                    Column(horizontalAlignment = Alignment.End) {
+                        subhead2_leah(
+                            text = viewItem.tokenAmount,
+                            textAlign = TextAlign.End
+                        )
+                        viewItem.fiatAmount?.let { fiatAmount ->
+                            VSpacer(4.dp)
+                            subhead2_grey(text = fiatAmount, textAlign = TextAlign.End)
+                        }
+                    }
                 }
             }
 
@@ -170,7 +185,7 @@ private fun SwapSelectProviderScreenPreview() {
 //                    quote.fields
 //                ),
             ),
-            preferredProviderId = SwapMainModule.OneInchProvider.id,
+            currentQuote = null,
             onSelectQuote = {}
         )
     }
