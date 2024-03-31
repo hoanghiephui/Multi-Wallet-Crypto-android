@@ -252,60 +252,56 @@ fun BalanceItems(
                 )
             }
 
-                    if (!accountViewItem.isWatchAccount) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 24.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            ButtonPrimaryYellow(
-                                modifier = Modifier.weight(1f),
-
-                                title = stringResource(R.string.Balance_Send),
-                                onClick = {
-                                    navController.slideFromRight(R.id.sendTokenSelectFragment)
-                                }
-                            )
-                            HSpacer(8.dp)
-                            ButtonPrimaryDefault(
-                                modifier = Modifier.weight(1f),
-
-                                title = stringResource(R.string.Balance_Receive),
-                                onClick = {
-                                    when (val receiveAllowedState =
-                                        viewModel.getReceiveAllowedState()) {
-                                        ReceiveAllowedState.Allowed -> {
-                                            navController.slideFromRight(R.id.receiveFragment)
-                                        }
-
-                                        is ReceiveAllowedState.BackupRequired -> {
-                                            val account = receiveAllowedState.account
-                                            val text = Translator.getString(
-                                                R.string.Balance_Receive_BackupRequired_Description,
-                                                account.name
-                                            )
-                                            navController.slideFromBottom(
-                                                R.id.backupRequiredDialog,
-                                                BackupRequiredDialog.Input(account, text)
-                                            )
-                                        }
-
-                                        null -> Unit
+            if (!accountViewItem.isWatchAccount) {
+                item {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        ButtonPrimaryYellow(
+                            modifier = Modifier.weight(1f),
+                            title = stringResource(R.string.Balance_Send),
+                            onClick = {
+                                navController.slideFromRight(R.id.sendTokenSelectFragment)
+                            }
+                        )
+                        HSpacer(8.dp)
+                        ButtonPrimaryDefault(
+                            modifier = Modifier.weight(1f),
+                            title = stringResource(R.string.Balance_Receive),
+                            onClick = {
+                                when (val receiveAllowedState = viewModel.getReceiveAllowedState()) {
+                                    ReceiveAllowedState.Allowed -> {
+                                        navController.slideFromRight(R.id.receiveFragment)
                                     }
-                                }
-                            )
-                            HSpacer(8.dp)
-                            ButtonPrimaryCircle(
-                                icon = R.drawable.ic_swap_24,
-                                contentDescription = stringResource(R.string.Swap),
-                                onClick = {
-                                    navController.slideFromRight(R.id.multiswap)
-                                }
-                            )
-                        }
-                        VSpacer(12.dp)
-                    }
-                }
 
+                                    is ReceiveAllowedState.BackupRequired -> {
+                                        val account = receiveAllowedState.account
+                                        val text = Translator.getString(
+                                            R.string.Balance_Receive_BackupRequired_Description,
+                                            account.name
+                                        )
+                                        navController.slideFromBottom(
+                                            R.id.backupRequiredDialog,
+                                            BackupRequiredDialog.Input(account, text)
+                                        )
+                                    }
+
+                                    null -> Unit
+                                }
+                            }
+                        )
+                        HSpacer(8.dp)
+                        ButtonPrimaryCircle(
+                            icon = R.drawable.ic_swap_24,
+                            contentDescription = stringResource(R.string.Swap),
+                            onClick = {
+                                navController.slideFromRight(R.id.multiswap)
+                            }
+                        )
+                    }
+                    VSpacer(12.dp)
+                }
             }
 
             stickyHeader {
@@ -349,12 +345,7 @@ fun BalanceItems(
                     HeaderNote.None -> Unit
                     HeaderNote.NonStandardAccount -> {
                         NoteError(
-                            modifier = Modifier.padding(
-                                start = 16.dp,
-                                end = 16.dp,
-                                top = 12.dp,
-                                bottom = 24.dp
-                            ),
+                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp),
                             text = stringResource(R.string.AccountRecovery_MigrationRequired),
                             onClick = {
                                 FaqManager.showFaqPage(
@@ -367,12 +358,7 @@ fun BalanceItems(
 
                     HeaderNote.NonRecommendedAccount -> {
                         NoteWarning(
-                            modifier = Modifier.padding(
-                                start = 16.dp,
-                                end = 16.dp,
-                                top = 12.dp,
-                                bottom = 24.dp
-                            ),
+                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp),
                             text = stringResource(R.string.AccountRecovery_MigrationRecommended),
                             onClick = {
                                 FaqManager.showFaqPage(
