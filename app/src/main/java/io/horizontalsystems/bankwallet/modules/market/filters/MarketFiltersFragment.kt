@@ -241,6 +241,19 @@ private fun BottomSheetContent(
                 onClose = onClose
             )
         }
+
+        TradingSignals -> {
+            SingleSelectBottomSheetContent(
+                title = R.string.Market_Filter_TradingSignals,
+                headerIcon = R.drawable.ic_ring_24,
+                items = viewModel.tradingSignals,
+                selectedItem = uiState.filterTradingSignal,
+                onSelect = {
+                    viewModel.updateTradingSignal(it)
+                },
+                onClose = onClose
+            )
+        }
     }
 }
 
@@ -312,6 +325,16 @@ fun AdvancedSearchContent(
         )
     }
     VSpacer(height = 32.dp)
+
+    HeaderText(stringResource(R.string.Market_FilterSection_Indicators))
+    SectionUniversalLawrence {
+        AdvancedSearchDropdown(
+            title = R.string.Market_Filter_TradingSignals,
+            value = uiState.filterTradingSignal.title,
+            onDropdownClick = { showBottomSheet(TradingSignals) }
+        )
+    }
+    VSpacer(32.dp)
 
     HeaderText(stringResource(R.string.Market_FilterSection_PriceParameters))
     SectionUniversalLawrence {

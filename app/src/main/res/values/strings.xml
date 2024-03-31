@@ -198,6 +198,7 @@
     <string name="Market_FilterSection_MarketParameters">MARKET PARAMETERS</string>
     <string name="Market_FilterSection_PriceParameters">PRICE PARAMETERS</string>
     <string name="Market_FilterSection_NetworkParameters">NETWORK PARAMETERS</string>
+    <string name="Market_FilterSection_Indicators">INDICATORS</string>
     <string name="Market_Field_HighestCap">Highest Cap</string>
     <string name="Market_Field_LowestCap">Lowest Cap</string>
     <string name="Market_Field_HighestVolume">Highest Volume</string>
@@ -205,7 +206,7 @@
     <string name="Market_Field_HighestPrice">Highest Price</string>
     <string name="Market_Field_LowestPrice">Lowest Price</string>
     <string name="Market_Sort_PopupTitle">Sort by</string>
-    <string name="Market_TotalMarketCap">Total Cap</string>
+    <string name="Market_TotalMarketCap">Total M.Cap</string>
     <string name="Market_BtcDominance">BTC Dominance</string>
     <string name="Market_Volume24h">24h Volume</string>
     <string name="Market_TvlDeFi">TVL in DeFi</string>
@@ -267,6 +268,7 @@
     <string name="Market_Filter_Volume">Trading Volume</string>
     <string name="Market_Filter_Volume24h">Trading Volume (24h)</string>
     <string name="Market_Filter_PricePeriod">Price Period</string>
+    <string name="Market_Filter_TradingSignals">Trading Signals</string>
     <string name="Market_Filter_PriceChange">Price Change</string>
     <string name="Market_Filter_Blockchains">Blockchains</string>
     <string name="Market_Filter_OutperformedBtc">Outperformed BTC</string>
@@ -281,6 +283,12 @@
     <string name="Market_Filter_SolidDex_Description">Overall Score is Good or Excellent</string>
     <string name="Market_Filter_GoodDistribution">Good Distribution</string>
     <string name="Market_Filter_GoodDistribution_Description">Overall Score is Good or Excellent</string>
+    <string name="Market_Filter_StrongBuy">Strong Buy</string>
+    <string name="Market_Filter_Buy">Buy</string>
+    <string name="Market_Filter_Neutral">Neutral</string>
+    <string name="Market_Filter_StrongSell">Strong Sell</string>
+    <string name="Market_Filter_Sell">Sell</string>
+    <string name="Market_Filter_RiskToTrade">Risk to Trade</string>
 
     <string name="Market_Filter_Top_100">Top 100</string>
     <string name="Market_Filter_Top_250">Top 250</string>
@@ -386,6 +394,7 @@
     <string name="Balance_Receive_SetAmount">Set Amount</string>
     <string name="Balance_Receive_AddressType">Address type</string>
     <string name="Balance_LockedAmount_Title">Locked</string>
+    <string name="Balance_NotRelayedAmount_Title">Broadcasting</string>
     <string name="Balance_Receive_Memo">Memo (Tag)</string>
     <string name="Balance_Error_InvalidQrCode">Can\'t recognize</string>
     <string name="Balance_Receive_WatchAddressAlert">This address is the address of the watched account. Send only network-compatible tokens.</string>
@@ -767,7 +776,8 @@
     <string name="Transactions_ContractCreation">Contract Creation</string>
     <string name="Transactions_To">to %s</string>
     <string name="Transactions_From">from %s</string>
-    <string name="Transaction_Unlimited">unlimited %s</string>
+    <string name="Transaction_Unlimited_CoinCode">unlimited %s</string>
+    <string name="Transaction_Unlimited">unlimited</string>
     <string name="Transactions_All">All</string>
     <string name="Transactions_Filter_Blockchain">Blockchain</string>
     <string name="Transactions_Filter_Coin">Coin</string>
@@ -820,6 +830,10 @@
     <string name="TransactionInfo_YouPaid">You Paid</string>
     <string name="TransactionInfo_YouGet">You Get</string>
     <string name="TransactionInfo_YouGot">You Got</string>
+    <string name="TransactionInfo_YouSent">You Sent</string>
+    <string name="TransactionInfo_Received">Received</string>
+    <string name="TransactionInfo_Sent">Sent</string>
+    <string name="TransactionInfo_Approved">Approved</string>
     <string name="TransactionInfo_Resend">Resend</string>
     <string name="TransactionInfo_RevokeApproval">Revoke Approval</string>
     <string name="TransactionInfo_Options">Options</string>
@@ -859,6 +873,9 @@
     <string name="Info_LockTime_Title" translatable="false">TimeLock</string>
     <string name="Info_LockTime_Description">The sender sent these funds with a spending lock that will expire on %s.\n\nNo worries, the received Bitcoins are already yours, but until the lock period expires you can not spend them on the Bitcoin network.</string>
     <string name="Info_LockTime_Description_Static">The sender sent these funds with a spending lock that will expire on the shown date. \n\nNo worries, the received Bitcoins are already yours, but until the lock period expires you cannot spend them on the Bitcoin network.</string>
+
+    <string name="Info_NotRelayed_Title">Broadcast</string>
+    <string name="Info_NotRelayed_Description">The transaction holding this amount is broadcasted but not yet accepted by the network.</string>
 
     <string name="Info_DoubleSpend_Title">Double Spend</string>
     <string name="Info_DoubleSpend_Description">Double Spend Risk! There is another transaction on the blockchain that is trying to spend inputs used in this transaction. Only one transaction will be accepted by the network</string>
@@ -1271,7 +1288,7 @@
     <string name="ShowKey_PrivateKey_Warning">This key is for all EVM-compatible blockchains.\n\nAs a security measure we recommend not to use copy action on private key.</string>
     <string name="ShowKey_Bip44" translatable="false">BIP 44</string>
     <string name="ShowKey_Bip49" translatable="false">BIP 49 - SegWit</string>
-    <string name="ShowKey_Bip84" translatable="false">BIP 84 - Native SegWit</string>
+    <string name="ShowKey_Bip84" translatable="false">BIP 84 - Native SegWit(recommended)</string>
 
     <!-- Backup Recovery Phrase -->
     <string name="BackupRecoveryPhrase_Title">Backup Recovery Phrase</string>
@@ -1404,7 +1421,7 @@
     <!-- Address Format Settings List -->
 
     <string name="AddressFormatSettings_Title">Address Format</string>
-    <string name="AddressFormatSettings_Description">Select address format for the coin. Proceed with recommended option if unsure. A correct format should be chosen when restoring an existing wallet.</string>
+    <string name="AddressFormatSettings_Description">Select address format for receiving payments. A correct format should be chosen when restoring an existing wallet.</string>
 
     <!-- Coin Platforms -->
 
@@ -1735,13 +1752,12 @@
     <string name="TechnicalAdvice_InfoDescription">We use the Bollinger Bands + RSI strategy to determine trading signals. All calculations are based on daily candlesticks and provide advice for a moderately long term. The essence of the strategy is that the asset price should reach an extreme, breaking out of the Bollinger Bands channel, and the RSI should be in the overbought/oversold zone. After the price returns to the channel, there is a high probability of the price returning to the mean values or attempting to break the channel from the other side. Note that the strategy may give several false signals during strong market movements before a correct signal appears.\n\nPlease remember that it is very important to apply risk management to trading and remember to cut losses if the market situation changes!</string>
     <string name="TechnicalAdvice_ShowDetails">Show Details</string>
     <string name="TechnicalAdvice_HideDetails">Hide Details</string>
-    <string name="TechnicalAdvice_Indicators_Oversold">Very Risky to Trade</string>
     <string name="TechnicalAdvice_Indicators_StrongBuy">Buy Signal</string>
     <string name="TechnicalAdvice_Indicators_Buy">Good Time to Buy</string>
     <string name="TechnicalAdvice_Indicators_Neutral">Neutral</string>
     <string name="TechnicalAdvice_Indicators_Sell">Good Time to Sell</string>
     <string name="TechnicalAdvice_Indicators_StrongSell">Sell Signal</string>
-    <string name="TechnicalAdvice_Indicators_Overbought">Very Risky to Trade</string>
+    <string name="TechnicalAdvice_Indicators_RiskyToTrade">Very Risky to Trade</string>
 
     <string name="Detectors_TokenDetectors">Token Detectors</string>
     <string name="Detectors_GeneralDetectors">General Detectors</string>

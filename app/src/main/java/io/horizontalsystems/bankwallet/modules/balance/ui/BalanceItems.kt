@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -190,7 +191,34 @@ fun BalanceItems(
     }
 
     val context = LocalContext.current
+    val view = LocalView.current
     var revealedCardId by remember { mutableStateOf<Int?>(null) }
+
+    val navigateToTokenBalance: (BalanceViewItem2) -> Unit = remember {
+        {
+            navController.slideFromRight(
+                R.id.tokenBalanceFragment,
+                it.wallet
+            )
+        }
+    }
+
+    val onClickSyncError: (BalanceViewItem2) -> Unit = remember {
+        {
+            onSyncErrorClicked(
+                it,
+                viewModel,
+                navController,
+                view
+            )
+        }
+    }
+
+    val onDisable: (BalanceViewItem2) -> Unit = remember {
+        {
+            viewModel.disable(it)
+        }
+    }
 
     HSSwipeRefresh(
         refreshing = uiState.isRefreshing,
@@ -207,18 +235,22 @@ fun BalanceItems(
             }
         ) {
             item {
-                ElevatedCard(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    TotalBalanceRow(
-                        totalState = totalState,
-                        onClickTitle = {
+                TotalBalanceRow(
+                    totalState = totalState,
+                    onClickTitle = remember {
+                        {
                             viewModel.toggleBalanceVisibility()
                             HudHelper.vibrate(context)
-                        },
-                        onClickSubtitle = {
+                        }
+                    },
+                    onClickSubtitle = remember {
+                        {
                             viewModel.toggleTotalType()
                             HudHelper.vibrate(context)
                         }
-                    )
+                    }
+                )
+            }
 
                     if (!accountViewItem.isWatchAccount) {
                         Row(
@@ -266,7 +298,7 @@ fun BalanceItems(
                                 icon = R.drawable.ic_swap_24,
                                 contentDescription = stringResource(R.string.Swap),
                                 onClick = {
-                                    navController.slideFromRight(R.id.swapXxx)
+                                    navController.slideFromRight(R.id.multiswap)
                                 }
                             )
                         }
@@ -364,8 +396,6 @@ fun BalanceItems(
             ) { item ->
                 BalanceCardSwipable(
                     viewItem = item,
-                    viewModel = viewModel,
-                    navController = navController,
                     revealed = revealedCardId == item.wallet.hashCode(),
                     onReveal = { walletHashCode ->
                         if (revealedCardId != walletHashCode) {
@@ -374,6 +404,15 @@ fun BalanceItems(
                     },
                     onConceal = {
                         revealedCardId = null
+                    },
+                    onClick = {
+                        navigateToTokenBalance.invoke(item)
+                    },
+                    onClickSyncError = {
+                        onClickSyncError.invoke(item)
+                    },
+                    onDisable = {
+                        onDisable.invoke(item)
                     }
                 )
             }

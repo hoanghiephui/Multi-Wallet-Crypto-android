@@ -28,9 +28,10 @@ import io.horizontalsystems.bankwallet.modules.walletconnect.list.WalletConnectL
 import io.horizontalsystems.marketkit.models.BlockchainType
 import io.horizontalsystems.marketkit.models.TokenType
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 
 class BalanceViewModel(
@@ -57,8 +58,10 @@ class BalanceViewModel(
     var connectionResult by mutableStateOf<WalletConnectListViewModel.ConnectionResult?>(null)
         private set
 
+    private var refreshViewItemsJob: Job? = null
+
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             service.balanceItemsFlow
                 .collect { items ->
                     totalBalance.setTotalServiceItems(items?.map {
@@ -115,11 +118,13 @@ class BalanceViewModel(
         return account.headerNote(nonRecommendedDismissed)
     }
 
-    private suspend fun refreshViewItems(balanceItems: List<BalanceModule.BalanceItem>?) {
-        withContext(Dispatchers.IO) {
+    private fun refreshViewItems(balanceItems: List<BalanceModule.BalanceItem>?) {
+        refreshViewItemsJob?.cancel()
+        refreshViewItemsJob = viewModelScope.launch(Dispatchers.Default) {
             if (balanceItems != null) {
                 viewState = ViewState.Success
                 balanceViewItems = balanceItems.map { balanceItem ->
+                    ensureActive()
                     balanceViewItemFactory.viewItem2(
                         balanceItem,
                         service.baseCurrency,
@@ -134,6 +139,7 @@ class BalanceViewModel(
                 balanceViewItems = listOf()
             }
 
+            ensureActive()
             emitState()
         }
     }
