@@ -39,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
@@ -116,6 +117,7 @@ fun SwapScreen(navController: NavController, tokenIn: Token?) {
         factory = SwapViewModel.Factory(tokenIn)
     )
     val uiState = viewModel.uiState
+    val context = LocalContext.current
 
     SwapScreenInner(
         uiState = uiState,
@@ -123,7 +125,7 @@ fun SwapScreen(navController: NavController, tokenIn: Token?) {
         onClickCoinFrom = {
             navController.slideFromBottomForResult<Token>(
                 R.id.swapSelectCoinFragment,
-                uiState.tokenOut
+                SwapSelectCoinFragment.Input(uiState.tokenOut, context.getString(R.string.Swap_YouPay))
             ) {
                 viewModel.onSelectTokenIn(it)
             }
@@ -131,7 +133,7 @@ fun SwapScreen(navController: NavController, tokenIn: Token?) {
         onClickCoinTo = {
             navController.slideFromBottomForResult<Token>(
                 R.id.swapSelectCoinFragment,
-                uiState.tokenIn
+                SwapSelectCoinFragment.Input(uiState.tokenIn, context.getString(R.string.Swap_YouGet))
             ) {
                 viewModel.onSelectTokenOut(it)
             }
@@ -341,7 +343,7 @@ private fun SwapScreenInner(
                         PriceField(quote.tokenIn, quote.tokenOut, quote.amountIn, quote.amountOut)
                         PriceImpactField(uiState.priceImpact, uiState.priceImpactLevel, navController)
                         quote.fields.forEach {
-                            it.GetContent(navController)
+                            it.GetContent(navController, false)
                         }
                     }
                 } else {

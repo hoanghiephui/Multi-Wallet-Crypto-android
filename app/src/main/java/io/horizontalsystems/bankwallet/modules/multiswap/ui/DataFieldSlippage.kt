@@ -4,23 +4,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.modules.multiswap.QuoteInfoRow
-import io.horizontalsystems.bankwallet.modules.send.SendModule
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_leah
+import java.math.BigDecimal
 
-// todo: remove this class if it's unused
-data class SwapDataFieldFee(val feeAmountData: SendModule.AmountData) : SwapDataField {
+data class DataFieldSlippage(val slippage: BigDecimal) : DataField {
     @Composable
-    override fun GetContent(navController: NavController) {
+    override fun GetContent(navController: NavController, borderTop: Boolean) {
         QuoteInfoRow(
+            borderTop = borderTop,
             title = {
-                subhead2_grey(text = stringResource(R.string.Swap_Fee))
+                subhead2_grey(text = stringResource(R.string.Swap_Slippage))
             },
             value = {
-                val text =
-                    feeAmountData.secondary?.getFormatted() ?: feeAmountData.primary.getFormatted()
-                subhead2_leah(text = text)
+                subhead2_leah(text = App.numberFormatter.format(slippage, 0, 2, suffix = "%"))
             }
         )
     }

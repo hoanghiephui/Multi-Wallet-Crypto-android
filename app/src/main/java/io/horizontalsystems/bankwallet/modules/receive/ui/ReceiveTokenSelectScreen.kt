@@ -47,7 +47,7 @@ fun ReceiveTokenSelectScreen(
     val fullCoins = viewModel.uiState.fullCoins
     val coroutineScope = rememberCoroutineScope()
     SearchBar(
-        title = stringResource(R.string.Balance_Receive),
+        title = stringResource(R.string.Balance_ReceiveHint_Search),
         onSearchTextChanged = { text ->
             viewModel.updateFilter(text)
         },

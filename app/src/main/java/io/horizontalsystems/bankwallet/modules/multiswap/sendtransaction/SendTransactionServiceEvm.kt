@@ -15,6 +15,8 @@ import io.horizontalsystems.bankwallet.modules.evmfee.EvmFeeService
 import io.horizontalsystems.bankwallet.modules.evmfee.IEvmGasPriceService
 import io.horizontalsystems.bankwallet.modules.evmfee.eip1559.Eip1559GasPriceService
 import io.horizontalsystems.bankwallet.modules.evmfee.legacy.LegacyGasPriceService
+import io.horizontalsystems.bankwallet.modules.multiswap.ui.DataField
+import io.horizontalsystems.bankwallet.modules.multiswap.ui.DataFieldNonce
 import io.horizontalsystems.bankwallet.modules.send.SendModule
 import io.horizontalsystems.bankwallet.modules.send.evm.settings.SendEvmFeeSettingsScreen
 import io.horizontalsystems.bankwallet.modules.send.evm.settings.SendEvmNonceService
@@ -76,7 +78,7 @@ class SendTransactionServiceEvm(blockchainType: BlockchainType) : ISendTransacti
     private val cautionViewItemFactory by lazy { CautionViewItemFactory(baseCoinService) }
 
     private val _sendTransactionSettingsFlow = MutableStateFlow(
-        SendTransactionSettings.Evm(null)
+        SendTransactionSettings.Evm(null, evmKitWrapper.evmKit.receiveAddress)
     )
     override val sendTransactionSettingsFlow = _sendTransactionSettingsFlow.asStateFlow()
 
@@ -85,19 +87,21 @@ class SendTransactionServiceEvm(blockchainType: BlockchainType) : ISendTransacti
     private var cautions: List<CautionViewItem> = listOf()
     private var sendable = false
     private var loading = true
+    private var fields = listOf<DataField>()
 
     override fun createState() = SendTransactionServiceState(
         networkFee = feeAmountData,
         cautions = cautions,
         sendable = sendable,
-        loading = loading
+        loading = loading,
+        fields = fields
     )
 
     override fun start(coroutineScope: CoroutineScope) {
         coroutineScope.launch {
             gasPriceService.stateFlow.collect { gasPriceState ->
                 _sendTransactionSettingsFlow.update {
-                    SendTransactionSettings.Evm(gasPriceState.dataOrNull)
+                    SendTransactionSettings.Evm(gasPriceState.dataOrNull, evmKitWrapper.evmKit.receiveAddress)
                 }
             }
         }
@@ -109,6 +113,23 @@ class SendTransactionServiceEvm(blockchainType: BlockchainType) : ISendTransacti
                 handleTransactionState(transactionState)
             }
         }
+        coroutineScope.launch {
+            nonceService.stateFlow.collect { nonceState ->
+                handleNonceState(nonceState)
+            }
+        }
+    }
+
+    private fun handleNonceState(nonceState: DataState<SendEvmNonceService.State>) {
+        fields = emptyList()
+
+        nonceState.dataOrNull?.let {
+            if (!it.default || it.fixed) {
+                fields = listOf(DataFieldNonce(it.nonce))
+            }
+        }
+
+        emitState()
     }
 
     private fun handleTransactionState(transactionState: DataState<SendEvmSettingsService.Transaction>) {

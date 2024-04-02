@@ -25,6 +25,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 fun TokenSelectScreen(
     navController: NavController,
     title: String,
+    searchHintText: String = "",
     onClickItem: (BalanceViewItem2) -> Unit,
     viewModel: TokenSelectViewModel,
     emptyItemsText: String,
@@ -44,6 +45,7 @@ fun TokenSelectScreen(
                 content = {
                     val uiState = viewModel.uiState
                     if (uiState.noItems) {
+                        header?.invoke()
                         ListEmptyView(
                             text = emptyItemsText,
                             icon = R.drawable.ic_empty_wallet
@@ -84,6 +86,5 @@ fun TokenSelectScreen(
                 }
             )
         }
-
     }
 }

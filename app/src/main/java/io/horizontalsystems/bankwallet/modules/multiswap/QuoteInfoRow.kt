@@ -1,27 +1,33 @@
 package io.horizontalsystems.bankwallet.modules.multiswap
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
-import io.horizontalsystems.bankwallet.ui.compose.components.HFillSpacer
+import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.cell.CellUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_leah
 
 @Composable
 fun QuoteInfoRow(
+    borderTop: Boolean = false,
     title: @Composable() (RowScope.() -> Unit),
     value: @Composable() (RowScope.() -> Unit),
 ) {
-    CellUniversal(borderTop = false) {
+    CellUniversal(borderTop = borderTop) {
         title.invoke(this)
-        HFillSpacer(minWidth = 16.dp)
-        value.invoke(this)
+        HSpacer(width = 16.dp)
+        Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.End) {
+            value.invoke(this)
+        }
     }
 }
 
