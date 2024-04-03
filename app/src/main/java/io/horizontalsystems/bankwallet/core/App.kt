@@ -112,9 +112,9 @@ import io.horizontalsystems.bankwallet.modules.settings.appearance.AppIconServic
 import io.horizontalsystems.bankwallet.modules.settings.appearance.LaunchScreenService
 import io.horizontalsystems.bankwallet.modules.theme.ThemeService
 import io.horizontalsystems.bankwallet.modules.theme.ThemeType
-import io.horizontalsystems.bankwallet.modules.walletconnect.storage.WCSessionStorage
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCManager
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCSessionManager
+import io.horizontalsystems.bankwallet.modules.walletconnect.storage.WCSessionStorage
 import io.horizontalsystems.bankwallet.widgets.MarketWidgetManager
 import io.horizontalsystems.bankwallet.widgets.MarketWidgetRepository
 import io.horizontalsystems.bankwallet.widgets.MarketWidgetWorker
@@ -224,7 +224,6 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
             Log.w("RxJava ErrorHandler", e)
         }
         initApplovin()
-        EthereumKit.init()
         instance = this
         preferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
         mUserDataRepository = this.userDataRepository
@@ -250,7 +249,6 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
             appConfigProvider = appConfigProvider,
             subscriptionManager = subscriptionManager
         )
-        marketKit.sync()
 
         feeRateProvider = FeeRateProvider(appConfigProvider)
         backgroundManager = BackgroundManager(this)
@@ -496,7 +494,6 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
                 Log.w("AAA", "error", error.throwable)
             },
         )
-
         Web3Wallet.initialize(Wallet.Params.Init(core = CoreClient)) { error ->
             Log.e("AAA", "error", error.throwable)
         }
@@ -545,10 +542,14 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
 
     private fun startTasks() {
         Thread {
+            EthereumKit.init()
+            adapterManager.startAdapterManager()
+            marketKit.sync()
             rateAppManager.onAppLaunch()
             nftMetadataSyncer.start()
             pinComponent.initDefaultPinLevel()
             accountManager.clearAccounts()
+            wcSessionManager.start()
 
             AppVersionManager(systemInfoManager, localStorage).apply { storeAppVersion() }
 

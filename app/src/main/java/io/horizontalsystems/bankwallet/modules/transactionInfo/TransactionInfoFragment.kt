@@ -25,6 +25,7 @@ import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
+import io.horizontalsystems.bankwallet.ui.compose.components.PriceWithToggleCell
 import io.horizontalsystems.bankwallet.ui.compose.components.SectionTitleCell
 import io.horizontalsystems.bankwallet.ui.compose.components.TitleAndValueCell
 import io.horizontalsystems.bankwallet.ui.compose.components.TransactionAmountCell
@@ -158,7 +159,16 @@ fun TransactionInfoSection(
                             TitleAndValueCell(
                                 title = viewItem.title,
                                 value = viewItem.value,
-                                valueIcon = viewItem.valueIcon
+                            )
+                        }
+                    }
+
+                    is TransactionInfoViewItem.PriceWithToggle -> {
+                        add {
+                            PriceWithToggleCell(
+                                title = viewItem.title,
+                                valueOne = viewItem.valueTwo,
+                                valueTwo = viewItem.valueOne
                             )
                         }
                     }
