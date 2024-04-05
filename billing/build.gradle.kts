@@ -35,7 +35,7 @@ android {
         jvmTarget = "17"
     }
     buildFeatures.compose = true
-    composeOptions.kotlinCompilerExtensionVersion = "1.5.8"
+    composeOptions.kotlinCompilerExtensionVersion = "1.5.11"
 }
 
 protobuf {
@@ -68,7 +68,7 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:2.50")
     implementation("androidx.datastore:datastore:1.0.0")
     implementation("com.google.protobuf:protobuf-kotlin-lite:3.25.2")
-    implementation(platform("androidx.compose:compose-bom:2024.03.00"))
+    implementation(platform("androidx.compose:compose-bom:2024.04.00"))
     implementation("androidx.compose.ui:ui-tooling-preview")
 
     testImplementation("junit:junit:4.13.2")
