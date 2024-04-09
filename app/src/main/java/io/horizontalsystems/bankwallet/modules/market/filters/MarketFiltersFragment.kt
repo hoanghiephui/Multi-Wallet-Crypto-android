@@ -277,16 +277,6 @@ fun AdvancedSearchContent(
     }
     VSpacer(height = 32.dp)
 
-    HeaderText(stringResource(R.string.Market_FilterSection_Indicators))
-    SectionUniversalLawrence {
-        AdvancedSearchDropdown(
-            title = R.string.Market_Filter_TradingSignals,
-            value = uiState.filterTradingSignal.title,
-            onDropdownClick = { showBottomSheet(TradingSignals) }
-        )
-    }
-    VSpacer(32.dp)
-
     HeaderText(stringResource(R.string.Market_FilterSection_MarketParameters))
     SectionUniversalLawrence {
         AdvancedSearchDropdown(
@@ -322,16 +312,6 @@ fun AdvancedSearchContent(
             subtitle = R.string.Market_Filter_GoodDistribution_Description,
             enabled = uiState.goodDistributionOn,
             onChecked = { viewModel.updateGoodDistributionOn(it) }
-        )
-    }
-    VSpacer(height = 32.dp)
-
-    HeaderText(stringResource(R.string.Market_FilterSection_NetworkParameters))
-    SectionUniversalLawrence {
-        AdvancedSearchDropdown(
-            title = R.string.Market_Filter_Blockchains,
-            value = uiState.selectedBlockchainsValue,
-            onDropdownClick = onFilterByBlockchainsClick
         )
     }
     VSpacer(height = 32.dp)
@@ -376,6 +356,26 @@ fun AdvancedSearchContent(
         )
     }
     VSpacer(height = 32.dp)
+
+    HeaderText(stringResource(R.string.Market_FilterSection_NetworkParameters))
+    SectionUniversalLawrence {
+        AdvancedSearchDropdown(
+            title = R.string.Market_Filter_Blockchains,
+            value = uiState.selectedBlockchainsValue,
+            onDropdownClick = onFilterByBlockchainsClick
+        )
+    }
+    VSpacer(height = 32.dp)
+
+    HeaderText(stringResource(R.string.Market_FilterSection_Indicators))
+    SectionUniversalLawrence {
+        AdvancedSearchDropdown(
+            title = R.string.Market_Filter_TradingSignals,
+            value = uiState.filterTradingSignal.title,
+            onDropdownClick = { showBottomSheet(TradingSignals) }
+        )
+    }
+    VSpacer(32.dp)
 }
 
 @Composable
@@ -407,7 +407,7 @@ private fun AdvancedSearchSwitch(
     title: Int,
     subtitle: Int? = null,
     enabled: Boolean,
-    borderTop: Boolean = false,
+    borderTop: Boolean = true,
     onChecked: (Boolean) -> Unit,
 ) {
     CellUniversal(
