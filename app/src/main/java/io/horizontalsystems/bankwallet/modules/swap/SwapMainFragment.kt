@@ -32,7 +32,6 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -60,7 +59,6 @@ import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.core.AdType
-import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.BaseFragment
 import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.requireInput
@@ -178,7 +176,10 @@ private fun SwapMainScreen(
     val modalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val providerViewItems = viewModel.swapState.providerViewItems
     val focusManager = LocalFocusManager.current
-
+    val context = LocalContext.current
+    LaunchedEffect(key1 = BuildConfig.SWAP_COIN_NATIVE, block = {
+        viewModel.loadAds(context, BuildConfig.SWAP_COIN_NATIVE)
+    })
     NiaBackground {
         ModalBottomSheetLayout(
             sheetState = modalBottomSheetState,
@@ -252,10 +253,7 @@ fun SwapCards(
     val buttons = viewModel.swapState.buttons
     val hasNonZeroBalance = viewModel.swapState.hasNonZeroBalance
     val nativeAd by viewModel.adState
-    val context = LocalContext.current
-    LaunchedEffect(key1 = BuildConfig.SWAP_COIN_NATIVE, block = {
-        viewModel.loadAds(context, BuildConfig.SWAP_COIN_NATIVE)
-    })
+
     LaunchedEffect(swapState.refocusKey) {
         focusRequester.requestFocus()
     }

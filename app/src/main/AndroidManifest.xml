@@ -295,10 +295,6 @@
         </activity-alias>
 
         <meta-data
-            android:name="applovin.sdk.key"
-            android:value="@string/APPLOVIN_SDK_KEY" />
-
-        <meta-data
             android:name="firebase_crashlytics_collection_enabled"
             android:value="false" />
         <meta-data android:name="firebase_analytics_collection_enabled" android:value="false" />

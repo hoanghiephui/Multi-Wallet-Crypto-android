@@ -17,9 +17,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Divider
-import androidx.compose.material.Text
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -228,18 +229,18 @@ fun Price(
         )
         Box(modifier = Modifier.size(14.5.dp)) {
             CircularProgressIndicator(
-                progress = 1f,
+                progress = { 1f },
                 modifier = Modifier.size(14.5.dp),
                 color = ComposeAppTheme.colors.steel20,
-                strokeWidth = 1.5.dp
+                strokeWidth = 1.5.dp,
             )
             CircularProgressIndicator(
-                progress = timeoutProgress,
+                progress = { timeoutProgress },
                 modifier = Modifier
                     .size(14.5.dp)
                     .scale(scaleX = -1f, scaleY = 1f),
                 color = ComposeAppTheme.colors.jacob,
-                strokeWidth = 1.5.dp
+                strokeWidth = 1.5.dp,
             )
         }
     }
@@ -253,7 +254,7 @@ fun SwitchCoinsSection(onSwitchButtonClick: () -> Unit) {
             .fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),
@@ -264,7 +265,7 @@ fun SwitchCoinsSection(onSwitchButtonClick: () -> Unit) {
             icon = R.drawable.ic_arrow_down_20,
             onClick = onSwitchButtonClick
         )
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f),

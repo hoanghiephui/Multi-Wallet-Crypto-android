@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
-import androidx.startup.AppInitializer
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import coil.decode.GifDecoder
@@ -17,17 +16,21 @@ import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
 import com.android.billing.DebugTree
 import com.android.billing.UserDataRepository
+import com.applovin.sdk.AppLovinMediationProvider
 import com.applovin.sdk.AppLovinSdk
+import com.applovin.sdk.AppLovinSdkInitializationConfiguration
+import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.crashlytics.crashlytics
+import com.wallet.blockchain.bitcoin.BuildConfig
+import com.wallet.blockchain.bitcoin.R
 import com.walletconnect.android.Core
 import com.walletconnect.android.CoreClient
 import com.walletconnect.android.relay.ConnectionType
 import com.walletconnect.web3.wallet.client.Wallet
 import com.walletconnect.web3.wallet.client.Web3Wallet
-import com.wallet.blockchain.bitcoin.BuildConfig
 import dagger.hilt.android.HiltAndroidApp
 import io.horizontalsystems.bankwallet.core.BaseViewModel.Companion.SHOW_ADS
 import io.horizontalsystems.bankwallet.core.factories.AccountFactory
@@ -126,7 +129,12 @@ import io.horizontalsystems.core.security.KeyStoreManager
 import io.horizontalsystems.ethereumkit.core.EthereumKit
 import io.horizontalsystems.hdwalletkit.Mnemonic
 import io.reactivex.plugins.RxJavaPlugins
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.Collections
 import java.util.logging.Level
 import java.util.logging.Logger
 import javax.inject.Inject
@@ -134,8 +142,10 @@ import androidx.work.Configuration as WorkConfiguration
 
 @HiltAndroidApp
 class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
+    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     companion object : ICoreApp by CoreApp {
         lateinit var appLoVinSdk: AppLovinSdk
+        lateinit var appLovinSdkInitialization: AppLovinSdkInitializationConfiguration
 
         lateinit var preferences: SharedPreferences
         lateinit var feeRateProvider: FeeRateProvider
@@ -566,10 +576,24 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
 
     private fun initApplovin() {
         if (SHOW_ADS) {
-            AppLovinSdk.getInstance(this).apply {
-                mediationProvider = "max"
-                appLoVinSdk = this
+            applicationScope.launch {
+                val currentGaid = AdvertisingIdClient.getAdvertisingIdInfo(this@App).id
+                val testDeviceAdvertisingIds = if (currentGaid != null) {
+                    Collections.singletonList(currentGaid)
+                } else emptyList()
+                val initConfig = AppLovinSdkInitializationConfiguration.builder(
+                    getString(R.string.APPLOVIN_SDK_KEY),
+                    this@App
+                )
+                    .setMediationProvider(AppLovinMediationProvider.MAX)
+                    .setTestDeviceAdvertisingIds(testDeviceAdvertisingIds)
+                    .build()
+                // Initialize the AppLovin SDK
+                val sdk = AppLovinSdk.getInstance(this@App)
+                appLovinSdkInitialization = initConfig
+                appLoVinSdk = sdk
             }
+
         }
     }
 

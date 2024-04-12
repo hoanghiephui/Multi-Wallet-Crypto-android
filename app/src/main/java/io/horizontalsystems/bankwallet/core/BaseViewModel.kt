@@ -32,7 +32,7 @@ abstract class BaseViewModel : ViewModel() {
     ) {
         // Initialize ad with ad loader.
         if (SHOW_ADS) {
-            App.appLoVinSdk.initializeSdk {
+            App.appLoVinSdk.initialize(App.appLovinSdkInitialization) {
                 nativeAdLoader.loadAd(context, adUnitIdentifier)
                 Log.d("Applovin", "loadAds")
             }

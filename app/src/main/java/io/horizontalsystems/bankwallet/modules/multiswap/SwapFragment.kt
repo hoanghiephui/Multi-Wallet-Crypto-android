@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -52,8 +53,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.AdType
+import io.horizontalsystems.bankwallet.core.AdViewState
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.badge
 import io.horizontalsystems.bankwallet.core.getInput
 import io.horizontalsystems.bankwallet.core.iconPlaceholder
@@ -118,7 +123,10 @@ fun SwapScreen(navController: NavController, tokenIn: Token?) {
     )
     val uiState = viewModel.uiState
     val context = LocalContext.current
-
+    LaunchedEffect(key1 = BuildConfig.SWAP_COIN_NATIVE, block = {
+        viewModel.loadAds(context, BuildConfig.SWAP_COIN_NATIVE)
+    })
+    val nativeAd by viewModel.adState
     SwapScreenInner(
         uiState = uiState,
         onClickClose = navController::popBackStack,
@@ -162,7 +170,8 @@ fun SwapScreen(navController: NavController, tokenIn: Token?) {
         onActionCompleted = {
             viewModel.onActionCompleted()
         },
-        navController = navController
+        navController = navController,
+        nativeAd = nativeAd
     )
 }
 
@@ -184,6 +193,7 @@ private fun SwapScreenInner(
     onActionStarted: () -> Unit,
     onActionCompleted: () -> Unit,
     navController: NavController,
+    nativeAd: AdViewState
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val lifecycleState by lifecycleOwner.lifecycle.currentStateFlow.collectAsState()
@@ -224,7 +234,6 @@ private fun SwapScreenInner(
             .fillMaxSize()) {
             Column(
                 modifier = Modifier
-                    .padding(it)
                     .verticalScroll(rememberScrollState())
             ) {
                 VSpacer(height = 12.dp)
@@ -369,7 +378,8 @@ private fun SwapScreenInner(
                         )
                     }
                 }
-
+                VSpacer(height = 10.dp)
+                MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
                 VSpacer(height = 32.dp)
             }
 
@@ -584,7 +594,7 @@ private fun SwapInput(
                 onClickCoin = onClickCoinTo
             )
         }
-        Divider(
+        HorizontalDivider(
             modifier = Modifier.align(Alignment.Center),
             thickness = 1.dp,
             color = ComposeAppTheme.colors.steel10
@@ -734,7 +744,7 @@ private fun FiatAmountInput(
                     }
                     text = it
                     onValueChange.invoke(amount)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
 
                 }
             },
@@ -836,7 +846,7 @@ private fun AmountInput(
                 }
 
                 onValueChange.invoke(amount)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
 
             }
         },
