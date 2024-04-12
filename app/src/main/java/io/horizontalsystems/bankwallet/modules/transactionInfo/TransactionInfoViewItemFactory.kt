@@ -475,8 +475,10 @@ class TransactionInfoViewItemFactory(
         itemSections.add(getStatusSectionItems(transaction, status, rates))
         if (transaction is EvmTransactionRecord && !transaction.foreignTransaction && status == TransactionStatus.Pending && resendEnabled) {
             itemSections.add(listOf(SpeedUpCancel(transactionHash = transaction.transactionHash, blockchainType = transaction.blockchainType)))
+            itemSections.add(listOf(TransactionInfoViewItem.Description(translator.getString(R.string.TransactionInfo_SpeedUpDescription))))
         } else if (transaction is BitcoinOutgoingTransactionRecord && transaction.replaceable && resendEnabled) {
             itemSections.add(listOf(SpeedUpCancel(transactionHash = transaction.transactionHash, blockchainType = transaction.blockchainType)))
+            itemSections.add(listOf(TransactionInfoViewItem.Description(translator.getString(R.string.TransactionInfo_SpeedUpDescription))))
         }
         itemSections.add(getExplorerSectionItems(transactionItem.explorerData))
 
@@ -861,6 +863,12 @@ class TransactionInfoViewItemFactory(
 
             is BinanceChainOutgoingTransactionRecord ->
                 items.add(getFee(transaction.fee, rates[transaction.fee.coinUid]))
+
+            is SolanaOutgoingTransactionRecord -> {
+                if (transaction.fee != null) {
+                    items.add(getFeeItem(transaction.fee, rates[transaction.fee.coinUid], status))
+                }
+            }
         }
 
         items.add(TransactionHash(transaction.transactionHash))

@@ -47,6 +47,7 @@ fun UtxoExpertModeScreen(
     adapter: ISendBitcoinAdapter,
     token: Token,
     address: Address?,
+    memo: String?,
     value: BigDecimal?,
     feeRate: Int?,
     customUnspentOutputs: List<UnspentOutputInfo>?,
@@ -54,8 +55,17 @@ fun UtxoExpertModeScreen(
     onBackClick: () -> Unit
 ) {
 
-    val viewModel: UtxoExpertModeViewModel =
-        viewModel(factory = UtxoExpertModeModule.Factory(adapter, token, address, value, feeRate, customUnspentOutputs))
+    val viewModel: UtxoExpertModeViewModel = viewModel(
+        factory = UtxoExpertModeModule.Factory(
+            adapter,
+            token,
+            address,
+            memo,
+            value,
+            feeRate,
+            customUnspentOutputs
+        )
+    )
     val uiState = viewModel.uiState
 
     ComposeAppTheme {

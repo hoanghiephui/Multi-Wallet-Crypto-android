@@ -24,6 +24,7 @@ import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
+import io.horizontalsystems.bankwallet.ui.compose.components.DescriptionCell
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.PriceWithToggleCell
 import io.horizontalsystems.bankwallet.ui.compose.components.SectionTitleCell
@@ -108,11 +109,21 @@ fun TransactionInfoSection(
     navController: NavController,
     getRawTransaction: () -> String?
 ) {
-    if (section.size == 1 && section[0] is TransactionInfoViewItem.WarningMessage) {
-        (section[0] as? TransactionInfoViewItem.WarningMessage)?.let {
-            WarningMessageCell(it.message)
+    //items without background
+    if (section.size == 1) {
+        when (val item = section[0]) {
+            is TransactionInfoViewItem.WarningMessage -> {
+                WarningMessageCell(item.message)
+                return
+            }
+            is TransactionInfoViewItem.Description -> {
+                DescriptionCell(text = item.text)
+                return
+            }
+            else -> {
+                //do nothing
+            }
         }
-        return
     }
 
     CellUniversalLawrenceSection(
@@ -256,8 +267,8 @@ fun TransactionInfoSection(
                         }
                     }
 
-                    is TransactionInfoViewItem.WarningMessage -> {
-                        //already handled
+                    else -> {
+                        //do nothing
                     }
                 }
             }

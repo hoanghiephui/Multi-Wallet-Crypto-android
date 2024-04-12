@@ -191,7 +191,7 @@ private fun TransactionSpeedUpCancelScreen(
                         feeViewModel,
                         nonceViewModel,
                         navController,
-                        speedUpCancelViewModel.description
+
                     )
                 }
                 ButtonsGroupWithShade {
