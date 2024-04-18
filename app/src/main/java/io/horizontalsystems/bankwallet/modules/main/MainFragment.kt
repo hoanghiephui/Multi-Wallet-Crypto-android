@@ -308,16 +308,7 @@ private fun MainScreen(
         }
     }
 
-    if (uiState.showWhatsNew) {
-        LaunchedEffect(Unit) {
-            fragmentNavController.slideFromBottom(
-                R.id.releaseNotesFragment,
-                ReleaseNotesFragment.Input(true)
-            )
-            viewModel.whatsNewShown()
-        }
-    }
-    LaunchedEffect(key1 = Unit, block = {
+    LaunchedEffect(key1 = uiState, block = {
         if (uiState.showRateAppDialog) {
             val request = manager.requestReviewFlow()
             request.addOnCompleteListener { task ->

@@ -26,8 +26,8 @@ android {
         compileSdk compile_sdk_version
         minSdkVersion min_sdk_version
         targetSdkVersion compile_sdk_version
-        versionCode 19
-        versionName "0.1.9"
+        versionCode 20
+        versionName "0.2.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         kapt {
@@ -334,9 +334,9 @@ dependencies {
     implementation project(':core')
     implementation project(':components:icons')
     implementation project(':components:chartview')
-    implementation platform('androidx.compose:compose-bom:2024.04.00')
+    implementation platform('androidx.compose:compose-bom:2024.04.01')
     // Integration with activities
-    implementation 'androidx.activity:activity-compose:1.8.2'
+    implementation 'androidx.activity:activity-compose:1.9.0'
     // Compose Material Design
     implementation "androidx.compose.material:material"
     implementation "androidx.compose.material3:material3:1.2.1"
@@ -388,8 +388,8 @@ dependencies {
     implementation 'com.applovin.mediation:bytedance-adapter:5.9.0.2.0'
     implementation 'com.google.android.exoplayer:exoplayer:2.19.1'
     implementation("com.google.android.gms:play-services-ads-identifier:18.0.1")
-    implementation("com.android.billingclient:billing:6.2.0")
-    implementation("com.android.billingclient:billing-ktx:6.2.0")
+    implementation("com.android.billingclient:billing:6.2.1")
+    implementation("com.android.billingclient:billing-ktx:6.2.1")
     implementation project(":in-app-update")
     implementation('com.airbnb.android:lottie:6.3.0')
     implementation('com.airbnb.android:lottie-compose:6.3.0')
