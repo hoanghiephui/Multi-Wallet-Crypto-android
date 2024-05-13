@@ -228,7 +228,7 @@ private fun MainScreen(
                             destinations = uiState.mainNavItems,
                             onNavigateToDestination = {
                                 viewModel.onSelect(it.mainNavItem)
-                                stat(page = StatPage.Main, event = StatEvent.SwitchTab(item.mainNavItem.statTab))
+                                stat(page = StatPage.Main, event = StatEvent.SwitchTab(it.mainNavItem.statTab))
                             }
                         )
                     }

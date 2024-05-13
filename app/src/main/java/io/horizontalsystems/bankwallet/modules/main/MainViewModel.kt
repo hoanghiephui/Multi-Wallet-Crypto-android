@@ -324,7 +324,7 @@ class MainViewModel(
                         }
                     }
                     deeplinkString.contains("plus") -> {
-                        deeplinkPage = DeeplinkPage(R.id.BillingPlusDialog, CoinFragment.Input("", "widget"))
+                        deeplinkPage = DeeplinkPage(R.id.BillingPlusDialog, CoinFragment.Input("widget"))
                     }
                 }
 

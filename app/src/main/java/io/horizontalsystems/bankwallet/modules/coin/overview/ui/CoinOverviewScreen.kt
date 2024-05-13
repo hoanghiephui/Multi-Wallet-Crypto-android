@@ -261,7 +261,8 @@ fun CoinOverviewScreen(
                                                     ButtonSecondaryDefault(
                                                         title = stringResource(id = R.string.Button_Show),
                                                         onClick = {
-                                                            viewModel.enableChartIndicators()stat(page = StatPage.CoinOverview, event = StatEvent.ToggleIndicators(true))
+                                                            viewModel.enableChartIndicators()
+                                                            stat(page = StatPage.CoinOverview, event = StatEvent.ToggleIndicators(true))
                                                         }
                                                     )
                                                 }

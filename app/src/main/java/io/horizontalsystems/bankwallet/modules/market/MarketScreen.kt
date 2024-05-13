@@ -45,6 +45,7 @@ import io.horizontalsystems.bankwallet.modules.main.MainViewModel
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
 import io.horizontalsystems.bankwallet.core.stats.stat
+import io.horizontalsystems.bankwallet.core.stats.statSection
 import io.horizontalsystems.bankwallet.core.stats.statTab
 import io.horizontalsystems.bankwallet.modules.market.favorites.MarketFavoritesScreen
 import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewModule
@@ -52,6 +53,7 @@ import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewScr
 import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewViewModel
 import io.horizontalsystems.bankwallet.modules.market.posts.MarketPostsScreen
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchResults
+import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchSection
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchViewModel
 import io.horizontalsystems.bankwallet.ui.compose.NiaTab
 import io.horizontalsystems.bankwallet.ui.compose.NiaTabRow
@@ -122,25 +124,26 @@ fun MarketScreen(
                     val itemSections =
                         if (!isSearch && uiState.page is MarketSearchViewModel.Page.SearchResults)
                             mapOf(
-                                Optional.ofNullable<String>(null) to uiState.page.items
+                                MarketSearchSection.SearchResults to uiState.page.items
                             )
                         else if (uiState.page is MarketSearchViewModel.Page.Discovery)
                             mapOf(
-                                Optional.of(stringResource(R.string.Market_Search_Sections_PopularTitle)) to uiState.page.popular.take(6)
+                                MarketSearchSection.Popular to uiState.page.popular.take(6),
                             ) else mapOf()
 
                     MarketSearchResults(
                         uiState.listId,
                         itemSections = itemSections,
-                        onCoinClick = { coin ->
+                        onCoinClick = { coin, section ->
                             active = false
                             text = ""
                             uiState.page
                             searchViewModel.onCoinOpened(coin)
                             navController.slideFromRight(
                                 R.id.coinFragment,
-                                CoinFragment.Input(coin.uid, "market_search")
+                                CoinFragment.Input(coin.uid)
                             )
+                            stat(page = StatPage.MarketSearch, section = section.statSection, event = StatEvent.OpenCoin(coin.uid))
                         }
                     ) { favorited, coinUid ->
                         searchViewModel.onFavoriteClick(favorited, coinUid)
