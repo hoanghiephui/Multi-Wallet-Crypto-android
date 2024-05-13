@@ -23,6 +23,9 @@ import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.authorizedAction
 import io.horizontalsystems.bankwallet.core.getInput
 import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.entities.Account
 import io.horizontalsystems.bankwallet.modules.manageaccount.evmprivatekey.EvmPrivateKeyFragment
 import io.horizontalsystems.bankwallet.modules.manageaccount.showextendedkey.ShowExtendedKeyFragment
@@ -81,6 +84,8 @@ fun ManageAccountScreen(navController: NavController, account: Account) {
                             R.id.evmPrivateKeyFragment,
                             EvmPrivateKeyFragment.Input(key)
                         )
+
+                        stat(page = StatPage.PrivateKeys, event = StatEvent.Open(StatPage.EvmPrivateKey))
                     }
                 }
             }
@@ -97,6 +102,8 @@ fun ManageAccountScreen(navController: NavController, account: Account) {
                                 key.displayKeyType
                             )
                         )
+
+                        stat(page = StatPage.PrivateKeys, event = StatEvent.Open(StatPage.Bip32RootKey))
                     }
                 }
             }
@@ -110,6 +117,8 @@ fun ManageAccountScreen(navController: NavController, account: Account) {
                             R.id.showExtendedKeyFragment,
                             ShowExtendedKeyFragment.Input(key.hdKey, key.displayKeyType)
                         )
+
+                        stat(page = StatPage.PrivateKeys, event = StatEvent.Open(StatPage.AccountExtendedPrivateKey))
                     }
                 }
             }

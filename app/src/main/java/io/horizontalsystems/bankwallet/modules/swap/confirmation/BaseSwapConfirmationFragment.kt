@@ -26,6 +26,9 @@ import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.AppLogger
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromBottom
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
 import io.horizontalsystems.bankwallet.modules.evmfee.EvmFeeCellViewModel
 import io.horizontalsystems.bankwallet.modules.send.evm.settings.SendEvmNonceViewModel
@@ -65,6 +68,8 @@ abstract class BaseSwapConfirmationFragment : BaseComposeFragment() {
             onSendClick = {
                 logger.info("click swap button")
                 sendEvmTransactionViewModel.send(logger)
+
+                stat(page = StatPage.SwapConfirmation, event = StatEvent.Send)
             })
     }
 
@@ -145,8 +150,8 @@ private fun BaseSwapConfirmationScreen(
                         sendEvmTransactionViewModel,
                         feeViewModel,
                         nonceViewModel,
-                        navController
-                    )
+                        navController,
+                    StatPage.SwapConfirmation)
                     Spacer(modifier = Modifier.height(12.dp))
                 }
                 ButtonsGroupWithShade {

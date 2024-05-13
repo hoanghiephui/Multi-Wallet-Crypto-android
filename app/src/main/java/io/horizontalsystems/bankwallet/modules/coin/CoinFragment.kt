@@ -32,6 +32,10 @@ import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.getInput
 import io.horizontalsystems.bankwallet.core.slideFromBottom
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
+import io.horizontalsystems.bankwallet.core.stats.statTab
 import io.horizontalsystems.bankwallet.modules.billing.showBillingPlusDialog
 import io.horizontalsystems.bankwallet.modules.coin.analytics.CoinAnalyticsScreen
 import io.horizontalsystems.bankwallet.modules.coin.coinmarkets.CoinMarketsScreen
@@ -40,7 +44,12 @@ import io.horizontalsystems.bankwallet.ui.AdMaxRewardedLoader
 import io.horizontalsystems.bankwallet.ui.AdRewardedCallback
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
-import io.horizontalsystems.bankwallet.ui.compose.components.*
+import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
+import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
+import io.horizontalsystems.bankwallet.ui.compose.components.ListEmptyView
+import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
+import io.horizontalsystems.bankwallet.ui.compose.components.TabItem
+import io.horizontalsystems.bankwallet.ui.compose.components.Tabs
 import io.horizontalsystems.core.helpers.HudHelper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -54,11 +63,10 @@ class CoinFragment : BaseComposeFragment(), AdRewardedCallback {
     override fun GetContent(navController: NavController) {
         val input = navController.getInput<Input>()
         val coinUid = input?.coinUid ?: ""
-        val apiTag = input?.apiTag ?: ""
         viewModel = coinViewModel(coinUid, userDataRepository)
+
         CoinScreen(
             coinUid,
-            apiTag,
             viewModel,
             navController,
             childFragmentManager
@@ -96,20 +104,19 @@ class CoinFragment : BaseComposeFragment(), AdRewardedCallback {
     override fun onShowFail() {}
 
     @Parcelize
-    data class Input(val coinUid: String, val apiTag: String) : Parcelable
+    data class Input(val coinUid: String) : Parcelable
 }
 
 @Composable
 fun CoinScreen(
     coinUid: String,
-    apiTag: String,
     coinViewModel: CoinViewModel?,
     navController: NavController,
     fragmentManager: FragmentManager,
     openAds: () -> Unit
 ) {
     if (coinViewModel != null) {
-        CoinTabs(apiTag, coinViewModel, navController, fragmentManager, openAds)
+        CoinTabs(coinViewModel, navController, fragmentManager, openAds)
     } else {
         CoinNotFound(coinUid, navController)
     }
@@ -118,7 +125,6 @@ fun CoinScreen(
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CoinTabs(
-    apiTag: String,
     viewModel: CoinViewModel,
     navController: NavController,
     fragmentManager: FragmentManager,
@@ -145,7 +151,11 @@ fun CoinTabs(
                                 title = TranslatableString.ResString(R.string.CoinPage_Unfavorite),
                                 icon = R.drawable.ic_filled_star_24,
                                 tint = MaterialTheme.colorScheme.onSurface,
-                                onClick = { viewModel.onUnfavoriteClick() }
+                                onClick = {
+                                    viewModel.onUnfavoriteClick()
+
+                                    stat(page = StatPage.CoinPage, event = StatEvent.RemoveFromWatchlist(viewModel.fullCoin.coin.uid))
+                                }
                             )
                         )
                     } else {
@@ -156,6 +166,7 @@ fun CoinTabs(
                                 onClick = {
                                     if (isPlusMode) {
                                         viewModel.onFavoriteClick()
+                                        stat(page = StatPage.CoinPage, event = StatEvent.AddToWatchlist(viewModel.fullCoin.coin.uid))
                                     } else {
                                         openAlertDialog = true
                                     }
@@ -175,6 +186,8 @@ fun CoinTabs(
             coroutineScope.launch {
                 pagerState.scrollToPage(tab.ordinal)
 
+                stat(page = StatPage.CoinPage, event = StatEvent.SwitchTab(tab.statTab))
+
                 if (tab == CoinModule.Tab.Details && viewModel.shouldShowSubscriptionInfo()) {
                     viewModel.subscriptionInfoShown()
 
@@ -191,7 +204,6 @@ fun CoinTabs(
             when (tabs[page]) {
                 CoinModule.Tab.Overview -> {
                     CoinOverviewScreen(
-                        apiTag = apiTag,
                         fullCoin = viewModel.fullCoin,
                         navController = navController
                     )
@@ -203,7 +215,6 @@ fun CoinTabs(
 
                 CoinModule.Tab.Details -> {
                     CoinAnalyticsScreen(
-                        apiTag = apiTag,
                         fullCoin = viewModel.fullCoin,
                         navController = navController,
                         fragmentManager = fragmentManager

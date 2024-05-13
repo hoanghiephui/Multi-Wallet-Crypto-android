@@ -20,6 +20,10 @@ import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.getInput
 import io.horizontalsystems.bankwallet.core.managers.FaqManager
+import io.horizontalsystems.bankwallet.core.stats.StatEntity
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.modules.manageaccount.ui.ActionButton
 import io.horizontalsystems.bankwallet.modules.manageaccount.ui.HidableContent
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
@@ -62,6 +66,8 @@ private fun EvmAddressScreen(evmAddress: String, navController: NavController) {
                     icon = R.drawable.ic_info_24,
                     onClick = {
                         FaqManager.showFaqPage(navController, FaqManager.faqPathPrivateKeys)
+
+                        stat(page = StatPage.EvmAddress, event = StatEvent.Open(StatPage.Info))
                     }
                 )
             )
@@ -79,6 +85,8 @@ private fun EvmAddressScreen(evmAddress: String, navController: NavController) {
         ActionButton(R.string.Alert_Copy) {
             TextHelper.copyText(evmAddress)
             HudHelper.showSuccessMessage(view, R.string.Hud_Text_Copied)
+
+            stat(page = StatPage.EvmAddress, event = StatEvent.Copy(StatEntity.EvmAddress))
         }
     }
 }

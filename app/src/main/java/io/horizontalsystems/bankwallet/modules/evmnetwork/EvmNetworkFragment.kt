@@ -47,6 +47,9 @@ import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.composablePopup
 import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.core.requireInput
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.entities.EvmSyncSource
 import io.horizontalsystems.bankwallet.modules.btcblockchainsettings.BlockchainSettingCell
 import io.horizontalsystems.bankwallet.modules.evmnetwork.addrpc.AddRpcScreen
@@ -169,6 +172,8 @@ private fun EvmNetworkScreen(
                     CellUniversalLawrenceSection(viewModel.viewState.defaultItems) { item ->
                         BlockchainSettingCell(item.name, item.url, item.selected, null) {
                             viewModel.onSelectSyncSource(item.syncSource)
+
+                            stat(page = StatPage.BlockchainSettingsEvm, event = StatEvent.SwitchEvmSource(blockchain.uid, item.name))
                         }
                     }
                 }
@@ -179,6 +184,8 @@ private fun EvmNetworkScreen(
                         revealedCardId,
                         onClick = { syncSource ->
                             viewModel.onSelectSyncSource(syncSource)
+
+                            stat(page = StatPage.BlockchainSettingsEvm, event = StatEvent.SwitchEvmSource(blockchain.uid, "custom"))
                         },
                         onReveal = { id ->
                             if (revealedCardId != id) {
@@ -191,6 +198,8 @@ private fun EvmNetworkScreen(
                     ) {
                         viewModel.onRemoveCustomRpc(it)
                         HudHelper.showErrorMessage(view, R.string.Hud_Removed)
+
+                        stat(page = StatPage.BlockchainSettingsEvm, event = StatEvent.DeleteCustomEvmSource(blockchain.uid))
                     }
                 }
 
@@ -198,6 +207,8 @@ private fun EvmNetworkScreen(
                     Spacer(Modifier.height(32.dp))
                     AddButton {
                         navController.navigate(AddRpcPage)
+
+                        stat(page = StatPage.BlockchainSettingsEvm, event = StatEvent.OpenBlockchainSettingsEvmAdd(blockchain.uid))
                     }
                 }
             }

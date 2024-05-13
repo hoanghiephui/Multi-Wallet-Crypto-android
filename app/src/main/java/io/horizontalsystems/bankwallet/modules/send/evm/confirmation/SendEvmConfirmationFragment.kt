@@ -26,6 +26,9 @@ import io.horizontalsystems.bankwallet.core.AppLogger
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.getInputX
 import io.horizontalsystems.bankwallet.core.slideFromBottom
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
 import io.horizontalsystems.bankwallet.modules.evmfee.EvmFeeCellViewModel
 import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmData
@@ -93,6 +96,8 @@ class SendEvmConfirmationFragment : BaseComposeFragment() {
             onSendClick = {
                 logger.info("click send button")
                 sendEvmTransactionViewModel.send(logger)
+
+                stat(page = StatPage.SendConfirmation, event = StatEvent.Send)
             })
     }
 
@@ -176,7 +181,8 @@ private fun SendEvmConfirmationScreen(
                     sendEvmTransactionViewModel,
                     feeViewModel,
                     nonceViewModel,
-                    navController
+                    navController,
+                    StatPage.SendConfirmation
                 )
             }
             ButtonsGroupWithShade {

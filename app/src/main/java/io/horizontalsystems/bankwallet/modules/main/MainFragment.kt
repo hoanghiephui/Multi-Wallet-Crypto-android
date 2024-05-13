@@ -64,6 +64,11 @@ import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.core.stats.StatEntity
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
+import io.horizontalsystems.bankwallet.core.stats.statTab
 import io.horizontalsystems.bankwallet.modules.balance.ui.BalanceScreen
 import io.horizontalsystems.bankwallet.modules.billing.showBillingPlusDialog
 import io.horizontalsystems.bankwallet.modules.keystore.KeyStoreActivity
@@ -223,6 +228,7 @@ private fun MainScreen(
                             destinations = uiState.mainNavItems,
                             onNavigateToDestination = {
                                 viewModel.onSelect(it.mainNavItem)
+                                stat(page = StatPage.Main, event = StatEvent.SwitchTab(item.mainNavItem.statTab))
                             }
                         )
                     }
@@ -337,6 +343,8 @@ private fun MainScreen(
                     R.id.backupRequiredDialog,
                     BackupRequiredDialog.Input(wcSupportState.account, text)
                 )
+
+                stat(page = StatPage.Main, event = StatEvent.Open(StatPage.BackupRequired))
             }
 
             is SupportState.NotSupported -> {

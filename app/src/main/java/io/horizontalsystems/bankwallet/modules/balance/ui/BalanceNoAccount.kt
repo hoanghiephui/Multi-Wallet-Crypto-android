@@ -31,6 +31,9 @@ import io.horizontalsystems.bankwallet.core.AdType
 import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.navigateWithTermsAccepted
 import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.modules.balance.BalanceAccountsViewModel
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryDefault
@@ -81,6 +84,8 @@ fun BalanceNoAccount(navController: NavController,
             onClick = {
                 navController.navigateWithTermsAccepted {
                     navController.slideFromRight(R.id.createAccountFragment)
+
+                    stat(page = StatPage.Balance, event = StatEvent.Open(StatPage.NewWallet))
                 }
             }
         )
@@ -93,6 +98,8 @@ fun BalanceNoAccount(navController: NavController,
             onClick = {
                 navController.navigateWithTermsAccepted {
                     navController.slideFromRight(R.id.importWalletFragment)
+
+                    stat(page = StatPage.Balance, event = StatEvent.Open(StatPage.ImportWallet))
                 }
             }
         )
@@ -104,6 +111,8 @@ fun BalanceNoAccount(navController: NavController,
             title = stringResource(R.string.ManageAccounts_WatchAddress),
             onClick = {
                 navController.slideFromRight(R.id.watchAddressFragment)
+
+                stat(page = StatPage.Balance, event = StatEvent.Open(StatPage.WatchWallet))
             }
         )
 

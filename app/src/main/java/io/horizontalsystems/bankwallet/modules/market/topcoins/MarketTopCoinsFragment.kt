@@ -28,6 +28,12 @@ import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.getInput
 import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
+import io.horizontalsystems.bankwallet.core.stats.statField
+import io.horizontalsystems.bankwallet.core.stats.statMarketTop
+import io.horizontalsystems.bankwallet.core.stats.statSortType
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
@@ -70,9 +76,11 @@ class MarketTopCoinsFragment : BaseComposeFragment() {
         get() = "MarketTopCoinsFragment"
 
     private fun onCoinClick(coinUid: String, navController: NavController) {
-        val arguments = CoinFragment.Input(coinUid, "market_overview_top_coins")
+        val arguments = CoinFragment.Input(coinUid)
 
         navController.slideFromRight(R.id.coinFragment, arguments)
+
+        stat(page = StatPage.TopCoins, event = StatEvent.OpenCoin(coinUid))
     }
 
     @Parcelize
@@ -123,8 +131,16 @@ fun TopCoinsScreen(
                                 CoinList(
                                     items = it,
                                     scrollToTop = scrollToTopAfterUpdate,
-                                    onAddFavorite = { uid -> viewModel.onAddFavorite(uid) },
-                                    onRemoveFavorite = { uid -> viewModel.onRemoveFavorite(uid) },
+                                    onAddFavorite = { uid ->
+                                        viewModel.onAddFavorite(uid)
+
+                                        stat(page = StatPage.TopCoins, event = StatEvent.AddToWatchlist(uid))
+                                    },
+                                    onRemoveFavorite = { uid ->
+                                        viewModel.onRemoveFavorite(uid)
+
+                                        stat(page = StatPage.TopCoins, event = StatEvent.RemoveFromWatchlist(uid))
+                                    },
                                     onCoinClick = onCoinClick,
                                     preItems = {
                                         header?.let { header ->
@@ -163,6 +179,8 @@ fun TopCoinsScreen(
                                                                         viewModel.onSelectTopMarket(
                                                                             topMarket
                                                                         )
+
+                                                                        stat(page = StatPage.TopCoins, event = StatEvent.SwitchMarketTop(topMarket.statMarketTop))
                                                                     }
                                                                 )
                                                             }
@@ -171,7 +189,11 @@ fun TopCoinsScreen(
                                                         Box(modifier = Modifier.padding(start = 8.dp)) {
                                                             ButtonSecondaryToggle(
                                                                 select = menu.marketFieldSelect,
-                                                                onSelect = viewModel::onSelectMarketField
+                                                                onSelect = {
+                                                                    viewModel.onSelectMarketField(it)
+
+                                                                    stat(page = StatPage.TopCoins, event = StatEvent.SwitchField(it.statField))
+                                                                }
                                                             )
                                                         }
                                                     }
@@ -200,6 +222,8 @@ fun TopCoinsScreen(
                     { selected ->
                         scrollToTopAfterUpdate = true
                         viewModel.onSelectSortingField(selected)
+
+                        stat(page = StatPage.TopCoins, event = StatEvent.SwitchSortType(selected.statSortType))
                     },
                     { viewModel.onSelectorDialogDismiss() }
                 )

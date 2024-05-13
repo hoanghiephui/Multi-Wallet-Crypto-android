@@ -19,6 +19,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.market.ImageSource
@@ -64,12 +67,14 @@ fun TopPairsScreen(navController: NavController) {
                         ViewState.Loading -> {
                             Loading()
                         }
+
                         is ViewState.Error -> {
                             ListErrorView(
                                 stringResource(R.string.SyncError),
                                 viewModel::onErrorClick
                             )
                         }
+
                         ViewState.Success -> {
                             LazyColumn(
                                 modifier = Modifier.fillMaxSize()
@@ -85,6 +90,8 @@ fun TopPairsScreen(navController: NavController) {
                                     TopPairItem(item, borderTop = i == 0, borderBottom = true) {
                                         it.tradeUrl?.let {
                                             LinkHelper.openLinkInAppBrowser(context, it)
+
+                                            stat(page = StatPage.TopMarketPairs, event = StatEvent.Open(StatPage.ExternalMarketPair))
                                         }
                                     }
                                 }

@@ -24,6 +24,9 @@ import coil.compose.rememberAsyncImagePainter
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromBottom
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
@@ -105,14 +108,20 @@ private fun onClick(
     when (item.blockchainItem) {
         is BlockchainSettingsModule.BlockchainItem.Btc -> {
             navController.slideFromBottom(R.id.btcBlockchainSettingsFragment, item.blockchainItem.blockchain)
+
+            stat(page = StatPage.BlockchainSettings, event = StatEvent.OpenBlockchainSettingsBtc(item.blockchainItem.blockchain.uid))
         }
 
         is BlockchainSettingsModule.BlockchainItem.Evm -> {
             navController.slideFromBottom(R.id.evmNetworkFragment, item.blockchainItem.blockchain)
+
+            stat(page = StatPage.BlockchainSettings, event = StatEvent.OpenBlockchainSettingsEvm(item.blockchainItem.blockchain.uid))
         }
 
         is BlockchainSettingsModule.BlockchainItem.Solana -> {
             navController.slideFromBottom(R.id.solanaNetworkFragment)
+
+            stat(page = StatPage.BlockchainSettings, event = StatEvent.Open(StatPage.BlockchainSettingsSolana))
         }
     }
 }

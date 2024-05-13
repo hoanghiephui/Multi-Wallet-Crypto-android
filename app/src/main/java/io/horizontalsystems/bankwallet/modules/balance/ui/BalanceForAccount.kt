@@ -39,6 +39,9 @@ import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.slideFromBottom
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.core.utils.ModuleField
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.backupalert.BackupAlert
@@ -145,6 +148,8 @@ fun BalanceForAccount(navController: NavController, accountViewItem: AccountView
                                     when (val state = viewModel.getWalletConnectSupportState()) {
                                         WCManager.SupportState.Supported -> {
                                             qrScannerLauncher.launch(QRScannerActivity.getScanQrIntent(context, true))
+
+                                            stat(page = StatPage.Balance, event = StatEvent.Open(StatPage.ScanQrCode))
                                         }
 
                                         WCManager.SupportState.NotSupportedDueToNoActiveAccount -> {
@@ -157,6 +162,8 @@ fun BalanceForAccount(navController: NavController, accountViewItem: AccountView
                                                 R.id.backupRequiredDialog,
                                                 BackupRequiredDialog.Input(state.account, text)
                                             )
+
+                                            stat(page = StatPage.Balance, event = StatEvent.Open(StatPage.BackupRequired))
                                         }
 
                                         is WCManager.SupportState.NotSupported -> {
@@ -216,6 +223,8 @@ fun BalanceTitleRow(
                     R.id.manageAccountsFragment,
                     ManageAccountsModule.Mode.Switcher
                 )
+
+                stat(page = StatPage.Balance, event = StatEvent.Open(StatPage.ManageWallets))
             },
         verticalAlignment = Alignment.CenterVertically
     ) {

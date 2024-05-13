@@ -34,6 +34,11 @@ import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.getInput
 import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
+import io.horizontalsystems.bankwallet.core.stats.statPeriod
+import io.horizontalsystems.bankwallet.core.stats.statSortType
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.market.ImageSource
@@ -121,6 +126,8 @@ fun TopPlatformsScreen(
                                             R.id.marketPlatformFragment,
                                             it
                                         )
+
+                                        stat(page = StatPage.TopPlatforms, event = StatEvent.OpenPlatform(it.uid))
                                     },
                                     preItems = {
                                         item {
@@ -150,6 +157,8 @@ fun TopPlatformsScreen(
                                                             it,
                                                             viewModel.periodOptions
                                                         )
+
+                                                        stat(page = StatPage.TopPlatforms, event = StatEvent.SwitchPeriod(it.statPeriod))
                                                     }
                                                 )
                                                 Spacer(modifier = Modifier.width(16.dp))
@@ -171,6 +180,8 @@ fun TopPlatformsScreen(
                     option.select,
                     { selected ->
                         viewModel.onSelectSortingField(selected)
+
+                        stat(page = StatPage.TopPlatforms, event = StatEvent.SwitchSortType(selected.statSortType))
                     },
                     { viewModel.onSelectorDialogDismiss() }
                 )

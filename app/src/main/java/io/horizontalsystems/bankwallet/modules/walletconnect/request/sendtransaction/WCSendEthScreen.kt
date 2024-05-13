@@ -20,6 +20,10 @@ import io.horizontalsystems.bankwallet.core.AppLogger
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.shorten
 import io.horizontalsystems.bankwallet.core.slideFromBottom
+import io.horizontalsystems.bankwallet.core.stats.StatEntity
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.modules.evmfee.Cautions
 import io.horizontalsystems.bankwallet.modules.evmfee.EvmFeeCellViewModel
 import io.horizontalsystems.bankwallet.modules.fee.FeeCell
@@ -107,13 +111,25 @@ fun WCSendEthRequestScreen(
                                 item.type
                             )
 
-                            is ViewItem.Address -> TransactionInfoAddressCell(
-                                item.title,
-                                item.value,
-                                item.showAdd,
-                                item.blockchainType,
-                                navController
-                            )
+                            is ViewItem.Address -> {
+                                TransactionInfoAddressCell(
+                                    item.title,
+                                    item.value,
+                                    item.showAdd,
+                                    item.blockchainType,
+                                    navController,
+                                    onCopy = {
+                                        stat(page = StatPage.WalletConnect, section = item.statSection, event = StatEvent.Copy(StatEntity.Address))
+                                    },
+                                    onAddToExisting = {
+                                        stat(page = StatPage.WalletConnect, section = item.statSection, event = StatEvent.Open(StatPage.ContactAddToExisting))
+                                    },
+                                    onAddToNew = {
+                                        stat(page = StatPage.WalletConnect, section = item.statSection, event = StatEvent.Open(StatPage.ContactNew))
+                                    }
+                                )
+
+                            }
 
                             is ViewItem.ContactItem -> TransactionInfoContactCell(
                                 item.contact.name

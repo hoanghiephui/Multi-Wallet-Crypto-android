@@ -22,6 +22,9 @@ import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.composablePage
 import io.horizontalsystems.bankwallet.core.getInput
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.entities.Wallet
 import io.horizontalsystems.bankwallet.modules.receive.ReceiveRoutes.BCH_ADDRESS_FORMAT_SCREEN
 import io.horizontalsystems.bankwallet.modules.receive.ReceiveRoutes.COIN_SELECT_SCREEN
@@ -148,8 +151,7 @@ fun ReceiveScreen(
                         navController.navigate(NETWORK_SELECT_SCREEN)
                     },
                     onCoinClick = { wallet ->
-                        viewModel.wallet = wallet
-                        navController.navigate(RECEIVE_ADDRESS_SCREEN)
+                        onSelectWallet(wallet, viewModel, navController)
                     },
                     onBackPress = navigateBack(fragmentNavController, navController),
                 )
@@ -168,8 +170,7 @@ fun ReceiveScreen(
                     addressFormatItems = bchAddressViewModel.items,
                     description = stringResource(R.string.Balance_Receive_AddressFormat_RecommendedAddressType),
                     onSelect = { wallet ->
-                        viewModel.wallet = wallet
-                        navController.navigate(RECEIVE_ADDRESS_SCREEN)
+                        onSelectWallet(wallet, viewModel, navController)
                     },
                     onBackPress = navigateBack(fragmentNavController, navController)
                 )
@@ -188,8 +189,7 @@ fun ReceiveScreen(
                     addressFormatItems = derivationViewModel.items,
                     description = stringResource(R.string.Balance_Receive_AddressFormat_RecommendedDerivation),
                     onSelect = { wallet ->
-                        viewModel.wallet = wallet
-                        navController.navigate(RECEIVE_ADDRESS_SCREEN)
+                        onSelectWallet(wallet, viewModel, navController)
                     },
                     onBackPress = navigateBack(fragmentNavController, navController)
                 )
@@ -207,13 +207,19 @@ fun ReceiveScreen(
                     activeAccount = activeAccount,
                     fullCoin = fullCoin,
                     onSelect = { wallet ->
-                        viewModel.wallet = wallet
-                        navController.navigate(RECEIVE_ADDRESS_SCREEN)
+                        onSelectWallet(wallet, viewModel, navController)
                     }
                 )
             }
         }
     }
+}
+
+private fun onSelectWallet(wallet: Wallet, viewModel: ReceiveSharedViewModel, navController: NavController) {
+    viewModel.wallet = wallet
+    navController.navigate(RECEIVE_ADDRESS_SCREEN)
+
+    stat(page = StatPage.ReceiveTokenList, event = StatEvent.OpenReceive(wallet.token))
 }
 
 @Composable

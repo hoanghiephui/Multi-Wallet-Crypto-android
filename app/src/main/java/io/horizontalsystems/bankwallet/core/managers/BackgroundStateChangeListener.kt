@@ -1,6 +1,7 @@
 package io.horizontalsystems.bankwallet.core.managers
 
 import android.app.Activity
+import io.horizontalsystems.bankwallet.core.stats.StatsManager
 import io.horizontalsystems.bankwallet.core.IAccountManager
 import io.horizontalsystems.bankwallet.modules.keystore.KeyStoreActivity
 import io.horizontalsystems.bankwallet.modules.lockscreen.LockScreenActivity
@@ -14,6 +15,7 @@ class BackgroundStateChangeListener(
     private val systemInfoManager: ISystemInfoManager,
     private val keyStoreManager: IKeyStoreManager,
     private val pinComponent: IPinComponent,
+    private val statsManager: StatsManager,
     private val accountManager: IAccountManager,
 ) : BackgroundManager.Listener {
 
@@ -45,6 +47,8 @@ class BackgroundStateChangeListener(
         if (pinComponent.shouldShowPin(activity)) {
             LockScreenActivity.start(activity)
         }
+
+        statsManager.sendStats()
     }
 
     override fun didEnterBackground() {

@@ -34,14 +34,23 @@ import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.getInput
 import io.horizontalsystems.bankwallet.core.navigateWithTermsAccepted
 import io.horizontalsystems.bankwallet.core.slideFromBottom
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.modules.backuplocal.fullbackup.BackupFileValidator
-import io.horizontalsystems.bankwallet.modules.backuplocal.password.BackupLocalPasswordViewModel.*
 import io.horizontalsystems.bankwallet.modules.contacts.screen.ConfirmationBottomSheet
 import io.horizontalsystems.bankwallet.modules.manageaccounts.ManageAccountsModule
 import io.horizontalsystems.bankwallet.modules.restorelocal.RestoreLocalFragment
 import io.horizontalsystems.bankwallet.modules.swap.settings.Caution
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
-import io.horizontalsystems.bankwallet.ui.compose.components.*
+import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
+import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
+import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
+import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
+import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
+import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
+import io.horizontalsystems.bankwallet.ui.compose.components.headline2_leah
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
@@ -90,9 +99,12 @@ private fun ImportWalletScreen(
                                     popUpToInclusiveId,
                                     inclusive,
                                     jsonString,
-                                    fileName
+                                    fileName,
+                                    StatPage.ImportWalletFromFiles
                                 )
                             )
+
+                            stat(page = StatPage.ImportWallet, event = StatEvent.Open(StatPage.ImportWalletFromFiles))
                         }
                     }
                 } catch (e: Throwable) {
@@ -153,7 +165,10 @@ private fun ImportWalletScreen(
                         navController.navigateWithTermsAccepted {
                             navController.slideFromBottom(
                                 R.id.restoreAccountFragment,
-                                ManageAccountsModule.Input(popUpToInclusiveId, inclusive)                            )
+                                ManageAccountsModule.Input(popUpToInclusiveId, inclusive)
+                            )
+
+                            stat(page = StatPage.ImportWallet, event = StatEvent.Open(StatPage.ImportWalletFromKey))
                         }
                     }
                 )
@@ -174,7 +189,10 @@ private fun ImportWalletScreen(
                     onClick = {
                         navController.slideFromBottom(
                             R.id.importCexAccountFragment,
-                            ManageAccountsModule.Input(popUpToInclusiveId, inclusive)                        )
+                            ManageAccountsModule.Input(popUpToInclusiveId, inclusive)
+                        )
+
+                        stat(page = StatPage.ImportWallet, event = StatEvent.Open(StatPage.ImportWalletFromExchangeWallet))
                     }
                 )
                 VSpacer(12.dp)

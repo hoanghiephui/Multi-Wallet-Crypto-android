@@ -21,6 +21,10 @@ import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
+import io.horizontalsystems.bankwallet.core.stats.statPeriod
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
@@ -49,6 +53,8 @@ fun MarketFavoritesScreen(
         refreshing = isRefreshing,
         onRefresh = {
             viewModel.refresh()
+
+            stat(page = StatPage.Watchlist, event = StatEvent.Refresh)
         }
     ) {
         Crossfade(
@@ -78,18 +84,32 @@ fun MarketFavoritesScreen(
                                 items = data.marketItems,
                                 scrollToTop = scrollToTopAfterUpdate,
                                 onAddFavorite = { /*not used */ },
-                                onRemoveFavorite = { uid -> viewModel.removeFromFavorites(uid) },
+                                onRemoveFavorite = { uid ->
+                                    viewModel.removeFromFavorites(uid)
+
+                                    stat(page = StatPage.Watchlist, event = StatEvent.RemoveFromWatchlist(uid))
+                                },
                                 onCoinClick = { coinUid ->
-                                    val arguments = CoinFragment.Input(coinUid, "market_watchlist")
+                                    val arguments = CoinFragment.Input(coinUid)
                                     navController.slideFromRight(R.id.coinFragment, arguments)
+
+                                    stat(page = StatPage.Watchlist, event = StatEvent.OpenCoin(coinUid))
                                 },
                                 preItems = {
                                     stickyHeader {
                                         MarketFavoritesMenu(
                                             sortDescending = data.sortingDescending,
                                             periodSelect = data.periodSelect,
-                                            onSortingToggle = viewModel::onSortToggle,
-                                            onSelectPeriod = viewModel::onSelectTimeDuration
+                                            onSortingToggle = {
+                                                viewModel.onSortToggle()
+
+                                                stat(page = StatPage.Watchlist, event = StatEvent.ToggleSortDirection)
+                                            },
+                                            onSelectPeriod = {
+                                                viewModel.onSelectTimeDuration(it)
+
+                                                stat(page = StatPage.Watchlist, event = StatEvent.SwitchPeriod(it.statPeriod))
+                                            }
                                         )
                                     }
                                 }

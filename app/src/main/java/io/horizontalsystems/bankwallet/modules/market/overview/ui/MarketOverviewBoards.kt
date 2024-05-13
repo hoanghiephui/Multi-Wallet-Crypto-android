@@ -22,6 +22,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
+import io.horizontalsystems.bankwallet.core.stats.statSection
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
 import io.horizontalsystems.bankwallet.modules.market.MarketModule
 import io.horizontalsystems.bankwallet.modules.market.MarketViewItem
@@ -43,7 +47,7 @@ fun BoardsView(
         {
             navController.slideFromRight(
                 R.id.coinFragment,
-                CoinFragment.Input(it.coinUid, "market_overview")
+                CoinFragment.Input(it.coinUid)
             )
         }
     }
@@ -64,7 +68,11 @@ fun BoardsView(
             shape = RoundedCornerShape(12.dp)
         ){
             boardItem.marketViewItems.forEach { coin ->
-                MarketCoinWithBackground(coin) { onItemClick.invoke(coin) }
+                MarketCoinWithBackground(coin) {
+                    onItemClick.invoke(coin)
+
+                    stat(page = StatPage.MarketOverview, section = boardItem.type.statSection, event = StatEvent.OpenCoin(coin.coinUid))
+                }
             }
 
             SeeAllButton { onClickSeeAll(boardItem.type) }

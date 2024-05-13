@@ -42,6 +42,10 @@ import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
 import io.horizontalsystems.bankwallet.modules.main.MainModule
 import io.horizontalsystems.bankwallet.modules.main.MainViewModel
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
+import io.horizontalsystems.bankwallet.core.stats.statTab
 import io.horizontalsystems.bankwallet.modules.market.favorites.MarketFavoritesScreen
 import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewModule
 import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewScreen
@@ -104,8 +108,12 @@ fun MarketScreen(
                     IconButton(onClick = {
                         active = false
                         navController.slideFromRight(R.id.marketSearchFragment)
+
+                        stat(page = StatPage.Markets, event = StatEvent.Open(StatPage.MarketSearch))
                     }) {
                         Icon(Icons.Rounded.MoreVert, contentDescription = null)
+
+                        stat(page = StatPage.Markets, event = StatEvent.Open(StatPage.AdvancedSearch))
                     }
                 },
             ) {

@@ -47,6 +47,10 @@ import io.horizontalsystems.bankwallet.core.iconPlaceholder
 import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.core.slideFromBottomForResult
 import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.core.stats.StatEntity
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.model.BnTimePeriod
 import io.horizontalsystems.bankwallet.model.TickerStreamRepository
@@ -88,12 +92,11 @@ import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun CoinOverviewScreen(
-    apiTag: String,
     fullCoin: FullCoin,
     navController: NavController,
     binanceViewModel: BinanceViewModel = hiltViewModel()
 ) {
-    val vmFactory by lazy { CoinOverviewModule.Factory(fullCoin, apiTag) }
+    val vmFactory by lazy { CoinOverviewModule.Factory(fullCoin) }
     val viewModel = viewModel<CoinOverviewViewModel>(factory = vmFactory)
     val chartViewModel = viewModel<ChartViewModel>(factory = vmFactory)
 
@@ -251,13 +254,14 @@ fun CoinOverviewScreen(
                                                         title = stringResource(id = R.string.Button_Hide),
                                                         onClick = {
                                                             viewModel.disableChartIndicators()
-                                                        }
-                                                    )
+
+                                                    stat(page = StatPage.CoinOverview, event = StatEvent.ToggleIndicators(false))
+                                                    })
                                                 } else {
                                                     ButtonSecondaryDefault(
                                                         title = stringResource(id = R.string.Button_Show),
                                                         onClick = {
-                                                            viewModel.enableChartIndicators()
+                                                            viewModel.enableChartIndicators()stat(page = StatPage.CoinOverview, event = StatEvent.ToggleIndicators(true))
                                                         }
                                                     )
                                                 }
@@ -267,6 +271,8 @@ fun CoinOverviewScreen(
                                                 icon = R.drawable.ic_setting_20
                                             ) {
                                                 navController.slideFromRight(R.id.indicatorsFragment)
+
+                                                stat(page = StatPage.CoinOverview, event = StatEvent.Open(StatPage.Indicators))
                                             }
                                         }
                                     }
@@ -291,9 +297,13 @@ fun CoinOverviewScreen(
                                         tokenVariants = tokenVariants,
                                         onClickAddToWallet = {
                                             manageWalletsViewModel.enable(it)
+
+                                            stat(page = StatPage.CoinOverview, event = StatEvent.AddToWallet)
                                         },
                                         onClickRemoveWallet = {
                                             manageWalletsViewModel.disable(it)
+
+                                            stat(page = StatPage.CoinOverview, event = StatEvent.RemoveFromWallet)
                                         },
                                         onClickCopy = {
                                             TextHelper.copyText(it)
@@ -301,9 +311,13 @@ fun CoinOverviewScreen(
                                                 view,
                                                 R.string.Hud_Text_Copied
                                             )
+
+                                            stat(page = StatPage.CoinOverview, event = StatEvent.Copy(StatEntity.ContractAddress))
                                         },
                                         onClickExplorer = {
                                             LinkHelper.openLinkInAppBrowser(context, it)
+
+                                            stat(page = StatPage.CoinOverview, event = StatEvent.Open(StatPage.ExternalBlockExplorer))
                                         },
                                     )
                                 }
@@ -435,6 +449,16 @@ private fun onClick(coinLink: CoinLink, context: Context, navController: NavCont
         }
 
         else -> LinkHelper.openLinkInAppBrowser(context, absoluteUrl)
+    }
+
+    when(coinLink.linkType) {
+        LinkType.Guide -> stat(page = StatPage.CoinOverview, event = StatEvent.Open(StatPage.Guide))
+        LinkType.Website -> stat(page = StatPage.CoinOverview, event = StatEvent.Open(StatPage.ExternalCoinWebsite))
+        LinkType.Whitepaper -> stat(page = StatPage.CoinOverview, event = StatEvent.Open(StatPage.ExternalCoinWhitePaper))
+        LinkType.Twitter -> stat(page = StatPage.CoinOverview, event = StatEvent.Open(StatPage.ExternalTwitter))
+        LinkType.Telegram -> stat(page = StatPage.CoinOverview, event = StatEvent.Open(StatPage.ExternalTelegram))
+        LinkType.Reddit -> stat(page = StatPage.CoinOverview, event = StatEvent.Open(StatPage.ExternalReddit))
+        LinkType.Github -> stat(page = StatPage.CoinOverview, event = StatEvent.Open(StatPage.ExternalGithub))
     }
 }
 

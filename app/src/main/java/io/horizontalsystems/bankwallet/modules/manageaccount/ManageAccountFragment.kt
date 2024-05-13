@@ -27,6 +27,10 @@ import io.horizontalsystems.bankwallet.core.managers.FaqManager
 import io.horizontalsystems.bankwallet.core.requireInput
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.core.stats.StatEntity
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.entities.Account
 import io.horizontalsystems.bankwallet.modules.balance.HeaderNote
 import io.horizontalsystems.bankwallet.modules.balance.ui.NoteError
@@ -106,6 +110,8 @@ fun ManageAccountScreen(navController: NavController, accountId: String) {
                 hint = "",
                 onValueChange = {
                     viewModel.onChange(it)
+
+                    stat(page = StatPage.ManageWallet, event = StatEvent.Edit(StatEntity.WalletName))
                 }
             )
 
@@ -161,6 +167,8 @@ fun ManageAccountScreen(navController: NavController, accountId: String) {
                             R.id.unlinkConfirmationDialog,
                             viewModel.account
                         )
+
+                        stat(page = StatPage.ManageWallet, event = StatEvent.Open(StatPage.UnlinkWallet))
                     }
                 })
             VSpacer(32.dp)
@@ -192,6 +200,8 @@ private fun BackupActions(
                                 R.id.backupKeyFragment,
                                 account
                             )
+
+                            stat(page = StatPage.ManageWallet, event = StatEvent.Open(StatPage.ManualBackup))
                         }
                     }
                 }
@@ -206,6 +216,8 @@ private fun BackupActions(
                     ) {
                         navController.authorizedAction {
                             navController.slideFromBottom(R.id.backupLocalFragment, account)
+
+                            stat(page = StatPage.ManageWallet, event = StatEvent.Open(StatPage.FileBackup))
                         }
                     }
                 }
@@ -248,6 +260,8 @@ private fun KeyActions(
                                 R.id.recoveryPhraseFragment,
                                 viewModel.account
                             )
+
+                            stat(page = StatPage.ManageWallet, event = StatEvent.Open(StatPage.RecoveryPhrase))
                         }
                     }
                 }
@@ -263,6 +277,8 @@ private fun KeyActions(
                             R.id.privateKeysFragment,
                             viewModel.account
                         )
+
+                        stat(page = StatPage.ManageWallet, event = StatEvent.Open(StatPage.PrivateKeys))
                     }
                 }
             }
@@ -277,6 +293,8 @@ private fun KeyActions(
                             R.id.publicKeysFragment,
                             viewModel.account
                         )
+
+                        stat(page = StatPage.ManageWallet, event = StatEvent.Open(StatPage.PublicKeys))
                     }
                 }
             }
