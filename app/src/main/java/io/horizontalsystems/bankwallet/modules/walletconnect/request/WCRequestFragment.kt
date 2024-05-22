@@ -12,24 +12,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.navGraphViewModels
 import com.google.gson.Gson
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.AppLogger
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
-import io.horizontalsystems.bankwallet.modules.evmfee.EvmFeeCellViewModel
-import io.horizontalsystems.bankwallet.modules.send.evm.settings.SendEvmNonceViewModel
-import io.horizontalsystems.bankwallet.modules.sendevmtransaction.SendEvmTransactionViewModel
-import io.horizontalsystems.bankwallet.modules.walletconnect.request.sendtransaction.WCRequestModule
-import io.horizontalsystems.bankwallet.modules.walletconnect.request.sendtransaction.WCSendEthereumTransactionRequestViewModel
-import io.horizontalsystems.bankwallet.modules.walletconnect.request.ui.TitleTypedValueCell
-import io.horizontalsystems.bankwallet.modules.walletconnect.session.ui.BlockchainCell
+import io.horizontalsystems.bankwallet.modules.sendevmtransaction.TitleValue
+import io.horizontalsystems.bankwallet.modules.sendevmtransaction.ValueType
+import io.horizontalsystems.bankwallet.modules.sendevmtransaction.ViewItem
 import io.horizontalsystems.bankwallet.modules.walletconnect.request.sendtransaction.WCEthereumTransaction
 import io.horizontalsystems.bankwallet.modules.walletconnect.request.sendtransaction.WCSendEthRequestScreen
+import io.horizontalsystems.bankwallet.modules.walletconnect.request.signtransaction.WCSignEthereumTransactionRequestScreen
+import io.horizontalsystems.bankwallet.modules.walletconnect.session.ui.BlockchainCell
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
@@ -48,13 +44,12 @@ class WCRequestFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent(navController: NavController) {
-        val wcRequestViewModel =
-            viewModel<WCNewRequestViewModel>(factory = WCNewRequestViewModel.Factory())
+        val wcRequestViewModel = viewModel<WCNewRequestViewModel>(factory = WCNewRequestViewModel.Factory())
         val composableScope = rememberCoroutineScope()
         when (val sessionRequestUI = wcRequestViewModel.sessionRequest) {
             is SessionRequestUI.Content -> {
                 if (sessionRequestUI.method == "eth_sendTransaction") {
-                    val evmKitWrapper = wcRequestViewModel.evmKitWrapper ?: return
+                    val blockchainType = wcRequestViewModel.blockchain?.type ?: return
                     val transaction =
                         try {
                             val ethTransaction = Gson().fromJson(
@@ -65,46 +60,34 @@ class WCRequestFragment : BaseComposeFragment() {
                         } catch (e: Throwable) {
                             return
                         }
-                    val vmFactory by lazy {
-                        WCRequestModule.FactoryV2(
-                            evmKitWrapper,
-                            transaction,
-                            sessionRequestUI.peerUI.peerName
-                        )
-                    }
-                    val viewModel by viewModels<WCSendEthereumTransactionRequestViewModel> { vmFactory }
-                    val sendEvmTransactionViewModel by navGraphViewModels<SendEvmTransactionViewModel>(
-                        R.id.wcRequestFragment
-                    ) { vmFactory }
-                    val feeViewModel by navGraphViewModels<EvmFeeCellViewModel>(R.id.wcRequestFragment) { vmFactory }
-                    val nonceViewModel by navGraphViewModels<SendEvmNonceViewModel>(R.id.wcRequestFragment) { vmFactory }
-
-                    val cachedNonceViewModel = nonceViewModel //needed in SendEvmSettingsFragment
-
-                    sendEvmTransactionViewModel.sendSuccessLiveData.observe(viewLifecycleOwner) { transactionHash ->
-                        viewModel.approve(transactionHash)
-                        HudHelper.showSuccessMessage(
-                            requireActivity().findViewById(android.R.id.content),
-                            R.string.Hud_Text_Done
-                        )
-                        navController.popBackStack()
-                    }
-
-                    sendEvmTransactionViewModel.sendFailedLiveData.observe(viewLifecycleOwner) {
-                        HudHelper.showErrorMessage(
-                            requireActivity().findViewById(android.R.id.content),
-                            it
-                        )
-                    }
 
                     WCSendEthRequestScreen(
                         navController,
-                        viewModel,
-                        sendEvmTransactionViewModel,
-                        feeViewModel,
                         logger,
-                        R.id.wcRequestFragment
-                    ) { navController.popBackStack() }
+                        blockchainType,
+                        transaction,
+                        sessionRequestUI.peerUI.peerName
+                    )
+                } else if (sessionRequestUI.method == "eth_signTransaction") {
+                    val blockchainType = wcRequestViewModel.blockchain?.type ?: return
+
+                    val transaction = try {
+                        val ethTransaction = Gson().fromJson(
+                            sessionRequestUI.param,
+                            WCEthereumTransaction::class.java
+                        )
+                        ethTransaction.getWCTransaction()
+                    } catch (e: Throwable) {
+                        return
+                    }
+
+                    WCSignEthereumTransactionRequestScreen(
+                        navController,
+                        logger,
+                        blockchainType,
+                        transaction,
+                        sessionRequestUI.peerUI.peerName
+                    )
                 } else {
                     WCNewSignRequestScreen(
                         sessionRequestUI,
@@ -241,9 +224,12 @@ private fun MessageContent(
 ) {
     SectionUniversalLawrence {
         dAppName?.let { dApp ->
-            TitleTypedValueCell(
-                stringResource(R.string.WalletConnect_SignMessageRequest_dApp),
-                dApp
+            TitleValue(
+                ViewItem.Value(
+                    title = stringResource(R.string.WalletConnect_SignMessageRequest_dApp),
+                    value = dApp,
+                    type = ValueType.Regular
+                )
             )
         }
         wcChainData?.let {

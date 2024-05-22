@@ -60,6 +60,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
+import io.github.alexzhirkevich.qrose.options.QrBallShape
+import io.github.alexzhirkevich.qrose.options.QrErrorCorrectionLevel
+import io.github.alexzhirkevich.qrose.options.QrFrameShape
+import io.github.alexzhirkevich.qrose.options.QrLogoPadding
+import io.github.alexzhirkevich.qrose.options.QrLogoShape
+import io.github.alexzhirkevich.qrose.options.QrPixelShape
+import io.github.alexzhirkevich.qrose.options.roundCorners
+import io.github.alexzhirkevich.qrose.rememberQrCodePainter
+import io.horizontalsystems.bankwallet.R
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.core.AdType
@@ -172,7 +181,6 @@ fun ReceiveAddressScreen(
                             }
 
                             ViewState.Success -> {
-                                val qrCodeBitmap = TextHelper.getQrCodeBitmap(uiState.uri)
                                 Column(
                                     modifier = Modifier
                                         .weight(1f)
@@ -197,9 +205,15 @@ fun ReceiveAddressScreen(
                                                 .fillMaxWidth()
                                                 .clickable {
                                                     TextHelper.copyText(uiState.uri)
-                                                    HudHelper.showSuccessMessage(localView, R.string.Hud_Text_Copied)
+                                                    HudHelper.showSuccessMessage(
+                                                        localView,
+                                                        R.string.Hud_Text_Copied
+                                                    )
 
-                                                    stat(page = StatPage.Receive, event = StatEvent.Copy(StatEntity.ReceiveAddress))
+                                                    stat(
+                                                        page = StatPage.Receive,
+                                                        event = StatEvent.Copy(StatEntity.ReceiveAddress)
+                                                    )
                                                 },
                                             horizontalAlignment = Alignment.CenterHorizontally,
                                         ) {
@@ -211,32 +225,7 @@ fun ReceiveAddressScreen(
                                                     .size(224.dp),
                                                 contentAlignment = Alignment.Center
                                             ) {
-                                                qrCodeBitmap?.let { qrCode ->
-                                                    Image(
-                                                        modifier = Modifier
-                                                            .padding(8.dp)
-                                                            .fillMaxSize(),
-                                                        bitmap = qrCode.asImageBitmap(),
-                                                        contentScale = ContentScale.FillWidth,
-                                                        contentDescription = null
-                                                    )
-                                                    Box(
-                                                        modifier = Modifier
-                                                            .clip(RoundedCornerShape(8.dp))
-                                                            .background(ComposeAppTheme.colors.white)
-                                                            .size(64.dp),
-                                                        contentAlignment = Alignment.Center
-                                                    ) {
-                                                        Image(
-                                                            modifier = Modifier.size(48.dp),
-                                                            painter = adaptiveIconPainterResource(
-                                                                id = R.mipmap.ic_launcher_round               ,
-                                                                fallbackDrawable = R.drawable.launcher_main_preview
-                                                            ),
-                                                            contentDescription = null
-                                                        )
-                                                    }
-                                                }
+                                                QrCodeImage(uiState.uri)
                                             }
                                             VSpacer(12.dp)
                                             subhead2_leah(
@@ -327,6 +316,39 @@ fun ReceiveAddressScreen(
         }
     }
     TrackScreenViewEvent(screenName = "ReceiveAddressScreen: ${uiState.networkName}")
+}
+
+@Composable
+private fun QrCodeImage(address: String) {
+    val logoPainter: Painter =
+        adaptiveIconPainterResource(
+            id = R.mipmap.ic_launcher_round,
+            fallbackDrawable = R.drawable.launcher_main_preview
+        )
+    val qrcodePainter: Painter =
+        rememberQrCodePainter(address) {
+            errorCorrectionLevel = QrErrorCorrectionLevel.Medium
+            logo {
+                painter = logoPainter
+                padding = QrLogoPadding.Natural(.3f)
+                shape = QrLogoShape.roundCorners(0.8f)
+                size = 0.2f
+            }
+
+            shapes {
+                ball = QrBallShape.roundCorners(.25f)
+                darkPixel = QrPixelShape.roundCorners()
+                frame = QrFrameShape.roundCorners(.25f)
+            }
+        }
+    Image(
+        painter = qrcodePainter,
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxSize(),
+        contentScale = ContentScale.FillWidth,
+        contentDescription = null
+    )
 }
 
 @Composable

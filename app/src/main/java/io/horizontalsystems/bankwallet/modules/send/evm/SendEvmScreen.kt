@@ -21,8 +21,9 @@ import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.core.AdType
 import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
-import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.core.slideFromRightForResult
 import io.horizontalsystems.bankwallet.entities.Address
+import io.horizontalsystems.bankwallet.entities.Wallet
 import io.horizontalsystems.bankwallet.modules.address.AddressParserModule
 import io.horizontalsystems.bankwallet.modules.address.AddressParserViewModel
 import io.horizontalsystems.bankwallet.modules.address.HSAddressInput
@@ -30,7 +31,7 @@ import io.horizontalsystems.bankwallet.modules.amount.AmountInputModeViewModel
 import io.horizontalsystems.bankwallet.modules.amount.HSAmountInput
 import io.horizontalsystems.bankwallet.modules.availablebalance.AvailableBalance
 import io.horizontalsystems.bankwallet.modules.send.SendScreen
-import io.horizontalsystems.bankwallet.modules.send.evm.confirmation.SendEvmConfirmationModule
+import io.horizontalsystems.bankwallet.modules.send.evm.confirmation.SendEvmConfirmationFragment
 import io.horizontalsystems.bankwallet.modules.sendtokenselect.PrefilledData
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
@@ -40,12 +41,12 @@ import io.horizontalsystems.core.helpers.HudHelper
 fun SendEvmScreen(
     title: String,
     navController: NavController,
-    viewModel: SendEvmViewModel,
     amountInputModeViewModel: AmountInputModeViewModel,
-    sendEntryPointDestId: Int,
     prefilledData: PrefilledData?,
+    wallet: Wallet,
+    predefinedAddress: String?,
 ) {
-    val wallet = viewModel.wallet
+    val viewModel = viewModel<SendEvmViewModel>(factory = SendEvmModule.Factory(wallet, predefinedAddress))
     val uiState = viewModel.uiState
 
     val availableBalance = uiState.availableBalance
@@ -128,10 +129,17 @@ fun SendEvmScreen(
                 onClick = {
                     if (viewModel.hasConnection()) {
                         viewModel.getSendData()?.let {
-                            navController.slideFromRight(
+                            navController.slideFromRightForResult<SendEvmConfirmationFragment.Result>(
                                 R.id.sendEvmConfirmationFragment,
-                                SendEvmConfirmationModule.Input(it, R.id.sendXFragment, sendEntryPointDestId)
-                            )
+                                SendEvmConfirmationFragment.Input(
+                                    sendData = it,
+                                    blockchainType = viewModel.wallet.token.blockchainType
+                                )
+                            ) {
+                                if (it.success) {
+                                    navController.popBackStack()
+                                }
+                            }
                         }
                     } else {
                         HudHelper.showErrorMessage(view, R.string.Hud_Text_NoInternet)

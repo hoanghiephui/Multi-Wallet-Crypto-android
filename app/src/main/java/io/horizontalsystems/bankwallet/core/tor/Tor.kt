@@ -34,7 +34,7 @@ enum class ConnectionStatus {
     companion object {
 
         fun getByName(typName: String): ConnectionStatus {
-            return entries
+            return values()
                 .find { it.name.contentEquals(typName.uppercase(Locale.ROOT)) } ?: CLOSED
         }
     }

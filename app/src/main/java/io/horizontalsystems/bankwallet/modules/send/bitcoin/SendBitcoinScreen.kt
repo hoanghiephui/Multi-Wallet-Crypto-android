@@ -84,7 +84,7 @@ fun SendBitcoinNavHost(
         navController = navController,
         startDestination = SendBtcPage,
     ) {
-        composable(SendBtcPage) { entry ->
+        composable(SendBtcPage) {
             SendBitcoinScreen(
                 title,
                 fragmentNavController,
@@ -104,7 +104,7 @@ fun SendBitcoinNavHost(
             )
         }
         composablePopup(TransactionInputsSortInfoPage) { BtcTransactionInputSortInfoScreen { navController.popBackStack() } }
-        composablePage(UtxoExpertModePage) { entry ->
+        composablePage(UtxoExpertModePage) {
             UtxoExpertModeScreen(
                 adapter = viewModel.adapter,
                 token = viewModel.wallet.token,

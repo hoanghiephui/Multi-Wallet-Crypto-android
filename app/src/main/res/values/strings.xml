@@ -365,8 +365,6 @@
     <string name="Balance_SearchingTransactions">Searching transactions…</string>
     <string name="Balance_FoundTx">%s tx</string>
     <string name="Balance_Syncing_WithProgress">Syncing… %s%%</string>
-    <string name="Balance_AddCoins">Add Coins</string>
-    <string name="Balance_AddCoin">Add Coin</string>
     <string name="Balance_CoinDisabled">Disabled coin %s</string>
     <string name="Balance_Sort_Balance">Balance</string>
     <string name="Balance_Sort_PopupTitle">Sort by</string>
@@ -375,7 +373,6 @@
     <string name="Balance_Hidden">hidden</string>
     <string name="Balance_DownloadingBlocks">Downloading Blocks</string>
     <string name="Balance_ScanningBlocks">Scanning Blocks</string>
-    <string name="Balance_Backup_Alert">You need to backup the %1$s Wallet before you may receive %2$s.</string>
     <string name="Balance_NoWalletAlert">You don\'t have any installed wallets yet.\nCreate a new wallet or restore an existing one </string>
     <string name="Balance_NoCoinsAlert">You haven\'t added any coins to this wallet.</string>
     <string name="Balance_WatchAccount_NoBalance">This wallet address doesn\'t have any balance</string>
@@ -467,10 +464,6 @@
 
     <string name="Send_DialogAvailableBalance">Available Balance</string>
     <string name="Send_DialogSpeed">Transaction Speed</string>
-    <string name="Send_TxSpeed_Low">Low</string>
-    <string name="Send_TxSpeed_High">High</string>
-    <string name="Send_TxSpeed_Recommended">Recommended</string>
-    <string name="Send_TxSpeed_Custom">Custom</string>
     <string name="Send_TxSpeed_CustomFeeHint" translatable="false">sat/byte</string>
     <string name="Send_DialogFee">Fee</string>
     <string name="Send_DialogMemoHint" translatable="false">Memo</string>
@@ -596,6 +589,9 @@
     <string name="WalletConnect_Error_NoSuitableAccount">No suitable account</string>
     <string name="WalletConnect_Error_NoSuitableEvmKit">No suitable evm kit</string>
     <string name="WalletConnect_Error_DataParsingError">Data parsing error</string>
+    <string name="WalletConnect_Error_UnsupportedChains">Unsupported chains: %s</string>
+    <string name="WalletConnect_Error_UnsupportedMethods">Unsupported methods: %s</string>
+    <string name="WalletConnect_Error_UnsupportedEvents">Unsupported events: %s</string>
     <string name="WalletConnect_Error_RequestNotFoundError">Request not found error</string>
     <string name="WalletConnect_NoConnection">You don\’t have any connected dapps</string>
     <string name="WalletConnect_PendingRequests">Pending Requests</string>
@@ -713,7 +709,6 @@
     <string name="SwapSettings_Apply">Apply</string>
     <string name="SwapSettings_DeadlineMinute">%s min</string>
     <string name="SwapSettings_RecipientPlaceholder">Address or domain</string>
-    <string name="SwapSettings_FeeSettingsAlert">A service fee for the swap action on the platform typically either 0.3% or 0.6%</string>
 
     <string name="SwapSettings_Error_DeadlineZero">Zero Deadline</string>
     <string name="SwapSettings_Error_SlippageZero">Zero Slippage</string>
@@ -743,6 +738,14 @@
     <string name="Approve_Spender">Spender</string>
     <string name="Approve_YouApprove">You Approve</string>
     <string name="Approve_YouRevoke">You Revoke</string>
+
+
+    <!--Swap Unlock Access-->
+
+    <string name="Swap_Unlock_PageTitle">Unlock Access</string>
+    <string name="Swap_Unlock_Subtitle">Allow access to the following amount</string>
+    <string name="Swap_Unlock_Info">Grant permission to a smart contract for token trading on your behalf, specifying the allowed amount. No impact on your balance, but incurs a small fee for approval.\n\nPre-approving a higher amount for future trades is cost-effective compared to on-demand approvals.</string>
+    <string name="Swap_Unlock_Unlimited">Unlimited</string>
 
     <!--Uniswap Info -->
 
@@ -926,6 +929,8 @@
     <string name="Settings_AutoLock">Auto-Lock</string>
     <string name="Settings_Telegram" translatable="false">Telegram</string>
     <string name="Settings_Twitter" translatable="false">Twitter</string>
+    <string name="Settings_JoinUnstoppables">Join Unstoppables</string>
+    <string name="Settings_JoinUnstoppables_Description">Stay on top of Unstoppable happenings. Be the first to know about new features, user reported issues and things we work on!</string>
 
     <string name="Settings_PersonalSupport">Personal Support</string>
     <string name="Settings_PersonalSupport_EnterTelegramAccountDescription">Enter your Telegram account name to start a personal support chat with our team. We\'ll get back to you and start working on your problem as soon as we see it.</string>
@@ -1333,6 +1338,7 @@
     <string name="ExtendedKey_Purpose" translatable="false">Purpose</string>
     <string name="ExtendedKey_Account" translatable="false">Account</string>
     <string name="ExtendedKey_TapToShowPrivateKey">Tap to show private key</string>
+    <string name="ExtendedKey_AccountInfo">To do</string>
 
     <string name="AccountExtendedPrivateKey" translatable="false">Account Extended Private Key</string>
     <string name="AccountExtendedPublicKey" translatable="false">Account Extended Public Key</string>

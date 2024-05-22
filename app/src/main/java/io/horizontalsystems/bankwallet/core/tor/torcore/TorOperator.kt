@@ -6,7 +6,10 @@ import io.horizontalsystems.bankwallet.core.tor.EntityStatus
 import io.horizontalsystems.bankwallet.core.tor.Tor
 import io.horizontalsystems.bankwallet.core.tor.torutils.ProcessUtils
 import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlow
 import java.io.File
 import java.io.FileNotFoundException
 import java.util.logging.Level
@@ -23,6 +26,7 @@ class TorOperator(private val torSettings: Tor.Settings, private val listener: L
 
     private var torControl: TorControl? = null
     private lateinit var resManager: TorResourceManager
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
     fun start() {
 
@@ -59,16 +63,16 @@ class TorOperator(private val torSettings: Tor.Settings, private val listener: L
                     torInfo.status = EntityStatus.RUNNING
                     eventMonitor(torInfo = torInfo, msg = "Tor started successfully")
 
-                    torControl?.let {
-                        it.initConnection(4)
-                            .subscribe(
-                                { torConnection ->
+                    torControl?.let { it ->
+                        coroutineScope.launch {
+                            try {
+                                it.initConnection(4).asFlow().collect { torConnection ->
                                     torInfo.connection = torConnection
-                                },
-                                {
-                                    torInfo.processId = -1
-                                })
-
+                                }
+                            } catch (e: Throwable) {
+                                torInfo.processId = -1
+                            }
+                        }
                     }
                 }
             } else {
@@ -92,7 +96,6 @@ class TorOperator(private val torSettings: Tor.Settings, private val listener: L
 
     fun stop(): Single<Boolean> {
         return killAllDaemons()
-            .subscribeOn(Schedulers.io())
     }
 
     fun newIdentity(): Boolean {
@@ -159,7 +162,7 @@ class TorOperator(private val torSettings: Tor.Settings, private val listener: L
         var exitCode: Int
 
         exitCode = try {
-            exec("$torCmdString --verify-config", true)
+            exec("$torCmdString --verify-config")
         } catch (e: Exception) {
             eventMonitor(msg = "Tor configuration did not verify: " + e.message + e)
             return false
@@ -171,7 +174,7 @@ class TorOperator(private val torSettings: Tor.Settings, private val listener: L
         }
 
         exitCode = try {
-            exec(torCmdString, true)
+            exec(torCmdString)
         } catch (e: Exception) {
             eventMonitor(msg = "Tor was unable to start: " + e.message + e)
             return false
@@ -186,7 +189,7 @@ class TorOperator(private val torSettings: Tor.Settings, private val listener: L
     }
 
     @Throws(Exception::class)
-    private fun exec(cmd: String, wait: Boolean = false): Int {
+    private fun exec(cmd: String): Int {
         val shellResult = Shell.run(cmd)
         //  debug("CMD: " + cmd + "; SUCCESS=" + shellResult.isSuccessful());
 

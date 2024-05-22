@@ -45,6 +45,8 @@ import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.imageUrl
+import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.modules.settings.main.HsSettingCell
 import io.horizontalsystems.bankwallet.modules.theme.ThemeType
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.Select
@@ -62,6 +64,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.MultitextM1
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.TextImportantWarning
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
+import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_jacob
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_leah
 import io.horizontalsystems.bankwallet.ui.extensions.BottomSheetHeader
@@ -119,6 +122,28 @@ fun AppearanceScreen(navController: NavController) {
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState()),
                 ) {
+                    CellUniversalLawrenceSection(
+                        listOf({
+                            HsSettingCell(
+                                R.string.Settings_BaseCurrency,
+                                R.drawable.ic_currency,
+                                value = uiState.baseCurrencyCode,
+                                onClick = {
+                                    navController.slideFromRight(R.id.baseCurrencySettingsFragment)
+                                }
+                            )
+                        }, {
+                            HsSettingCell(
+                                R.string.Settings_Language,
+                                R.drawable.ic_language,
+                                value = uiState.currentLanguage,
+                                onClick = {
+                                    navController.slideFromRight(R.id.languageSettingsFragment)
+                                }
+                            )
+                        })
+                    )
+                    VSpacer(height = 12.dp)
                     HeaderText(text = stringResource(id = R.string.Appearance_Theme))
                     CellUniversalLawrenceSection(uiState.themeOptions.options) { option: ThemeType ->
                         RowSelect(

@@ -10,7 +10,6 @@ import io.horizontalsystems.bankwallet.core.stats.StatPage
 import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.core.stats.statField
 import io.horizontalsystems.bankwallet.core.stats.statPage
-import io.horizontalsystems.bankwallet.core.subscribeIO
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.market.MarketField
 import io.horizontalsystems.bankwallet.modules.market.MarketItem
@@ -18,15 +17,14 @@ import io.horizontalsystems.bankwallet.modules.market.MarketModule
 import io.horizontalsystems.bankwallet.modules.market.MarketViewItem
 import io.horizontalsystems.bankwallet.modules.metricchart.MetricsType
 import io.horizontalsystems.bankwallet.ui.compose.Select
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlow
 
 class MetricsPageViewModel(
     private val service: MetricsPageService,
 ) : BaseViewModel() {
 
-    private val disposables = CompositeDisposable()
     private val marketFields = MarketField.entries
     private var marketField: MarketField
     private var marketItems: List<MarketItem> = listOf()
@@ -51,8 +49,8 @@ class MetricsPageViewModel(
             MetricsType.TvlInDefi -> MarketField.MarketCap
         }
 
-        service.marketItemsObservable
-            .subscribeIO { marketItemsDataState ->
+        viewModelScope.launch {
+            service.marketItemsObservable.asFlow().collect { marketItemsDataState ->
                 marketItemsDataState.viewState?.let {
                     viewStateLiveData.postValue(it)
                 }
@@ -62,7 +60,7 @@ class MetricsPageViewModel(
                     syncMarketItems(it)
                 }
             }
-            .let { disposables.add(it) }
+        }
 
         service.start()
     }
@@ -111,6 +109,5 @@ class MetricsPageViewModel(
 
     override fun onCleared() {
         service.stop()
-        disposables.clear()
     }
 }

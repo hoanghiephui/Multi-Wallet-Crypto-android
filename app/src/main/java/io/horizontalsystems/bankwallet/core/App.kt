@@ -101,9 +101,6 @@ import io.horizontalsystems.bankwallet.modules.backuplocal.fullbackup.BackupProv
 import io.horizontalsystems.bankwallet.modules.balance.BalanceViewTypeManager
 import io.horizontalsystems.bankwallet.modules.chart.ChartIndicatorManager
 import io.horizontalsystems.bankwallet.modules.contacts.ContactsRepository
-import io.horizontalsystems.bankwallet.modules.keystore.KeyStoreActivity
-import io.horizontalsystems.bankwallet.modules.launcher.LauncherActivity
-import io.horizontalsystems.bankwallet.modules.lockscreen.LockScreenActivity
 import io.horizontalsystems.bankwallet.modules.market.favorites.MarketFavoritesMenuService
 import io.horizontalsystems.bankwallet.modules.market.topnftcollections.TopNftCollectionsRepository
 import io.horizontalsystems.bankwallet.modules.market.topnftcollections.TopNftCollectionsViewItemFactory
@@ -220,6 +217,8 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
     }
     @Inject
     lateinit var userDataRepository: UserDataRepository
+
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
     override fun onCreate() {
         super.onCreate()
@@ -378,17 +377,12 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
 
         pinComponent = PinComponent(
             pinSettingsStorage = pinSettingsStorage,
-            excludedActivityNames = listOf(
-                KeyStoreActivity::class.java.name,
-                LockScreenActivity::class.java.name,
-                LauncherActivity::class.java.name,
-            ),
             userManager = userManager,
             pinDbStorage = PinDbStorage(appDatabase.pinDao())
         )
 
         statsManager = StatsManager(appDatabase.statsDao(), localStorage, marketKit, appConfigProvider)
-        backgroundStateChangeListener = BackgroundStateChangeListener(systemInfoManager, keyStoreManager, pinComponent, statsManager, accountManager).apply {
+        backgroundStateChangeListener = BackgroundStateChangeListener(pinComponent, statsManager, accountManager).apply {
             backgroundManager.registerListener(this)
         }
 
@@ -552,7 +546,7 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
     }
 
     private fun startTasks() {
-        Thread {
+        coroutineScope.launch {
             EthereumKit.init()
             adapterManager.startAdapterManager()
             marketKit.sync()
@@ -572,8 +566,7 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
 
             evmLabelManager.sync()
             contactsRepository.initialize()
-
-        }.start()
+        }
     }
 
     private fun initApplovin() {

@@ -8,7 +8,7 @@ import com.android.tools.profgen.DexFile
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
-apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.devtools.ksp'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'com.google.dagger.hilt.android'
@@ -30,11 +30,8 @@ android {
         versionName "0.2.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        kapt {
-            arguments {
-                arg("room.schemaLocation", "$projectDir/schemas".toString())
-                arg("room.incremental", true)
-            }
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas".toString())
         }
         vectorDrawables.useSupportLibrary = true
         lintOptions {
@@ -47,7 +44,6 @@ android {
         resValue "string", "appGithubLink", "https://github.com/hoanghiephui/unstoppable-wallet-android"
         resValue "string", "appTwitterLink", "https://twitter.com/UnstoppableByHS"
         resValue "string", "appTelegramLink", "https://t.me/unstoppable_announcements"
-        resValue "string", "appRedditLink", "https://www.reddit.com/r/UNSTOPPABLEWallet/"
         resValue "string", "reportEmail", "living.solutions.vn@gmail.com"
         resValue "string", "releaseNotesUrl", "https://api.github.com/repos/horizontalsystems/unstoppable-wallet-android/releases/tags/"
         resValue "string", "walletConnectAppMetaDataName", "Unstoppable"
@@ -169,6 +165,7 @@ android {
     }
 
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
@@ -188,7 +185,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion '1.5.11'
+        kotlinCompilerExtensionVersion '1.5.12'
     }
     namespace 'com.wallet.blockchain.bitcoin'
     lint {
@@ -243,7 +240,7 @@ dependencies {
     implementation "androidx.room:room-runtime:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
     implementation "androidx.room:room-rxjava2:$room_version"
-    kapt "androidx.room:room-compiler:$room_version"
+    ksp "androidx.room:room-compiler:$room_version"
     // alternately - if using Java8, use the following instead of compiler
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
     // optional - ReactiveStreams support for LiveData
@@ -258,10 +255,10 @@ dependencies {
     // explicitly depend on RxJava's latest version for bug fixes and new features.
     // (see https://github.com/ReactiveX/RxJava/releases for latest 2.x.x version)
     implementation "io.reactivex.rxjava2:rxjava:$rxjava_version"
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-scalars:2.9.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.11.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.11.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.11.0'
+    implementation 'com.squareup.retrofit2:converter-scalars:2.11.0'
     implementation(platform("com.squareup.okhttp3:okhttp-bom:4.12.0"))
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
@@ -287,6 +284,9 @@ dependencies {
 
     api 'com.journeyapps:zxing-android-embedded:4.3.0'
 
+    // QR code generator
+    implementation("io.github.alexzhirkevich:qrose:1.0.1")
+
     // WorkManager Kotlin
     def work_version = "2.9.0"
     implementation "androidx.work:work-runtime-ktx:$work_version"
@@ -298,7 +298,7 @@ dependencies {
     //debugImplementation leakCanary
 
     // Wallet kits
-    implementation 'com.github.horizontalsystems:ton-kit-kmm:51bdea4'
+    implementation 'com.github.horizontalsystems:ton-kit-kmm:f1fd301'
     implementation 'com.github.horizontalsystems:bitcoin-kit-android:80fd413'
     implementation 'com.github.horizontalsystems:ethereum-kit-android:f4957a9'
     implementation 'com.github.horizontalsystems:blockchain-fee-rate-kit-android:1d3bd49'
@@ -307,7 +307,8 @@ dependencies {
     implementation 'com.github.horizontalsystems:solana-kit-android:d8bb9f2'
     implementation 'com.github.horizontalsystems:tron-kit-android:dc3dca7'
     // Zcash SDK
-    implementation "cash.z.ecc.android:zcash-android-sdk:2.0.1"
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
+    implementation "cash.z.ecc.android:zcash-android-sdk:2.1.1"
     implementation("io.github.binance:binance-connector-java:3.0.0rc2") {
         exclude group: "org.bouncycastle", module: "bcprov-jdk18on"
     }
@@ -325,7 +326,7 @@ dependencies {
 
     implementation 'com.twitter.twittertext:twitter-text:3.1.0'
 
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-rx2:1.7.3'
 
     // UI modules
@@ -344,7 +345,9 @@ dependencies {
     // Tooling support (Previews, etc.)
     implementation "androidx.compose.ui:ui-tooling"
     // Integration with ViewModels
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version"
+    // Lifecycle utilities for Compose
+    implementation "androidx.lifecycle:lifecycle-runtime-compose:$lifecycle_version"
 
     implementation "androidx.compose.runtime:runtime-livedata"
 

@@ -21,7 +21,7 @@ import io.horizontalsystems.bankwallet.modules.market.favorites.MarketFavoritesM
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchSection
 import io.horizontalsystems.bankwallet.modules.metricchart.MetricsType
 import io.horizontalsystems.bankwallet.modules.metricchart.ProChartModule
-import io.horizontalsystems.bankwallet.modules.transactionInfo.options.TransactionInfoOptionsModule
+import io.horizontalsystems.bankwallet.modules.transactionInfo.options.SpeedUpCancelType
 import io.horizontalsystems.bankwallet.modules.transactions.FilterTransactionType
 import io.horizontalsystems.hdwalletkit.HDExtendedKey
 import io.horizontalsystems.marketkit.models.HsTimePeriod
@@ -274,8 +274,8 @@ val FilterTransactionType.statTab: StatTab
         FilterTransactionType.Approve -> StatTab.Approve
     }
 
-val TransactionInfoOptionsModule.Type.statResendType: StatResendType
+val SpeedUpCancelType.statResendType: StatResendType
     get() = when(this) {
-        TransactionInfoOptionsModule.Type.SpeedUp -> StatResendType.SpeedUp
-        TransactionInfoOptionsModule.Type.Cancel -> StatResendType.Cancel
+        SpeedUpCancelType.SpeedUp -> StatResendType.SpeedUp
+        SpeedUpCancelType.Cancel -> StatResendType.Cancel
     }

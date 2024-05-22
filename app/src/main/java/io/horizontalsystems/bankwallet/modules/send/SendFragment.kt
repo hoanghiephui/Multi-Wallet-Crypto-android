@@ -20,10 +20,7 @@ import io.horizontalsystems.bankwallet.modules.send.binance.SendBinanceViewModel
 import io.horizontalsystems.bankwallet.modules.send.bitcoin.SendBitcoinModule
 import io.horizontalsystems.bankwallet.modules.send.bitcoin.SendBitcoinNavHost
 import io.horizontalsystems.bankwallet.modules.send.bitcoin.SendBitcoinViewModel
-import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmModule
 import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmScreen
-import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmViewModel
-import io.horizontalsystems.bankwallet.modules.send.evm.confirmation.EvmKitWrapperHoldingViewModel
 import io.horizontalsystems.bankwallet.modules.send.solana.SendSolanaModule
 import io.horizontalsystems.bankwallet.modules.send.solana.SendSolanaScreen
 import io.horizontalsystems.bankwallet.modules.send.solana.SendSolanaViewModel
@@ -129,21 +126,14 @@ class SendFragment : BaseFragment() {
                     BlockchainType.Gnosis,
                     BlockchainType.Fantom,
                     BlockchainType.ArbitrumOne -> {
-                        val factory = SendEvmModule.Factory(wallet, predefinedAddress)
-                        val evmKitWrapperViewModel by navGraphViewModels<EvmKitWrapperHoldingViewModel>(
-                            R.id.sendXFragment
-                        ) { factory }
-                        @Suppress("UNUSED_VARIABLE")
-                        val initiateLazyViewModel = evmKitWrapperViewModel //needed in SendEvmConfirmationFragment
-                        val sendEvmViewModel by navGraphViewModels<SendEvmViewModel>(R.id.sendXFragment) { factory }
                         setContent {
                             SendEvmScreen(
                                 title,
                                 findNavController(),
-                                sendEvmViewModel,
                                 amountInputModeViewModel,
-                                sendEntryPointDestId,
                                 prefilledData,
+                                wallet,
+                                predefinedAddress
                             )
                         }
                     }

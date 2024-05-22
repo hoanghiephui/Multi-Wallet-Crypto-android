@@ -4,27 +4,23 @@ import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.IAccountManager
 import io.horizontalsystems.bankwallet.core.IBackupManager
 import io.horizontalsystems.bankwallet.core.ITermsManager
-import io.horizontalsystems.bankwallet.core.managers.CurrencyManager
-import io.horizontalsystems.bankwallet.core.managers.LanguageManager
 import io.horizontalsystems.bankwallet.core.providers.AppConfigProvider
 import io.horizontalsystems.bankwallet.core.providers.Translator
-import io.horizontalsystems.bankwallet.entities.Currency
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCManager
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCSessionManager
 import io.horizontalsystems.core.IPinComponent
 import io.horizontalsystems.core.ISystemInfoManager
 import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 
 class MainSettingsService(
     private val backupManager: IBackupManager,
-    private val languageManager: LanguageManager,
     private val systemInfoManager: ISystemInfoManager,
-    private val currencyManager: CurrencyManager,
     private val termsManager: ITermsManager,
     private val pinComponent: IPinComponent,
     private val wcSessionManager: WCSessionManager,
@@ -44,16 +40,11 @@ class MainSettingsService(
     val termsAccepted by termsManager::allTermsAccepted
     val termsAcceptedFlow by termsManager::termsAcceptedSignalFlow
 
-    private val baseCurrencySubject = BehaviorSubject.create<Currency>()
-    val baseCurrencyObservable: Observable<Currency> get() = baseCurrencySubject
-
     private val walletConnectSessionCountSubject = BehaviorSubject.create<Int>()
     val walletConnectSessionCountObservable: Observable<Int> get() = walletConnectSessionCountSubject
 
     val hasNonStandardAccount: Boolean
         get() = accountManager.hasNonStandardAccount
-
-    private var disposables: CompositeDisposable = CompositeDisposable()
 
     val appVersion: String
         get() {
@@ -73,37 +64,29 @@ class MainSettingsService(
     val walletConnectSessionCount: Int
         get() = wcSessionManager.sessions.count()
 
-    val currentLanguageDisplayName: String
-        get() = languageManager.currentLanguageName
-
-    val baseCurrency: Currency
-        get() = currencyManager.baseCurrency
-
     val isPinSet: Boolean
         get() = pinComponent.isPinSet
 
     fun start() {
-        disposables.add(backupManager.allBackedUpFlowable.subscribe {
-            backedUpSubject.onNext(it)
-        })
-
+        coroutineScope.launch {
+            backupManager.allBackedUpFlowable.asFlow().collect {
+                backedUpSubject.onNext(it)
+            }
+        }
         coroutineScope.launch {
             wcSessionManager.sessionsFlow.collect{
                 walletConnectSessionCountSubject.onNext(walletConnectSessionCount)
             }
         }
-
-        disposables.add(currencyManager.baseCurrencyUpdatedSignal.subscribe {
-            baseCurrencySubject.onNext(currencyManager.baseCurrency)
-        })
-
-        disposables.add(pinComponent.pinSetFlowable.subscribe {
-            pinSetSubject.onNext(pinComponent.isPinSet)
-        })
+        coroutineScope.launch {
+            pinComponent.pinSetFlowable.asFlow().collect {
+                pinSetSubject.onNext(pinComponent.isPinSet)
+            }
+        }
     }
 
     fun stop() {
-        disposables.clear()
+        coroutineScope.cancel()
     }
 
     fun getWalletConnectSupportState(): WCManager.SupportState {

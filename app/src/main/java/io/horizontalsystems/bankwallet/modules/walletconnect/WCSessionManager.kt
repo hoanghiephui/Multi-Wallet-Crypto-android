@@ -4,16 +4,15 @@ import com.walletconnect.web3.wallet.client.Wallet
 import com.walletconnect.web3.wallet.client.Web3Wallet
 import io.horizontalsystems.bankwallet.core.IAccountManager
 import io.horizontalsystems.bankwallet.core.managers.ActiveAccountState
-import io.horizontalsystems.bankwallet.core.subscribeIO
 import io.horizontalsystems.bankwallet.modules.walletconnect.storage.WCSessionStorage
 import io.horizontalsystems.bankwallet.modules.walletconnect.storage.WalletConnectV2Session
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 
 class WCSessionManager(
     private val accountManager: IAccountManager,
@@ -21,7 +20,6 @@ class WCSessionManager(
 ) {
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
-    private val disposable = CompositeDisposable()
 
     private val _sessionsFlow = MutableStateFlow<List<Wallet.Model.Session>>(emptyList())
     val sessionsFlow: StateFlow<List<Wallet.Model.Session>>
@@ -54,11 +52,11 @@ class WCSessionManager(
             }
         }
 
-        accountManager.accountsDeletedFlowable
-            .subscribeIO {
+        coroutineScope.launch {
+            accountManager.accountsDeletedFlowable.asFlow().collect {
                 handleDeletedAccount()
             }
-            .let { disposable.add(it) }
+        }
 
         coroutineScope.launch {
             WCDelegate.walletEvents.collect {
@@ -130,6 +128,8 @@ class WCSessionManager(
         object NoSuitableEvmKit : RequestDataError()
         object NoSigner : RequestDataError()
         object RequestNotFoundError : RequestDataError()
+        object InvalidGasPrice: RequestDataError()
+        object InvalidNonce: RequestDataError()
     }
 
 }

@@ -111,7 +111,7 @@ private fun AboutScreen(
                 Spacer(Modifier.height(24.dp))
                 InfoTextBody(text = stringResource(R.string.SettingsTerms_Text))
                 Spacer(Modifier.height(24.dp))
-                SettingSections(aboutViewModel, navController, showContactOptions)
+                SettingSections(aboutViewModel, navController)
                 Spacer(Modifier.height(36.dp))
             }
         }
@@ -121,8 +121,7 @@ private fun AboutScreen(
 @Composable
 private fun SettingSections(
     viewModel: AboutViewModel,
-    navController: NavController,
-    showContactOptions: () -> Unit
+    navController: NavController
 ) {
 
     val context = LocalContext.current

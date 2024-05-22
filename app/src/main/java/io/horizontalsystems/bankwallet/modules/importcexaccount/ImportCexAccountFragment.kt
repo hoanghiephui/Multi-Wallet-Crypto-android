@@ -10,8 +10,6 @@ import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.composablePage
 import io.horizontalsystems.bankwallet.core.getInput
-import io.horizontalsystems.bankwallet.core.slideFromBottom
-import io.horizontalsystems.bankwallet.modules.info.ErrorDisplayDialogFragment
 import io.horizontalsystems.bankwallet.modules.manageaccounts.ManageAccountsModule
 import io.horizontalsystems.core.helpers.HudHelper
 
@@ -63,12 +61,6 @@ fun ImportCexAccountNavHost(
                         iconTint = R.color.white
                     )
                     fragmentNavController.popBackStack(popUpToInclusiveId, inclusive)
-                },
-                onShowError = { title, text ->
-                    fragmentNavController.slideFromBottom(
-                        R.id.errorDisplayDialogFragment,
-                        ErrorDisplayDialogFragment.Input(title.toString(), text.toString())
-                    )
                 }
             )
         }

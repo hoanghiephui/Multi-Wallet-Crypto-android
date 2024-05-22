@@ -23,11 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.wallet.blockchain.bitcoin.R
-import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.core.slideFromRightForResult
 import io.horizontalsystems.bankwallet.modules.address.AddressParserViewModel
 import io.horizontalsystems.bankwallet.modules.address.AddressViewModel
 import io.horizontalsystems.bankwallet.modules.address.HSAddressInput
-import io.horizontalsystems.bankwallet.modules.send.evm.confirmation.SendEvmConfirmationModule
+import io.horizontalsystems.bankwallet.modules.send.evm.confirmation.SendEvmConfirmationFragment
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
@@ -42,7 +42,6 @@ fun SendEip721Screen(
     viewModel: SendEip721ViewModel,
     addressViewModel: AddressViewModel,
     addressParserViewModel: AddressParserViewModel,
-    parentNavId: Int,
 ) {
 
     Scaffold(
@@ -102,10 +101,17 @@ fun SendEip721Screen(
                     title = stringResource(R.string.Button_Next),
                     onClick = {
                         viewModel.getSendData()?.let { sendData ->
-                            navController.slideFromRight(
+                            navController.slideFromRightForResult<SendEvmConfirmationFragment.Result>(
                                 R.id.sendEvmConfirmationFragment,
-                                SendEvmConfirmationModule.Input(sendData, parentNavId)
-                            )
+                                SendEvmConfirmationFragment.Input(
+                                    sendData = sendData,
+                                    blockchainType = viewModel.getBlockchainType()
+                                )
+                            ) {
+                                if (it.success) {
+                                    navController.popBackStack()
+                                }
+                            }
                         }
                     },
                     enabled = viewModel.uiState.canBeSend

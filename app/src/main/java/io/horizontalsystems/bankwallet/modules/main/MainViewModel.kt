@@ -31,11 +31,11 @@ import io.horizontalsystems.bankwallet.modules.walletconnect.WCManager
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCSessionManager
 import io.horizontalsystems.bankwallet.modules.walletconnect.list.WCListFragment
 import io.horizontalsystems.core.IPinComponent
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.reactive.asFlow
 import se.warting.inappupdate.compose.findActivity
 
 class MainViewModel(
@@ -51,7 +51,6 @@ class MainViewModel(
     deepLink: Uri?
 ) : ViewModelUiState<MainModule.UiState>() {
 
-    private val disposables = CompositeDisposable()
     private var wcPendingRequestsCount = 0
     private var marketsTabEnabled = localStorage.marketsTabEnabledFlow.value
     private var transactionsEnabled = isTransactionsTabEnabled()
@@ -123,18 +122,22 @@ class MainViewModel(
             emitState()
         }
 
-        disposables.add(backupManager.allBackedUpFlowable.subscribe {
-            updateSettingsBadge()
-        })
-
-        disposables.add(pinComponent.pinSetFlowable.subscribe {
-            updateSettingsBadge()
-        })
-
-        disposables.add(accountManager.accountsFlowable.subscribe {
-            updateTransactionsTabEnabled()
-            updateSettingsBadge()
-        })
+        viewModelScope.launch {
+            backupManager.allBackedUpFlowable.asFlow().collect {
+                updateSettingsBadge()
+            }
+        }
+        viewModelScope.launch {
+            pinComponent.pinSetFlowable.asFlow().collect {
+                updateSettingsBadge()
+            }
+        }
+        viewModelScope.launch {
+            accountManager.accountsFlowable.asFlow().collect {
+                updateTransactionsTabEnabled()
+                updateSettingsBadge()
+            }
+        }
 
         viewModelScope.launch {
             accountManager.activeAccountStateFlow.collect {
@@ -171,10 +174,6 @@ class MainViewModel(
     private fun isTransactionsTabEnabled(): Boolean =
         !accountManager.isAccountsEmpty && accountManager.activeAccount?.type !is AccountType.Cex
 
-
-    override fun onCleared() {
-        disposables.clear()
-    }
 
     fun whatsNewShown() {
         showWhatsNew = false

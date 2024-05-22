@@ -8,6 +8,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,6 +20,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -52,7 +54,6 @@ import io.horizontalsystems.bankwallet.modules.contacts.ContactsFragment
 import io.horizontalsystems.bankwallet.modules.contacts.Mode
 import io.horizontalsystems.bankwallet.modules.manageaccount.dialogs.BackupRequiredDialog
 import io.horizontalsystems.bankwallet.modules.manageaccounts.ManageAccountsModule
-import io.horizontalsystems.bankwallet.modules.settings.main.MainSettingsModule.CounterType
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCAccountTypeNotSupportedDialog
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCManager
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
@@ -60,11 +61,13 @@ import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.BadgeCount
 import io.horizontalsystems.bankwallet.ui.compose.components.CellSingleLineLawrenceSection
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
+import io.horizontalsystems.bankwallet.ui.compose.components.InfoText
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.caption_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_grey
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_jacob
 import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
 import se.warting.inappupdate.compose.findActivity
 
@@ -105,15 +108,14 @@ private fun SettingSections(
     val showAlertSecurityCenter by viewModel.securityCenterShowAlertLiveData.observeAsState(false)
     val showAlertAboutApp by viewModel.aboutAppShowAlertLiveData.observeAsState(false)
     val wcCounter by viewModel.wcCounterLiveData.observeAsState()
-    val baseCurrency by viewModel.baseCurrencyLiveData.observeAsState()
-    val language by viewModel.languageLiveData.observeAsState()
     val context = LocalContext.current
 
     CellUniversalLawrenceSection(
         listOf {
             HsSettingCell(
                 R.string.billing_plus_title,
-                R.drawable.ic_heart_jacob_48,
+                R.drawable.ic_heart_filled_24,
+                ComposeAppTheme.colors.jacob,
                 onClick = {
                     context.findActivity().showBillingPlusDialog()
 
@@ -152,27 +154,10 @@ private fun SettingSections(
             )
         }, {
             HsSettingCell(
-                R.string.BackupManager_Title,
-                R.drawable.ic_file_24,
-                onClick = {
-                    navController.slideFromRight(R.id.backupManagerFragment)
-
-                    stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.BackupManager))
-                }
-            )
-        }
-        )
-    )
-
-    VSpacer(32.dp)
-
-    CellUniversalLawrenceSection(
-        listOf {
-            HsSettingCell(
                 R.string.Settings_WalletConnect,
                 R.drawable.ic_wallet_connect_20,
-                value = (wcCounter as? CounterType.SessionCounter)?.number?.toString(),
-                counterBadge = (wcCounter as? CounterType.PendingRequestCounter)?.number?.toString(),
+                value = (wcCounter as? MainSettingsModule.CounterType.SessionCounter)?.number?.toString(),
+                counterBadge = (wcCounter as? MainSettingsModule.CounterType.PendingRequestCounter)?.number?.toString(),
                 onClick = {
                     when (val state = viewModel.getWalletConnectSupportState()) {
                         WCManager.SupportState.Supported -> {
@@ -204,7 +189,18 @@ private fun SettingSections(
                     }
                 }
             )
+        }, {
+            HsSettingCell(
+                R.string.BackupManager_Title,
+                R.drawable.ic_file_24,
+                onClick = {
+                    navController.slideFromRight(R.id.backupManagerFragment)
+
+                    stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.BackupManager))
+                }
+            )
         }
+        )
     )
 
     VSpacer(32.dp)
@@ -248,31 +244,47 @@ private fun SettingSections(
                     }
                 )
             },
-            {
-                HsSettingCell(
-                    R.string.Settings_BaseCurrency,
-                    R.drawable.ic_currency,
-                    value = baseCurrency?.code,
-                    onClick = {
-                        navController.slideFromRight(R.id.baseCurrencySettingsFragment)
-
-                        stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.BaseCurrency))
-                    }
-                )
-            },
-            {
-                HsSettingCell(
-                    R.string.Settings_Language,
-                    R.drawable.ic_language,
-                    value = language,
-                    onClick = {
-                        navController.slideFromRight(R.id.languageSettingsFragment)
-
-                        stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.Language))
-                    }
-                )
-            },
         )
+    )
+
+    VSpacer(24.dp)
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 32.dp)
+            .height(32.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        subhead1_jacob(text = stringResource(id = R.string.Settings_JoinUnstoppables).uppercase())
+    }
+    CellUniversalLawrenceSection(
+        listOf({
+            HsSettingCell(
+                R.string.Settings_Telegram,
+                R.drawable.ic_telegram_filled_24,
+                ComposeAppTheme.colors.jacob,
+                onClick = {
+                    LinkHelper.openLinkInAppBrowser(context, App.appConfigProvider.appTelegramLink)
+
+                    stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.ExternalTelegram))
+                }
+            )
+        }, {
+            HsSettingCell(
+                R.string.Settings_Twitter,
+                R.drawable.ic_twitter_filled_24,
+                ComposeAppTheme.colors.jacob,
+                onClick = {
+                    LinkHelper.openLinkInAppBrowser(context, App.appConfigProvider.appTwitterLink)
+
+                    stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.ExternalTwitter))
+                }
+            )
+        })
+    )
+    InfoText(
+        text = stringResource(R.string.Settings_JoinUnstoppables_Description),
     )
 
     VSpacer(32.dp)
@@ -345,6 +357,7 @@ private fun SettingSections(
 fun HsSettingCell(
     @StringRes title: Int,
     @DrawableRes icon: Int,
+    iconTint: Color? = null,
     value: String? = null,
     counterBadge: String? = null,
     showAlert: Boolean = false,
@@ -354,10 +367,11 @@ fun HsSettingCell(
         modifier = Modifier.padding(horizontal = 16.dp),
         onClick = onClick
     ) {
-        Image(
+        Icon(
             modifier = Modifier.size(24.dp),
             painter = painterResource(id = icon),
             contentDescription = null,
+            tint = iconTint ?: ComposeAppTheme.colors.grey
         )
         body_leah(
             text = stringResource(title),
