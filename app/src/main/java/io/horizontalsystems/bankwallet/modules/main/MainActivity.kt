@@ -4,19 +4,17 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.fragment.NavHostFragment
-import com.walletconnect.web3.wallet.client.Wallet
 import com.wallet.blockchain.bitcoin.R
+import com.walletconnect.web3.wallet.client.Wallet
 import dagger.hilt.android.AndroidEntryPoint
 import io.horizontalsystems.bankwallet.core.BaseActivity
 import io.horizontalsystems.bankwallet.core.slideFromBottom
+import io.horizontalsystems.bankwallet.modules.billing.BillingPlusViewModel
 import io.horizontalsystems.bankwallet.modules.intro.IntroActivity
 import io.horizontalsystems.bankwallet.modules.keystore.KeyStoreActivity
 import io.horizontalsystems.bankwallet.modules.lockscreen.LockScreenActivity
-import io.horizontalsystems.core.hideKeyboard
-import io.horizontalsystems.bankwallet.modules.billing.BillingPlusViewModel
 import io.horizontalsystems.bankwallet.worker.Sync
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import io.horizontalsystems.core.hideKeyboard
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {

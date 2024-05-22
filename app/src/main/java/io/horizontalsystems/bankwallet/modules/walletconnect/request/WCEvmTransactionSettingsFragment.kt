@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.modules.walletconnect.request.sendtransaction.WCSendEthereumTransactionRequestViewModel
 
@@ -13,6 +13,9 @@ class WCEvmTransactionSettingsFragment : BaseComposeFragment() {
     override fun GetContent(navController: NavController) {
         WCEvmTransactionSettingsScreen(navController)
     }
+
+    override val logScreen: String
+        get() = "WCEvmTransactionSettingsFragment"
 }
 
 @Composable

@@ -27,7 +27,7 @@ import dagger.assisted.AssistedInject
 import io.horizontalsystems.bankwallet.analytics.AnalyticsHelper
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.getColorCompat
-import io.horizontalsystems.bankwallet.modules.launcher.LauncherActivity
+import io.horizontalsystems.bankwallet.modules.main.MainActivity
 import io.horizontalsystems.bankwallet.repository.CoinBaseRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -131,7 +131,7 @@ internal class SyncWorker @AssistedInject constructor(
         notificationManager.createNotificationChannel(channel)
 
 
-        val intent = Intent(context, LauncherActivity::class.java)
+        val intent = Intent(context, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
         val pendingIntent =
             PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)

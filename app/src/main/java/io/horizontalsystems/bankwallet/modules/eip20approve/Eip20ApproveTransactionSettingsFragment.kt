@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 
 class Eip20ApproveTransactionSettingsFragment : BaseComposeFragment() {
@@ -12,6 +12,9 @@ class Eip20ApproveTransactionSettingsFragment : BaseComposeFragment() {
     override fun GetContent(navController: NavController) {
         Eip20ApproveTransactionSettingsScreen(navController)
     }
+
+    override val logScreen: String
+        get() = "Eip20ApproveTransactionSettingsFragment"
 }
 
 @Composable

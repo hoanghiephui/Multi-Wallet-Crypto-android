@@ -17,8 +17,7 @@ import io.horizontalsystems.core.security.KeyStoreValidationError
 import kotlinx.coroutines.launch
 
 class MainActivityViewModel(
-    private valuserManager: UserManager
-,
+    private val userManager: UserManager,
     private val accountManager: IAccountManager,
     private val pinComponent: IPinComponent,
     private val systemInfoManager: ISystemInfoManager,

@@ -6,15 +6,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Scaffold
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.requireInput
 import io.horizontalsystems.bankwallet.core.setNavigationResultX
@@ -38,7 +41,7 @@ import io.horizontalsystems.marketkit.models.Token
 import kotlinx.parcelize.Parcelize
 import java.math.BigDecimal
 
-class Eip20ApproveFragment : BaseComposeFragment() {
+class Eip20ApproveFragment(override val logScreen: String = "Eip20ApproveFragment") : BaseComposeFragment() {
 
     @Composable
     override fun GetContent(navController: NavController) {
@@ -53,6 +56,7 @@ class Eip20ApproveFragment : BaseComposeFragment() {
     ) : Parcelable
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Eip20ApproveScreen(navController: NavController, input: Eip20ApproveFragment.Input) {
     val viewModelStoreOwner = remember(navController.currentBackStackEntry) {
@@ -101,7 +105,8 @@ fun Eip20ApproveScreen(navController: NavController, input: Eip20ApproveFragment
                 )
             }
         },
-        backgroundColor = ComposeAppTheme.colors.tyler,
+        containerColor = Color.Transparent,
+        contentColor = MaterialTheme.colorScheme.background
     ) {
         Column(
             modifier = Modifier

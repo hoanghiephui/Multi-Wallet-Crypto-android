@@ -382,7 +382,7 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         )
 
         statsManager = StatsManager(appDatabase.statsDao(), localStorage, marketKit, appConfigProvider)
-        backgroundStateChangeListener = BackgroundStateChangeListener(pinComponent, statsManager, accountManager).apply {
+        backgroundStateChangeListener = BackgroundStateChangeListener(pinComponent, statsManager).apply {
             backgroundManager.registerListener(this)
         }
 

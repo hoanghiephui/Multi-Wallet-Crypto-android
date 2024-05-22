@@ -14,7 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.setNavigationResultX
 import io.horizontalsystems.bankwallet.core.slideFromRight
@@ -47,6 +47,9 @@ class Eip20ApproveConfirmFragment : BaseComposeFragment() {
 
     @Parcelize
     data class Result(val approved: Boolean) : Parcelable
+
+    override val logScreen: String
+        get() = "Eip20ApproveConfirmFragment"
 }
 
 @Composable
