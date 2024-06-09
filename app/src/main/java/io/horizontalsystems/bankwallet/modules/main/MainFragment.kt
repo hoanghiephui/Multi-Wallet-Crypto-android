@@ -47,7 +47,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
-import com.android.billing.UserDataRepository
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
@@ -117,7 +116,6 @@ class MainFragment : BaseComposeFragment() {
                 deepLink = intentUri,
                 navController = navController,
                 searchViewModel = searchViewModel,
-                userDataRepository = userDataRepository
             )
         }
     }
@@ -147,7 +145,6 @@ private fun MainScreenWithRootedDeviceCheck(
     navController: NavController,
     rootedDeviceViewModel: RootedDeviceViewModel = viewModel(factory = RootedDeviceModule.Factory()),
     searchViewModel: MarketSearchViewModel,
-    userDataRepository: UserDataRepository
 ) {
     if (rootedDeviceViewModel.showRootedDeviceWarning) {
         RootedDeviceScreen { rootedDeviceViewModel.ignoreRootedDeviceWarning() }
@@ -157,7 +154,6 @@ private fun MainScreenWithRootedDeviceCheck(
             deepLink,
             navController,
             searchViewModel = searchViewModel,
-            userDataRepository = userDataRepository
         )
     }
 }
@@ -172,7 +168,6 @@ private fun MainScreen(
     fragmentNavController: NavController,
     viewModel: MainViewModel = viewModel(factory = MainModule.Factory(deepLink)),
     searchViewModel: MarketSearchViewModel,
-    userDataRepository: UserDataRepository
 ) {
     val uiState = viewModel.uiState
     val selectedPage = uiState.selectedTabIndex
@@ -251,7 +246,6 @@ private fun MainScreen(
                             MainNavigation.Market -> MarketScreen(
                                 fragmentNavController,
                                 searchViewModel,
-                                userDataRepository,
                                 viewModel
                             )
 

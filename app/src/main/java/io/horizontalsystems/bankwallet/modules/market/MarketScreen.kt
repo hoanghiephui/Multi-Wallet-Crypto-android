@@ -19,9 +19,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Search
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -33,7 +33,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
@@ -47,9 +46,6 @@ import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
-import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
-import io.horizontalsystems.bankwallet.modules.main.MainModule
-import io.horizontalsystems.bankwallet.modules.main.MainViewModel
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
 import io.horizontalsystems.bankwallet.core.stats.StatSection
@@ -57,11 +53,11 @@ import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.core.stats.statPage
 import io.horizontalsystems.bankwallet.core.stats.statSection
 import io.horizontalsystems.bankwallet.core.stats.statTab
+import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
+import io.horizontalsystems.bankwallet.modules.main.MainModule
+import io.horizontalsystems.bankwallet.modules.main.MainViewModel
 import io.horizontalsystems.bankwallet.modules.market.MarketModule.Tab
 import io.horizontalsystems.bankwallet.modules.market.favorites.MarketFavoritesScreen
-import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewModule
-import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewScreen
-import io.horizontalsystems.bankwallet.modules.market.overview.MarketOverviewViewModel
 import io.horizontalsystems.bankwallet.modules.market.posts.MarketPostsScreen
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchResults
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchSection
@@ -71,8 +67,6 @@ import io.horizontalsystems.bankwallet.modules.market.toppairs.TopPairsScreen
 import io.horizontalsystems.bankwallet.modules.market.topplatforms.TopPlatforms
 import io.horizontalsystems.bankwallet.modules.metricchart.MetricsType
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
-import io.horizontalsystems.bankwallet.ui.compose.NiaTab
-import io.horizontalsystems.bankwallet.ui.compose.NiaTabRow
 import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.ScrollableTabs
 import io.horizontalsystems.bankwallet.ui.compose.components.TabItem
@@ -80,15 +74,13 @@ import io.horizontalsystems.bankwallet.ui.compose.components.caption_bran
 import io.horizontalsystems.bankwallet.ui.compose.components.caption_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.caption_lucian
 import io.horizontalsystems.bankwallet.ui.compose.components.caption_remus
-import java.util.Optional
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MarketScreen(
     navController: NavController,
     searchViewModel: MarketSearchViewModel,
-    userDataRepository: UserDataRepository,
     mainViewModel: MainViewModel
 ) {
     val marketViewModel = viewModel<MarketViewModel>(factory = MarketModule.Factory())
@@ -137,35 +129,42 @@ fun MarketScreen(
                     }) {
                         Icon(Icons.Rounded.MoreVert, contentDescription = null)
 
-                        stat(page = StatPage.Markets, event = StatEvent.Open(StatPage.AdvancedSearch))
+                        stat(
+                            page = StatPage.Markets,
+                            event = StatEvent.Open(StatPage.AdvancedSearch)
+                        )
                     }
                 },
             ) {
                 Crossfade(targetState = text.isBlank(), label = "") { isSearch ->
-                    val uiState = searchViewModel.uiState
+                    val uiSearchState = searchViewModel.uiState
                     val itemSections =
-                        if (!isSearch && uiState.page is MarketSearchViewModel.Page.SearchResults)
+                        if (!isSearch && uiSearchState.page is MarketSearchViewModel.Page.SearchResults)
                             mapOf(
-                                MarketSearchSection.SearchResults to uiState.page.items
+                                MarketSearchSection.SearchResults to uiSearchState.page.items
                             )
-                        else if (uiState.page is MarketSearchViewModel.Page.Discovery)
+                        else if (uiSearchState.page is MarketSearchViewModel.Page.Discovery)
                             mapOf(
-                                MarketSearchSection.Popular to uiState.page.popular.take(6),
+                                MarketSearchSection.Popular to uiSearchState.page.popular.take(6),
                             ) else mapOf()
 
                     MarketSearchResults(
-                        uiState.listId,
+                        uiSearchState.listId,
                         itemSections = itemSections,
                         onCoinClick = { coin, section ->
                             active = false
                             text = ""
-                            uiState.page
+                            uiSearchState.page
                             searchViewModel.onCoinOpened(coin)
                             navController.slideFromRight(
                                 R.id.coinFragment,
                                 CoinFragment.Input(coin.uid)
                             )
-                            stat(page = StatPage.MarketSearch, section = section.statSection, event = StatEvent.OpenCoin(coin.uid))
+                            stat(
+                                page = StatPage.MarketSearch,
+                                section = section.statSection,
+                                event = StatEvent.OpenCoin(coin.uid)
+                            )
                         }
                     ) { favorited, coinUid ->
                         searchViewModel.onFavoriteClick(favorited, coinUid)
@@ -176,10 +175,12 @@ fun MarketScreen(
 
         Column(
             Modifier
+                .fillMaxSize()
+                .padding(top = 92.dp)
                 .background(ComposeAppTheme.colors.tyler)
         ) {
             MetricsBoard(navController, uiState.marketOverviewItems)
-            Divider(
+            HorizontalDivider(
                 color = ComposeAppTheme.colors.steel10,
                 thickness = 1.dp
             )
@@ -292,7 +293,7 @@ fun MetricsBoard(
             .height(40.dp)
             .background(ComposeAppTheme.colors.tyler)
             .horizontalScroll(rememberScrollState()),
-        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically
     ) {
         HSpacer(4.dp)
         marketOverviewItems.forEach { item ->
@@ -325,9 +326,11 @@ private fun openMetricsPage(metricsType: MetricsType, navController: NavControll
         MetricsType.TvlInDefi -> {
             navController.slideFromBottom(R.id.tvlFragment)
         }
+
         MetricsType.Etf -> {
             navController.slideFromBottom(R.id.etfFragment)
         }
+
         else -> {
             navController.slideFromBottom(R.id.metricsPageFragment, metricsType)
         }

@@ -1,6 +1,6 @@
 package io.horizontalsystems.bankwallet.ui.compose.components
 
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -73,7 +73,7 @@ fun <T> ScrollableTabs(tabs: List<TabItem<T>>, onClick: (T) -> Unit) {
         tabs.forEach { tab ->
             Tab(
                 modifier = Modifier
-                    .fillMaxHeight()
+                    .height(50.dp)
                     .padding(horizontal = 12.dp),
                 selected = tab.selected,
                 onClick = {
