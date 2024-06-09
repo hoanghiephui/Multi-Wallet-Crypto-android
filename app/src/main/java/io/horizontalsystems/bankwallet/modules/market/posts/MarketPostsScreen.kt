@@ -19,6 +19,7 @@ import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.StatSection
 import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
@@ -40,7 +41,7 @@ fun MarketPostsScreen(viewModel: MarketPostsViewModel = viewModel(factory = Mark
         onRefresh = {
             viewModel.refresh()
 
-            stat(page = StatPage.News, event = StatEvent.Refresh)
+            stat(page = StatPage.Markets, section = StatSection.News, event = StatEvent.Refresh)
         }
     ) {
         Crossfade(viewState, label = "MarketPostsScreen") { viewState ->
@@ -63,7 +64,7 @@ fun MarketPostsScreen(viewModel: MarketPostsViewModel = viewModel(factory = Mark
                             ) {
                                 LinkHelper.openLinkInAppBrowser(context, postItem.url)
 
-                                stat(page = StatPage.News, event = StatEvent.Open(StatPage.ExternalNews))
+                                stat(page = StatPage.Markets, section = StatSection.News, event = StatEvent.Open(StatPage.ExternalNews))
                             }
                         }
                         item {

@@ -11,6 +11,7 @@ import io.horizontalsystems.bankwallet.core.ethereum.EvmCoinServiceFactory
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.modules.multiswap.sendtransaction.SendTransactionData
 import io.horizontalsystems.bankwallet.modules.multiswap.sendtransaction.SendTransactionServiceEvm
+import io.horizontalsystems.bankwallet.modules.multiswap.sendtransaction.SendTransactionServiceState
 import io.horizontalsystems.bankwallet.modules.multiswap.ui.DataField
 import io.horizontalsystems.bankwallet.modules.send.SendModule
 import io.horizontalsystems.bankwallet.modules.sendevmtransaction.SectionViewItem
@@ -28,19 +29,28 @@ import kotlinx.coroutines.withContext
 
 class WCSendEthereumTransactionRequestViewModel(
     private val sendEvmTransactionViewItemFactory: SendEvmTransactionViewItemFactory,
-    val sendTransactionService: SendTransactionServiceEvm,
     private val dAppName: String,
-    transaction: WalletConnectTransaction
+    transaction: WalletConnectTransaction,
+    blockchainType: BlockchainType
 ) : ViewModelUiState<WCSendEthereumTransactionRequestUiState>() {
+    val sendTransactionService: SendTransactionServiceEvm
+
     private val transactionData = TransactionData(
         transaction.to,
         transaction.value,
         transaction.data
     )
 
-    private var sendTransactionState = sendTransactionService.stateFlow.value
+    private var sendTransactionState: SendTransactionServiceState
 
     init {
+        sendTransactionService = SendTransactionServiceEvm(
+            blockchainType = blockchainType,
+            initialGasPrice = transaction.getGasPriceObj(),
+            initialNonce = transaction.nonce
+        )
+        sendTransactionState = sendTransactionService.stateFlow.value
+
         viewModelScope.launch {
             sendTransactionService.stateFlow.collect { transactionState ->
                 sendTransactionState = transactionState
@@ -114,7 +124,6 @@ class WCSendEthereumTransactionRequestViewModel(
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            val sendTransactionService = SendTransactionServiceEvm(blockchainType)
             val feeToken = App.evmBlockchainManager.getBaseToken(blockchainType)!!
             val coinServiceFactory = EvmCoinServiceFactory(
                 feeToken,
@@ -132,9 +141,9 @@ class WCSendEthereumTransactionRequestViewModel(
 
             return WCSendEthereumTransactionRequestViewModel(
                 sendEvmTransactionViewItemFactory,
-                sendTransactionService,
                 peerName,
-                transaction
+                transaction,
+                blockchainType
             ) as T
         }
     }

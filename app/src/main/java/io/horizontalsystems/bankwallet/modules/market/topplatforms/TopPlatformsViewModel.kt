@@ -1,76 +1,83 @@
 package io.horizontalsystems.bankwallet.modules.market.topplatforms
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
+import io.horizontalsystems.bankwallet.core.ViewModelUiState
+import io.horizontalsystems.bankwallet.core.managers.CurrencyManager
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.market.SortingField
 import io.horizontalsystems.bankwallet.modules.market.TimeDuration
-import io.horizontalsystems.bankwallet.modules.market.topcoins.SelectorDialogState
-import io.horizontalsystems.bankwallet.ui.compose.Select
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class TopPlatformsViewModel(
-    private val service: TopPlatformsService,
+    private val repository: TopPlatformsRepository,
+    private val currencyManager: CurrencyManager,
     timeDuration: TimeDuration?,
-) : ViewModel() {
+) : ViewModelUiState<TopPlatformsModule.UiState>() {
 
-    private val sortingFields = listOf(
+    val sortingOptions = listOf(
         SortingField.HighestCap,
         SortingField.LowestCap,
         SortingField.TopGainers,
         SortingField.TopLosers
     )
 
-    var sortingField: SortingField = SortingField.HighestCap
-        private set
+    val periods = listOf(
+        TimeDuration.SevenDay,
+        TimeDuration.ThirtyDay,
+        TimeDuration.ThreeMonths,
+    )
 
-    val periodOptions = TimeDuration.values().toList()
+    private var sortingField = SortingField.TopGainers
 
-    var timePeriod = timeDuration ?: TimeDuration.OneDay
-        private set
+    private var timePeriod = timeDuration ?: periods.first()
 
-    val timePeriodSelect = Select(timePeriod, periodOptions)
+    private var viewItems = emptyList<TopPlatformViewItem>()
 
-    var sortingSelect by mutableStateOf(Select(sortingField, sortingFields))
-        private set
+    private var viewState: ViewState = ViewState.Loading
 
-    var viewItems by mutableStateOf<List<TopPlatformViewItem>>(listOf())
-        private set
-
-    var viewState by mutableStateOf<ViewState>(ViewState.Loading)
-        private set
-
-    var isRefreshing by mutableStateOf(false)
-        private set
-
-    var selectorDialogState by mutableStateOf<SelectorDialogState>(SelectorDialogState.Closed)
-        private set
+    private var isRefreshing = false
 
 
     init {
         viewModelScope.launch {
             sync(false)
         }
-    }
 
-    private fun sync(forceRefresh: Boolean = false) {
         viewModelScope.launch {
-            try {
-                val topPlatformItems =
-                    service.getTopPlatforms(sortingField, timePeriod, forceRefresh)
-                viewItems = getViewItems(topPlatformItems)
-                viewState = ViewState.Success
-            } catch (e: Throwable) {
-                viewState = ViewState.Error(e)
+            currencyManager.baseCurrencyUpdatedFlow.collect {
+                sync(true)
             }
         }
+    }
+
+    override fun createState(): TopPlatformsModule.UiState {
+        return TopPlatformsModule.UiState(
+            sortingField = sortingField,
+            timePeriod = timePeriod,
+            viewItems = viewItems,
+            viewState = viewState,
+            isRefreshing = isRefreshing
+        )
+    }
+
+    private suspend fun sync(forceRefresh: Boolean = false) {
+        try {
+            val topPlatformItems = repository.get(
+                sortingField,
+                timePeriod,
+                currencyManager.baseCurrency.code,
+                forceRefresh
+            )
+            viewItems = getViewItems(topPlatformItems)
+            viewState = ViewState.Success
+        } catch (e: Throwable) {
+            viewState = ViewState.Error(e)
+        }
+        emitState()
     }
 
     private fun getViewItems(topPlatformItems: List<TopPlatformItem>): List<TopPlatformViewItem> {
@@ -83,7 +90,7 @@ class TopPlatformsViewModel(
                 ),
                 marketCap = App.numberFormatter.formatFiatShort(
                     item.marketCap,
-                    service.baseCurrency.symbol,
+                    currencyManager.baseCurrency.symbol,
                     2
                 ),
                 marketCapDiff = item.changeDiff,
@@ -96,27 +103,22 @@ class TopPlatformsViewModel(
     private fun refreshWithMinLoadingSpinnerPeriod() {
         viewModelScope.launch {
             isRefreshing = true
+            emitState()
+
             sync(true)
+
             delay(1000)
             isRefreshing = false
+            emitState()
         }
     }
 
     fun onSelectSortingField(sortingField: SortingField) {
         this.sortingField = sortingField
-        sortingSelect = Select(sortingField, sortingFields)
-        selectorDialogState = SelectorDialogState.Closed
-        sync()
-    }
 
-    fun onSelectorDialogDismiss() {
-        selectorDialogState = SelectorDialogState.Closed
-    }
-
-    fun showSelectorMenu() {
-        selectorDialogState = SelectorDialogState.Opened(
-            Select(sortingSelect.selected, sortingSelect.options)
-        )
+        viewModelScope.launch {
+            sync()
+        }
     }
 
     fun refresh() {
@@ -129,6 +131,9 @@ class TopPlatformsViewModel(
 
     fun onTimePeriodSelect(timePeriod: TimeDuration) {
         this.timePeriod = timePeriod
-        sync()
+
+        viewModelScope.launch {
+            sync()
+        }
     }
 }

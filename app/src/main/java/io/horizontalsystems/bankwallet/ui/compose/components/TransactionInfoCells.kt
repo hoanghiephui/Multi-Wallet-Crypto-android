@@ -122,8 +122,8 @@ fun TransactionNftAmountCell(
     RowUniversal(
         modifier = Modifier.padding(horizontal = 16.dp),
     ) {
-        CoinImage(
-            iconUrl = iconUrl,
+        HsImage(
+            url = iconUrl,
             placeholder = iconPlaceholder,
             modifier = Modifier
                 .size(32.dp)
@@ -159,6 +159,7 @@ fun TransactionAmountCell(
     fiatAmount: ColoredValue?,
     coinAmount: ColoredValue,
     coinIconUrl: String?,
+    alternativeCoinIconUrl: String?,
     badge: String?,
     coinIconPlaceholder: Int?,
     onClick: (() -> Unit)? = null
@@ -174,8 +175,9 @@ fun TransactionAmountCell(
         modifier = Modifier.padding(horizontal = 16.dp),
         onClick = onClick
     ) {
-        CoinImage(
-            iconUrl = coinIconUrl,
+        HsImage(
+            url = coinIconUrl,
+            alternativeUrl = alternativeCoinIconUrl,
             placeholder = coinIconPlaceholder,
             modifier = Modifier.size(32.dp)
         )

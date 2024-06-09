@@ -147,7 +147,7 @@ fun BalanceCardInner(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         body_leah(
-                            text = viewItem.coinCode,
+                            text = viewItem.wallet.coin.code,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -217,7 +217,7 @@ fun BalanceCardInner(
                                 }
 
                                 BalanceCardSubtitleType.CoinName -> {
-                                    subhead2_grey(text = viewItem.coinTitle)
+                                    subhead2_grey(text = viewItem.wallet.coin.name)
                                 }
                             }
                         }
@@ -291,10 +291,8 @@ private fun WalletIcon(
             )
         } else {
             CoinImage(
-                iconUrl = viewItem.coinIconUrl,
-                placeholder = viewItem.coinIconPlaceholder,
-                modifier = Modifier
-                    .size(32.dp)
+                token = viewItem.wallet.token,
+                modifier = Modifier.size(32.dp)
             )
         }
     }

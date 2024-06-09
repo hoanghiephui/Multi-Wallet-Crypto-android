@@ -51,10 +51,12 @@ import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.ethereumkit.core.LegacyGasPriceProvider
 import io.horizontalsystems.ethereumkit.core.eip1559.Eip1559GasPriceProvider
 import io.horizontalsystems.ethereumkit.decorations.TransactionDecoration
+import io.horizontalsystems.ethereumkit.models.GasPrice
 import io.horizontalsystems.ethereumkit.models.TransactionData
 import io.horizontalsystems.marketkit.models.BlockchainType
 import io.reactivex.Flowable
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -62,17 +64,28 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.await
 import java.math.BigDecimal
 
-class SendTransactionServiceEvm(blockchainType: BlockchainType) : ISendTransactionService() {
+class SendTransactionServiceEvm(
+    blockchainType: BlockchainType,
+    initialGasPrice: GasPrice? = null,
+    initialNonce: Long? = null
+) : ISendTransactionService() {
     private val token by lazy { App.evmBlockchainManager.getBaseToken(blockchainType)!! }
     private val evmKitWrapper by lazy { App.evmBlockchainManager.getEvmKitManager(blockchainType).evmKitWrapper!! }
     private val gasPriceService: IEvmGasPriceService by lazy {
         val evmKit = evmKitWrapper.evmKit
         if (evmKit.chain.isEIP1559Supported) {
             val gasPriceProvider = Eip1559GasPriceProvider(evmKit)
-            Eip1559GasPriceService(gasPriceProvider, Flowable.empty())
+            Eip1559GasPriceService(
+                gasProvider = gasPriceProvider,
+                refreshSignalFlowable = Flowable.empty(),
+                initialGasPrice = initialGasPrice as? GasPrice.Eip1559
+            )
         } else {
             val gasPriceProvider = LegacyGasPriceProvider(evmKit)
-            LegacyGasPriceService(gasPriceProvider)
+            LegacyGasPriceService(
+                gasPriceProvider = gasPriceProvider,
+                initialGasPrice = (initialGasPrice as? GasPrice.Legacy)?.legacyGasPrice
+            )
         }
     }
     private val feeService by lazy {
@@ -90,16 +103,10 @@ class SendTransactionServiceEvm(blockchainType: BlockchainType) : ISendTransacti
             App.coinManager
         )
     }
-    private val nonceService by lazy { SendEvmNonceService(evmKitWrapper.evmKit) }
+    private val nonceService by lazy {
+        SendEvmNonceService(evmKitWrapper.evmKit, initialNonce)
+    }
     private val settingsService by lazy { SendEvmSettingsService(feeService, nonceService) }
-//    private val sendService by lazy {
-//        SendEvmTransactionService(
-//            sendEvmData,
-//            evmKitWrapper,
-//            settingsService,
-//            App.evmLabelManager
-//        )
-//    }
 
     private val baseCoinService = coinServiceFactory.baseCoinService
     private val cautionViewItemFactory by lazy { CautionViewItemFactory(baseCoinService) }
@@ -125,6 +132,9 @@ class SendTransactionServiceEvm(blockchainType: BlockchainType) : ISendTransacti
     )
 
     override fun start(coroutineScope: CoroutineScope) {
+        gasPriceService.start()
+        feeService.start()
+
         coroutineScope.launch {
             gasPriceService.stateFlow.collect { gasPriceState ->
                 _sendTransactionSettingsFlow.update {
@@ -134,6 +144,9 @@ class SendTransactionServiceEvm(blockchainType: BlockchainType) : ISendTransacti
         }
         coroutineScope.launch {
             settingsService.start()
+        }
+        coroutineScope.launch(Dispatchers.Default) {
+            nonceService.start()
         }
         coroutineScope.launch {
             settingsService.stateFlow.collect { transactionState ->

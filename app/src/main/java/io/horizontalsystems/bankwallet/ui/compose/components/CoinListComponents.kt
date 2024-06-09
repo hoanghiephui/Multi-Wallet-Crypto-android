@@ -54,6 +54,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.alternativeImageUrl
 import io.horizontalsystems.bankwallet.core.iconPlaceholder
 import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.modules.market.ImageSource
@@ -126,14 +127,17 @@ fun CoinList(
                     },
                     content = {
                         MarketCoin(
-                            item.fullCoin.coin.name,
-                            item.fullCoin.coin.code,
-                            item.fullCoin.coin.imageUrl,
-                            item.fullCoin.iconPlaceholder,
-                            item.coinRate,
-                            item.marketDataValue,
-                            item.rank
-                        ) { onCoinClick.invoke(item.fullCoin.coin.uid) }
+                            title = item.fullCoin.coin.code,
+                            subtitle = item.subtitle,
+                            coinIconUrl = item.fullCoin.coin.imageUrl,
+                            alternativeCoinIconUrl = item.fullCoin.coin.alternativeImageUrl,
+                            coinIconPlaceholder = item.fullCoin.iconPlaceholder,
+                            value = item.value,
+                            marketDataValue = item.marketDataValue,
+                            label = item.rank,
+                            advice = item.signal,
+                            onClick = { onCoinClick.invoke(item.fullCoin.coin.uid) }
+                        )
                     }
                 )
                 HorizontalDivider(

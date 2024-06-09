@@ -3,8 +3,11 @@ package io.horizontalsystems.bankwallet.modules.market.topcoins
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import io.horizontalsystems.bankwallet.core.App
+import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.market.MarketField
+import io.horizontalsystems.bankwallet.modules.market.MarketViewItem
 import io.horizontalsystems.bankwallet.modules.market.SortingField
+import io.horizontalsystems.bankwallet.modules.market.TimeDuration
 import io.horizontalsystems.bankwallet.modules.market.TopMarket
 import io.horizontalsystems.bankwallet.ui.compose.Select
 
@@ -22,9 +25,9 @@ object MarketTopCoinsModule {
                 topMarketsRepository,
                 App.currencyManager,
                 App.marketFavoritesManager,
+                App.priceManager,
                 topMarket ?: defaultTopMarket,
                 sortingField ?: defaultSortingField,
-                marketField ?: defaultMarketField
             )
             return MarketTopCoinsViewModel(
                 service,
@@ -38,6 +41,15 @@ object MarketTopCoinsModule {
             val defaultMarketField = MarketField.PriceDiff
         }
     }
+
+    data class UiState(
+        val viewItems: List<MarketViewItem>,
+        val viewState: ViewState,
+        val isRefreshing: Boolean,
+        val sortingField: SortingField,
+        val topMarket: TopMarket,
+        val timeDuration: TimeDuration,
+    )
 
     data class Menu(
         val sortingFieldSelect: Select<SortingField>,

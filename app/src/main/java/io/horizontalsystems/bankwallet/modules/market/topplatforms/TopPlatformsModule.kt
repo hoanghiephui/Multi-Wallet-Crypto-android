@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.iconUrl
+import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.market.MarketField
 import io.horizontalsystems.bankwallet.modules.market.SortingField
 import io.horizontalsystems.bankwallet.modules.market.TimeDuration
@@ -19,9 +20,8 @@ object TopPlatformsModule {
     class Factory(private val timeDuration: TimeDuration?) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            val repository = TopPlatformsRepository(App.marketKit, App.currencyManager)
-            val service = TopPlatformsService(repository, App.currencyManager)
-            return TopPlatformsViewModel(service, timeDuration) as T
+            val repository = TopPlatformsRepository(App.marketKit)
+            return TopPlatformsViewModel(repository, App.currencyManager, timeDuration) as T
         }
     }
 
@@ -30,13 +30,21 @@ object TopPlatformsModule {
         val marketFieldSelect: Select<MarketField>
     )
 
+    data class UiState(
+        val sortingField: SortingField,
+        val timePeriod: TimeDuration,
+        val viewItems: List<TopPlatformViewItem>,
+        val viewState: ViewState,
+        val isRefreshing: Boolean
+    )
+
 }
 
 @Parcelize
 data class Platform(
     val uid: String,
     val name: String,
-): Parcelable
+) : Parcelable
 
 data class TopPlatformItem(
     val platform: Platform,

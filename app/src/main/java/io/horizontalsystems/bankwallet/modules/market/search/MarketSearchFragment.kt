@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -30,6 +31,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
@@ -47,6 +49,7 @@ import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.alternativeImageUrl
 import io.horizontalsystems.bankwallet.core.iconPlaceholder
 import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.core.slideFromRight
@@ -64,6 +67,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.CoinImage
 import io.horizontalsystems.bankwallet.ui.compose.components.HeaderStick
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
+import io.horizontalsystems.bankwallet.ui.compose.components.HsImage
 import io.horizontalsystems.bankwallet.ui.compose.components.ListEmptyView
 import io.horizontalsystems.bankwallet.ui.compose.components.MarketCoinFirstRow
 import io.horizontalsystems.bankwallet.ui.compose.components.MarketCoinSecondRow
@@ -97,7 +101,7 @@ fun MarketSearchScreen(viewModel: MarketSearchViewModel, navController: NavContr
     NiaBackground {
         Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
             AppBar(
-                title = stringResource(R.string.Market_Overview_TopSectors),
+                title = stringResource(R.string.Market_Search),
                 navigationIcon = {
                     HsBackButton(onClick = { navController.popBackStack() })
                 },
@@ -248,16 +252,12 @@ fun MarketSearchResults(
                                         coinCode = coin.code,
                                         coinName = coin.name,
                                         coinIconUrl = coin.imageUrl,
+                                        alternativeCoinIconUrl = coin.alternativeImageUrl,
                                         coinIconPlaceholder = item.fullCoin.iconPlaceholder,
                                         onClick = { onCoinClick(coin, section) }
                                     )
                                 }
                             }
-                        )
-                        HorizontalDivider(
-                            thickness = 1.dp,
-                            color = ComposeAppTheme.colors.steel10,
-                            modifier = Modifier.align(Alignment.BottomCenter)
                         )
                     }
                 }
@@ -282,6 +282,7 @@ private fun MarketCoin(
     coinCode: String,
     coinName: String,
     coinIconUrl: String,
+    alternativeCoinIconUrl: String?,
     coinIconPlaceholder: Int,
     onClick: () -> Unit,
     coinRate: String? = null,
@@ -292,12 +293,14 @@ private fun MarketCoin(
         borderTop = true,
         onClick = onClick
     ) {
-        CoinImage(
-            iconUrl = coinIconUrl,
+        HsImage(
+            url = coinIconUrl,
+            alternativeUrl = alternativeCoinIconUrl,
             placeholder = coinIconPlaceholder,
             modifier = Modifier
                 .padding(end = 16.dp)
                 .size(32.dp)
+                .clip(CircleShape)
         )
         Column(
             modifier = Modifier.weight(1f)
@@ -318,6 +321,7 @@ fun MarketCoinPreview() {
             coin.code,
             coin.name,
             coin.imageUrl,
+            null,
             R.drawable.coin_placeholder,
             {},
         )

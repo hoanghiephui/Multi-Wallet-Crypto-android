@@ -40,17 +40,13 @@ import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
 import io.horizontalsystems.bankwallet.core.stats.StatSection
 import io.horizontalsystems.bankwallet.core.stats.stat
-import io.horizontalsystems.bankwallet.core.stats.statMarketTop
 import io.horizontalsystems.bankwallet.core.stats.statPeriod
-import io.horizontalsystems.bankwallet.core.stats.statSection
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
-import io.horizontalsystems.bankwallet.modules.market.overview.ui.BoardsView
 import io.horizontalsystems.bankwallet.modules.market.overview.ui.MetricChartsView
 import io.horizontalsystems.bankwallet.modules.market.overview.ui.TopPairsBoardView
 import io.horizontalsystems.bankwallet.modules.market.overview.ui.TopPlatformsBoardView
 import io.horizontalsystems.bankwallet.modules.market.overview.ui.TopSectorsBoardView
-import io.horizontalsystems.bankwallet.modules.market.topcoins.MarketTopCoinsFragment
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
@@ -135,31 +131,31 @@ fun MarketOverviewScreen(
                             }
                             MaxTemplateNativeAdViewComposable(nativeAd, AdType.MEDIUM)
                             Spacer(modifier = Modifier.height(16.dp))
-                            BoardsView(
-                                boards = viewItem.boards,
-                                navController = navController,
-                                onClickSeeAll = { listType ->
-                                    val (sortingField, topMarket, marketField) = viewModel.getTopCoinsParams(
-                                        listType
-                                    )
-
-                                    navController.slideFromBottom(
-                                        R.id.marketTopCoinsFragment,
-                                        MarketTopCoinsFragment.Input(
-                                            sortingField,
-                                            topMarket,
-                                            marketField
-                                        )
-                                    )
-
-                                    stat(page = StatPage.MarketOverview, section = listType.statSection, event = StatEvent.Open(StatPage.TopCoins))
-                                },
-                                onSelectTopMarket = { topMarket, listType ->
-                                    viewModel.onSelectTopMarket(topMarket, listType)
-
-                                    stat(page = StatPage.MarketOverview, section = listType.statSection, event = StatEvent.SwitchMarketTop(topMarket.statMarketTop))
-                                }
-                            )
+//                            BoardsView(
+//                                boards = viewItem.boards,
+//                                navController = navController,
+//                                onClickSeeAll = { listType ->
+//                                    val (sortingField, topMarket, marketField) = viewModel.getTopCoinsParams(
+//                                        listType
+//                                    )
+//
+////                                    navController.slideFromBottom(
+////                                        R.id.marketTopCoinsFragment,
+////                                        MarketTopCoinsFragment.Input(
+////                                            sortingField,
+////                                            topMarket,
+////                                            marketField
+////                                        )
+////                                    )
+//
+//                                    stat(page = StatPage.MarketOverview, section = listType.statSection, event = StatEvent.Open(StatPage.TopCoins))
+//                                },
+//                                onSelectTopMarket = { topMarket, listType ->
+//                                    viewModel.onSelectTopMarket(topMarket, listType)
+//
+//                                    stat(page = StatPage.MarketOverview, section = listType.statSection, event = StatEvent.SwitchMarketTop(topMarket.statMarketTop))
+//                                }
+//                            )
 
                             TopPairsBoardView(
                                 topMarketPairs = viewItem.topMarketPairs,
@@ -171,9 +167,9 @@ fun MarketOverviewScreen(
                                     }
                                 }
                             ) {
-                                navController.slideFromBottom(R.id.topPairsFragment)
+                                //navController.slideFromBottom(R.id.topPairsFragment)
 
-                                stat(page = StatPage.MarketOverview, event = StatEvent.Open(StatPage.TopMarketPairs))
+//                                stat(page = StatPage.MarketOverview, event = StatEvent.Open(StatPage.TopMarketPairs))
                             }
 
                             TopPlatformsBoardView(
@@ -191,12 +187,12 @@ fun MarketOverviewScreen(
                                 onClickSeeAll = {
                                     val timeDuration = viewModel.topPlatformsTimeDuration
 
-                                    navController.slideFromBottom(
-                                        R.id.marketTopPlatformsFragment,
-                                        timeDuration
-                                    )
+//                                    navController.slideFromBottom(
+//                                        R.id.marketTopPlatformsFragment,
+//                                        timeDuration
+//                                    )
 
-                                    stat(page = StatPage.MarketOverview, event = StatEvent.Open(StatPage.TopPlatforms))
+//                                    stat(page = StatPage.MarketOverview, event = StatEvent.Open(StatPage.TopPlatforms))
                                 }
                             )
 

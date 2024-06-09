@@ -15,8 +15,10 @@ import io.horizontalsystems.bankwallet.modules.balance.BalanceSortType
 import io.horizontalsystems.bankwallet.modules.balance.BalanceViewType
 import io.horizontalsystems.bankwallet.modules.main.MainModule
 import io.horizontalsystems.bankwallet.modules.market.MarketModule
-import io.horizontalsystems.bankwallet.modules.market.favorites.MarketFavoritesModule.Period
+import io.horizontalsystems.bankwallet.modules.market.TimeDuration
+import io.horizontalsystems.bankwallet.modules.market.favorites.WatchlistSorting
 import io.horizontalsystems.bankwallet.modules.settings.appearance.AppIcon
+import io.horizontalsystems.bankwallet.modules.settings.appearance.PriceChangeInterval
 import io.horizontalsystems.bankwallet.modules.settings.security.autolock.AutoLockInterval
 import io.horizontalsystems.bankwallet.modules.theme.ThemeType
 import io.horizontalsystems.core.ILockoutStorage
@@ -66,8 +68,10 @@ class LocalStorageManager(
     private val LAUNCH_PAGE = "launch_page"
     private val APP_ICON = "app_icon"
     private val MAIN_TAB = "main_tab"
-    private val MARKET_FAVORITES_SORT_DESCENDING = "market_favorites_sort_descending"
+    private val MARKET_FAVORITES_SORTING = "market_favorites_sorting"
+    private val MARKET_FAVORITES_SHOW_SIGNALS = "market_favorites_show_signals"
     private val MARKET_FAVORITES_TIME_DURATION = "market_favorites_time_duration"
+    private val MARKET_FAVORITES_MANUAL_SORTING_ORDER = "market_favorites_manual_sorting_order"
     private val RELAUNCH_BY_SETTING_CHANGE = "relaunch_by_setting_change"
     private val MARKETS_TAB_ENABLED = "markets_tab_enabled"
     private val BALANCE_AUTO_HIDE_ENABLED = "balance_auto_hide_enabled"
@@ -80,6 +84,8 @@ class LocalStorageManager(
     private val UTXO_EXPERT_MODE = "utxo_expert_mode"
     private val RBF_ENABLED = "rbf_enabled"
     private val STATS_SYNC_TIME = "stats_sync_time"
+    private val PRICE_CHANGE_INTERVAL = "price_change_interval"
+    private val UI_STATS_ENABLED = "ui_stats_enabled"
 
     private val _utxoExpertModeEnabledFlow = MutableStateFlow(false)
     override val utxoExpertModeEnabledFlow = _utxoExpertModeEnabledFlow
@@ -423,15 +429,29 @@ class LocalStorageManager(
             preferences.edit().putString(MAIN_TAB, value?.name).apply()
         }
 
-    override var marketFavoritesSortDescending: Boolean
-        get() = preferences.getBoolean(MARKET_FAVORITES_SORT_DESCENDING, true)
+    override var marketFavoritesSorting: WatchlistSorting?
+        get() = preferences.getString(MARKET_FAVORITES_SORTING, null)?.let {
+            WatchlistSorting.valueOf(it)
+        }
         set(value) {
-            preferences.edit().putBoolean(MARKET_FAVORITES_SORT_DESCENDING, value).apply()
+            preferences.edit().putString(MARKET_FAVORITES_SORTING, value?.name).apply()
         }
 
-    override var marketFavoritesPeriod: Period?
+    override var marketFavoritesShowSignals: Boolean
+        get() = preferences.getBoolean(MARKET_FAVORITES_SHOW_SIGNALS, false)
+        set(value) {
+            preferences.edit().putBoolean(MARKET_FAVORITES_SHOW_SIGNALS, value).apply()
+        }
+
+    override var marketFavoritesManualSortingOrder: List<String>
+        get() = preferences.getString(MARKET_FAVORITES_MANUAL_SORTING_ORDER, null)?.split(",") ?: listOf()
+        set(value) {
+            preferences.edit().putString(MARKET_FAVORITES_MANUAL_SORTING_ORDER, value.joinToString(",")).apply()
+        }
+
+    override var marketFavoritesPeriod: TimeDuration?
         get() = preferences.getString(MARKET_FAVORITES_TIME_DURATION, null)?.let {
-            Period.valueOf(it)
+            TimeDuration.entries.find { period -> period.name == it }
         }
         set(value) {
             preferences.edit().putString(MARKET_FAVORITES_TIME_DURATION, value?.name).apply()
@@ -451,6 +471,15 @@ class LocalStorageManager(
                 value
             }
         }
+
+    override var balanceTabButtonsEnabled: Boolean
+        get() = preferences.getBoolean("balanceTabButtonsEnabled", true)
+        set(value) {
+            preferences.edit().putBoolean("balanceTabButtonsEnabled", value).apply()
+            balanceTabButtonsEnabledFlow.update { value }
+        }
+
+    override val balanceTabButtonsEnabledFlow = MutableStateFlow(balanceTabButtonsEnabled)
 
     override var personalSupportEnabled: Boolean
         get() = preferences.getBoolean(PERSONAL_SUPPORT_ENABLED, false)
@@ -517,5 +546,33 @@ class LocalStorageManager(
         get() = preferences.getLong(STATS_SYNC_TIME, 0)
         set(value) {
             preferences.edit().putLong(STATS_SYNC_TIME, value).apply()
+        }
+
+    override var priceChangeInterval: PriceChangeInterval
+        get() = preferences.getString(PRICE_CHANGE_INTERVAL, null)?.let {
+            PriceChangeInterval.fromRaw(it)
+        } ?: PriceChangeInterval.LAST_24H
+        set(value) {
+            preferences.edit().putString(PRICE_CHANGE_INTERVAL, value.raw).apply()
+
+            priceChangeIntervalFlow.update { value }
+        }
+
+    override val priceChangeIntervalFlow = MutableStateFlow(priceChangeInterval)
+
+    override var uiStatsEnabled: Boolean?
+        get() = when {
+            preferences.contains(UI_STATS_ENABLED) -> {
+                preferences.getBoolean(UI_STATS_ENABLED, false)
+            }
+            else -> null
+        }
+        set(value) {
+            val editor = preferences.edit()
+            if (value == null) {
+                editor.remove(UI_STATS_ENABLED).apply()
+            } else {
+                editor.putBoolean(UI_STATS_ENABLED, value).apply()
+            }
         }
 }

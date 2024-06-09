@@ -27,7 +27,6 @@ import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.core.App
-import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.core.stats.StatEntity
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
@@ -108,7 +107,7 @@ fun SendConfirmationScreen(
         }
 
         is SendResult.Failed -> {
-            HudHelper.showErrorMessage(view, sendResult.caution.getString())
+            HudHelper.showErrorMessage(view, sendResult.caution.getDescription() ?: sendResult.caution.getString())
         }
 
         null -> Unit
@@ -164,7 +163,7 @@ fun SendConfirmationScreen(
                                 .getFormattedFull()
                         }
 
-                        ConfirmAmountCell(currencyAmount, coinAmount, coin.imageUrl)
+                        ConfirmAmountCell(currencyAmount, coinAmount, coin)
                     }
                     add {
                         TransactionInfoAddressCell(
@@ -277,13 +276,12 @@ fun SendButton(modifier: Modifier, sendResult: SendResult?, onClickSend: () -> U
 }
 
 @Composable
-fun ConfirmAmountCell(fiatAmount: String?, coinAmount: String, iconUrl: String?) {
+fun ConfirmAmountCell(fiatAmount: String?, coinAmount: String, coin: Coin) {
     RowUniversal(
         modifier = Modifier.padding(horizontal = 16.dp),
     ) {
         CoinImage(
-            iconUrl = iconUrl,
-            placeholder = R.drawable.coin_placeholder,
+            coin = coin,
             modifier = Modifier.size(32.dp)
         )
         subhead2_leah(

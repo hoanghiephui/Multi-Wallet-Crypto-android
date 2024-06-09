@@ -19,6 +19,9 @@ import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.LocalizedException
 import io.horizontalsystems.bankwallet.core.slideFromRight
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.entities.Faq
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
@@ -48,8 +51,9 @@ class FaqListFragment : BaseComposeFragment() {
                     R.id.markdownFragment,
                         MarkdownFragment.Input( faqItem.markdown)
                     )
-                }
-            )
+
+            stat(page = StatPage.Faq, event = StatEvent.OpenArticle(faqItem.markdown))
+            })
         }
     }
 

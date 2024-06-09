@@ -7,8 +7,14 @@ import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.ViewModelUiState
 import io.horizontalsystems.bankwallet.core.managers.CurrencyManager
 import io.horizontalsystems.bankwallet.core.managers.MarketKitWrapper
+import io.horizontalsystems.bankwallet.core.stats.StatEvent
+import io.horizontalsystems.bankwallet.core.stats.StatPage
+import io.horizontalsystems.bankwallet.core.stats.StatSection
+import io.horizontalsystems.bankwallet.core.stats.StatSortType
+import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.market.overview.TopPairViewItem
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -23,6 +29,7 @@ class TopPairsViewModel(
     private var isRefreshing = false
     private var items = listOf<TopPairViewItem>()
     private var viewState: ViewState = ViewState.Loading
+    private var sortDescending = true
 
     init {
         viewModelScope.launch {
@@ -41,16 +48,24 @@ class TopPairsViewModel(
     override fun createState() = TopPairsUiState(
         isRefreshing = isRefreshing,
         items = items,
-        viewState = viewState
+        viewState = viewState,
+        sortDescending = sortDescending,
     )
+
+    private fun sortItems(items: List<TopPairViewItem>) =
+        if (sortDescending) items.sortedByDescending { it.volume } else items.sortedBy { it.volume }
 
     private suspend fun fetchItems() = withContext(Dispatchers.Default) {
         try {
-            val topPairs = marketKit.topPairsSingle(currencyManager.baseCurrency.code, 1, 100).await()
-            items = topPairs.map {
+            val topPairs =
+                marketKit.topPairsSingle(currencyManager.baseCurrency.code, 1, 100).await()
+            val pairs = topPairs.map {
                 TopPairViewItem.createFromTopPair(it, currencyManager.baseCurrency.symbol)
             }
+            items = sortItems(pairs)
             viewState = ViewState.Success
+        } catch (e: CancellationException) {
+            // no-op
         } catch (e: Throwable) {
             viewState = ViewState.Error(e)
         }
@@ -66,10 +81,32 @@ class TopPairsViewModel(
             isRefreshing = false
             emitState()
         }
+
+        stat(
+            page = StatPage.Markets,
+            section = StatSection.Pairs,
+            event = StatEvent.Refresh
+        )
+
     }
 
     fun onErrorClick() {
         refresh()
+    }
+
+    fun toggleSorting() {
+        sortDescending = !sortDescending
+        emitState()
+        viewModelScope.launch {
+            items = sortItems(items)
+            emitState()
+        }
+
+        stat(
+            page = StatPage.Markets,
+            section = StatSection.Pairs,
+            event = StatEvent.SwitchSortType(if (sortDescending) StatSortType.HighestVolume else StatSortType.LowestVolume)
+        )
     }
 
     class Factory : ViewModelProvider.Factory {
@@ -84,5 +121,6 @@ class TopPairsViewModel(
 data class TopPairsUiState(
     val isRefreshing: Boolean,
     val items: List<TopPairViewItem>,
-    val viewState: ViewState
+    val viewState: ViewState,
+    val sortDescending: Boolean,
 )

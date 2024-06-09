@@ -293,18 +293,18 @@ dependencies {
     // WorkManager RxJava2 support
     implementation "androidx.work:work-rxjava2:$work_version"
 
-    //def leakCanary = 'com.squareup.leakcanary:leakcanary-android:2.10'
+    //def leakCanary = 'com.squareup.leakcanary:leakcanary-android:2.14'
     //appcenterdebugImplementation leakCanary
     //debugImplementation leakCanary
 
     // Wallet kits
     implementation 'com.github.horizontalsystems:ton-kit-kmm:f1fd301'
     implementation 'com.github.horizontalsystems:bitcoin-kit-android:80fd413'
-    implementation 'com.github.horizontalsystems:ethereum-kit-android:f4957a9'
+    implementation 'com.github.horizontalsystems:ethereum-kit-android:3d83900'
     implementation 'com.github.horizontalsystems:blockchain-fee-rate-kit-android:1d3bd49'
     implementation 'com.github.horizontalsystems:binance-chain-kit-android:c1509a2'
-    implementation 'com.github.horizontalsystems:market-kit-android:a0361bf'
-    implementation 'com.github.horizontalsystems:solana-kit-android:d8bb9f2'
+    implementation 'com.github.horizontalsystems:market-kit-android:de765ab'
+    implementation 'com.github.horizontalsystems:solana-kit-android:ec238b4'
     implementation 'com.github.horizontalsystems:tron-kit-android:dc3dca7'
     // Zcash SDK
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'

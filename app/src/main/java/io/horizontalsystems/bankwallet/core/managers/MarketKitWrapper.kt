@@ -153,7 +153,7 @@ class MarketKitWrapper(
 
     // Market Tickers
 
-    fun marketTickersSingle(coinUid: String) = marketKit.marketTickersSingle(coinUid)
+    fun marketTickersSingle(coinUid: String, currencyCode: String) = marketKit.marketTickersSingle(coinUid, currencyCode)
 
     // Details
 
@@ -211,9 +211,13 @@ class MarketKitWrapper(
 
     fun marketOverviewSingle(currencyCode: String) = marketKit.marketOverviewSingle(currencyCode)
 
+    fun marketGlobalSingle(currencyCode: String) = marketKit.marketGlobalSingle(currencyCode)
+
     fun topPairsSingle(currencyCode: String, page: Int, limit: Int) = marketKit.topPairsSingle(currencyCode, page, limit)
 
     fun topMoversSingle(currencyCode: String) = marketKit.topMoversSingle(currencyCode)
+
+    fun topCoinsMarketInfosSingle(top: Int, currencyCode: String) = marketKit.topCoinsMarketInfosSingle(top, currencyCode)
 
     // Chart Info
 
@@ -245,6 +249,8 @@ class MarketKitWrapper(
     fun topPlatformCoinListSingle(chain: String, currencyCode: String) =
         marketKit.topPlatformMarketInfosSingle(chain, currencyCode)
 
+    fun getCoinSignalsSingle(coinUids: List<String>) = marketKit.coinsSignalsSingle(coinUids)
+
     // NFT
 
     suspend fun nftCollections(): List<NftTopCollection> =
@@ -273,5 +279,11 @@ class MarketKitWrapper(
     fun sendStats(stats: String, appVersion: String, appId: String?): Single<Unit> {
         return marketKit.sendStats(stats, appVersion, appId)
     }
+
+    // Etf
+
+    fun etfs(currencyCode: String) = marketKit.etfSingle(currencyCode)
+
+    fun etfPoints(currencyCode: String) = marketKit.etfPointSingle(currencyCode)
 
 }

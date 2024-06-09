@@ -50,9 +50,9 @@ fun ButtonSecondaryDefault(
         onClick = onClick,
         content = {
             if (enabled) {
-                subhead1_leah(text = title, maxLines = 1)
+                captionSB_leah(text = title, maxLines = 1)
             } else {
-                subhead1_grey50(text = title, maxLines = 1)
+                captionSB_grey50(text = title, maxLines = 1)
             }
         },
         enabled = enabled
@@ -79,6 +79,7 @@ fun ButtonSecondaryYellow(
             Text(
                 title,
                 maxLines = 1,
+                style = ComposeAppTheme.typography.captionSB,
                 overflow = TextOverflow.Ellipsis,
             )
         },
@@ -99,19 +100,19 @@ fun ButtonSecondaryWithIcon(
         onClick = onClick,
         contentPadding = PaddingValues(
             start = 16.dp,
-            end = 12.dp,
+            end = 8.dp,
         ),
         content = {
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                subhead1_leah(
+                captionSB_leah(
                     text = title,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Icon(
-                    modifier = Modifier.padding(start = 4.dp),
+                    modifier = Modifier.padding(start = 2.dp),
                     painter = iconRight,
                     contentDescription = null,
                     tint = ComposeAppTheme.colors.grey
@@ -142,12 +143,13 @@ fun ButtonSecondaryTransparent(
         ),
         content = {
             if (iconRight != null) {
-                Row {
-                    Text(
-                        title,
+                Row (
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    captionSB_leah(
+                        text = title,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = false)
+                        overflow = TextOverflow.Ellipsis
                     )
                     Icon(
                         modifier = Modifier.padding(start = 4.dp),
@@ -157,7 +159,11 @@ fun ButtonSecondaryTransparent(
                     )
                 }
             } else {
-                Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                captionSB_leah(
+                    text = title,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
         },
         enabled = enabled
@@ -185,7 +191,12 @@ fun <T : WithTranslatableTitle> ButtonSecondaryToggle(
                 modifier = Modifier.height(IntrinsicSize.Max),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(select.selected.title.getString(), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(
+                    text = select.selected.title.getString(),
+                    maxLines = 1,
+                    style = ComposeAppTheme.typography.captionSB,
+                    overflow = TextOverflow.Ellipsis
+                )
                 Column(
                     modifier = Modifier
                         .height(16.dp)

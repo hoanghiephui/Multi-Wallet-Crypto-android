@@ -1,5 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.settings.appearance
 
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,6 +33,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,18 +46,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
-import io.horizontalsystems.bankwallet.core.imageUrl
-import io.horizontalsystems.bankwallet.core.slideFromRight
-import io.horizontalsystems.bankwallet.modules.settings.main.HsSettingCell
-import io.horizontalsystems.bankwallet.modules.theme.ThemeType
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.Select
+import io.horizontalsystems.bankwallet.ui.compose.components.AlertGroup
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.B2
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryTransparent
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
-import io.horizontalsystems.bankwallet.ui.compose.components.CoinImage
 import io.horizontalsystems.bankwallet.ui.compose.components.D1
 import io.horizontalsystems.bankwallet.ui.compose.components.HeaderText
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
@@ -64,6 +62,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.MultitextM1
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.TextImportantWarning
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_jacob
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_leah
@@ -94,6 +93,11 @@ fun AppearanceScreen(navController: NavController) {
         ModalBottomSheetValue.Hidden
     )
 
+    var openThemeSelector by rememberSaveable { mutableStateOf(false) }
+    var openLaunchPageSelector by rememberSaveable { mutableStateOf(false) }
+    var openBalanceValueSelector by rememberSaveable { mutableStateOf(false) }
+    var openPriceChangeIntervalSelector by rememberSaveable { mutableStateOf(false) }
+
     Surface(color = MaterialTheme.colorScheme.background) {
         ModalBottomSheetLayout(
             sheetState = sheetState,
@@ -122,132 +126,98 @@ fun AppearanceScreen(navController: NavController) {
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState()),
                 ) {
-                    CellUniversalLawrenceSection(
-                        listOf({
-                            HsSettingCell(
-                                R.string.Settings_BaseCurrency,
-                                R.drawable.ic_currency,
-                                value = uiState.baseCurrencyCode,
-                                onClick = {
-                                    navController.slideFromRight(R.id.baseCurrencySettingsFragment)
-                                }
-                            )
-                        }, {
-                            HsSettingCell(
-                                R.string.Settings_Language,
-                                R.drawable.ic_language,
-                                value = uiState.currentLanguage,
-                                onClick = {
-                                    navController.slideFromRight(R.id.languageSettingsFragment)
-                                }
-                            )
-                        })
-                    )
                     VSpacer(height = 12.dp)
-                    HeaderText(text = stringResource(id = R.string.Appearance_Theme))
-                    CellUniversalLawrenceSection(uiState.themeOptions.options) { option: ThemeType ->
-                        RowSelect(
-                            imageContent = {
-                                Image(
-                                    modifier = Modifier.size(24.dp),
-                                    painter = painterResource(id = option.iconRes),
-                                    contentDescription = null,
-                                    colorFilter = ColorFilter.tint(ComposeAppTheme.colors.grey)
-                                )
-                            },
-                            text = option.title.getString(),
-                            selected = option == uiState.themeOptions.selected
-                        ) {
-                            viewModel.onEnterTheme(option)
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    HeaderText(text = stringResource(id = R.string.Appearance_Tab))
                     CellUniversalLawrenceSection(
                         listOf {
-                            RowUniversal(
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                            ) {
-                                Image(
-                                    modifier = Modifier.size(24.dp),
-                                    painter = painterResource(id = R.drawable.ic_market_20),
-                                    contentDescription = null,
-                                    colorFilter = ColorFilter.tint(ComposeAppTheme.colors.grey)
-                                )
-
-                                body_leah(
-                                    text = stringResource(id = R.string.Appearance_MarketsTab),
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(horizontal = 16.dp)
-                                )
-
-                                HsSwitch(
-                                    checked = uiState.marketsTabEnabled,
-                                    onCheckedChange = {
-                                        viewModel.onSetMarketTabsEnabled(it)
-                                    }
-                                )
-
-                            }
-
+                            MenuItemWithDialog(
+                                R.string.Settings_Theme,
+                                value = uiState.selectedTheme.title.getString(),
+                                onClick = { openThemeSelector = true }
+                            )
                         }
                     )
-                    Spacer(modifier = Modifier.height(24.dp))
 
-                    AnimatedVisibility(visible = uiState.marketsTabEnabled) {
-                        Column {
-                            HeaderText(text = stringResource(id = R.string.Appearance_LaunchScreen))
-                            CellUniversalLawrenceSection(uiState.launchScreenOptions.options) { option ->
-                                RowSelect(
-                                    imageContent = {
-                                        Image(
-                                            modifier = Modifier.size(24.dp),
-                                            painter = painterResource(id = option.iconRes),
-                                            contentDescription = null,
-                                            colorFilter = ColorFilter.tint(ComposeAppTheme.colors.grey)
-                                        )
-                                    },
-                                    text = option.title.getString(),
-                                    selected = option == uiState.launchScreenOptions.selected
+                    VSpacer(24.dp)
+
+                    HeaderText(text = stringResource(id = R.string.Appearance_MarketsTab))
+                    CellUniversalLawrenceSection(
+                        listOf (
+                            {
+                                RowUniversal(
+                                    modifier = Modifier.padding(horizontal = 16.dp),
                                 ) {
-                                    viewModel.onEnterLaunchPage(option)
+                                    body_leah(
+                                        text = stringResource(id = R.string.Appearance_HideMarketsTab),
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(end = 16.dp)
+                                    )
+                                    HsSwitch(
+                                        checked = uiState.marketsTabHidden,
+                                        onCheckedChange = {
+                                            viewModel.onSetMarketTabsHidden(it)
+                                        }
+                                    )
                                 }
-                            }
-                            Spacer(modifier = Modifier.height(24.dp))
-                        }
-                    }
-
-                    HeaderText(text = stringResource(id = R.string.Appearance_BalanceConversion))
-                    CellUniversalLawrenceSection(uiState.baseTokenOptions.options) { option ->
-                        RowSelect(
-                            imageContent = {
-                                CoinImage(
-                                    iconUrl = option.coin.imageUrl,
-                                    modifier = Modifier.size(32.dp)
-                                )
                             },
-                            text = option.coin.code,
-                            selected = option == uiState.baseTokenOptions.selected
-                        ) {
-                            viewModel.onEnterBaseToken(option)
+                            {
+                                MenuItemWithDialog(
+                                    R.string.Appearance_PriceChangeInterval,
+                                    value = uiState.priceChangeInterval.title.getString(),
+                                    onClick = { openPriceChangeIntervalSelector = true }
+                                )
+                            }
+                        )
+                    )
+
+                    AnimatedVisibility(visible = !uiState.marketsTabHidden) {
+                        Column {
+                            VSpacer(32.dp)
+                            CellUniversalLawrenceSection(
+                                listOf {
+                                    MenuItemWithDialog(
+                                        R.string.Settings_LaunchScreen,
+                                        value = uiState.selectedLaunchScreen.title.getString(),
+                                        onClick = { openLaunchPageSelector = true }
+                                    )
+                                }
+                            )
                         }
                     }
-                    Spacer(modifier = Modifier.height(24.dp))
 
-                    HeaderText(text = stringResource(id = R.string.Appearance_BalanceValue))
-                    CellUniversalLawrenceSection(uiState.balanceViewTypeOptions.options) { option ->
-                        RowMultilineSelect(
-                            title = stringResource(id = option.titleResId),
-                            subtitle = stringResource(id = option.subtitleResId),
-                            selected = option == uiState.balanceViewTypeOptions.selected
-                        ) {
-                            viewModel.onEnterBalanceViewType(option)
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(24.dp))
+                    VSpacer(24.dp)
+                    HeaderText(text = stringResource(id = R.string.Appearance_BalanceTab))
+                    CellUniversalLawrenceSection(
+                        listOf(
+                            {
+                                RowUniversal(
+                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                ) {
+                                    body_leah(
+                                        text = stringResource(id = R.string.Appearance_HideBalanceTabButtons),
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(end = 16.dp)
+                                    )
+                                    HsSwitch(
+                                        checked = uiState.balanceTabButtonsHidden,
+                                        onCheckedChange = {
+                                            viewModel.onSetBalanceTabButtonsHidden(it)
+                                        }
+                                    )
+                                }
+                            },
+                            {
+                                MenuItemWithDialog(
+                                    R.string.Appearance_BalanceValue,
+                                    value = uiState.selectedBalanceViewType.title.getString(),
+                                    onClick = { openBalanceValueSelector = true }
+                                )
+                            }
+                        )
+                    )
 
+                    VSpacer(24.dp)
                     HeaderText(text = stringResource(id = R.string.Appearance_AppIcon))
                     AppIconSection(uiState.appIconOptions) {
                         scope.launch {
@@ -256,8 +226,53 @@ fun AppearanceScreen(navController: NavController) {
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(32.dp))
+                    VSpacer(32.dp)
                 }
+            }
+            //Dialogs
+            if (openThemeSelector) {
+                AlertGroup(
+                    R.string.Settings_Theme,
+                    uiState.themeOptions,
+                    { selected ->
+                        viewModel.onEnterTheme(selected)
+                        openThemeSelector = false
+                    },
+                    { openThemeSelector = false }
+                )
+            }
+            if (openLaunchPageSelector) {
+                AlertGroup(
+                    R.string.Settings_LaunchScreen,
+                    uiState.launchScreenOptions,
+                    { selected ->
+                        viewModel.onEnterLaunchPage(selected)
+                        openLaunchPageSelector = false
+                    },
+                    { openLaunchPageSelector = false }
+                )
+            }
+            if (openBalanceValueSelector) {
+                AlertGroup(
+                    R.string.Appearance_BalanceValue,
+                    uiState.balanceViewTypeOptions,
+                    { selected ->
+                        viewModel.onEnterBalanceViewType(selected)
+                        openBalanceValueSelector = false
+                    },
+                    { openBalanceValueSelector = false }
+                )
+            }
+            if (openPriceChangeIntervalSelector) {
+                AlertGroup(
+                    R.string.Appearance_PriceChangeInterval,
+                    uiState.priceChangeIntervalOptions,
+                    { selected ->
+                        viewModel.onSetPriceChangeInterval(selected)
+                        openPriceChangeIntervalSelector = false
+                    },
+                    { openPriceChangeIntervalSelector = false }
+                )
             }
         }
     }
@@ -294,7 +309,7 @@ private fun AppCloseWarningBottomSheet(
             title = stringResource(id = R.string.Button_Cancel),
             onClick = onCloseClick
         )
-        Spacer(modifier = Modifier.height(20.dp))
+        VSpacer(20.dp)
     }
 }
 
@@ -430,5 +445,35 @@ fun RowSelect(
                 colorFilter = ColorFilter.tint(ComposeAppTheme.colors.jacob)
             )
         }
+    }
+}
+
+@Composable
+fun MenuItemWithDialog(
+    @StringRes title: Int,
+    value: String,
+    onClick: () -> Unit
+) {
+    RowUniversal(
+        modifier = Modifier.padding(horizontal = 16.dp),
+        onClick = onClick
+    ) {
+        body_leah(
+            text = stringResource(title),
+            maxLines = 1,
+            modifier = Modifier.weight(1f)
+        )
+
+        subhead1_grey(
+            text = value,
+            maxLines = 1,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
+
+        Image(
+            modifier = Modifier.size(20.dp),
+            painter = painterResource(id = R.drawable.ic_down_arrow_20),
+            contentDescription = null,
+        )
     }
 }

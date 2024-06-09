@@ -31,7 +31,6 @@ import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.HSCaution
-import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.stats.StatEntity
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
@@ -96,7 +95,6 @@ fun SendTronConfirmationScreen(
     val feeCoin = confirmationData.feeCoin
     val amount = confirmationData.amount
     val address = confirmationData.address
-    val isInactiveAddress = confirmationData.isInactiveAddress
     val contact = confirmationData.contact
     val fee = confirmationData.fee
     val activationFee = confirmationData.activationFee
@@ -179,7 +177,7 @@ fun SendTronConfirmationScreen(
                                 .getFormattedFull()
                         }
 
-                        ConfirmAmountCell(currencyAmount, coinAmount, coin.imageUrl)
+                        ConfirmAmountCell(currencyAmount, coinAmount, coin)
                     }
                     add {
                         TransactionInfoAddressCell(
@@ -198,11 +196,6 @@ fun SendTronConfirmationScreen(
                                 stat(page = StatPage.SendConfirmation, section = StatSection.AddressTo, event = StatEvent.Open(StatPage.ContactNew))
                             }
                         )
-                    }
-                    if (isInactiveAddress) {
-                        add {
-                            InactiveAddressWarningItem(navController)
-                        }
                     }
                     contact?.let {
                         add {

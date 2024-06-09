@@ -2,13 +2,15 @@ package io.horizontalsystems.bankwallet.modules.market.topcoins
 
 import io.horizontalsystems.bankwallet.core.managers.CurrencyManager
 import io.horizontalsystems.bankwallet.core.managers.MarketFavoritesManager
+import io.horizontalsystems.bankwallet.core.managers.PriceManager
 import io.horizontalsystems.bankwallet.entities.DataState
-import io.horizontalsystems.bankwallet.modules.market.MarketField
 import io.horizontalsystems.bankwallet.modules.market.MarketItem
 import io.horizontalsystems.bankwallet.modules.market.SortingField
+import io.horizontalsystems.bankwallet.modules.market.TimeDuration
 import io.horizontalsystems.bankwallet.modules.market.TopMarket
 import io.horizontalsystems.bankwallet.modules.market.category.MarketItemWrapper
 import io.reactivex.subjects.BehaviorSubject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -21,9 +23,9 @@ class MarketTopCoinsService(
     private val marketTopMoversRepository: MarketTopMoversRepository,
     private val currencyManager: CurrencyManager,
     private val favoritesManager: MarketFavoritesManager,
+    private val priceManager: PriceManager,
     topMarket: TopMarket = TopMarket.Top100,
     sortingField: SortingField = SortingField.HighestCap,
-    private val marketField: MarketField,
 ) {
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private var syncJob: Job? = null
@@ -33,11 +35,25 @@ class MarketTopCoinsService(
     val stateObservable: BehaviorSubject<DataState<List<MarketItemWrapper>>> =
         BehaviorSubject.create()
 
-    val topMarkets = TopMarket.values().toList()
+    val periods = listOf(
+        TimeDuration.OneDay,
+        TimeDuration.SevenDay,
+        TimeDuration.ThirtyDay,
+        TimeDuration.ThreeMonths,
+    )
+    var period: TimeDuration = periods[0]
+        private set
+
+    val topMarkets = TopMarket.entries
     var topMarket: TopMarket = topMarket
         private set
 
-    val sortingFields = SortingField.values().toList()
+    val sortingFields = listOf(
+        SortingField.HighestCap,
+        SortingField.LowestCap,
+        SortingField.TopGainers,
+        SortingField.TopLosers,
+        )
     var sortingField: SortingField = sortingField
         private set
 
@@ -51,6 +67,11 @@ class MarketTopCoinsService(
         sync()
     }
 
+    fun setTimeDuration(period: TimeDuration) {
+        this.period = period
+        sync()
+    }
+
     private fun sync() {
         syncJob?.cancel()
         syncJob = coroutineScope.launch {
@@ -59,10 +80,13 @@ class MarketTopCoinsService(
                     topMarket.value,
                     sortingField,
                     topMarket.value,
-                    currencyManager.baseCurrency
+                    currencyManager.baseCurrency,
+                    period,
                 ).await()
 
                 syncItems()
+            } catch (e: CancellationException) {
+                //do nothing
             } catch (e: Throwable) {
                 stateObservable.onNext(DataState.Error(e))
             }
@@ -80,6 +104,18 @@ class MarketTopCoinsService(
         coroutineScope.launch {
             favoritesManager.dataUpdatedAsync.asFlow().collect {
                 syncItems()
+            }
+        }
+
+        coroutineScope.launch {
+            currencyManager.baseCurrencyUpdatedFlow.collect {
+                sync()
+            }
+        }
+
+        coroutineScope.launch {
+            priceManager.priceChangeIntervalFlow.collect {
+                sync()
             }
         }
 

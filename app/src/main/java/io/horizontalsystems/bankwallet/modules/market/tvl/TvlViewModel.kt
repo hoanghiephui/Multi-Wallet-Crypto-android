@@ -3,15 +3,17 @@ package io.horizontalsystems.bankwallet.modules.market.tvl
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
 import io.horizontalsystems.bankwallet.core.stats.stat
+import io.horizontalsystems.bankwallet.core.stats.statType
 import io.horizontalsystems.bankwallet.entities.ViewState
+import io.horizontalsystems.bankwallet.modules.market.ImageSource
 import io.horizontalsystems.bankwallet.modules.market.MarketModule
 import io.horizontalsystems.bankwallet.modules.market.tvl.TvlModule.SelectorDialogState
 import io.horizontalsystems.bankwallet.modules.market.tvl.TvlModule.TvlDiffType
-import io.horizontalsystems.bankwallet.modules.metricchart.MetricsType
 import io.horizontalsystems.bankwallet.ui.compose.Select
 import io.horizontalsystems.marketkit.models.HsTimePeriod
 import kotlinx.coroutines.delay
@@ -29,7 +31,6 @@ class TvlViewModel(
             tvlDiffTypeLiveData.postValue(value)
         }
     private var tvlItems: List<TvlModule.MarketTvlItem> = listOf()
-    private val metricsType = MetricsType.TvlInDefi
 
     val isRefreshingLiveData = MutableLiveData<Boolean>()
     val tvlLiveData = MutableLiveData<TvlModule.TvlData>()
@@ -38,9 +39,9 @@ class TvlViewModel(
     val chainSelectorDialogStateLiveData = MutableLiveData<SelectorDialogState>()
 
     var header = MarketModule.Header(
-        title = Translator.getString(metricsType.title),
-        description = Translator.getString(metricsType.description),
-        icon = metricsType.headerIcon
+        title = Translator.getString(R.string.MarketGlobalMetrics_TvlInDefi),
+        description = Translator.getString(R.string.MarketGlobalMetrics_TvlInDefiDescription),
+        icon = ImageSource.Remote("https://cdn.blocksdecoded.com/header-images/tvl@3x.png")
     )
 
     init {
@@ -91,7 +92,7 @@ class TvlViewModel(
     fun onToggleTvlDiffType() {
         tvlDiffType = if (tvlDiffType == TvlDiffType.Percent) TvlDiffType.Currency else TvlDiffType.Percent
 
-        stat(page = StatPage.GlobalMetricsTvlInDefi, event = StatEvent.ToggleTvlField)
+        stat(page = StatPage.GlobalMetricsTvlInDefi, event = StatEvent.ToggleTvlField(tvlDiffType.statType))
     }
 
     fun onClickChainSelector() {

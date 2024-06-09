@@ -7,8 +7,10 @@ import io.horizontalsystems.bankwallet.core.managers.MarketKitWrapper
 import io.horizontalsystems.bankwallet.core.providers.AppConfigProvider
 import io.horizontalsystems.bankwallet.core.storage.StatsDao
 import io.horizontalsystems.bankwallet.entities.AccountType
+import io.horizontalsystems.bankwallet.entities.LaunchPage
 import io.horizontalsystems.bankwallet.entities.StatRecord
 import io.horizontalsystems.bankwallet.modules.balance.BalanceSortType
+import io.horizontalsystems.bankwallet.modules.balance.BalanceViewType
 import io.horizontalsystems.bankwallet.modules.coin.CoinModule
 import io.horizontalsystems.bankwallet.modules.coin.analytics.CoinAnalyticsModule
 import io.horizontalsystems.bankwallet.modules.main.MainModule
@@ -17,14 +19,23 @@ import io.horizontalsystems.bankwallet.modules.market.MarketModule
 import io.horizontalsystems.bankwallet.modules.market.SortingField
 import io.horizontalsystems.bankwallet.modules.market.TimeDuration
 import io.horizontalsystems.bankwallet.modules.market.TopMarket
-import io.horizontalsystems.bankwallet.modules.market.favorites.MarketFavoritesModule
+import io.horizontalsystems.bankwallet.modules.market.etf.EtfModule
+import io.horizontalsystems.bankwallet.modules.market.favorites.WatchlistSorting
+import io.horizontalsystems.bankwallet.modules.market.filters.TimePeriod
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchSection
+import io.horizontalsystems.bankwallet.modules.market.tvl.TvlModule
 import io.horizontalsystems.bankwallet.modules.metricchart.MetricsType
 import io.horizontalsystems.bankwallet.modules.metricchart.ProChartModule
+import io.horizontalsystems.bankwallet.modules.settings.appearance.PriceChangeInterval
+import io.horizontalsystems.bankwallet.modules.theme.ThemeType
 import io.horizontalsystems.bankwallet.modules.transactionInfo.options.SpeedUpCancelType
 import io.horizontalsystems.bankwallet.modules.transactions.FilterTransactionType
+import io.horizontalsystems.core.toHexString
 import io.horizontalsystems.hdwalletkit.HDExtendedKey
 import io.horizontalsystems.marketkit.models.HsTimePeriod
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import java.time.Instant
 import java.util.concurrent.Executors
 
@@ -36,13 +47,37 @@ class StatsManager(
     private val statsDao: StatsDao,
     private val localStorage: ILocalStorage,
     private val marketKit: MarketKitWrapper,
-    private val appConfigProvider: AppConfigProvider
+    private val appConfigProvider: AppConfigProvider,
 ) {
+    var uiStatsEnabled = getInitialUiStatsEnabled()
+        private set
+
+    private val _uiStatsEnabledFlow = MutableStateFlow(uiStatsEnabled)
+    val uiStatsEnabledFlow = _uiStatsEnabledFlow.asStateFlow()
+
     private val gson by lazy { Gson() }
     private val executor = Executors.newCachedThreadPool()
-    private val syncInterval = 0 //60 * 60 // 1H in seconds
+    private val syncInterval = 60 * 60 // 1H in seconds
+    private val sqliteMaxVariableNumber = 999
+
+    private fun getInitialUiStatsEnabled(): Boolean {
+        val uiStatsEnabled = localStorage.uiStatsEnabled
+        if (uiStatsEnabled != null) return uiStatsEnabled
+
+        val signatures = listOf(
+            "b797339fb356afce5160fe49274ee17a1c1816db", // appcenter
+            "5afb2517b06caac7f108ba9d96ad826f1c4ba30c", // hs
+        )
+
+        val applicationSignatures = App.instance.getApplicationSignatures()
+        return applicationSignatures.any {
+            signatures.contains(it.toHexString())
+        }
+    }
 
     fun logStat(eventPage: StatPage, eventSection: StatSection? = null, event: StatEvent) {
+        if (!uiStatsEnabled) return
+
         executor.submit {
             try {
                 val eventMap = buildMap {
@@ -65,6 +100,8 @@ class StatsManager(
     }
 
     fun sendStats() {
+        if (!uiStatsEnabled) return
+
         executor.submit {
             try {
                 val statLastSyncTime = localStorage.statsLastSyncTime
@@ -78,7 +115,9 @@ class StatsManager(
 //                    Log.e("e", "send $statsArray")
                     marketKit.sendStats(statsArray, appConfigProvider.appVersion, appConfigProvider.appId).blockingGet()
 
-                    statsDao.delete(stats.map { it.id })
+                    stats.chunked(sqliteMaxVariableNumber).forEach { chunk ->
+                        statsDao.delete(chunk.map { it.id })
+                    }
                     localStorage.statsLastSyncTime = currentTime
                 }
 
@@ -86,6 +125,12 @@ class StatsManager(
 //                Log.e("e", "sendStats error", error)
             }
         }
+    }
+
+    fun toggleUiStats(enabled: Boolean) {
+        localStorage.uiStatsEnabled = enabled
+        uiStatsEnabled = enabled
+        _uiStatsEnabledFlow.update { enabled }
     }
 
 }
@@ -136,6 +181,15 @@ val SortingField.statSortType: StatSortType
         SortingField.LowestVolume -> StatSortType.LowestVolume
         SortingField.TopGainers -> StatSortType.TopGainers
         SortingField.TopLosers -> StatSortType.TopLosers
+    }
+
+val WatchlistSorting.statSortType: StatSortType
+    get() = when (this) {
+        WatchlistSorting.Manual -> StatSortType.Manual
+        WatchlistSorting.HighestCap -> StatSortType.HighestCap
+        WatchlistSorting.LowestCap -> StatSortType.LowestCap
+        WatchlistSorting.Gainers -> StatSortType.TopGainers
+        WatchlistSorting.Losers -> StatSortType.TopLosers
     }
 
 
@@ -209,9 +263,8 @@ val AccountType.statAccountType: String
 val MetricsType.statPage: StatPage
     get() = when (this) {
         MetricsType.TotalMarketCap -> StatPage.GlobalMetricsMarketCap
-        MetricsType.BtcDominance -> StatPage.GlobalMetricsMarketCap
         MetricsType.Volume24h -> StatPage.GlobalMetricsVolume
-        MetricsType.DefiCap -> StatPage.GlobalMetricsDefiCap
+        MetricsType.Etf -> StatPage.GlobalMetricsEtf
         MetricsType.TvlInDefi -> StatPage.GlobalMetricsTvlInDefi
     }
 
@@ -228,6 +281,7 @@ val TopMarket.statMarketTop: StatMarketTop
         TopMarket.Top100 -> StatMarketTop.Top100
         TopMarket.Top200 -> StatMarketTop.Top200
         TopMarket.Top300 -> StatMarketTop.Top300
+        TopMarket.Top500 -> StatMarketTop.Top500
     }
 
 val MarketModule.ListType.statSection: StatSection
@@ -246,9 +300,11 @@ val TimeDuration.statPeriod: StatPeriod
 
 val MarketModule.Tab.statTab: StatTab
     get() = when (this) {
-        MarketModule.Tab.Overview -> StatTab.Overview
         MarketModule.Tab.Posts -> StatTab.News
         MarketModule.Tab.Watchlist -> StatTab.Watchlist
+        MarketModule.Tab.Coins -> StatTab.Coins
+        MarketModule.Tab.Platform -> StatTab.Platforms
+        MarketModule.Tab.Pairs -> StatTab.Pairs
     }
 
 val MarketSearchSection.statSection: StatSection
@@ -258,11 +314,15 @@ val MarketSearchSection.statSection: StatSection
         MarketSearchSection.SearchResults -> StatSection.SearchResults
     }
 
-val MarketFavoritesModule.Period.statPeriod: StatPeriod
+val TimePeriod.statPeriod: StatPeriod
     get() = when (this) {
-        MarketFavoritesModule.Period.OneDay -> StatPeriod.Day1
-        MarketFavoritesModule.Period.SevenDay -> StatPeriod.Week1
-        MarketFavoritesModule.Period.ThirtyDay -> StatPeriod.Month1
+        TimePeriod.TimePeriod_1D -> StatPeriod.Day1
+        TimePeriod.TimePeriod_1W -> StatPeriod.Week1
+        TimePeriod.TimePeriod_1M -> StatPeriod.Month1
+        TimePeriod.TimePeriod_2W -> TODO()
+        TimePeriod.TimePeriod_3M -> TODO()
+        TimePeriod.TimePeriod_6M -> TODO()
+        TimePeriod.TimePeriod_1Y -> TODO()
     }
 
 val FilterTransactionType.statTab: StatTab
@@ -275,7 +335,48 @@ val FilterTransactionType.statTab: StatTab
     }
 
 val SpeedUpCancelType.statResendType: StatResendType
-    get() = when(this) {
+    get() = when (this) {
         SpeedUpCancelType.SpeedUp -> StatResendType.SpeedUp
         SpeedUpCancelType.Cancel -> StatResendType.Cancel
+    }
+
+val ThemeType.statValue: String
+    get() = when (this) {
+        ThemeType.Dark -> "dark"
+        ThemeType.Light -> "light"
+        ThemeType.System -> "system"
+    }
+
+val PriceChangeInterval.statValue: String
+    get() = when (this) {
+        PriceChangeInterval.LAST_24H -> "hour_24"
+        PriceChangeInterval.FROM_UTC_MIDNIGHT -> "midnight_utc"
+    }
+
+val BalanceViewType.statValue: String
+    get() = when (this) {
+        BalanceViewType.CoinThenFiat -> "coin"
+        BalanceViewType.FiatThenCoin -> "currency"
+    }
+
+val LaunchPage.statValue: String
+    get() = when (this) {
+        LaunchPage.Auto -> "auto"
+        LaunchPage.Balance -> "balance"
+        LaunchPage.Market -> "market_overview"
+        LaunchPage.Watchlist -> "watchlist"
+    }
+
+val TvlModule.TvlDiffType.statType: String
+    get() = when (this) {
+        TvlModule.TvlDiffType.Percent -> "percent"
+        TvlModule.TvlDiffType.Currency -> "currency"
+    }
+
+val EtfModule.SortBy.statSortType: StatSortType
+    get() = when (this) {
+        EtfModule.SortBy.HighestAssets -> StatSortType.HighestAssets
+        EtfModule.SortBy.LowestAssets -> StatSortType.LowestAssets
+        EtfModule.SortBy.Inflow -> StatSortType.Inflow
+        EtfModule.SortBy.Outflow -> StatSortType.Outflow
     }

@@ -38,6 +38,7 @@ import androidx.navigation.NavController
 import com.tradingview.lightweightcharts.api.series.common.SeriesData
 import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.alternativeImageUrl
 import io.horizontalsystems.bankwallet.BinanceAvailable
 import io.horizontalsystems.bankwallet.BinanceViewModel
 import io.horizontalsystems.bankwallet.CandlestickSeries
@@ -210,7 +211,7 @@ fun CoinOverviewScreen(
                                             fullCoin.coin.name,
                                             overview.marketCapRank,
                                             fullCoin.coin.imageUrl,
-                                            fullCoin.iconPlaceholder
+                                            fullCoin.coin.alternativeImageUrl,fullCoin.iconPlaceholder
                                         )
 
                                         Chart(chartViewModel = chartViewModel)

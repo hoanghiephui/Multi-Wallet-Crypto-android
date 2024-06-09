@@ -238,7 +238,7 @@ fun BalanceItems(
             modifier = Modifier.fillMaxSize(),
             state = rememberSaveable(
                 accountViewItem.id,
-                viewModel.sortType,
+                uiState.sortType,
                 saver = LazyListState.Saver
             ) {
                 LazyListState()
@@ -266,7 +266,7 @@ fun BalanceItems(
                 )
             }
 
-            if (!accountViewItem.isWatchAccount) {
+            if (uiState.balanceTabButtonsEnabled && !accountViewItem.isWatchAccount) {
                 item {
                     Row(
                         modifier = Modifier.padding(horizontal = 24.dp),
@@ -329,10 +329,10 @@ fun BalanceItems(
             stickyHeader {
                 HeaderSorting(background = Color.Transparent) {
                     BalanceSortingSelector(
-                        sortType = viewModel.sortType,
-                        sortTypes = viewModel.sortTypes
+                        sortType = uiState.sortType,
+                        sortTypes = uiState.sortTypes
                     ) {
-                        viewModel.sortType = it
+                        viewModel.setSortType(it)
                     }
 
                     Spacer(modifier = Modifier.weight(1f))

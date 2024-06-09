@@ -24,9 +24,11 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.BadgedBox
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
@@ -88,6 +90,7 @@ import io.horizontalsystems.bankwallet.modules.transactions.TransactionsViewMode
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCAccountTypeNotSupportedDialog
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCManager.SupportState
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
+import io.horizontalsystems.bankwallet.ui.compose.components.BadgeText
 import io.horizontalsystems.bankwallet.ui.compose.NiaNavigationBar
 import io.horizontalsystems.bankwallet.ui.compose.NiaNavigationBarItem
 import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
@@ -394,15 +397,9 @@ private fun BadgedIcon(
         is MainModule.BadgeType.BadgeNumber ->
             BadgedBox(
                 badge = {
-                    Badge(
-                        contentColor = ComposeAppTheme.colors.lucian
-                    ) {
-                        Text(
-                            text = badge.number.toString(),
-                            style = ComposeAppTheme.typography.micro,
-                            color = ComposeAppTheme.colors.white,
-                        )
-                    }
+                    BadgeText(
+                        text = badge.number.toString(),
+                    )
                 },
                 content = icon
             )

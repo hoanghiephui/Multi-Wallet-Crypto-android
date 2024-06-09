@@ -2,17 +2,21 @@ package io.horizontalsystems.bankwallet.modules.market
 
 import androidx.compose.runtime.Immutable
 import io.horizontalsystems.bankwallet.core.App
+import io.horizontalsystems.bankwallet.core.alternativeImageUrl
 import io.horizontalsystems.bankwallet.core.iconPlaceholder
 import io.horizontalsystems.bankwallet.core.imageUrl
+import io.horizontalsystems.marketkit.models.Analytics.TechnicalAdvice.Advice
 import io.horizontalsystems.marketkit.models.FullCoin
 
 @Immutable
 data class MarketViewItem(
     val fullCoin: FullCoin,
-    val coinRate: String,
+    val subtitle: String,
+    val value: String,
     val marketDataValue: MarketDataValue,
     val rank: String?,
     val favorited: Boolean,
+    val signal: Advice? = null
 ) {
 
     val coinUid: String
@@ -26,6 +30,9 @@ data class MarketViewItem(
 
     val iconUrl: String
         get() = fullCoin.coin.imageUrl
+
+    val alternativeIconUrl: String?
+        get() = fullCoin.coin.alternativeImageUrl
 
     val iconPlaceHolder: Int
         get() = fullCoin.iconPlaceholder
@@ -41,24 +48,27 @@ data class MarketViewItem(
     companion object {
         fun create(
             marketItem: MarketItem,
-            favorited: Boolean = false
+            favorited: Boolean = false,
+            advice: Advice? = null
         ): MarketViewItem {
             return MarketViewItem(
                 marketItem.fullCoin,
+                marketItem.fullCoin.coin.name,
                 App.numberFormatter.formatFiatFull(
                     marketItem.rate.value,
                     marketItem.rate.currency.symbol
                 ),
                 MarketDataValue.Diff(marketItem.diff),
                 marketItem.rank?.toString(),
-                favorited
+                favorited,
+                advice
             )
         }
 
         fun create(
             marketItem: MarketItem,
             marketField: MarketField,
-            favorited: Boolean = false
+            favorited: Boolean = false,
         ): MarketViewItem {
             val marketDataValue = when (marketField) {
                 MarketField.MarketCap -> {
@@ -85,6 +95,7 @@ data class MarketViewItem(
             }
             return MarketViewItem(
                 marketItem.fullCoin,
+                marketItem.fullCoin.coin.name,
                 App.numberFormatter.formatFiatFull(
                     marketItem.rate.value,
                     marketItem.rate.currency.symbol
