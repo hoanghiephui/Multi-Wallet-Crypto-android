@@ -93,8 +93,7 @@ fun MarketScreen(
             active = false
         }
     })
-
-
+    
     Box(Modifier.fillMaxSize()) {
         Box(
             Modifier
@@ -188,47 +187,9 @@ fun MarketScreen(
                 marketViewModel.onSelect(tab)
             }
         }
-
-        /*Column(
-            Modifier
-                .fillMaxSize()
-                .padding(top = 92.dp)
-        ) {
-
-            LaunchedEffect(key1 = selectedTab, block = {
-                pagerState.scrollToPage(selectedTab.ordinal)
-            })
-
-
-            NiaTabRow(selectedTabIndex = selectedTab.ordinal) {
-                tabs.forEach { title ->
-                    NiaTab(
-                        selected = title == selectedTab,
-                        onClick = { marketViewModel.onSelect(title) },
-                        text = { Text(text = stringResource(id = title.titleResId)) },
-                    )
-                }
-            }
-            // our list with build in nested scroll support that will notify us about its scroll
-            HorizontalPager(
-                state = pagerState,
-                userScrollEnabled = false,
-            ) { page ->
-                viewModel.showSearchBar.value = false
-                when (tabs[page]) {
-                    Tab.Overview -> MarketOverviewScreen(navController, viewModel) {
-                        active = false
-                    }
-                    Tab.Posts -> MarketPostsScreen()
-                    Tab.Watchlist -> MarketFavoritesScreen(navController)
-                }
-            }
-        }*/
     }
 
     TrackScreenViewEvent("MarketScreen")
-
-
 }
 
 @OptIn(ExperimentalFoundationApi::class)
