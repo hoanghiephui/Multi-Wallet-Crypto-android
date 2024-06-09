@@ -5,10 +5,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -32,7 +31,6 @@ import io.horizontalsystems.bankwallet.modules.settings.appstatus.AppStatusScree
 import io.horizontalsystems.bankwallet.modules.settings.main.HsSettingCell
 import io.horizontalsystems.bankwallet.modules.settings.privacy.PrivacyScreen
 import io.horizontalsystems.bankwallet.modules.settings.terms.TermsScreen
-import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
@@ -161,7 +159,7 @@ private fun SettingSections(
                 onClick = {
                     LinkHelper.openLinkInAppBrowser(context, viewModel.githubLink)
 
-                    stat(page = StatPage.AboutApp, event= StatEvent.Open(StatPage.ExternalGithub))
+                    stat(page = StatPage.AboutApp, event = StatEvent.Open(StatPage.ExternalGithub))
                 }
             )
         }, {
@@ -171,69 +169,12 @@ private fun SettingSections(
                 onClick = {
                     LinkHelper.openLinkInAppBrowser(context, viewModel.appWebPageLink)
 
-                    stat(page = StatPage.AboutApp, event= StatEvent.Open(StatPage.ExternalWebsite))
+                    stat(page = StatPage.AboutApp, event = StatEvent.Open(StatPage.ExternalWebsite))
                 }
             )
         })
     )
-    
+
     VSpacer(32.dp)
 }
 
-@Composable
-fun AboutHeader(appVersion: String) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp)
-    ) {
-        Image(
-            modifier = Modifier.size(72.dp),
-            painter = painterResource(id = R.drawable.ic_logo_splash),
-            contentDescription = null,
-        )
-        Column(
-            Modifier.height(72.dp).padding(start = 16.dp),
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = stringResource(R.string.App_Name),
-                style = ComposeAppTheme.typography.headline1,
-                color = ComposeAppTheme.colors.leah,
-                maxLines = 1,
-            )
-            Spacer(Modifier.height(12.dp))
-            subhead2_grey(
-                text = stringResource(R.string.Settings_InfoTitleWithVersion, appVersion),
-                maxLines = 1,
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun previewAboutScreen() {
-    ComposeAppTheme {
-        Column {
-            AboutHeader("0.24")
-            Spacer(Modifier.height(32.dp))
-            CellSingleLineLawrenceSection(
-                listOf({
-                    HsSettingCell(
-                        R.string.Settings_RateUs,
-                        R.drawable.ic_star_20,
-                        showAlert = true,
-                        onClick = { }
-                    )
-                }, {
-                    HsSettingCell(
-                        R.string.Settings_ShareThisWallet,
-                        R.drawable.ic_share_20,
-                        onClick = { }
-                    )
-                })
-            )
-        }
-    }
-}

@@ -100,7 +100,8 @@ fun AppStatusScreen(
                                     ShareCompat.IntentBuilder(context)
                                         .setType("text/plain")
                                         .setText(it)
-                                        .startChooser()stat(page = StatPage.AppStatus, event= StatEvent.Share(StatEntity.Status))
+                                        .startChooser()
+                                    stat(page = StatPage.AppStatus, event= StatEvent.Share(StatEntity.Status))
                                 }
                             }
                         )

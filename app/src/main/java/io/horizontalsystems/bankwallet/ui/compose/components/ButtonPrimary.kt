@@ -310,7 +310,6 @@ fun ButtonPrimaryWrapper(
 }
 
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ButtonPrimary(
     onClick: () -> Unit,

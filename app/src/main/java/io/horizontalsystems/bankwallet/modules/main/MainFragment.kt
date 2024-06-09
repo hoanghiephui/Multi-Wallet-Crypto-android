@@ -8,9 +8,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -19,19 +17,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BadgedBox
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberModalBottomSheetState
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -47,7 +39,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -72,8 +63,6 @@ import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.core.stats.statTab
 import io.horizontalsystems.bankwallet.modules.balance.ui.BalanceScreen
 import io.horizontalsystems.bankwallet.modules.billing.showBillingPlusDialog
-import io.horizontalsystems.bankwallet.modules.keystore.KeyStoreActivity
-import io.horizontalsystems.bankwallet.modules.keystore.NoSystemLockWarning
 import io.horizontalsystems.bankwallet.modules.main.MainModule.MainNavigation
 import io.horizontalsystems.bankwallet.modules.manageaccount.dialogs.BackupRequiredDialog
 import io.horizontalsystems.bankwallet.modules.market.MarketScreen
@@ -90,7 +79,6 @@ import io.horizontalsystems.bankwallet.modules.transactions.TransactionsViewMode
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCAccountTypeNotSupportedDialog
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCManager.SupportState
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
-import io.horizontalsystems.bankwallet.ui.compose.components.BadgeText
 import io.horizontalsystems.bankwallet.ui.compose.NiaNavigationBar
 import io.horizontalsystems.bankwallet.ui.compose.NiaNavigationBarItem
 import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
@@ -225,7 +213,10 @@ private fun MainScreen(
                             destinations = uiState.mainNavItems,
                             onNavigateToDestination = {
                                 viewModel.onSelect(it.mainNavItem)
-                                stat(page = StatPage.Main, event = StatEvent.SwitchTab(it.mainNavItem.statTab))
+                                stat(
+                                    page = StatPage.Main,
+                                    event = StatEvent.SwitchTab(it.mainNavItem.statTab)
+                                )
                             }
                         )
                     }
@@ -386,45 +377,6 @@ private fun HideContentBox(contentHidden: Boolean) {
             .fillMaxSize()
             .then(backgroundModifier)
     )
-}
-
-@Composable
-private fun BadgedIcon(
-    badge: MainModule.BadgeType?,
-    icon: @Composable BoxScope.() -> Unit,
-) {
-    when (badge) {
-        is MainModule.BadgeType.BadgeNumber ->
-            BadgedBox(
-                badge = {
-                    BadgeText(
-                        text = badge.number.toString(),
-                    )
-                },
-                content = icon
-            )
-
-        MainModule.BadgeType.BadgeDot ->
-            BadgedBox(
-                badge = {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .background(
-                                ComposeAppTheme.colors.lucian,
-                                shape = RoundedCornerShape(4.dp)
-                            )
-                    ) { }
-                },
-                content = icon
-            )
-
-        else -> {
-            Box {
-                icon()
-            }
-        }
-    }
 }
 
 @Composable

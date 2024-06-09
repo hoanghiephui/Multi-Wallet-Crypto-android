@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Scaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -18,7 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
@@ -42,12 +43,17 @@ class MarketSignalsFragment : BaseComposeFragment() {
     override fun GetContent(navController: NavController) {
         MarketSignalsScreen(navController)
     }
+
+    override val logScreen: String
+        get() = "MarketSignalsFragment"
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MarketSignalsScreen(navController: NavController) {
     val previousBackStackEntry = remember { navController.previousBackStackEntry }
-    val marketFavoritesViewModel = viewModel<MarketFavoritesViewModel>(viewModelStoreOwner = previousBackStackEntry!!)
+    val marketFavoritesViewModel =
+        viewModel<MarketFavoritesViewModel>(viewModelStoreOwner = previousBackStackEntry!!)
 
     Scaffold(
         topBar = {
@@ -79,7 +85,14 @@ fun MarketSignalsScreen(navController: NavController) {
                     VSpacer(height = 24.dp)
                 }
 
-                val signals = listOf(Advice.StrongBuy, Advice.Buy, Advice.Neutral, Advice.Sell, Advice.StrongSell, Advice.Overbought)
+                val signals = listOf(
+                    Advice.StrongBuy,
+                    Advice.Buy,
+                    Advice.Neutral,
+                    Advice.Sell,
+                    Advice.StrongSell,
+                    Advice.Overbought
+                )
                 signals.forEachIndexed { index, signal ->
                     val position: SectionItemPosition = when (index) {
                         0 -> SectionItemPosition.First
@@ -92,7 +105,14 @@ fun MarketSignalsScreen(navController: NavController) {
                             RowUniversal(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .then(Modifier.sectionItemBorder(1.dp, ComposeAppTheme.colors.steel20, 12.dp, position)),
+                                    .then(
+                                        Modifier.sectionItemBorder(
+                                            1.dp,
+                                            ComposeAppTheme.colors.steel20,
+                                            12.dp,
+                                            position
+                                        )
+                                    ),
                             ) {
                                 Box(
                                     modifier = Modifier

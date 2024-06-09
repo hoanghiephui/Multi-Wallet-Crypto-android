@@ -1,8 +1,8 @@
 package io.horizontalsystems.bankwallet.modules.market.metricspage
 
 import androidx.lifecycle.viewModelScope
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseViewModel
-import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.ViewModelUiState
 import io.horizontalsystems.bankwallet.core.managers.CurrencyManager
 import io.horizontalsystems.bankwallet.core.managers.MarketKitWrapper

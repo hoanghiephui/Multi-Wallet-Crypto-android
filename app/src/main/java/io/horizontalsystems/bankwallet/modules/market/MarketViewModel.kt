@@ -1,8 +1,9 @@
 package io.horizontalsystems.bankwallet.modules.market
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.ILocalStorage
 import io.horizontalsystems.bankwallet.core.IMarketStorage
@@ -33,7 +34,7 @@ class MarketViewModel(
     private var marketOverviewJob: Job? = null
     private var marketOverviewItems: List<MarketOverviewViewItem> = listOf()
     private var selectedTab: Tab = getInitialTab(localStorage.launchPage)
-
+    val showSearchBar = mutableStateOf(false)
     init {
         updateMarketOverview()
 

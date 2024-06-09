@@ -47,7 +47,8 @@ fun PrivacyScreen(navController: NavController) {
 
     val viewModel = viewModel<PrivacyViewModel>(factory = PrivacyViewModel.Factory())
 
-    val uiState = viewModel.uiState    Column(
+    val uiState = viewModel.uiState
+    Column(
             modifier = Modifier
                 .fillMaxSize()
         ) {
