@@ -2,7 +2,9 @@ package io.horizontalsystems.bankwallet.modules.market.topcoins
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,7 +65,10 @@ fun TopCoins(
             stat(page = StatPage.Markets, section = StatSection.Coins, event = StatEvent.Refresh)
         }
     ) {
-        Crossfade(uiState.viewState, label = "") { viewState ->
+        Crossfade(uiState.viewState, label = "",
+            modifier = Modifier
+                .background(color = MaterialTheme.colorScheme.background)
+        ) { viewState ->
             when (viewState) {
                 ViewState.Loading -> {
                     Loading()
