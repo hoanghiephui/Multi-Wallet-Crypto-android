@@ -2,6 +2,7 @@ package io.horizontalsystems.bankwallet.modules.market.topplatforms
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,16 +67,18 @@ fun TopPlatforms(
     var openSortingSelector by rememberSaveable { mutableStateOf(false) }
     val uiState = viewModel.uiState
 
-    Column {
-        HSSwipeRefresh(
+    HSSwipeRefresh(
             refreshing = uiState.isRefreshing,
             onRefresh = {
                 viewModel.refresh()
-
                 stat(page = StatPage.Markets, section = StatSection.Platforms, event = StatEvent.Refresh)
             }
-        ) {
-            Crossfade(uiState.viewState, label = "") { state ->
+    ) {
+        Crossfade(
+            uiState.viewState, label = "",
+            modifier = Modifier
+                .background(color = MaterialTheme.colorScheme.background)
+        ) { state ->
                 when (state) {
                     ViewState.Loading -> {
                         Loading()
@@ -132,7 +136,7 @@ fun TopPlatforms(
                 }
             }
         }
-    }
+
     //Dialogs
     if (openPeriodSelector) {
         AlertGroup(
@@ -185,7 +189,9 @@ private fun TopPlatformsList(
         modifier = Modifier.fillMaxSize()
     ) {
         preItems.invoke(this)
-        items(viewItems) { item ->
+        items(viewItems, key = {
+            it.platform.uid
+        }) { item ->
             TopPlatformItem(item, onItemClick)
         }
     }

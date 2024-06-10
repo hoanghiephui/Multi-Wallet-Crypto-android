@@ -136,6 +136,7 @@ fun TermsScreen(
                 onClick = { viewModel.onAgreeClick() },
                 enabled = viewModel.buttonEnabled
             )
+            Spacer(Modifier.height(16.dp))
         }
     }
 

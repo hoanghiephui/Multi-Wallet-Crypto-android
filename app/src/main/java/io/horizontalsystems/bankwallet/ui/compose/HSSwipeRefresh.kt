@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HSSwipeRefresh(
+    modifier: Modifier = Modifier,
     refreshing: Boolean,
     onRefresh: () -> Unit,
     content: @Composable () -> Unit,
@@ -20,7 +21,7 @@ fun HSSwipeRefresh(
     val pullRefreshState = rememberPullRefreshState(refreshing, onRefresh)
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .pullRefresh(pullRefreshState)
     ) {

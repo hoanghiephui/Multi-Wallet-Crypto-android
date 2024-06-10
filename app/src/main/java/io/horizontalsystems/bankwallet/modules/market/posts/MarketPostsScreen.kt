@@ -1,11 +1,13 @@
 package io.horizontalsystems.bankwallet.modules.market.posts
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -44,7 +46,11 @@ fun MarketPostsScreen(viewModel: MarketPostsViewModel = viewModel(factory = Mark
             stat(page = StatPage.Markets, section = StatSection.News, event = StatEvent.Refresh)
         }
     ) {
-        Crossfade(viewState, label = "MarketPostsScreen") { viewState ->
+        Crossfade(
+            viewState, label = "MarketPostsScreen",
+            modifier = Modifier
+                .background(color = MaterialTheme.colorScheme.background)
+        ) { viewState ->
             when (viewState) {
                 ViewState.Loading -> {
                     Loading()

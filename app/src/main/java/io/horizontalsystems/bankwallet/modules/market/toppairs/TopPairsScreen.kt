@@ -16,12 +16,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Scaffold
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -62,65 +64,61 @@ fun TopPairsScreen() {
         LazyListState(0, 0)
     }
 
-    Scaffold(
-        backgroundColor = ComposeAppTheme.colors.tyler,
+    HSSwipeRefresh(
+        refreshing = uiState.isRefreshing,
+        onRefresh = viewModel::refresh
     ) {
-        Column(modifier = Modifier.padding(it)) {
-            HSSwipeRefresh(
-                refreshing = uiState.isRefreshing,
-                onRefresh = viewModel::refresh
-            ) {
-                Crossfade(uiState.viewState, label = "") { viewState ->
-                    when (viewState) {
-                        ViewState.Loading -> {
-                            Loading()
+        Crossfade(uiState.viewState, label = "",
+            modifier = Modifier
+                .background(color = MaterialTheme.colorScheme.background)) { viewState ->
+            when (viewState) {
+                ViewState.Loading -> {
+                    Loading()
+                }
+
+                is ViewState.Error -> {
+                    ListErrorView(
+                        stringResource(R.string.SyncError),
+                        viewModel::onErrorClick
+                    )
+                }
+
+                ViewState.Success -> {
+                    LazyColumn(
+                        state = state,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        stickyHeader {
+                            HeaderSorting(borderBottom = true) {
+                                HSpacer(width = 16.dp)
+                                ButtonSecondaryWithIcon(
+                                    modifier = Modifier.height(28.dp),
+                                    onClick = {
+                                        viewModel.toggleSorting()
+                                    },
+                                    title = stringResource(R.string.Market_Volume),
+                                    iconRight = painterResource(
+                                        if (uiState.sortDescending) R.drawable.ic_arrow_down_20 else R.drawable.ic_arrow_up_20
+                                    ),
+                                )
+                                HSpacer(width = 16.dp)
+                            }
                         }
+                        itemsIndexed(uiState.items) { _, item ->
+                            TopPairItem(item, borderBottom = true) { topPairViewItem ->
+                                topPairViewItem.tradeUrl?.let {
+                                    LinkHelper.openLinkInAppBrowser(context, it)
 
-                        is ViewState.Error -> {
-                            ListErrorView(
-                                stringResource(R.string.SyncError),
-                                viewModel::onErrorClick
-                            )
-                        }
-
-                        ViewState.Success -> {
-                            LazyColumn(
-                                state = state,
-                                modifier = Modifier.fillMaxSize()
-                            ) {
-                                stickyHeader {
-                                    HeaderSorting(borderBottom = true) {
-                                        HSpacer(width = 16.dp)
-                                        ButtonSecondaryWithIcon(
-                                            modifier = Modifier.height(28.dp),
-                                            onClick = {
-                                                viewModel.toggleSorting()
-                                            },
-                                            title = stringResource(R.string.Market_Volume),
-                                            iconRight = painterResource(
-                                                if (uiState.sortDescending) R.drawable.ic_arrow_down_20 else R.drawable.ic_arrow_up_20
-                                            ),
-                                        )
-                                        HSpacer(width = 16.dp)
-                                    }
-                                }
-                                itemsIndexed(uiState.items) { i, item ->
-                                    TopPairItem(item, borderBottom = true) {
-                                        it.tradeUrl?.let {
-                                            LinkHelper.openLinkInAppBrowser(context, it)
-
-                                            stat(
-                                                page = StatPage.Markets,
-                                                section = StatSection.Pairs,
-                                                event = StatEvent.Open(StatPage.ExternalMarketPair)
-                                            )
-                                        }
-                                    }
-                                }
-                                item {
-                                    VSpacer(height = 32.dp)
+                                    stat(
+                                        page = StatPage.Markets,
+                                        section = StatSection.Pairs,
+                                        event = StatEvent.Open(StatPage.ExternalMarketPair)
+                                    )
                                 }
                             }
+                        }
+                        item {
+                            VSpacer(height = 32.dp)
                         }
                     }
                 }

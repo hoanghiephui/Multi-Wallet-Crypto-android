@@ -148,6 +148,7 @@ fun MarketScreen(
                             ) else mapOf()
 
                     MarketSearchResults(
+                        modifier = Modifier,
                         uiSearchState.listId,
                         itemSections = itemSections,
                         onCoinClick = { coin, section ->
