@@ -40,6 +40,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -56,7 +57,6 @@ import io.horizontalsystems.bankwallet.core.stats.StatPage
 import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.core.stats.statSection
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
-import io.horizontalsystems.bankwallet.modules.market.MarketDataValue
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchModule.CoinItem
 import io.horizontalsystems.bankwallet.modules.walletconnect.list.ui.DraggableCardSimple
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
@@ -66,11 +66,11 @@ import io.horizontalsystems.bankwallet.ui.compose.components.HeaderStick
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.HsImage
 import io.horizontalsystems.bankwallet.ui.compose.components.ListEmptyView
-import io.horizontalsystems.bankwallet.ui.compose.components.MarketCoinFirstRow
-import io.horizontalsystems.bankwallet.ui.compose.components.MarketCoinSecondRow
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.compose.components.SectionItemBorderedRowUniversalClear
+import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.marketkit.models.Coin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -288,8 +288,6 @@ private fun MarketCoin(
     alternativeCoinIconUrl: String?,
     coinIconPlaceholder: Int,
     onClick: () -> Unit,
-    coinRate: String? = null,
-    marketDataValue: MarketDataValue? = null,
 ) {
 
     SectionItemBorderedRowUniversalClear(
@@ -308,9 +306,17 @@ private fun MarketCoin(
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            MarketCoinFirstRow(coinCode, coinRate)
+            body_leah(
+                text = coinCode,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
             Spacer(modifier = Modifier.height(3.dp))
-            MarketCoinSecondRow(coinName, marketDataValue, null)
+            subhead2_grey(
+                text = coinName,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }

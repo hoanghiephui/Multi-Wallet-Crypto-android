@@ -6,7 +6,6 @@ import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.ViewModelUiState
 import io.horizontalsystems.bankwallet.entities.DataState
 import io.horizontalsystems.bankwallet.entities.ViewState
-import io.horizontalsystems.bankwallet.modules.market.MarketField
 import io.horizontalsystems.bankwallet.modules.market.MarketViewItem
 import io.horizontalsystems.bankwallet.modules.market.SortingField
 import io.horizontalsystems.bankwallet.modules.market.TimeDuration
@@ -18,7 +17,6 @@ import kotlinx.coroutines.rx2.asFlow
 
 class MarketTopCoinsViewModel(
     private val service: MarketTopCoinsService,
-    private var marketField: MarketField,
 ) : ViewModelUiState<MarketTopCoinsModule.UiState>() {
 
     private var marketItems: List<MarketItemWrapper> = listOf()
@@ -65,7 +63,7 @@ class MarketTopCoinsViewModel(
 
     private fun syncMarketViewItems() {
         viewItems = marketItems.map {
-            MarketViewItem.create(it.marketItem, marketField, it.favorited)
+            MarketViewItem.create(it.marketItem, it.favorited)
         }
         emitState()
     }
