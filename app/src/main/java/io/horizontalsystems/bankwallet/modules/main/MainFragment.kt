@@ -8,6 +8,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -62,6 +63,7 @@ import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.core.stats.statTab
 import io.horizontalsystems.bankwallet.modules.balance.ui.BalanceScreen
 import io.horizontalsystems.bankwallet.modules.billing.showBillingPlusDialog
+import io.horizontalsystems.bankwallet.modules.keystore.NoSystemLockWarning
 import io.horizontalsystems.bankwallet.modules.main.MainModule.MainNavigation
 import io.horizontalsystems.bankwallet.modules.manageaccount.dialogs.BackupRequiredDialog
 import io.horizontalsystems.bankwallet.modules.market.MarketScreen
@@ -94,7 +96,6 @@ class MainFragment : BaseComposeFragment() {
     private val searchViewModel by viewModels<MarketSearchViewModel> { MarketSearchModule.Factory() }
     private var intentUri: Uri? = null
 
-
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putBundle("nav_state", findNavController().saveState())
@@ -116,6 +117,7 @@ class MainFragment : BaseComposeFragment() {
                 deepLink = intentUri,
                 navController = navController,
                 searchViewModel = searchViewModel,
+                mainActivity = (activity as MainActivity)
             )
         }
     }
@@ -145,6 +147,7 @@ private fun MainScreenWithRootedDeviceCheck(
     navController: NavController,
     rootedDeviceViewModel: RootedDeviceViewModel = viewModel(factory = RootedDeviceModule.Factory()),
     searchViewModel: MarketSearchViewModel,
+    mainActivity: MainActivity
 ) {
     if (rootedDeviceViewModel.showRootedDeviceWarning) {
         RootedDeviceScreen { rootedDeviceViewModel.ignoreRootedDeviceWarning() }
@@ -154,6 +157,7 @@ private fun MainScreenWithRootedDeviceCheck(
             deepLink,
             navController,
             searchViewModel = searchViewModel,
+            mainActivity = mainActivity
         )
     }
 }
@@ -168,6 +172,7 @@ private fun MainScreen(
     fragmentNavController: NavController,
     viewModel: MainViewModel = viewModel(factory = MainModule.Factory(deepLink)),
     searchViewModel: MarketSearchViewModel,
+    mainActivity: MainActivity
 ) {
     val uiState = viewModel.uiState
     val selectedPage = uiState.selectedTabIndex
@@ -250,37 +255,28 @@ private fun MainScreen(
                             )
 
                             MainNavigation.Balance -> {
-                                /*if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
-                                    when (launchViewModel.getPage()) {
-                                        LaunchViewModel.Page.Unlock -> Unit
-
-                                        LaunchViewModel.Page.NoSystemLock -> {
-                                            Column(
-                                                modifier = Modifier
-                                                    .fillMaxSize(),
-                                                verticalArrangement = Arrangement.Center
-                                            ) {
-                                                NoSystemLockWarning()
-                                            }
-                                        }
-
-                                        LaunchViewModel.Page.KeyInvalidated -> {
-                                            KeyStoreActivity.startForInvalidKey(context)
-                                        }
-
-                                        LaunchViewModel.Page.UserAuthentication -> {
-                                            KeyStoreActivity.startForUserAuthentication(context)
-                                        }
-
-                                        LaunchViewModel.Page.Main -> {
-                                            BalanceScreen(fragmentNavController)
-                                        }
-
-                                        else -> Unit
-
+                                if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
+                                    mainActivity.validate(
+                                        onUseAppNotWallet = {
+                                            viewModel.openPageBalance(false)
+                                        },
+                                        onUseAppWallet = {
+                                            viewModel.openPageBalance(true)
+                                        },
+                                        isWithBalance = true
+                                    )
+                                }
+                                if (uiState.isShowBalance) {
+                                    BalanceScreen(fragmentNavController)
+                                } else {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxSize(),
+                                        verticalArrangement = Arrangement.Center
+                                    ) {
+                                        NoSystemLockWarning()
                                     }
-                                }*/
-                                BalanceScreen(fragmentNavController)//Todo
+                                }
                             }
 
                             MainNavigation.Transactions -> TransactionsScreen(

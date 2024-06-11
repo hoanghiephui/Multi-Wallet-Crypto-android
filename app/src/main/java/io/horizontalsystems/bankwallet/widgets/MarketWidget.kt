@@ -173,9 +173,7 @@ class MarketWidget : GlanceAppWidget() {
             }
             if (!isPlusUser) {
                 val deeplinkUri = "$deeplinkScheme://plus".toUri()
-                val plusIntent = Intent(Intent.ACTION_VIEW, deeplinkUri).apply {
-                    addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                }
+                val plusIntent = Intent(Intent.ACTION_VIEW, deeplinkUri)
                 Column(
                     modifier = GlanceModifier
                         .fillMaxSize()

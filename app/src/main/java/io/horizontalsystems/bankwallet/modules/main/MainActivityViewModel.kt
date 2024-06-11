@@ -46,24 +46,32 @@ class MainActivityViewModel(
     }
 
     fun validate() {
-        if (systemInfoManager.isSystemLockOff) {
-            throw MainScreenValidationError.NoSystemLock()
-        }
+        if (accountManager.isAccountsEmpty && systemInfoManager.isSystemLockOff) {
+            throw when {
+                !localStorage.mainShowedOnce -> MainScreenValidationError.Welcome()
+                pinComponent.isLocked -> MainScreenValidationError.Unlock()
+                else -> MainScreenValidationError.UseAppNotWallet()
+            }
+        } else {
+            if (systemInfoManager.isSystemLockOff) {
+                throw MainScreenValidationError.NoSystemLock()
+            }
 
-        try {
-            keyStoreManager.validateKeyStore()
-        } catch (e: KeyStoreValidationError.UserNotAuthenticated) {
-            throw MainScreenValidationError.UserAuthentication()
-        } catch (e: KeyStoreValidationError.KeyIsInvalid) {
-            throw MainScreenValidationError.KeyInvalidated()
-        }
+            try {
+                keyStoreManager.validateKeyStore()
+                if (!localStorage.mainShowedOnce) {
+                    throw MainScreenValidationError.Welcome()
+                }
 
-        if (accountManager.isAccountsEmpty && !localStorage.mainShowedOnce) {
-            throw MainScreenValidationError.Welcome()
-        }
-
-        if (pinComponent.isLocked) {
-            throw MainScreenValidationError.Unlock()
+                if (pinComponent.isLocked) {
+                    throw MainScreenValidationError.Unlock()
+                }
+                throw MainScreenValidationError.UseAppWallet()
+            } catch (e: KeyStoreValidationError.UserNotAuthenticated) {
+                throw MainScreenValidationError.UserAuthentication()
+            } catch (e: KeyStoreValidationError.KeyIsInvalid) {
+                throw MainScreenValidationError.KeyInvalidated()
+            }
         }
     }
 
@@ -85,4 +93,8 @@ sealed class MainScreenValidationError : Exception() {
     class NoSystemLock : MainScreenValidationError()
     class KeyInvalidated : MainScreenValidationError()
     class UserAuthentication : MainScreenValidationError()
+
+    class UseAppNotWallet: MainScreenValidationError()
+
+    class UseAppWallet: MainScreenValidationError()
 }

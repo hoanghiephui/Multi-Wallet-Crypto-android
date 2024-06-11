@@ -95,6 +95,7 @@ class MainViewModel(
     private var activeWallet = accountManager.activeAccount
     private var wcSupportState: WCManager.SupportState? = null
     private var torEnabled = localStorage.torEnabled
+    private var isShowBalance = false
 
     val wallets: List<Account>
         get() = accountManager.accounts.filter { !it.isWatchAccount }
@@ -168,7 +169,8 @@ class MainViewModel(
         showWhatsNew = showWhatsNew,
         activeWallet = activeWallet,
         wcSupportState = wcSupportState,
-        torEnabled = torEnabled
+        torEnabled = torEnabled,
+        isShowBalance = isShowBalance
     )
 
     private fun isTransactionsTabEnabled(): Boolean =
@@ -386,6 +388,11 @@ class MainViewModel(
             delay(1000)
             _openPro.tryEmit(true)
         }
+    }
+
+    fun openPageBalance(isBalance: Boolean) {
+        isShowBalance = isBalance
+        emitState()
     }
 
 }

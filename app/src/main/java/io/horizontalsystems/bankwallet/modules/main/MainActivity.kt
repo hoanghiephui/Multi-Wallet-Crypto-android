@@ -19,7 +19,7 @@ import io.horizontalsystems.core.hideKeyboard
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
 
-    private val viewModel by viewModels<MainActivityViewModel> {
+    val viewModel by viewModels<MainActivityViewModel> {
         MainActivityViewModel.Factory()
     }
 
@@ -71,11 +71,19 @@ class MainActivity : BaseActivity() {
         Sync.initialize(this)
     }
 
-    private fun validate() = try {//TODO mở màn hình không khoá
+    fun validate(
+        onUseAppNotWallet: () -> Unit = {},
+        onUseAppWallet: () -> Unit = {},
+        isWithBalance: Boolean = false
+    ) = try {
         viewModel.validate()
     } catch (e: MainScreenValidationError.NoSystemLock) {
-        KeyStoreActivity.startForNoSystemLock(this)
-        finish()
+        if (isWithBalance) {
+            onUseAppNotWallet()
+        } else {
+            KeyStoreActivity.startForNoSystemLock(this)
+            finish()
+        }
     } catch (e: MainScreenValidationError.KeyInvalidated) {
         KeyStoreActivity.startForInvalidKey(this)
         finish()
@@ -87,5 +95,9 @@ class MainActivity : BaseActivity() {
         finish()
     } catch (e: MainScreenValidationError.Unlock) {
         LockScreenActivity.start(this)
+    } catch (e: MainScreenValidationError.UseAppNotWallet) {
+        onUseAppNotWallet()
+    } catch (e: MainScreenValidationError.UseAppWallet) {
+        onUseAppWallet()
     }
 }

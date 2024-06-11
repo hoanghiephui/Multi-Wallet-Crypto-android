@@ -168,7 +168,7 @@ private fun KeyStoreScreen(
 @Composable
 fun NoSystemLockWarning() {
     val context = LocalContext.current
-    Column() {
+    Column {
         Spacer(Modifier.height(12.dp))
         Image(
             painter = painterResource(id = R.drawable.ic_attention_24),

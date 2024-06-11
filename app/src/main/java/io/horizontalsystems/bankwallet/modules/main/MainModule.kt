@@ -88,7 +88,8 @@ object MainModule {
         val showWhatsNew: Boolean,
         val activeWallet: Account?,
         val torEnabled: Boolean,
-        val wcSupportState: WCManager.SupportState?
+        val wcSupportState: WCManager.SupportState?,
+        val isShowBalance: Boolean
     )
 }
 
