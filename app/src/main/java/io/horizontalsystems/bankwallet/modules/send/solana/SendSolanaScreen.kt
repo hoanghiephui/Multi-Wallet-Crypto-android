@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.BuildConfig
@@ -54,7 +55,7 @@ fun SendSolanaScreen(
     val amountCaution = uiState.amountCaution
     val proceedEnabled = uiState.canBeSend
     val amountInputType = amountInputModeViewModel.inputType
-    val nativeAd by viewModel.adState
+    val nativeAd by viewModel.adState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     LaunchedEffect(key1 = BuildConfig.SEND_COIN_NATIVE, block = {
         viewModel.loadAds(context, BuildConfig.SEND_COIN_NATIVE)

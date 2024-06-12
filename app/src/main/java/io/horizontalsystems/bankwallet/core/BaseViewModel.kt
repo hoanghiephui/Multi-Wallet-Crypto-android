@@ -5,13 +5,14 @@ import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.StateFlow
 
 abstract class BaseViewModel : ViewModel() {
     private val callbacks = mutableStateListOf<String>()
     private val nativeAdLoader: MaxTemplateNativeAdViewComposableLoader by lazy {
         MaxTemplateNativeAdViewComposableLoader(this)
     }
-    val adState: State<AdViewState> get() = nativeAdLoader.nativeAdView
+    val adState: StateFlow<AdViewState> get() = nativeAdLoader.nativeAdView
     companion object{
         const val SHOW_ADS = true
     }

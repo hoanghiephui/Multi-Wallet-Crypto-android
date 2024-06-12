@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
@@ -45,7 +46,7 @@ fun BalanceNoAccount(navController: NavController,
                      viewModel: BalanceAccountsViewModel
 ) {
     val context = LocalContext.current
-    val nativeAd by viewModel.adState
+    val nativeAd by viewModel.adState.collectAsStateWithLifecycle()
     LaunchedEffect(key1 = Unit, block = {
         viewModel.loadAds(context,
             BuildConfig.BALANCE_NATIVE)

@@ -22,6 +22,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -147,7 +148,7 @@ fun SendBitcoinScreen(
     val feeRateCaution = uiState.feeRateCaution
     val context = LocalContext.current
     val rate = viewModel.coinRate
-    val nativeAd by viewModel.adState
+    val nativeAd by viewModel.adState.collectAsStateWithLifecycle()
     val paymentAddressViewModel = viewModel<AddressParserViewModel>(
         factory = AddressParserModule.Factory(wallet.token, prefilledData?.amount)
     )

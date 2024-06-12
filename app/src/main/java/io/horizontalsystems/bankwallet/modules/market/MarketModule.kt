@@ -125,7 +125,7 @@ enum class SortingField(@StringRes val titleResId: Int) : WithTranslatableTitle,
         get() = TranslatableString.ResString(titleResId)
 
     companion object {
-        val map = values().associateBy(SortingField::name)
+        val map = entries.associateBy(SortingField::name)
         fun fromString(type: String?): SortingField? = map[type]
     }
 }
@@ -136,13 +136,13 @@ enum class MarketField(@StringRes val titleResId: Int) : WithTranslatableTitle, 
     MarketCap(R.string.Market_Field_MarketCap),
     Volume(R.string.Market_Field_Volume);
 
-    fun next() = values()[if (ordinal == values().size - 1) 0 else ordinal + 1]
+    fun next() = entries[if (ordinal == entries.size - 1) 0 else ordinal + 1]
 
     override val title: TranslatableString
         get() = TranslatableString.ResString(titleResId)
 
     companion object {
-        val map = values().associateBy(MarketField::name)
+        val map = entries.associateBy(MarketField::name)
         fun fromString(type: String?): MarketField? = map[type]
     }
 }

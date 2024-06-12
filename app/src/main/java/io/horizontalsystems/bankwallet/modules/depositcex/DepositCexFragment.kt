@@ -6,6 +6,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -81,7 +82,7 @@ fun CexDepositScreen(
                 val addressViewModel =
                     viewModel<DepositAddressViewModel>(factory = DepositAddressViewModel.Factory(cexAsset, viewModel.network))
                 val context = LocalContext.current
-                val nativeAd by addressViewModel.adState
+                val nativeAd by addressViewModel.adState.collectAsStateWithLifecycle()
                 LaunchedEffect(key1 = BuildConfig.TOKEN_BALANCE_NATIVE, block = {
                     addressViewModel.loadAds(context, BuildConfig.TOKEN_BALANCE_NATIVE)
                 })

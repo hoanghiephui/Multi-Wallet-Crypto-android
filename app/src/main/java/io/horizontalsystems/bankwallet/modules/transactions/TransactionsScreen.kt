@@ -40,6 +40,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.BuildConfig
@@ -83,7 +84,7 @@ fun TransactionsScreen(
 ) {
     val accountsViewModel = viewModel<BalanceAccountsViewModel>(factory = BalanceModule.AccountsFactory())
     val context = LocalContext.current
-    val nativeAd by accountsViewModel.adState
+    val nativeAd by accountsViewModel.adState.collectAsStateWithLifecycle()
     LaunchedEffect(key1 = BuildConfig.TRANSACTION_NATIVE, block = {
         accountsViewModel.loadAds(context,
             BuildConfig.TRANSACTION_NATIVE)
@@ -316,7 +317,8 @@ fun TransactionCell(item: TransactionViewItem, position: SectionItemPosition, on
                     is TransactionViewItem.Icon.Regular -> {
                         val shape = if (icon.rectangle) RoundedCornerShape(CornerSize(4.dp)) else CircleShape
                         HsImage(
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier
+                                .size(32.dp)
                                 .clip(shape),
                             url = icon.url,
                             alternativeUrl = icon.alternativeUrl,

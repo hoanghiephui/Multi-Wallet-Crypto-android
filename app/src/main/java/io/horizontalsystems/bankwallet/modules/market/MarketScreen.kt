@@ -1,6 +1,7 @@
 package io.horizontalsystems.bankwallet.modules.market
 
 import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -29,21 +30,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.android.billing.UserDataRepository
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
+import io.horizontalsystems.bankwallet.core.AdViewState
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
@@ -93,6 +98,10 @@ fun MarketScreen(
             active = false
         }
     })
+    val nativeAd by marketViewModel.adState.collectAsStateWithLifecycle()
+    rememberAdsState {
+        marketViewModel.loadAds(it, BuildConfig.HOME_MARKET_NATIVE)
+    }
     
     Box(Modifier.fillMaxSize()) {
         Box(
@@ -184,7 +193,12 @@ fun MarketScreen(
                 color = ComposeAppTheme.colors.steel10,
                 thickness = 1.dp
             )
-            TabsSection(navController, tabs, uiState.selectedTab) { tab ->
+            TabsSection(
+                navController = navController,
+                tabs = tabs,
+                selectedTab = uiState.selectedTab,
+                nativeAd = nativeAd
+            ) { tab ->
                 marketViewModel.onSelect(tab)
             }
         }
@@ -199,6 +213,7 @@ fun TabsSection(
     navController: NavController,
     tabs: Array<Tab>,
     selectedTab: Tab,
+    nativeAd: AdViewState,
     onTabClick: (Tab) -> Unit
 ) {
     val pagerState = rememberPagerState(initialPage = selectedTab.ordinal) { tabs.size }
@@ -222,7 +237,10 @@ fun TabsSection(
     ) { page ->
         when (tabs[page]) {
             Tab.Coins -> {
-                TopCoins(onCoinClick = { onCoinClick(it, navController) })
+                TopCoins(
+                    onCoinClick = { onCoinClick(it, navController) },
+                    nativeAd = nativeAd
+                )
             }
 
             Tab.Watchlist -> {
@@ -307,4 +325,24 @@ private fun onCoinClick(coinUid: String, navController: NavController) {
     navController.slideFromRight(R.id.coinFragment, arguments)
 
     stat(page = StatPage.Markets, section = StatSection.Coins, event = StatEvent.OpenCoin(coinUid))
+}
+
+data class AdsState(
+    val loadAds: (Context) -> Unit
+)
+
+@Composable
+fun rememberAdsState(
+    loadAds: (Context) -> Unit
+): AdsState {
+    val context = LocalContext.current
+    LaunchedEffect(key1 = BuildConfig.HOME_MARKET_NATIVE) {
+        loadAds(context)
+    }
+    return remember(
+        loadAds,
+        context
+    ) {
+        AdsState(loadAds)
+    }
 }

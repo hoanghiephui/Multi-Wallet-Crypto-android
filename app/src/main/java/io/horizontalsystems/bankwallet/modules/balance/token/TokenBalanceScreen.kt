@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
@@ -91,7 +92,7 @@ fun TokenBalanceScreen(
 ) {
     val uiState = viewModel.uiState
     val context = LocalContext.current
-    val nativeAd by viewModel.adState
+    val nativeAd by viewModel.adState.collectAsStateWithLifecycle()
     LaunchedEffect(key1 = BuildConfig.TOKEN_BALANCE_NATIVE, block = {
         viewModel.loadAds(context, BuildConfig.TOKEN_BALANCE_NATIVE)
     })

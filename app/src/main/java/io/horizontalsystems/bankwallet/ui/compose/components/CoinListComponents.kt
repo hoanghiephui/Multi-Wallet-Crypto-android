@@ -74,7 +74,8 @@ fun CoinList(
     onRemoveFavorite: (String) -> Unit,
     onCoinClick: (String) -> Unit,
     userScrollEnabled: Boolean = true,
-    preItems: LazyListScope.() -> Unit
+    preItems: LazyListScope.() -> Unit,
+    preAdsItem: LazyListScope.() -> Unit = {}
 ) {
     val coroutineScope = rememberCoroutineScope()
     val listState = rememberLazyListState()
@@ -82,6 +83,7 @@ fun CoinList(
 
     LazyColumn(state = listState, userScrollEnabled = userScrollEnabled) {
         preItems.invoke(this)
+        preAdsItem()
         itemsIndexed(items, key = { _, item -> item.coinUid }) { _, item ->
             Box(
                 modifier = Modifier

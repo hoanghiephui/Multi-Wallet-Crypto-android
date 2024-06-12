@@ -37,6 +37,9 @@ import io.horizontalsystems.bankwallet.core.BaseViewModel.Companion.SHOW_ADS
 import io.horizontalsystems.bankwallet.modules.billing.showBillingPlusDialog
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.ui.compose.bold
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import se.warting.inappupdate.compose.findActivity
 
 /**
@@ -45,7 +48,8 @@ import se.warting.inappupdate.compose.findActivity
 class MaxTemplateNativeAdViewComposableLoader(
     private val viewModel: BaseViewModel
 ) {
-    var nativeAdView = mutableStateOf<AdViewState>(AdViewState.Default)
+    private var _nativeAdView = MutableStateFlow<AdViewState>(AdViewState.Default)
+    val nativeAdView = _nativeAdView.asStateFlow()
     private var nativeAd: MaxAd? = null
     private var nativeAdLoader: MaxNativeAdLoader? = null
     fun destroy() {
@@ -81,13 +85,17 @@ class MaxTemplateNativeAdViewComposableLoader(
 
                 nativeAd = ad // Save ad for cleanup.
                 loadedNativeAdView?.let {
-                    nativeAdView.value = AdViewState.LoadAd(loadedNativeAdView)
+                    _nativeAdView.update {
+                        AdViewState.LoadAd(loadedNativeAdView)
+                    }
                 }
             }
 
             override fun onNativeAdLoadFailed(adUnitId: String, error: MaxError) {
                 viewModel.logCallback()
-                nativeAdView.value = AdViewState.LoadFail
+                _nativeAdView.update {
+                    AdViewState.LoadFail
+                }
             }
 
             override fun onNativeAdClicked(ad: MaxAd) {

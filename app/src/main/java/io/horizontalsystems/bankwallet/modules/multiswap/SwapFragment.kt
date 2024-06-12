@@ -49,6 +49,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.BuildConfig
@@ -122,7 +123,7 @@ fun SwapScreen(navController: NavController, tokenIn: Token?) {
     LaunchedEffect(key1 = BuildConfig.SWAP_COIN_NATIVE, block = {
         viewModel.loadAds(context, BuildConfig.SWAP_COIN_NATIVE)
     })
-    val nativeAd by viewModel.adState
+    val nativeAd by viewModel.adState.collectAsStateWithLifecycle()
     SwapScreenInner(
         uiState = uiState,
         onClickClose = navController::popBackStack,

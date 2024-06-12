@@ -65,7 +65,7 @@ fun MarketOverviewScreen(
     val viewItem by viewModel.viewItem.observeAsState()
     val isPlusMode by viewModel.screenState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
-    val nativeAd by viewModel.adState
+    val nativeAd by viewModel.adState.collectAsStateWithLifecycle()
     if (!isPlusMode) {
         LaunchedEffect(key1 = BuildConfig.HOME_MARKET_NATIVE, block = {
             viewModel.loadAds(context, BuildConfig.HOME_MARKET_NATIVE)

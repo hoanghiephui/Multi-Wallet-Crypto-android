@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
@@ -95,7 +96,7 @@ fun ReceiveScreen(
 
                 val addressViewModel = viewModel<ReceiveAddressViewModel>(factory = ReceiveModule.Factory(walletNonNull))
                 val context = LocalContext.current
-                val nativeAd by addressViewModel.adState
+                val nativeAd by addressViewModel.adState.collectAsStateWithLifecycle()
                 LaunchedEffect(key1 = BuildConfig.TOKEN_BALANCE_NATIVE, block = {
                     addressViewModel.loadAds(context, BuildConfig.TOKEN_BALANCE_NATIVE)
                 })

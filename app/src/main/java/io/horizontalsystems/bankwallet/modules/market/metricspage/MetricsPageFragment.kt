@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
@@ -89,7 +90,7 @@ class MetricsPageFragment : BaseComposeFragment() {
         onCoinClick: (String) -> Unit,
     ) {
         val uiState = viewModel.uiState
-        val nativeAd by viewModel.adState
+        val nativeAd by viewModel.adState.collectAsStateWithLifecycle()
         val context = LocalContext.current
         LaunchedEffect(key1 = BuildConfig.METRICS_NATIVE, block = {
             viewModel.loadAds(context, BuildConfig.METRICS_NATIVE)

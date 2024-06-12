@@ -32,6 +32,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.BuildConfig
@@ -84,7 +85,7 @@ fun BalanceForAccount(navController: NavController, accountViewItem: AccountView
         HudHelper.showErrorMessage(view, text = message)
         viewModel.errorShown()
     }
-    val nativeAd by viewModel.adState
+    val nativeAd by viewModel.adState.collectAsStateWithLifecycle()
     LaunchedEffect(key1 = BuildConfig.BALANCE_NATIVE, block = {
         viewModel.loadAds(context,
             BuildConfig.BALANCE_NATIVE)

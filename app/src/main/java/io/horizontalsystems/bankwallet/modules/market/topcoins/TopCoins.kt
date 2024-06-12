@@ -16,6 +16,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.AdType
+import io.horizontalsystems.bankwallet.core.AdViewState
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
 import io.horizontalsystems.bankwallet.core.stats.StatSection
@@ -35,6 +38,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.CoinList
 import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.HeaderSorting
 import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
+import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -45,7 +49,8 @@ fun TopCoins(
             TopMarket.Top100,
             SortingField.TopGainers,
         )
-    )
+    ),
+    nativeAd: AdViewState
 ) {
 
     var openSortingSelector by rememberSaveable { mutableStateOf(false) }
@@ -120,6 +125,13 @@ fun TopCoins(
                                     )
                                     HSpacer(width = 16.dp)
                                 }
+                            }
+                        },
+                        preAdsItem = {
+                            item {
+                                VSpacer(12.dp)
+                                MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
+                                VSpacer(8.dp)
                             }
                         }
                     )

@@ -110,7 +110,7 @@ fun CoinOverviewScreen(
     val context = LocalContext.current
 
     val coinSymbol = "${fullCoin.coin.code}USDT"
-    val nativeAd by viewModel.adState
+    val nativeAd by viewModel.adState.collectAsStateWithLifecycle()
     LaunchedEffect(key1 = BuildConfig.TRANSACTION_NATIVE, block = {
         viewModel.loadAds(
             context,
