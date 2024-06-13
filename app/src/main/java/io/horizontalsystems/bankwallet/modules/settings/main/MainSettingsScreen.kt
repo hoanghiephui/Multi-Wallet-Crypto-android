@@ -1,6 +1,5 @@
 package io.horizontalsystems.bankwallet.modules.settings.main
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.DrawableRes
@@ -8,7 +7,6 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,8 +17,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -39,8 +37,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
-import io.horizontalsystems.bankwallet.core.App
-import io.horizontalsystems.bankwallet.core.managers.RateAppManager
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
@@ -59,13 +55,11 @@ import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.BadgeText
 import io.horizontalsystems.bankwallet.ui.compose.components.CellSingleLineLawrenceSection
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
-import io.horizontalsystems.bankwallet.ui.compose.components.InfoText
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.caption_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_grey
-import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_jacob
 import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
 import se.warting.inappupdate.compose.findActivity
 
@@ -75,7 +69,8 @@ fun SettingsScreen(
     navController: NavController,
     viewModel: MainSettingsViewModel = viewModel(factory = MainSettingsModule.Factory()),
 ) {
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    val scrollBehavior =
+        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         containerColor = Color.Transparent,
@@ -87,7 +82,9 @@ fun SettingsScreen(
             )
         }
     ) {
-        Column(modifier = Modifier.verticalScroll(rememberScrollState()).padding(it)) {
+        Column(modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(it)) {
             Spacer(modifier = Modifier.height(12.dp))
             SettingSections(viewModel, navController)
             //SettingsFooter(viewModel.appVersion, viewModel.companyWebPage)
@@ -255,7 +252,10 @@ private fun SettingSections(
                     onClick = {
                         navController.slideFromRight(R.id.baseCurrencySettingsFragment)
 
-                        stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.BaseCurrency))
+                        stat(
+                            page = StatPage.Settings,
+                            event = StatEvent.Open(StatPage.BaseCurrency)
+                        )
                     }
                 )
             },
@@ -272,49 +272,6 @@ private fun SettingSections(
                 )
             }
         )
-    )
-
-    VSpacer(24.dp)
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 32.dp)
-            .height(32.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        subhead1_jacob(text = stringResource(id = R.string.Settings_JoinUnstoppables).uppercase())
-    }
-    CellUniversalLawrenceSection(
-        listOf({
-            HsSettingCell(
-                R.string.Settings_Telegram,
-                R.drawable.ic_telegram_filled_24,
-                ComposeAppTheme.colors.jacob,
-                onClick = {
-                    LinkHelper.openLinkInAppBrowser(context, App.appConfigProvider.appTelegramLink)
-
-                    stat(
-                        page = StatPage.Settings,
-                        event = StatEvent.Open(StatPage.ExternalTelegram)
-                    )
-                }
-            )
-        }, {
-            HsSettingCell(
-                R.string.Settings_Twitter,
-                R.drawable.ic_twitter_filled_24,
-                ComposeAppTheme.colors.jacob,
-                onClick = {
-                    LinkHelper.openLinkInAppBrowser(context, App.appConfigProvider.appTwitterLink)
-
-                    stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.ExternalTwitter))
-                }
-            )
-        })
-    )
-    InfoText(
-        text = stringResource(R.string.Settings_JoinUnstoppables_Description),
     )
 
     VSpacer(32.dp)
