@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -79,6 +78,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_lucian
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_remus
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.title3_leah
+import io.horizontalsystems.bankwallet.ui.compose.hsRememberLazyListState
 import io.horizontalsystems.core.helpers.DateHelper
 import io.horizontalsystems.core.helpers.HudHelper
 import io.horizontalsystems.marketkit.models.EtfPoint
@@ -143,14 +143,11 @@ fun EtfPage(
                     }
 
                     ViewState.Success -> {
-                        val listState = rememberSaveable(
+                        val listState = hsRememberLazyListState(
+                            2,
                             uiState.sortBy,
-                            uiState.timeDuration,
-                            saver = LazyListState.Saver
-                        ) {
-                            LazyListState()
-                        }
-
+                            uiState.timeDuration
+                        )
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
                             state = listState,
@@ -289,7 +286,12 @@ fun ChartEtf(loading: Boolean, etfPoints: List<EtfPoint>, currency: Currency) {
     }
 
     val dailyInflowStr = dailyInflow?.let {
-        App.numberFormatter.formatFiatShort(it.abs(), currency.symbol, currency.decimal)
+        val sign = when {
+            it == BigDecimal.ZERO -> ""
+            it < BigDecimal.ZERO -> "-"
+            else -> "+"
+        }
+        sign + App.numberFormatter.formatFiatShort(it.abs(), currency.symbol, currency.decimal)
     }
     val dailyInflowPositive = dailyInflow != null && dailyInflow > BigDecimal.ZERO
 
