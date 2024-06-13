@@ -5,12 +5,12 @@ buildscript {
         lifecycle_version = '2.7.0'
 
         compose_version = '1.6.7'
-        kotlin_version = '1.9.23'
+        kotlin_version = '1.9.24'
         material_version = "1.12.0"
-        appcompat_version = "1.6.1"
+        appcompat_version = "1.7.0"
         constraint_version = "2.1.4"
         core_ktx_version = "1.13.1"
-        fragment_ktx_version = "1.7.1"
+        fragment_ktx_version = "1.8.0"
         navigation_ktx_version = "2.7.7"
         rxjava_version = "2.2.21"
         biometric_version = "1.1.0"
@@ -25,11 +25,11 @@ buildscript {
         maven { url 'https://artifacts.applovin.com/android' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.4.1'
+        classpath 'com.android.tools.build:gradle:8.4.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.google.gms:google-services:4.4.1'
+        classpath 'com.google.gms:google-services:4.4.2'
         classpath 'com.google.firebase:firebase-crashlytics-gradle:3.0.1'
-        classpath 'com.google.dagger:hilt-android-gradle-plugin:2.50'
+        classpath 'com.google.dagger:hilt-android-gradle-plugin:2.51.1'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -37,7 +37,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.google.devtools.ksp' version '1.9.23-1.0.20' apply false
+    id 'com.google.devtools.ksp' version '1.9.24-1.0.20' apply false
 }
 
 allprojects {
