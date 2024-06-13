@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
@@ -16,7 +18,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Search
@@ -102,7 +103,7 @@ fun MarketScreen(
     rememberAdsState {
         marketViewModel.loadAds(it, BuildConfig.HOME_MARKET_NATIVE)
     }
-    
+
     Box(Modifier.fillMaxSize()) {
         Box(
             Modifier
@@ -262,6 +263,7 @@ fun TabsSection(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MetricsBoard(
     navController: NavController,
@@ -272,7 +274,10 @@ fun MetricsBoard(
             .fillMaxWidth()
             .height(40.dp)
             .background(ComposeAppTheme.colors.tyler)
-            .horizontalScroll(rememberScrollState()),
+            .basicMarquee(
+                iterations = Int.MAX_VALUE,
+                spacing = MarqueeSpacing(0.dp)
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         HSpacer(4.dp)
