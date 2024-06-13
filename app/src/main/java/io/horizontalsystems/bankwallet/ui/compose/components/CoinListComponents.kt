@@ -94,7 +94,7 @@ fun CoinList(
                 Box(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .background(if (item.favorited) ComposeAppTheme.colors.lucian else MaterialTheme.colorScheme.background)
+                        .background(if (item.favorited) ComposeAppTheme.colors.lucian else ComposeAppTheme.colors.jacob)
                         .align(Alignment.CenterEnd)
                         .width(100.dp)
                         .clickable {
@@ -112,7 +112,7 @@ fun CoinList(
                 ) {
                     Icon(
                         painter = painterResource(id = if (item.favorited) R.drawable.ic_star_off_24 else R.drawable.ic_star_24),
-                        tint = MaterialTheme.colorScheme.onSurface,
+                        tint = ComposeAppTheme.colors.claude,
                         contentDescription = stringResource(if (item.favorited) R.string.CoinPage_Unfavorite else R.string.CoinPage_Favorite),
                     )
                 }
