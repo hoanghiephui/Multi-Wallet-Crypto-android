@@ -112,7 +112,10 @@ fun Activity.showAsButtonSheet(
                 NiaBackground(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
-                    CompositionLocalProvider(LocalSystemBars provides systemBars) {
+                    CompositionLocalProvider(
+                        LocalSystemBars provides systemBars,
+                        androidx.lifecycle.compose.LocalLifecycleOwner provides androidx.compose.ui.platform.LocalLifecycleOwner.current
+                    ) {
                         BottomSheetWrapper(
                             parent = viewGroup,
                             composeView = this,

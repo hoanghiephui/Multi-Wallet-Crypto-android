@@ -203,7 +203,7 @@ private fun BottomNavigationTransition(
 ) {
     val animationProgress by animateFloatAsState(
         targetValue = if (selected) 1f else 0f,
-        animationSpec = BottomNavigationAnimationSpec
+        animationSpec = BottomNavigationAnimationSpec, label = ""
     )
 
     val color = lerp(inactiveColor, activeColor, animationProgress)
@@ -211,6 +211,7 @@ private fun BottomNavigationTransition(
     CompositionLocalProvider(
         LocalContentColor provides color.copy(alpha = 1f),
         LocalContentAlpha provides color.alpha,
+        androidx.lifecycle.compose.LocalLifecycleOwner provides androidx.compose.ui.platform.LocalLifecycleOwner.current
     ) {
         content(animationProgress)
     }

@@ -84,7 +84,10 @@ class TextStyles {
 
 @Composable
 fun AppWidgetTheme(colors: ColorProviders = AppWidgetTheme.colors, content: @Composable () -> Unit) {
-    CompositionLocalProvider(LocalColorProviders provides colors) {
+    CompositionLocalProvider(
+        LocalColorProviders provides colors,
+        androidx.lifecycle.compose.LocalLifecycleOwner provides androidx.compose.ui.platform.LocalLifecycleOwner.current
+    ) {
         content()
     }
 }

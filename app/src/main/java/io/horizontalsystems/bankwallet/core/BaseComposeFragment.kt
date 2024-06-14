@@ -46,7 +46,10 @@ abstract class BaseComposeFragment(
             )
 
             setContent {
-                CompositionLocalProvider(LocalAnalyticsHelper provides analyticsHelper) {
+                CompositionLocalProvider(
+                    LocalAnalyticsHelper provides analyticsHelper,
+                    androidx.lifecycle.compose.LocalLifecycleOwner provides androidx.compose.ui.platform.LocalLifecycleOwner.current
+                ) {
                     ComposeAppTheme {
                         GetContent(findNavController())
                     }
