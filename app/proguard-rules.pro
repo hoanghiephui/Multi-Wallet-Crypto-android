@@ -385,5 +385,10 @@
 -keep class org.json.**
 -keepclassmembers,includedescriptorclasses class org.json.** { *; }
 
--keep class androidx.lifecycle.compose.** { *; }
+-keep class androidx.lifecycle.** { *; }
+-keep interface androidx.lifecycle.** { *; }
+-keep @androidx.compose.runtime.Composable class * { *; }
+-keepclassmembers class * {
+    @androidx.compose.runtime.Composable <methods>;
+}
 -keep class io.horizontalsystems.marketkit.models.** { *; }
