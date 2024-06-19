@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 fun HSSwipeRefresh(
     modifier: Modifier = Modifier,
     refreshing: Boolean,
-    modifier: Modifier = Modifier,
     onRefresh: () -> Unit,
     content: @Composable () -> Unit,
 ) {

@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -93,7 +94,7 @@ class CoinFragment : BaseComposeFragment(), AdRewardedCallback {
 
     override fun onLoaded(rewardedAd: MaxRewardedAd) {
         if (rewardedAd.isReady) {
-            rewardedAd.showAd()
+            rewardedAd.showAd(requireActivity())
         }
     }
 
@@ -141,7 +142,8 @@ fun CoinTabs(
     val context = LocalContext.current
 
     Scaffold(
-        backgroundColor = MaterialTheme.colorScheme.background,
+        containerColor = Color.Transparent,
+        contentColor = MaterialTheme.colorScheme.background,
         topBar = {
             AppBar(
                 title = viewModel.fullCoin.coin.code,
@@ -275,7 +277,8 @@ fun CoinTabs(
 @Composable
 fun CoinNotFound(coinUid: String, navController: NavController) {
     Scaffold(
-        backgroundColor = MaterialTheme.colorScheme.background,
+        containerColor = Color.Transparent,
+        contentColor = MaterialTheme.colorScheme.background,
         topBar = {
             AppBar(
                 title = coinUid,

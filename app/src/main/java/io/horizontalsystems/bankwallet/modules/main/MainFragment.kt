@@ -201,8 +201,8 @@ private fun MainScreen(
     ) {
         Scaffold(
             containerColor = Color.Transparent,
-                contentColor = MaterialTheme.colorScheme.background,
-                contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            contentColor = MaterialTheme.colorScheme.background,
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
             bottomBar = {
                 Column {
                     if (uiState.torEnabled) {
@@ -210,84 +210,84 @@ private fun MainScreen(
                     }
                     NiaBottomBar(
                         destinations = uiState.mainNavItems,
-                            onNavigateToDestination = {
-                                viewModel.onSelect(it.mainNavItem)
-                                stat(
-                                    page = StatPage.Main,
-                                    event = StatEvent.SwitchTab(it.mainNavItem.statTab)
+                        onNavigateToDestination = {
+                            viewModel.onSelect(it.mainNavItem)
+                            stat(
+                                page = StatPage.Main,
+                                event = StatEvent.SwitchTab(it.mainNavItem.statTab)
 
+                            )
+                        }
+                    )
+                }
+            }
+        ) { padding ->
+            BackHandler(enabled = modalBottomSheetState.isVisible) {
+                coroutineScope.launch {
+                    modalBottomSheetState.hide()
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .consumeWindowInsets(padding)
+                    .windowInsetsPadding(
+                        WindowInsets.safeDrawing.only(
+                            WindowInsetsSides.Horizontal,
+                        ),
+                    )
+            ) {
+                LaunchedEffect(key1 = selectedPage, block = {
+                    pagerState.scrollToPage(selectedPage)
+                })
+
+                HorizontalPager(
+                    modifier = Modifier.weight(1f),
+                    state = pagerState,
+                    userScrollEnabled = false,
+                    verticalAlignment = Alignment.Top
+                ) { page ->
+                    when (uiState.mainNavItems[page].mainNavItem) {
+                        MainNavigation.Market -> MarketScreen(
+                            fragmentNavController,
+                            searchViewModel,
+                            viewModel
+                        )
+
+                        MainNavigation.Balance -> {
+                            if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
+                                mainActivity.validate(
+                                    onUseAppNotWallet = {
+                                        viewModel.openPageBalance(false)
+                                    },
+                                    onUseAppWallet = {
+                                        viewModel.openPageBalance(true)
+                                    },
+                                    isWithBalance = true
                                 )
                             }
-                    )
-                    }
-                }
-            ) { padding ->
-                BackHandler(enabled = modalBottomSheetState.isVisible) {
-                    coroutineScope.launch {
-                        modalBottomSheetState.hide()
-                    }
-                }
-                Column(
-                    modifier = Modifier
-                        .padding(padding)
-                        .consumeWindowInsets(padding)
-                        .windowInsetsPadding(
-                            WindowInsets.safeDrawing.only(
-                                WindowInsetsSides.Horizontal,
-                            ),
-                        )
-                ) {
-                    LaunchedEffect(key1 = selectedPage, block = {
-                        pagerState.scrollToPage(selectedPage)
-                    })
-
-                    HorizontalPager(
-                        modifier = Modifier.weight(1f),
-                        state = pagerState,
-                        userScrollEnabled = false,
-                        verticalAlignment = Alignment.Top
-                    ) { page ->
-                        when (uiState.mainNavItems[page].mainNavItem) {
-                            MainNavigation.Market -> MarketScreen(
-                                fragmentNavController,
-                                searchViewModel,
-                                viewModel
-                            )
-
-                            MainNavigation.Balance -> {
-                                if (lifecycleEvent == Lifecycle.Event.ON_RESUME) {
-                                    mainActivity.validate(
-                                        onUseAppNotWallet = {
-                                            viewModel.openPageBalance(false)
-                                        },
-                                        onUseAppWallet = {
-                                            viewModel.openPageBalance(true)
-                                        },
-                                        isWithBalance = true
-                                    )
-                                }
-                                if (uiState.isShowBalance) {
-                                    BalanceScreen(fragmentNavController)
-                                } else {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxSize(),
-                                        verticalArrangement = Arrangement.Center
-                                    ) {
-                                        NoSystemLockWarning()
-                                    }
+                            if (uiState.isShowBalance) {
+                                BalanceScreen(fragmentNavController)
+                            } else {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize(),
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    NoSystemLockWarning()
                                 }
                             }
-
-                            MainNavigation.Transactions -> TransactionsScreen(
-                                fragmentNavController,
-                                transactionsViewModel
-                            )
-
-                            MainNavigation.Settings -> SettingsScreen(fragmentNavController)
                         }
+
+                        MainNavigation.Transactions -> TransactionsScreen(
+                            fragmentNavController,
+                            transactionsViewModel
+                        )
+
+                        MainNavigation.Settings -> SettingsScreen(fragmentNavController)
                     }
                 }
+            }
         }
         HideContentBox(uiState.contentHidden)
     }
