@@ -326,7 +326,7 @@ fun BalanceItems(
                 }
             }
 
-            stickyHeader {
+            item {
                 HeaderSorting(background = Color.Transparent) {
                     BalanceSortingSelector(
                         sortType = uiState.sortType,
