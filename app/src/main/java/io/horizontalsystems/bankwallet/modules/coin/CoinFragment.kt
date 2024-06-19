@@ -2,8 +2,8 @@ package io.horizontalsystems.bankwallet.modules.coin
 
 import android.os.Parcelable
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.AlertDialog
@@ -11,6 +11,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -138,99 +139,107 @@ fun CoinTabs(
     val isPlusMode by viewModel.screenState.collectAsStateWithLifecycle()
     var openAlertDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
-        AppBar(
-            title = viewModel.fullCoin.coin.code,
-            navigationIcon = {
-                HsBackButton(onClick = { navController.popBackStack() })
-            },
-            menuItems = buildList {
-                if (viewModel.isWatchlistEnabled) {
-                    if (viewModel.isFavorite) {
-                        add(
-                            MenuItem(
-                                title = TranslatableString.ResString(R.string.CoinPage_Unfavorite),
-                                icon = R.drawable.ic_filled_star_24,
-                                tint = MaterialTheme.colorScheme.onSurface,
-                                onClick = {
-                                    viewModel.onUnfavoriteClick()
 
-                                    stat(page = StatPage.CoinPage, event = StatEvent.RemoveFromWatchlist(viewModel.fullCoin.coin.uid))
-                                }
-                            )
-                        )
-                    } else {
-                        add(
-                            MenuItem(
-                                title = TranslatableString.ResString(R.string.CoinPage_Favorite),
-                                icon = R.drawable.ic_star_24,
-                                onClick = {
-                                    if (isPlusMode) {
-                                        viewModel.onFavoriteClick()
-                                        stat(page = StatPage.CoinPage, event = StatEvent.AddToWatchlist(viewModel.fullCoin.coin.uid))
-                                    } else {
-                                        openAlertDialog = true
+    Scaffold(
+        backgroundColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            AppBar(
+                title = viewModel.fullCoin.coin.code,
+                navigationIcon = {
+                    HsBackButton(onClick = { navController.popBackStack() })
+                },
+                menuItems = buildList {
+                    if (viewModel.isWatchlistEnabled) {
+                        if (viewModel.isFavorite) {
+                            add(
+                                MenuItem(
+                                    title = TranslatableString.ResString(R.string.CoinPage_Unfavorite),
+                                    icon = R.drawable.ic_filled_star_24,
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                    onClick = {
+                                        viewModel.onUnfavoriteClick()
+
+                                        stat(
+                                            page = StatPage.CoinPage,
+                                            event = StatEvent.RemoveFromWatchlist(viewModel.fullCoin.coin.uid)
+                                        )
                                     }
-                                }
+                                )
                             )
+                        } else {
+                            add(
+                                MenuItem(
+                                    title = TranslatableString.ResString(R.string.CoinPage_Favorite),
+                                    icon = R.drawable.ic_star_24,
+                                    onClick = {
+                                        if (isPlusMode) {
+                                            viewModel.onFavoriteClick()
+                                            stat(page = StatPage.CoinPage, event = StatEvent.AddToWatchlist(viewModel.fullCoin.coin.uid))
+                                        } else {
+                                            openAlertDialog = true
+                                        }
+                                    }
+                                )
+                            )
+                        }
+                    }
+                }
+            )
+        }
+    ) { innerPaddings ->
+        Column(
+            modifier = Modifier.padding(innerPaddings)
+        ) {
+            val selectedTab = tabs[pagerState.currentPage]
+            val tabItems = tabs.map {
+                TabItem(stringResource(id = it.titleResId), it == selectedTab, it)
+            }
+            Tabs(tabItems, onClick = { tab ->
+                coroutineScope.launch {
+                    pagerState.scrollToPage(tab.ordinal)
+
+                    stat(page = StatPage.CoinPage, event = StatEvent.SwitchTab(tab.statTab))
+
+                    if (tab == CoinModule.Tab.Details && viewModel.shouldShowSubscriptionInfo()) {
+                        viewModel.subscriptionInfoShown()
+
+                        delay(1000)
+                        navController.slideFromBottom(R.id.subscriptionInfoFragment)
+                    }
+                }
+            })
+
+            HorizontalPager(
+                state = pagerState,
+                userScrollEnabled = false
+            ) { page ->
+                when (tabs[page]) {
+                    CoinModule.Tab.Overview -> {
+                        CoinOverviewScreen(
+                            fullCoin = viewModel.fullCoin,
+                            navController = navController
+                        )
+                    }
+
+                    CoinModule.Tab.Market -> {
+                        CoinMarketsScreen(fullCoin = viewModel.fullCoin)
+                    }
+
+                    CoinModule.Tab.Details -> {
+                        CoinAnalyticsScreen(
+                            fullCoin = viewModel.fullCoin,
+                            navController = navController,
+                            fragmentManager = fragmentManager
                         )
                     }
                 }
             }
-        )
 
-        val selectedTab = tabs[pagerState.currentPage]
-        val tabItems = tabs.map {
-            TabItem(stringResource(id = it.titleResId), it == selectedTab, it)
-        }
-        Tabs(tabItems, onClick = { tab ->
-            coroutineScope.launch {
-                pagerState.scrollToPage(tab.ordinal)
+            viewModel.successMessage?.let {
+                HudHelper.showSuccessMessage(view, it)
 
-                stat(page = StatPage.CoinPage, event = StatEvent.SwitchTab(tab.statTab))
-
-                if (tab == CoinModule.Tab.Details && viewModel.shouldShowSubscriptionInfo()) {
-                    viewModel.subscriptionInfoShown()
-
-                    delay(1000)
-                    navController.slideFromBottom(R.id.subscriptionInfoFragment)
-                }
+                viewModel.onSuccessMessageShown()
             }
-        })
-
-        HorizontalPager(
-            state = pagerState,
-            userScrollEnabled = false
-        ) { page ->
-            when (tabs[page]) {
-                CoinModule.Tab.Overview -> {
-                    CoinOverviewScreen(
-                        fullCoin = viewModel.fullCoin,
-                        navController = navController
-                    )
-                }
-
-                CoinModule.Tab.Market -> {
-                    CoinMarketsScreen(fullCoin = viewModel.fullCoin)
-                }
-
-                CoinModule.Tab.Details -> {
-                    CoinAnalyticsScreen(
-                        fullCoin = viewModel.fullCoin,
-                        navController = navController,
-                        fragmentManager = fragmentManager
-                    )
-                }
-//                CoinModule.Tab.Tweets -> {
-//                    CoinTweetsScreen(fullCoin = viewModel.fullCoin)
-//                }
-            }
-        }
-
-        viewModel.successMessage?.let {
-            HudHelper.showSuccessMessage(view, it)
-
-            viewModel.onSuccessMessageShown()
         }
         if (openAlertDialog) {
             AlertDialog(
@@ -265,18 +274,22 @@ fun CoinTabs(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CoinNotFound(coinUid: String, navController: NavController) {
-    Column(modifier = Modifier.background(color = ComposeAppTheme.colors.tyler)) {
-        AppBar(
-            title = coinUid,
-            navigationIcon = {
-                HsBackButton(onClick = { navController.popBackStack() })
-            }
-        )
-
-        ListEmptyView(
-            text = stringResource(R.string.CoinPage_CoinNotFound, coinUid),
-            icon = R.drawable.ic_not_available
-        )
-
-    }
+    Scaffold(
+        backgroundColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            AppBar(
+                title = coinUid,
+                navigationIcon = {
+                    HsBackButton(onClick = { navController.popBackStack() })
+                }
+            )
+        },
+        content = {
+            ListEmptyView(
+                paddingValues = it,
+                text = stringResource(R.string.CoinPage_CoinNotFound, coinUid),
+                icon = R.drawable.ic_not_available
+            )
+        }
+    )
 }

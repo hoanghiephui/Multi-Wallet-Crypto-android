@@ -199,26 +199,26 @@ private fun MainScreen(
             )
         },
     ) {
-        Box(Modifier.fillMaxSize()) {
-            Scaffold(
-                containerColor = Color.Transparent,
+        Scaffold(
+            containerColor = Color.Transparent,
                 contentColor = MaterialTheme.colorScheme.background,
                 contentWindowInsets = WindowInsets(0, 0, 0, 0),
-                bottomBar = {
-                    Column {
-                        if (uiState.torEnabled) {
-                            TorStatusView()
-                        }
-                        NiaBottomBar(
-                            destinations = uiState.mainNavItems,
+            bottomBar = {
+                Column {
+                    if (uiState.torEnabled) {
+                        TorStatusView()
+                    }
+                    NiaBottomBar(
+                        destinations = uiState.mainNavItems,
                             onNavigateToDestination = {
                                 viewModel.onSelect(it.mainNavItem)
                                 stat(
                                     page = StatPage.Main,
                                     event = StatEvent.SwitchTab(it.mainNavItem.statTab)
+
                                 )
                             }
-                        )
+                    )
                     }
                 }
             ) { padding ->
@@ -288,9 +288,8 @@ private fun MainScreen(
                         }
                     }
                 }
-            }
-            HideContentBox(uiState.contentHidden)
         }
+        HideContentBox(uiState.contentHidden)
     }
 
     LaunchedEffect(key1 = uiState, block = {

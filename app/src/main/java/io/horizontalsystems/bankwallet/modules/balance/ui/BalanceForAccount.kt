@@ -6,14 +6,16 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.Icon
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material3.Scaffold
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
@@ -131,9 +133,11 @@ fun BalanceForAccount(navController: NavController, accountViewItem: AccountView
             )
         }
     ) {
-        Column {
-            AppBar(
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+        Scaffold(
+            backgroundColor = ComposeAppTheme.colors.tyler,
+            topBar = {
+                AppBar(
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color.Transparent,
                 ),
                 title = {
@@ -150,40 +154,54 @@ fun BalanceForAccount(navController: NavController, accountViewItem: AccountView
                                         WCManager.SupportState.Supported -> {
                                             qrScannerLauncher.launch(QRScannerActivity.getScanQrIntent(context, true))
 
-                                            stat(page = StatPage.Balance, event = StatEvent.Open(StatPage.ScanQrCode))
-                                        }
+                                                stat(
+                                                    page = StatPage.Balance,
+                                                    event = StatEvent.Open(StatPage.ScanQrCode)
+                                                )
+                                            }
 
-                                        WCManager.SupportState.NotSupportedDueToNoActiveAccount -> {
-                                            navController.slideFromBottom(R.id.wcErrorNoAccountFragment)
-                                        }
+                                            WCManager.SupportState.NotSupportedDueToNoActiveAccount -> {
+                                                navController.slideFromBottom(R.id.wcErrorNoAccountFragment)
+                                            }
 
-                                        is WCManager.SupportState.NotSupportedDueToNonBackedUpAccount -> {
-                                            val text = Translator.getString(R.string.WalletConnect_Error_NeedBackup)
-                                            navController.slideFromBottom(
-                                                R.id.backupRequiredDialog,
-                                                BackupRequiredDialog.Input(state.account, text)
-                                            )
+                                            is WCManager.SupportState.NotSupportedDueToNonBackedUpAccount -> {
+                                                val text =
+                                                    Translator.getString(R.string.WalletConnect_Error_NeedBackup)
+                                                navController.slideFromBottom(
+                                                    R.id.backupRequiredDialog,
+                                                    BackupRequiredDialog.Input(state.account, text)
+                                                )
 
-                                            stat(page = StatPage.Balance, event = StatEvent.Open(StatPage.BackupRequired))
-                                        }
+                                                stat(
+                                                    page = StatPage.Balance,
+                                                    event = StatEvent.Open(StatPage.BackupRequired)
+                                                )
+                                            }
 
-                                        is WCManager.SupportState.NotSupported -> {
-                                            navController.slideFromBottom(
-                                                R.id.wcAccountTypeNotSupportedDialog,
-                                                WCAccountTypeNotSupportedDialog.Input(state.accountTypeDescription)
-                                            )
+                                            is WCManager.SupportState.NotSupported -> {
+                                                navController.slideFromBottom(
+                                                    R.id.wcAccountTypeNotSupportedDialog,
+                                                    WCAccountTypeNotSupportedDialog.Input(state.accountTypeDescription)
+                                                )
+                                            }
                                         }
                                     }
-                                }
+                                )
                             )
-                        )
+                        }
                     }
-                }
-            )
-
+                )
+            }
+        ) { paddingValues ->
             val uiState = viewModel.uiState
 
-            Crossfade(uiState.viewState, label = "") { viewState ->
+            Crossfade(
+                targetState = uiState.viewState,
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize(),
+                label = ""
+            ) { viewState ->
                 when (viewState) {
                     ViewState.Success -> {
                         val balanceViewItems = uiState.balanceViewItems

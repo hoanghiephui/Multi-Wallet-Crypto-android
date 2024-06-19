@@ -3,7 +3,6 @@ package io.horizontalsystems.bankwallet.modules.coin.ranks
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +22,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -111,17 +111,25 @@ private fun CoinRankScreen(
     val uiState = viewModel.uiState
     val viewItems = viewModel.uiState.rankViewItems
 
-    Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-        AppBar(
-            menuItems = listOf(
-                MenuItem(
-                    title = TranslatableString.ResString(R.string.Button_Close),
-                    icon = R.drawable.ic_close,
-                    onClick = { navController.popBackStack() }
+    Scaffold(
+        backgroundColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            AppBar(
+                menuItems = listOf(
+                    MenuItem(
+                        title = TranslatableString.ResString(R.string.Button_Close),
+                        icon = R.drawable.ic_close,
+                        onClick = { navController.popBackStack() }
+                    )
                 )
             )
-        )
-        Crossfade(uiState.viewState, label = "") { viewItemState ->
+        }
+    ) { padding ->
+        Crossfade(
+            targetState = uiState.viewState,
+            modifier = Modifier.padding(padding),
+            label = ""
+        ) { viewItemState ->
             when (viewItemState) {
                 ViewState.Loading -> {
                     Loading()

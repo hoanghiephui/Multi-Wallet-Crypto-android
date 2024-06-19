@@ -12,10 +12,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
+import androidx.compose.material3.Icon
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material3.Scaffold
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -52,6 +54,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.TextImportantError
 import io.horizontalsystems.bankwallet.ui.compose.components.TextImportantWarning
+import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.extensions.BottomSheetHeader
@@ -102,25 +105,33 @@ fun SendBtcAdvancedSettingsScreen(
                 )
             },
         ) {
-            Column {
-                AppBar(
-                    title = stringResource(R.string.Send_Advanced),
-                    navigationIcon = {
-                        HsBackButton(onClick = { navController.popBackStack() })
-                    },
-                    menuItems = listOf(
-                        MenuItem(
-                            title = TranslatableString.ResString(R.string.Button_Reset),
-                            onClick = {
-                                sendBitcoinViewModel.reset()
-                                viewModel.reset()
-                            }
+            Scaffold(
+                backgroundColor = MaterialTheme.colorScheme.background,
+                topBar = {
+                    AppBar(
+                        title = stringResource(R.string.Send_Advanced),
+                        navigationIcon = {
+                            HsBackButton(onClick = { navController.popBackStack() })
+                        },
+                        menuItems = listOf(
+                            MenuItem(
+                                title = TranslatableString.ResString(R.string.Button_Reset),
+                                onClick = {
+                                    sendBitcoinViewModel.reset()
+                                    viewModel.reset()
+                                }
+                            )
                         )
                     )
-                )
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                }
+            ) { paddingValues ->
+                Column(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .verticalScroll(rememberScrollState())
+                ) {
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    VSpacer(12.dp)
                     CellUniversalLawrenceSection(
                         listOf {
                             HSFeeRaw(
@@ -134,8 +145,8 @@ fun SendBtcAdvancedSettingsScreen(
                         }
                     )
 
-                    if(feeRateVisible) {
-                        Spacer(modifier = Modifier.height(24.dp))
+                    if (feeRateVisible) {
+                        VSpacer(24.dp)
                         EvmSettingsInput(
                             title = stringResource(R.string.FeeSettings_FeeRate),
                             info = stringResource(R.string.FeeSettings_FeeRate_Info),
@@ -158,7 +169,7 @@ fun SendBtcAdvancedSettingsScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    VSpacer(24.dp)
                     TransactionDataSortSettings(
                         navController,
                         viewModel.uiState.transactionSortTitle,
@@ -169,7 +180,7 @@ fun SendBtcAdvancedSettingsScreen(
                     }
 
                     if (lockTimeEnabled) {
-                        Spacer(Modifier.height(32.dp))
+                        VSpacer(32.dp)
                         CellUniversalLawrenceSection(
                             listOf {
                                 HSHodlerInput(
@@ -186,7 +197,7 @@ fun SendBtcAdvancedSettingsScreen(
                         )
                     }
 
-                    Spacer(Modifier.height(32.dp))
+                    VSpacer(32.dp)
                     CellUniversalLawrenceSection(
                         listOf {
                             UtxoSwitch(
@@ -199,7 +210,7 @@ fun SendBtcAdvancedSettingsScreen(
                         text = stringResource(R.string.Send_Utxo_Description),
                     )
 
-                    Spacer(Modifier.height(32.dp))
+                    VSpacer(32.dp)
                     CellUniversalLawrenceSection {
                         RbfSwitch(
                             enabled = viewModel.uiState.rbfEnabled,
@@ -213,12 +224,16 @@ fun SendBtcAdvancedSettingsScreen(
 
                     feeRateCaution?.let {
                         FeeRateCaution(
-                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp),
+                            modifier = Modifier.padding(
+                                start = 16.dp,
+                                end = 16.dp,
+                                top = 12.dp
+                            ),
                             feeRateCaution = it
                         )
                     }
 
-                    Spacer(Modifier.height(32.dp))
+                    VSpacer(32.dp)
                 }
             }
         }
@@ -365,6 +380,7 @@ fun FeeRateCaution(modifier: Modifier, feeRateCaution: HSCaution) {
                 text = feeRateCaution.getDescription() ?: ""
             )
         }
+
         HSCaution.Type.Warning -> {
             TextImportantWarning(
                 modifier = modifier,
