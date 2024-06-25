@@ -48,7 +48,6 @@ class MainViewModel(
     private val localStorage: ILocalStorage,
     wcSessionManager: WCSessionManager,
     private val wcManager: WCManager,
-    deepLink: Uri?
 ) : ViewModelUiState<MainModule.UiState>() {
 
     private var wcPendingRequestsCount = 0
@@ -86,7 +85,7 @@ class MainViewModel(
             )
         }
 
-    private var selectedTabIndex = getTabIndexToOpen(deepLink)
+    private var selectedTabIndex = getTabIndexToOpen()
     private var deeplinkPage: DeeplinkPage? = null
     private var mainNavItems = navigationItems()
     private var showRateAppDialog = false
@@ -257,14 +256,7 @@ class MainViewModel(
         }
     }
 
-    private fun getTabIndexToOpen(deepLink: Uri? = null): Int {
-        deepLink?.let {
-            val (tab, deeplinkPageData) = getNavigationDataForDeeplink(it)
-            deeplinkPage = deeplinkPageData
-            currentMainTab = tab
-            return items.indexOf(tab)
-        }
-
+    private fun getTabIndexToOpen(): Int {
         val tab = when {
             relaunchBySettingChange -> {
                 relaunchBySettingChange = false
@@ -393,6 +385,14 @@ class MainViewModel(
     fun openPageBalance(isBalance: Boolean) {
         isShowBalance = isBalance
         emitState()
+    }
+
+    fun handleDeepLink(uri: Uri) {
+        val (tab, deeplinkPageData) = getNavigationDataForDeeplink(uri)
+        deeplinkPage = deeplinkPageData
+        currentMainTab = tab
+        selectedTabIndex = items.indexOf(tab)
+        syncNavigation()
     }
 
 }

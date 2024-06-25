@@ -242,7 +242,7 @@ fun ButtonSecondary(
         enabled = enabled,
     ) {
         ProvideTextStyle(
-            value = ComposeAppTheme.typography.subhead1
+            value = ComposeAppTheme.typography.captionSB
         ) {
             Row(
                 Modifier

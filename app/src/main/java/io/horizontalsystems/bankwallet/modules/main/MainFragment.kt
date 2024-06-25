@@ -1,8 +1,5 @@
 package io.horizontalsystems.bankwallet.modules.main
 
-import android.Manifest
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.BackHandler
@@ -55,6 +52,8 @@ import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.findActivity
+import io.horizontalsystems.bankwallet.core.managers.RateAppManager
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
@@ -94,7 +93,6 @@ class MainFragment : BaseComposeFragment() {
 
     private val transactionsViewModel by navGraphViewModels<TransactionsViewModel>(R.id.mainFragment) { TransactionsModule.Factory() }
     private val searchViewModel by viewModels<MarketSearchViewModel> { MarketSearchModule.Factory() }
-    private var intentUri: Uri? = null
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -114,7 +112,6 @@ class MainFragment : BaseComposeFragment() {
         NiaBackground {
             MainScreenWithRootedDeviceCheck(
                 transactionsViewModel = transactionsViewModel,
-                deepLink = intentUri,
                 navController = navController,
                 searchViewModel = searchViewModel,
                 mainActivity = (activity as MainActivity)
@@ -124,8 +121,6 @@ class MainFragment : BaseComposeFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        intentUri = activity?.intent?.data
-        activity?.intent?.data = null //clear intent data
 
         requireActivity().onBackPressedDispatcher.addCallback(
             this,
@@ -143,7 +138,6 @@ class MainFragment : BaseComposeFragment() {
 @Composable
 private fun MainScreenWithRootedDeviceCheck(
     transactionsViewModel: TransactionsViewModel,
-    deepLink: Uri?,
     navController: NavController,
     rootedDeviceViewModel: RootedDeviceViewModel = viewModel(factory = RootedDeviceModule.Factory()),
     searchViewModel: MarketSearchViewModel,
@@ -154,7 +148,6 @@ private fun MainScreenWithRootedDeviceCheck(
     } else {
         MainScreen(
             transactionsViewModel,
-            deepLink,
             navController,
             searchViewModel = searchViewModel,
             mainActivity = mainActivity
@@ -168,9 +161,8 @@ private fun MainScreenWithRootedDeviceCheck(
 @Composable
 private fun MainScreen(
     transactionsViewModel: TransactionsViewModel,
-    deepLink: Uri?,
     fragmentNavController: NavController,
-    viewModel: MainViewModel = viewModel(factory = MainModule.Factory(deepLink)),
+    viewModel: MainViewModel = viewModel(factory = MainModule.Factory()),
     searchViewModel: MarketSearchViewModel,
     mainActivity: MainActivity
 ) {
@@ -189,6 +181,16 @@ private fun MainScreen(
             context.findActivity().showBillingPlusDialog()
         }
     })
+
+    LaunchedEffect(Unit) {
+        context.findActivity()?.let { activity ->
+            activity.intent?.data?.let { uri ->
+                viewModel.handleDeepLink(uri)
+                activity.intent?.data = null //clear intent data
+            }
+        }
+    }
+
 
     ModalBottomSheetLayout(
         sheetState = modalBottomSheetState,
