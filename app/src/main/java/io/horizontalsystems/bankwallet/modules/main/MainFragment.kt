@@ -1,5 +1,7 @@
 package io.horizontalsystems.bankwallet.modules.main
 
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.BackHandler
@@ -53,7 +55,6 @@ import com.google.android.play.core.review.ReviewManagerFactory
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.findActivity
-import io.horizontalsystems.bankwallet.core.managers.RateAppManager
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
@@ -174,16 +175,16 @@ private fun MainScreen(
     val modalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val lifecycleEvent = rememberLifecycleEvent()
     val updateState = rememberInAppUpdateState()
-    val manager: ReviewManager = ReviewManagerFactory.create(context)
+    val manager: ReviewManager = ReviewManagerFactory.create(mainActivity)
     val openPro by viewModel.openPro.collectAsStateWithLifecycle()
     LaunchedEffect(key1 = openPro, block = {
         if (openPro) {
-            context.findActivity().showBillingPlusDialog()
+            mainActivity.showBillingPlusDialog()
         }
     })
 
     LaunchedEffect(Unit) {
-        context.findActivity()?.let { activity ->
+        mainActivity.let { activity ->
             activity.intent?.data?.let { uri ->
                 viewModel.handleDeepLink(uri)
                 activity.intent?.data = null //clear intent data
@@ -300,7 +301,7 @@ private fun MainScreen(
             request.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val reviewInfo = task.result
-                    val flow = manager.launchReviewFlow(context.findActivity(), reviewInfo)
+                    val flow = manager.launchReviewFlow(mainActivity, reviewInfo)
                     flow.addOnCompleteListener { _ ->
 
                     }
