@@ -67,7 +67,7 @@ dependencies {
     implementation("com.jakewharton.timber:timber:5.0.1")
     kapt("com.google.dagger:hilt-android-compiler:2.51.1")
     implementation("androidx.datastore:datastore:1.1.1")
-    implementation("com.google.protobuf:protobuf-kotlin-lite:4.27.1")
+    implementation("com.google.protobuf:protobuf-kotlin-lite:4.27.2")
     implementation(platform("androidx.compose:compose-bom:2024.06.00"))
     implementation("androidx.compose.ui:ui-tooling-preview")
 

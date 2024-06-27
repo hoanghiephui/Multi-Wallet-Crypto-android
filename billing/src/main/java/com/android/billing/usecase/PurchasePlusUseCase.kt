@@ -35,7 +35,7 @@ class PurchasePlusUseCase @Inject constructor(
         activity: Activity,
         productDetails: ProductDetails,
     ): PurchaseConsumableResult = withContext(mainDispatcher) {
-        val command = purchaseSingle(productDetails, null)
+        val command = purchaseSingle(productDetails,  productDetails.offers.first().offerToken)
         val result = billingClient.launchBillingFlow(activity, command)
 
         PurchaseConsumableResult(command, productDetails, result.billingPurchase)

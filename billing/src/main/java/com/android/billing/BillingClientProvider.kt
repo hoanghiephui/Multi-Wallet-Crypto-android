@@ -13,10 +13,9 @@ import com.android.billingclient.api.BillingClient.BillingResponseCode
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingResult
 import com.android.billingclient.api.ConsumeParams
+import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.Purchase
-import com.android.billingclient.api.PurchaseHistoryRecord
 import com.android.billingclient.api.PurchasesUpdatedListener
-import com.android.billingclient.api.QueryPurchaseHistoryParams
 import com.android.billingclient.api.QueryPurchasesParams
 import dagger.hilt.android.qualifiers.ApplicationContext
 import timber.log.Timber
@@ -26,18 +25,40 @@ private typealias ResponseListener<T> = (Result<T>) -> Unit
 
 interface BillingClientProvider {
 
-    fun initialize(callback: (Unit) -> Unit)
+    fun initialize(
+        callback: (Unit) -> Unit,
+        onFailed: () -> Unit
+    )
+
     fun dispose()
 
     fun verifyFeatureSupported(featureType: FeatureType, listener: ResponseListener<Boolean>)
-    fun verifyFeaturesSupported(featureTypes: List<FeatureType>, listener: ResponseListener<Map<FeatureType, Boolean>>)
-    fun queryProductDetails(productId: ProductId, productType: ProductType, listener: ResponseListener<ProductDetails>)
-    fun queryProductDetailsList(productDetailsCommand: QueryProductDetailsCommand, productType: ProductType, listener: ResponseListener<List<ProductDetails>>)
+    fun verifyFeaturesSupported(
+        featureTypes: List<FeatureType>,
+        listener: ResponseListener<Map<FeatureType, Boolean>>
+    )
+
+    fun queryProductDetails(
+        productId: ProductId,
+        productType: ProductType,
+        listener: ResponseListener<ProductDetails>
+    )
+
+    fun queryProductDetailsList(
+        productDetailsCommand: QueryProductDetailsCommand,
+        productType: ProductType,
+        listener: ResponseListener<List<ProductDetails>>
+    )
+
     fun queryPurchases(productType: ProductType, listener: ResponseListener<List<Purchase>>)
-    fun queryPurchaseHistory(productType: ProductType, listener: ResponseListener<List<PurchaseHistoryRecord>>)
+    fun queryPurchaseHistory(productType: ProductType, listener: ResponseListener<List<Purchase>>)
     fun consumePurchase(purchase: Purchase, listener: ResponseListener<ConsumeResult>)
     fun acknowledgePurchase(purchase: Purchase, listener: ResponseListener<AcknowledgeResult>)
-    fun launchBillingFlow(activity: Activity, command: PurchaseSingleCommand, listener: ResponseListener<SingleBillingFlowResult>)
+    fun launchBillingFlow(
+        activity: Activity,
+        command: PurchaseSingleCommand,
+        listener: ResponseListener<SingleBillingFlowResult>
+    )
 
     enum class State {
         CONNECTING,
@@ -55,38 +76,45 @@ class BillingClientProviderImpl @Inject constructor(
     private val initializeResponseListeners = mutableListOf<ResponseListener<Unit>>()
     private val compositeListener = CompositePurchasesUpdatedListener()
 
-    private val billingClient = BillingClient
-        .newBuilder(context)
-        .setListener(compositeListener)
-        .enablePendingPurchases()
-        .build()
+    private var billingClient: BillingClient? = null
 
     private var state = BillingClientProvider.State.DISCONNECTED
 
-    override fun initialize(callback: (Unit) -> Unit) {
-        if (state == BillingClientProvider.State.DISPOSED) {
-            Timber.d("BillingClient already disposed")
+    override fun initialize(
+        callback: (Unit) -> Unit,
+        onFailed: () -> Unit
+    ) {
+        when (state) {
+            BillingClientProvider.State.UNAVAILABLE -> {
+                onFailed()
+                Timber.d("BillingClient unavailable")
+                return
+            }
+
+            BillingClientProvider.State.CONNECTED -> {
+                callback.invoke(Unit)
+                Timber.d("BillingClient already connected")
+                return
+            }
+
+            BillingClientProvider.State.CONNECTING -> {
+                Timber.d("BillingClient is connecting")
+                return
+            }
+
+            BillingClientProvider.State.DISPOSED, BillingClientProvider.State.DISCONNECTED -> {
+                state = BillingClientProvider.State.CONNECTING
+                billingClient = BillingClient
+                    .newBuilder(context)
+                    .setListener(compositeListener)
+                    .enablePendingPurchases(
+                        PendingPurchasesParams.newBuilder().enableOneTimeProducts().build()
+                    )
+                    .build()
+            }
         }
 
-        if (state == BillingClientProvider.State.UNAVAILABLE) {
-            Timber.d("BillingClient unavailable")
-            return
-        }
-
-        if (state == BillingClientProvider.State.CONNECTED) {
-            callback.invoke(Unit)
-            Timber.d("BillingClient already connected")
-            return
-        }
-
-        if (state == BillingClientProvider.State.CONNECTING) {
-            Timber.d("BillingClient is connecting")
-            return
-        }
-
-        state = BillingClientProvider.State.CONNECTING
-
-        billingClient.startConnection(
+        billingClient?.startConnection(
             object : BillingClientStateListener {
                 override fun onBillingSetupFinished(billingResult: BillingResult) {
                     state = when (val response = billingResult.toResponse()) {
@@ -96,14 +124,29 @@ class BillingClientProviderImpl @Inject constructor(
                             callback.invoke(Unit)
                             BillingClientProvider.State.CONNECTED
                         }
+
                         is BillingResponse.BillingUnavailable -> {
                             Timber.d("BillingClient unavailable")
-                            initializeResponseListeners.forEach { it.invoke(Result.failure(InitializationFailedException(response))) }
+                            onFailed()
+                            initializeResponseListeners.forEach {
+                                it.invoke(
+                                    Result.failure(
+                                        InitializationFailedException(response)
+                                    )
+                                )
+                            }
                             BillingClientProvider.State.UNAVAILABLE
                         }
+
                         else -> {
                             Timber.d("BillingClient connection failed: $response")
-                            initializeResponseListeners.forEach { it.invoke(Result.failure(InitializationFailedException(response))) }
+                            initializeResponseListeners.forEach {
+                                it.invoke(
+                                    Result.failure(
+                                        InitializationFailedException(response)
+                                    )
+                                )
+                            }
                             BillingClientProvider.State.DISPOSED
                         }
                     }
@@ -118,7 +161,8 @@ class BillingClientProviderImpl @Inject constructor(
     }
 
     override fun dispose() {
-        billingClient.endConnection()
+        billingClient?.endConnection()
+        billingClient = null
         state = BillingClientProvider.State.DISPOSED
     }
 
@@ -156,21 +200,39 @@ class BillingClientProviderImpl @Inject constructor(
         listener: ResponseListener<Map<FeatureType, Boolean>>,
     ) {
         require(state == BillingClientProvider.State.CONNECTED) { "BillingClient is not connected" }
-
+        if (billingClient == null) {
+            return
+        }
         val resultSet = mutableMapOf<FeatureType, Boolean>()
 
         for (featureType in featureTypes) {
-            when (val response = billingClient.isFeatureSupported(featureType.rawValue).toResponse()) {
+            when (val response =
+                billingClient!!.isFeatureSupported(featureType.rawValue).toResponse()) {
                 is BillingResponse.OK -> resultSet[featureType] = true
                 is BillingResponse.FeatureNotSupported -> resultSet[featureType] = false
                 is BillingResponse.ServiceDisconnected, is BillingResponse.ServiceError -> {
                     Timber.d("verifyFeatureSupported: service error. CODE=${response.code}")
                     state = BillingClientProvider.State.DISPOSED
-                    listener.invoke(Result.failure(VerifyFeatureSupportedFailedException(response, featureType)))
+                    listener.invoke(
+                        Result.failure(
+                            VerifyFeatureSupportedFailedException(
+                                response,
+                                featureType
+                            )
+                        )
+                    )
                     return
                 }
+
                 else -> {
-                    listener.invoke(Result.failure(VerifyFeatureSupportedFailedException(response, featureType)))
+                    listener.invoke(
+                        Result.failure(
+                            VerifyFeatureSupportedFailedException(
+                                response,
+                                featureType
+                            )
+                        )
+                    )
                     return
                 }
             }
@@ -197,11 +259,21 @@ class BillingClientProviderImpl @Inject constructor(
     ) {
         require(state == BillingClientProvider.State.CONNECTED) { "BillingClient is not connected" }
 
-        queryProductDetailsList(QueryProductDetailsCommand(listOf(productId)), productType) { result ->
+        queryProductDetailsList(
+            QueryProductDetailsCommand(listOf(productId)),
+            productType
+        ) { result ->
             result.fold(
                 onSuccess = {
                     if (it.isEmpty()) {
-                        listener.invoke(Result.failure(QueryProductDetailsFailedException(billingResponse(BillingResponseCode.ITEM_UNAVAILABLE), productId)))
+                        listener.invoke(
+                            Result.failure(
+                                QueryProductDetailsFailedException(
+                                    billingResponse(BillingResponseCode.ITEM_UNAVAILABLE),
+                                    productId
+                                )
+                            )
+                        )
                     } else {
                         listener.invoke(Result.success(it.first()))
                     }
@@ -218,18 +290,38 @@ class BillingClientProviderImpl @Inject constructor(
     ) {
         require(state == BillingClientProvider.State.CONNECTED) { "BillingClient is not connected" }
 
-        billingClient.queryProductDetailsAsync(productDetailsCommand.toQueryProductDetailsParams(productType)) { result, products ->
+        billingClient?.queryProductDetailsAsync(
+            productDetailsCommand.toQueryProductDetailsParams(
+                productType
+            )
+        ) { result, products ->
             when (val response = result.toResponse()) {
                 is BillingResponse.OK -> {
                     listener.invoke(Result.success(products.translate()))
                 }
+
                 is BillingResponse.ServiceDisconnected, is BillingResponse.ServiceError -> {
                     Timber.d("queryProductDetails: service error. CODE=${response.code}")
                     state = BillingClientProvider.State.DISPOSED
-                    listener.invoke(Result.failure(QueryProductDetailsListFailedException(response, productDetailsCommand)))
+                    listener.invoke(
+                        Result.failure(
+                            QueryProductDetailsListFailedException(
+                                response,
+                                productDetailsCommand
+                            )
+                        )
+                    )
                 }
+
                 else -> {
-                    listener.invoke(Result.failure(QueryProductDetailsListFailedException(response, productDetailsCommand)))
+                    listener.invoke(
+                        Result.failure(
+                            QueryProductDetailsListFailedException(
+                                response,
+                                productDetailsCommand
+                            )
+                        )
+                    )
                 }
             }
         }
@@ -245,16 +337,18 @@ class BillingClientProviderImpl @Inject constructor(
             .setProductType(productType.rawValue)
             .build()
 
-        billingClient.queryPurchasesAsync(params) { result, purchases ->
+        billingClient?.queryPurchasesAsync(params) { result, purchases ->
             when (val response = result.toResponse()) {
                 is BillingResponse.OK -> {
                     listener.invoke(Result.success(purchases))
                 }
+
                 is BillingResponse.ServiceDisconnected, is BillingResponse.ServiceError -> {
                     Timber.d("queryPurchases: service error. CODE=${response.code}")
                     state = BillingClientProvider.State.DISPOSED
                     listener.invoke(Result.failure(QueryPurchasesFailedException(response)))
                 }
+
                 else -> {
                     listener.invoke(Result.failure(QueryPurchasesFailedException(response)))
                 }
@@ -264,24 +358,26 @@ class BillingClientProviderImpl @Inject constructor(
 
     override fun queryPurchaseHistory(
         productType: ProductType,
-        listener: ResponseListener<List<PurchaseHistoryRecord>>,
+        listener: ResponseListener<List<Purchase>>,
     ) {
         require(state == BillingClientProvider.State.CONNECTED) { "BillingClient is not connected" }
 
-        val params = QueryPurchaseHistoryParams.newBuilder()
+        val params = QueryPurchasesParams.newBuilder()
             .setProductType(productType.rawValue)
             .build()
 
-        billingClient.queryPurchaseHistoryAsync(params) { result, purchases ->
+        billingClient?.queryPurchasesAsync(params) { result, purchases ->
             when (val response = result.toResponse()) {
                 is BillingResponse.OK -> {
-                    listener.invoke(Result.success(purchases ?: emptyList()))
+                    listener.invoke(Result.success(purchases))
                 }
+
                 is BillingResponse.ServiceDisconnected, is BillingResponse.ServiceError -> {
                     Timber.d("queryPurchaseHistory: service error. CODE=${response.code}")
                     state = BillingClientProvider.State.DISPOSED
                     listener.invoke(Result.failure(QueryPurchasesFailedException(response)))
                 }
+
                 else -> {
                     listener.invoke(Result.failure(QueryPurchasesFailedException(response)))
                 }
@@ -299,21 +395,38 @@ class BillingClientProviderImpl @Inject constructor(
             .setPurchaseToken(purchase.purchaseToken)
             .build()
 
-        billingClient.consumeAsync(params) { result, _ ->
+        billingClient?.consumeAsync(params) { result, _ ->
             when (val response = result.toResponse()) {
                 is BillingResponse.OK -> {
                     listener.invoke(Result.success(ConsumeResult(false, params)))
                 }
+
                 is BillingResponse.ItemNotOwned -> {
                     listener.invoke(Result.success(ConsumeResult(true, params)))
                 }
+
                 is BillingResponse.ServiceDisconnected, is BillingResponse.ServiceError -> {
                     Timber.d("consumePurchase: service error. CODE=${response.code}")
                     state = BillingClientProvider.State.DISPOSED
-                    listener.invoke(Result.failure(ConsumePurchaseFailedException(response, params)))
+                    listener.invoke(
+                        Result.failure(
+                            ConsumePurchaseFailedException(
+                                response,
+                                params
+                            )
+                        )
+                    )
                 }
+
                 else -> {
-                    listener.invoke(Result.failure(ConsumePurchaseFailedException(response, params)))
+                    listener.invoke(
+                        Result.failure(
+                            ConsumePurchaseFailedException(
+                                response,
+                                params
+                            )
+                        )
+                    )
                 }
             }
         }
@@ -329,18 +442,34 @@ class BillingClientProviderImpl @Inject constructor(
             .setPurchaseToken(purchase.purchaseToken)
             .build()
 
-        billingClient.acknowledgePurchase(params) { result ->
+        billingClient?.acknowledgePurchase(params) { result ->
             when (val response = result.toResponse()) {
                 is BillingResponse.OK -> {
                     listener.invoke(Result.success(AcknowledgeResult(params)))
                 }
+
                 is BillingResponse.ServiceDisconnected, is BillingResponse.ServiceError -> {
                     Timber.d("acknowledgePurchase: service error. CODE=${response.code}")
                     state = BillingClientProvider.State.DISPOSED
-                    listener.invoke(Result.failure(AcknowledgePurchaseFailedException(response, params)))
+                    listener.invoke(
+                        Result.failure(
+                            AcknowledgePurchaseFailedException(
+                                response,
+                                params
+                            )
+                        )
+                    )
                 }
+
                 else -> {
-                    listener.invoke(Result.failure(AcknowledgePurchaseFailedException(response, params)))
+                    listener.invoke(
+                        Result.failure(
+                            AcknowledgePurchaseFailedException(
+                                response,
+                                params
+                            )
+                        )
+                    )
                 }
             }
         }
@@ -354,13 +483,17 @@ class BillingClientProviderImpl @Inject constructor(
         require(state == BillingClientProvider.State.CONNECTED) { "BillingClient is not connected" }
 
         val updatedListener = object : PurchasesUpdatedListener {
-            override fun onPurchasesUpdated(result: BillingResult, purchases: MutableList<Purchase>?) {
+            override fun onPurchasesUpdated(
+                result: BillingResult,
+                purchases: MutableList<Purchase>?
+            ) {
                 val response = result.toResponse()
                 val isError = response !is BillingResponse.OK
                 val isLibraryError = response is BillingResponse.OK && purchases == null
-                val isPurchaseHandled = response is BillingResponse.OK && purchases != null && purchases.any {
-                    it.products.contains(command.productId.value) && !it.isAcknowledged
-                }
+                val isPurchaseHandled =
+                    response is BillingResponse.OK && purchases != null && purchases.any {
+                        it.products.contains(command.productId.value) && !it.isAcknowledged
+                    }
 
                 if (isError || isLibraryError || isPurchaseHandled) {
                     compositeListener.remove(this)
@@ -369,21 +502,51 @@ class BillingClientProviderImpl @Inject constructor(
                 when (response) {
                     is BillingResponse.OK -> {
                         if (purchases == null) {
-                            listener.invoke(Result.failure(LaunchBillingFlowFailedException(response, command)))
+                            listener.invoke(
+                                Result.failure(
+                                    LaunchBillingFlowFailedException(
+                                        response,
+                                        command
+                                    )
+                                )
+                            )
                             return
                         }
 
                         if (purchases.any { it.products.contains(command.productId.value) && !it.isAcknowledged }) {
-                            listener.invoke(Result.success(SingleBillingFlowResult(command, purchases)))
+                            listener.invoke(
+                                Result.success(
+                                    SingleBillingFlowResult(
+                                        command,
+                                        purchases
+                                    )
+                                )
+                            )
                         }
                     }
+
                     is BillingResponse.ServiceDisconnected, is BillingResponse.ServiceError -> {
                         Timber.d("launchBillingFlow: service error. CODE=${response.code}")
                         state = BillingClientProvider.State.DISPOSED
-                        listener.invoke(Result.failure(LaunchBillingFlowFailedException(response, command)))
+                        listener.invoke(
+                            Result.failure(
+                                LaunchBillingFlowFailedException(
+                                    response,
+                                    command
+                                )
+                            )
+                        )
                     }
+
                     else -> {
-                        listener.invoke(Result.failure(LaunchBillingFlowFailedException(response, command)))
+                        listener.invoke(
+                            Result.failure(
+                                LaunchBillingFlowFailedException(
+                                    response,
+                                    command
+                                )
+                            )
+                        )
                     }
                 }
             }
@@ -392,8 +555,8 @@ class BillingClientProviderImpl @Inject constructor(
         compositeListener.add(updatedListener)
 
         val launchBillingResponse = billingClient
-            .launchBillingFlow(activity, command.toBillingFlowParams())
-            .toResponse()
+            ?.launchBillingFlow(activity, command.toBillingFlowParams())
+            ?.toResponse() ?: return
 
         if (launchBillingResponse !is BillingResponse.OK) {
             if (launchBillingResponse is BillingResponse.ServiceDisconnected || launchBillingResponse is BillingResponse.ServiceError) {
@@ -402,7 +565,14 @@ class BillingClientProviderImpl @Inject constructor(
             }
 
             compositeListener.remove(updatedListener)
-            listener.invoke(Result.failure(LaunchBillingFlowFailedException(launchBillingResponse, command)))
+            listener.invoke(
+                Result.failure(
+                    LaunchBillingFlowFailedException(
+                        launchBillingResponse,
+                        command
+                    )
+                )
+            )
         }
     }
 }
