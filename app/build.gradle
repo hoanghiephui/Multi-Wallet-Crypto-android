@@ -26,8 +26,8 @@ android {
         compileSdk compile_sdk_version
         minSdkVersion min_sdk_version
         targetSdkVersion compile_sdk_version
-        versionCode 24
-        versionName "0.2.4"
+        versionCode 25
+        versionName "0.2.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         ksp {
@@ -232,7 +232,7 @@ dependencies {
 
     //AppWidgets
     implementation 'androidx.glance:glance-appwidget:1.1.0'
-    implementation 'com.google.firebase:firebase-crashlytics:19.0.2'
+    implementation 'com.google.firebase:firebase-crashlytics:19.0.3'
     implementation 'com.google.firebase:firebase-analytics:22.0.2'
 
     // Room
@@ -288,7 +288,7 @@ dependencies {
     implementation("io.github.alexzhirkevich:qrose:1.0.1")
 
     // WorkManager Kotlin
-    def work_version = "2.9.0"
+    def work_version = "2.9.1"
     implementation "androidx.work:work-runtime-ktx:$work_version"
     // WorkManager RxJava2 support
     implementation "androidx.work:work-rxjava2:$work_version"
@@ -336,7 +336,7 @@ dependencies {
     implementation project(':components:chartview')
     implementation platform('androidx.compose:compose-bom:2024.06.00')
     // Integration with activities
-    implementation 'androidx.activity:activity-compose:1.9.0'
+    implementation 'androidx.activity:activity-compose:1.9.1'
     // Compose Material Design
     implementation "androidx.compose.material:material"
     implementation "androidx.compose.material3:material3:1.2.1"
@@ -351,7 +351,7 @@ dependencies {
 
     implementation "androidx.compose.runtime:runtime-livedata"
 
-    def coil_version = '2.6.0'
+    def coil_version = '2.7.0'
     implementation "io.coil-kt:coil-compose:$coil_version"
     implementation "io.coil-kt:coil-svg:$coil_version"
     implementation("io.coil-kt:coil-gif:$coil_version")
@@ -386,7 +386,7 @@ dependencies {
 
     api 'com.jaredrummler:android-shell:1.0.0'
     api 'com.offbynull.portmapper:portmapper:2.0.5'
-    implementation("com.applovin:applovin-sdk:12.5.0")
+    implementation("com.applovin:applovin-sdk:12.6.0")
     implementation 'com.applovin.mediation:bytedance-adapter:5.9.0.6.0'
     implementation 'com.google.android.exoplayer:exoplayer:2.19.1'
     implementation("com.google.android.gms:play-services-ads-identifier:18.1.0")
@@ -401,8 +401,8 @@ dependencies {
     implementation(project(":billing"))
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.2")
-    implementation("androidx.work:work-runtime-ktx:2.9.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
+    implementation("androidx.work:work-runtime-ktx:2.9.1")
     implementation("androidx.hilt:hilt-work:1.2.0")
     implementation("joda-time:joda-time:2.12.7")
     implementation project(":lightweightlibrary")
