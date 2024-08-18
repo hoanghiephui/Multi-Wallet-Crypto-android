@@ -31,6 +31,8 @@ import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Wallet
 import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -60,6 +62,7 @@ import com.wallet.blockchain.bitcoin.R
 import dagger.hilt.android.AndroidEntryPoint
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.ui.compose.AsyncLoadContents
+import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.bold
 import io.horizontalsystems.bankwallet.ui.extensions.BaseComposableBottomSheetFragment
 import kotlinx.coroutines.launch
@@ -150,13 +153,15 @@ private fun BillingPlusDialog(
 
         val price = productDetails?.rawProductDetails?.subscriptionOfferDetails?.first()
             ?.pricingPhases?.pricingPhaseList?.first()?.formattedPrice ?: "1,99 USD"
-        Button(
+        ElevatedButton(
             modifier = Modifier
                 .padding(top = 24.dp)
                 .fillMaxWidth(),
             onClick = { onClickPurchase.invoke() },
         ) {
-            Text(stringResource(R.string.billing_plus_purchase_button, "$price **"))
+            Text(
+                stringResource(R.string.billing_plus_purchase_button, "$price **"),
+            )
         }
 
         OutlinedButton(

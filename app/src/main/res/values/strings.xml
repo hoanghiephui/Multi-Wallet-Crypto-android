@@ -2110,7 +2110,7 @@
     <string name="billing_plus_item_feature_description">Be the first to try new features as they are added. </string>
     <string name="billing_plus_item_support">Priority support</string>
     <string name="billing_plus_item_support_description">Wallet+ users receive priority support. </string>
-    <string name="billing_policy">** The monthly subscription package will automatically renew according to Google\'s payment policy. Alternatively, you can set up cancellation in the payment and subscription management section of Google Play.</string>
+    <string name="billing_policy">** The monthly subscription package will automatically renew according to Google\'s payment policy. You will be charged immediately, and there is no trial period. Alternatively, you can set up cancellation in the payment and subscription management section of Google Play.</string>
 
     <!-- Common Error -->
     <string name="error_executed">An error occurred</string>
