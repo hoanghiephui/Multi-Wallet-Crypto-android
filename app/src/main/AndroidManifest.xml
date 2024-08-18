@@ -96,6 +96,14 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="@string/DeeplinkScheme" />
             </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="unstoppable.money" />
+                <data android:pathPrefix="/referral" />
+            </intent-filter>
         </activity-alias>
         <activity-alias
             android:name="${applicationId}.DarkLauncherAlias"
@@ -120,6 +128,14 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="@string/DeeplinkScheme" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="unstoppable.money" />
+                <data android:pathPrefix="/referral" />
             </intent-filter>
         </activity-alias>
         <activity-alias
@@ -146,6 +162,14 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="@string/DeeplinkScheme" />
             </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="unstoppable.money" />
+                <data android:pathPrefix="/referral" />
+            </intent-filter>
         </activity-alias>
         <activity-alias
             android:name="${applicationId}.LeoLauncherAlias"
@@ -169,6 +193,14 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="@string/DeeplinkScheme" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="unstoppable.money" />
+                <data android:pathPrefix="/referral" />
             </intent-filter>
         </activity-alias>
         <activity-alias
@@ -194,6 +226,14 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="@string/DeeplinkScheme" />
             </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="unstoppable.money" />
+                <data android:pathPrefix="/referral" />
+            </intent-filter>
         </activity-alias>
         <activity-alias
             android:name="${applicationId}.YakLauncherAlias"
@@ -217,6 +257,14 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="@string/DeeplinkScheme" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="unstoppable.money" />
+                <data android:pathPrefix="/referral" />
             </intent-filter>
         </activity-alias>
         <activity-alias
@@ -242,6 +290,14 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="@string/DeeplinkScheme" />
             </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="unstoppable.money" />
+                <data android:pathPrefix="/referral" />
+            </intent-filter>
         </activity-alias>
         <activity-alias
             android:name="${applicationId}.ApeLauncherAlias"
@@ -266,6 +322,14 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="@string/DeeplinkScheme" />
             </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="unstoppable.money" />
+                <data android:pathPrefix="/referral" />
+            </intent-filter>
         </activity-alias>
         <activity-alias
             android:name="${applicationId}.Ball8LauncherAlias"
@@ -289,6 +353,14 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="@string/DeeplinkScheme" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="unstoppable.money" />
+                <data android:pathPrefix="/referral" />
             </intent-filter>
         </activity-alias>
 
