@@ -26,6 +26,7 @@ class AddTokenService(
         BlockchainType.Ethereum,
         BlockchainType.BinanceSmartChain,
         BlockchainType.Tron,
+        BlockchainType.Ton,
         BlockchainType.Polygon,
         BlockchainType.Avalanche,
         BlockchainType.BinanceChain,
@@ -33,6 +34,7 @@ class AddTokenService(
         BlockchainType.Fantom,
         BlockchainType.ArbitrumOne,
         BlockchainType.Optimism,
+        BlockchainType.Base,
         BlockchainType.Solana
     )
 
@@ -52,6 +54,9 @@ class AddTokenService(
             )
             BlockchainType.Tron -> {
                 AddTronTokenBlockchainService.getInstance(blockchain)
+            }
+            BlockchainType.Ton -> {
+                AddTonTokenBlockchainService(blockchain)
             }
             BlockchainType.Solana -> {
                 AddSolanaTokenBlockchainService.getInstance(blockchain)

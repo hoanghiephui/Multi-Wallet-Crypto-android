@@ -46,7 +46,8 @@ class BalanceViewModel(
     private val localStorage: ILocalStorage,
     private val wCManager: WCManager,
     private val addressHandlerFactory: AddressHandlerFactory,
-    private val priceManager: PriceManager
+    private val priceManager: PriceManager,
+    val isSwapEnabled: Boolean
 ) : ViewModelUiState<BalanceUiState>(), ITotalBalance by totalBalance {
 
     private var balanceViewType = balanceViewTypeManager.balanceViewTypeFlow.value
@@ -182,7 +183,7 @@ class BalanceViewModel(
 
         stat(page = StatPage.Balance, event = StatEvent.Refresh)
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             isRefreshing = true
             emitState()
 

@@ -3,12 +3,10 @@ package io.horizontalsystems.bankwallet.modules.transactions
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.adapters.TonTransactionRecord
-import io.horizontalsystems.bankwallet.core.adapters.TonTransactionRecord.Type.Incoming
-import io.horizontalsystems.bankwallet.core.adapters.TonTransactionRecord.Type.Outgoing
-import io.horizontalsystems.bankwallet.core.adapters.TonTransactionRecord.Type.Unknown
 import io.horizontalsystems.bankwallet.core.managers.BalanceHiddenManager
 import io.horizontalsystems.bankwallet.core.managers.EvmLabelManager
 import io.horizontalsystems.bankwallet.core.providers.Translator
+import io.horizontalsystems.bankwallet.core.shorten
 import io.horizontalsystems.bankwallet.entities.CurrencyValue
 import io.horizontalsystems.bankwallet.entities.TransactionValue
 import io.horizontalsystems.bankwallet.entities.nft.NftAssetBriefMetadata
@@ -89,6 +87,7 @@ class TransactionViewItemFactory(
 
             is TransactionValue.CoinValue,
             is TransactionValue.RawValue,
+            is TransactionValue.JettonValue,
             is TransactionValue.TokenValue -> {
                 TransactionViewItem.Icon.Regular(value.coinIconUrl, value.alternativeCoinIconUrl, value.coinIconPlaceholder)
             }
@@ -118,6 +117,7 @@ class TransactionViewItemFactory(
 
                 is TransactionValue.CoinValue,
                 is TransactionValue.RawValue,
+                is TransactionValue.JettonValue,
                 is TransactionValue.TokenValue -> {
                     frontRectangle = false
                     frontUrl = primaryValue.coinIconUrl
@@ -147,6 +147,8 @@ class TransactionViewItemFactory(
                     backAlternativeUrl = secondaryValue.alternativeCoinIconUrl
                     backPlaceHolder = secondaryValue.coinIconPlaceholder
                 }
+
+                is TransactionValue.JettonValue -> TODO()
             }
         } else {
             backRectangle = false
@@ -456,35 +458,79 @@ class TransactionViewItemFactory(
             getColoredValue(it, ColorName.Grey)
         }
 
-        val singleTransfer = record.transfers.singleOrNull()
+        val iconX: TransactionViewItem.Icon
+        var sentToSelf = false
 
-        when (record.type) {
-            Incoming -> {
-                title = Translator.getString(R.string.Transactions_Receive)
-                subtitle = if (singleTransfer == null) {
-                    Translator.getString(R.string.Transactions_Multiple)
-                } else {
-                    Translator.getString(R.string.Transactions_From, mapped(singleTransfer.src, record.blockchainType))
+        val action = record.actions.singleOrNull()
+
+        if (action != null) {
+            when (val actionType = action.type) {
+                is TonTransactionRecord.Action.Type.Send -> {
+                    title = Translator.getString(R.string.Transactions_Send)
+                    subtitle = Translator.getString(R.string.Transactions_To, mapped(actionType.to, record.blockchainType))
+
+                    primaryValue = getColoredValue(actionType.value, ColorName.Lucian)
+
+                    sentToSelf = actionType.sentToSelf
+
+                    iconX = singleValueIconType(actionType.value)
                 }
+                is TonTransactionRecord.Action.Type.Receive -> {
+                    title = Translator.getString(R.string.Transactions_Receive)
+                    subtitle = Translator.getString(
+                        R.string.Transactions_From,
+                        mapped(actionType.from, record.blockchainType)
+                    )
 
-                primaryValue = getColoredValue(record.mainValue, ColorName.Remus)
-            }
-            Outgoing -> {
-                title = Translator.getString(R.string.Transactions_Send)
-                subtitle = if (singleTransfer == null) {
-                    Translator.getString(R.string.Transactions_Multiple)
-                } else {
-                    Translator.getString(R.string.Transactions_To, mapped(singleTransfer.dest, record.blockchainType))
+                    primaryValue = getColoredValue(actionType.value, ColorName.Remus)
+                    iconX = singleValueIconType(actionType.value)
                 }
+                is TonTransactionRecord.Action.Type.Unsupported -> {
+                    title = Translator.getString(R.string.Transactions_TonTransaction)
+                    subtitle = actionType.type
+                    primaryValue = null
+                    secondaryValue = null
 
-                primaryValue = getColoredValue(record.mainValue, ColorName.Lucian)
+
+                    iconX = TransactionViewItem.Icon.Platform(record.blockchainType)
+                }
+                is TonTransactionRecord.Action.Type.Burn -> {
+                    iconX = singleValueIconType(actionType.value)
+                    title = Translator.getString(R.string.Transactions_Burn)
+                    subtitle = actionType.value.fullName
+                    primaryValue = getColoredValue(actionType.value, ColorName.Lucian)
+                }
+                is TonTransactionRecord.Action.Type.ContractCall -> {
+                    iconX = TransactionViewItem.Icon.Platform(record.blockchainType)
+                    title = Translator.getString(R.string.Transactions_ContractCall)
+                    subtitle = actionType.address.shorten()
+                    primaryValue = getColoredValue(actionType.value, ColorName.Lucian)
+                }
+                is TonTransactionRecord.Action.Type.ContractDeploy -> {
+                    iconX = TransactionViewItem.Icon.Platform(record.blockchainType)
+                    title = Translator.getString(R.string.Transactions_ContractDeploy)
+                    subtitle = actionType.interfaces.joinToString()
+                    primaryValue = null
+                }
+                is TonTransactionRecord.Action.Type.Mint -> {
+                    iconX = singleValueIconType(actionType.value)
+                    title = Translator.getString(R.string.Transactions_Mint)
+                    subtitle = actionType.value.fullName
+                    primaryValue = getColoredValue(actionType.value, ColorName.Remus)
+                }
+                is TonTransactionRecord.Action.Type.Swap -> {
+                    iconX = doubleValueIconType(actionType.valueOut, actionType.valueIn)
+                    title = Translator.getString(R.string.Transactions_Swap)
+                    subtitle = actionType.routerName ?: actionType.routerAddress.shorten()
+                    primaryValue = getColoredValue(actionType.valueOut, ColorName.Remus)
+                    secondaryValue = getColoredValue(actionType.valueIn, ColorName.Lucian)
+                }
             }
-            Unknown -> {
-                title = Translator.getString(R.string.Transactions_Unknown)
-                subtitle = Translator.getString(R.string.Transactions_Unknown_Description)
-                primaryValue = null
-                secondaryValue = null
-            }
+        } else {
+            iconX = TransactionViewItem.Icon.Platform(record.blockchainType)
+            title = Translator.getString(R.string.Transactions_TonTransaction)
+            subtitle = Translator.getString(R.string.Transactions_Multiple)
+            primaryValue = null
         }
 
         return TransactionViewItem(
@@ -495,8 +541,9 @@ class TransactionViewItemFactory(
             primaryValue = primaryValue,
             secondaryValue = secondaryValue,
             showAmount = showAmount,
+            sentToSelf = sentToSelf,
             date = Date(record.timestamp * 1000),
-            icon = icon ?: singleValueIconType(record.mainValue)
+            icon = icon ?: iconX
         )
     }
 
@@ -1053,6 +1100,7 @@ class TransactionViewItemFactory(
 
             is TransactionValue.CoinValue,
             is TransactionValue.RawValue,
+            is TransactionValue.JettonValue,
             is TransactionValue.TokenValue -> {
                 currencyValue?.let { getColoredValue(it, ColorName.Grey) }
             }

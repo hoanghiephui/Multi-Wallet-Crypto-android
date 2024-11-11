@@ -96,6 +96,7 @@ class BalanceViewItemFactory {
         BlockchainType.Polygon,
         BlockchainType.Avalanche,
         BlockchainType.Optimism,
+        BlockchainType.Base,
         BlockchainType.Solana,
         BlockchainType.Gnosis,
         BlockchainType.Fantom,
@@ -207,7 +208,24 @@ class BalanceViewItemFactory {
                     LockedValue(
                         title = TranslatableString.ResString(R.string.Balance_LockedAmount_Title),
                         infoTitle = TranslatableString.ResString(R.string.Info_LockTime_Title),
-                        info = TranslatableString.ResString(R.string.Info_LockTime_Description_Static),
+                        info = TranslatableString.ResString(R.string.Info_ProcessingBalance_Description),
+                        coinValue = it
+                    )
+                )
+            }
+
+            lockedCoinValue(
+                state,
+                item.balanceData.pending,
+                hideBalance,
+                wallet.decimal,
+                wallet.token
+            )?.let {
+                add(
+                    LockedValue(
+                        title = TranslatableString.ResString(R.string.Balance_ProcessingBalance_Title),
+                        infoTitle = TranslatableString.ResString(R.string.Info_ProcessingBalance_Title),
+                        info = TranslatableString.ResString(R.string.Info_ProcessingBalance_Description),
                         coinValue = it
                     )
                 )
@@ -244,7 +262,7 @@ class BalanceViewItemFactory {
             failedIconVisible = state is AdapterState.NotSynced,
             coinIconVisible = state !is AdapterState.NotSynced,
             badge = wallet.badge,
-            swapVisible = wallet.token.swappable,
+            swapVisible = App.instance.isSwapEnabled && wallet.token.swappable,
             swapEnabled = state is AdapterState.Synced,
             errorMessage = (state as? AdapterState.NotSynced)?.error?.message,
             isWatchAccount = watchAccount,

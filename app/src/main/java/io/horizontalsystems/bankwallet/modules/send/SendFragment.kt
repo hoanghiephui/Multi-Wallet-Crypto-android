@@ -103,7 +103,7 @@ class SendFragment : BaseComposeFragment() {
             BlockchainType.Polygon,
             BlockchainType.Avalanche,
             BlockchainType.Optimism,
-            BlockchainType.Gnosis,
+            BlockchainType.Base,BlockchainType.Gnosis,
             BlockchainType.Fantom,
             BlockchainType.ArbitrumOne -> {
                 SendEvmScreen(

@@ -1,127 +1,66 @@
 package io.horizontalsystems.bankwallet.core.adapters
 
 import io.horizontalsystems.bankwallet.core.AdapterState
-import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.BalanceData
-import io.horizontalsystems.bankwallet.core.IAdapter
-import io.horizontalsystems.bankwallet.core.IBalanceAdapter
-import io.horizontalsystems.bankwallet.core.IReceiveAdapter
 import io.horizontalsystems.bankwallet.core.ISendTonAdapter
-import io.horizontalsystems.bankwallet.core.ITransactionsAdapter
-import io.horizontalsystems.bankwallet.core.UnsupportedAccountException
-import io.horizontalsystems.bankwallet.entities.AccountType
-import io.horizontalsystems.bankwallet.entities.LastBlockInfo
+import io.horizontalsystems.bankwallet.core.managers.TonKitWrapper
+import io.horizontalsystems.bankwallet.core.managers.toAdapterState
 import io.horizontalsystems.bankwallet.entities.TransactionValue
-import io.horizontalsystems.bankwallet.entities.Wallet
 import io.horizontalsystems.bankwallet.entities.transactionrecords.TransactionRecord
-import io.horizontalsystems.bankwallet.modules.transactions.FilterTransactionType
 import io.horizontalsystems.bankwallet.modules.transactions.TransactionSource
 import io.horizontalsystems.bankwallet.modules.transactions.TransactionStatus
-import io.horizontalsystems.hdwalletkit.Curve
-import io.horizontalsystems.hdwalletkit.HDWallet
 import io.horizontalsystems.marketkit.models.Token
-import io.horizontalsystems.tonkit.ConnectionManager
-import io.horizontalsystems.tonkit.DriverFactory
-import io.horizontalsystems.tonkit.SyncState
-import io.horizontalsystems.tonkit.TonAddress
-import io.horizontalsystems.tonkit.TonKit
-import io.horizontalsystems.tonkit.TonKitFactory
-import io.horizontalsystems.tonkit.TonTransactionWithTransfers
-import io.horizontalsystems.tonkit.TonTransfer
-import io.horizontalsystems.tonkit.TransactionType
+import io.horizontalsystems.tonkit.FriendlyAddress
+import io.horizontalsystems.tonkit.core.TonKit.SendAmount
+import io.horizontalsystems.tonkit.models.Account
+import io.horizontalsystems.tonkit.models.Event
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
-import io.reactivex.Single
 import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlowable
-import kotlinx.coroutines.rx2.rxSingle
 import java.math.BigDecimal
+import kotlin.math.absoluteValue
 
-class TonAdapter(
-    private val wallet: Wallet,
-) : IAdapter, IBalanceAdapter, IReceiveAdapter, ITransactionsAdapter, ISendTonAdapter {
-
-    private val decimals = 9
+class TonAdapter(tonKitWrapper: TonKitWrapper) : BaseTonAdapter(tonKitWrapper, 9), ISendTonAdapter {
 
     private val balanceUpdatedSubject: PublishSubject<Unit> = PublishSubject.create()
     private val balanceStateUpdatedSubject: PublishSubject<Unit> = PublishSubject.create()
-    private val transactionsStateUpdatedSubject: PublishSubject<Unit> = PublishSubject.create()
-    private val tonKit: TonKit
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
-    private var balance = BigDecimal.ZERO
-
-    init {
-        val accountType = wallet.account.type
-        val tonKitFactory = TonKitFactory(DriverFactory(App.instance), ConnectionManager(App.instance))
-        tonKit = when (accountType) {
-            is AccountType.Mnemonic -> {
-                val hdWallet = HDWallet(accountType.seed, 607, HDWallet.Purpose.BIP44, Curve.Ed25519)
-                val privateKey = hdWallet.privateKey(0)
-                var privateKeyBytes = privateKey.privKeyBytes
-                if (privateKeyBytes.size > 32) {
-                    privateKeyBytes = privateKeyBytes.copyOfRange(1, privateKeyBytes.size)
-                }
-                tonKitFactory.create(privateKeyBytes, wallet.account.id)
-            }
-
-            is AccountType.TonAddress -> {
-                tonKitFactory.createWatch(accountType.address, wallet.account.id)
-            }
-
-            else -> {
-                throw UnsupportedAccountException()
-            }
-        }
-    }
+    private var balance = getBalanceFromAccount(tonKit.account)
 
     override fun start() {
         coroutineScope.launch {
-            tonKit.balanceFlow.collect {
-                balance = it.toBigDecimal().movePointLeft(decimals)
+            tonKit.accountFlow.collect { account ->
+                balance = getBalanceFromAccount(account)
                 balanceUpdatedSubject.onNext(Unit)
             }
         }
         coroutineScope.launch {
-            tonKit.balanceSyncStateFlow.collect {
-                balanceState = convertToAdapterState(it)
+            tonKit.syncStateFlow.collect {
+                balanceState = it.toAdapterState()
                 balanceStateUpdatedSubject.onNext(Unit)
             }
         }
-        coroutineScope.launch {
-            tonKit.transactionsSyncStateFlow.collect {
-                transactionsState = convertToAdapterState(it)
-                transactionsStateUpdatedSubject.onNext(Unit)
-            }
-        }
-        tonKit.start()
+    }
+
+    private fun getBalanceFromAccount(account: Account?): BigDecimal {
+        return account?.balance?.toBigDecimal()?.movePointLeft(decimals) ?: BigDecimal.ZERO
     }
 
     override fun stop() {
-        tonKit.stop()
         coroutineScope.cancel()
     }
 
     override fun refresh() {
-//        tonKit.refresh()
     }
 
     override val debugInfo: String
         get() = ""
-
-    val statusInfo: Map<String, Any>
-        get() = buildMap {
-            put("Balance Sync State", balanceState)
-            put("Transaction Sync State", transactionsState)
-        }
-
 
     override var balanceState: AdapterState = AdapterState.Syncing()
     override val balanceStateUpdatedFlowable: Flowable<Unit>
@@ -131,179 +70,108 @@ class TonAdapter(
     override val balanceUpdatedFlowable: Flowable<Unit>
         get() = balanceUpdatedSubject.toFlowable(BackpressureStrategy.BUFFER)
 
-    override val receiveAddress = tonKit.receiveAddress
-    override val isMainNet = true
-
-    override val explorerTitle = "tonscan.org"
-    override var transactionsState: AdapterState = AdapterState.Syncing()
-    override val transactionsStateUpdatedFlowable: Flowable<Unit>
-        get() = transactionsStateUpdatedSubject.toFlowable(BackpressureStrategy.BUFFER)
-    override val lastBlockInfo: LastBlockInfo?
-        get() = null
-    override val lastBlockUpdatedFlowable: Flowable<Unit>
-        get() = Flowable.empty()
-
-    override fun getTransactionsAsync(
-        from: TransactionRecord?,
-        token: Token?,
-        limit: Int,
-        transactionType: FilterTransactionType,
-        address: String?,
-    ): Single<List<TransactionRecord>> {
-
-        return rxSingle {
-            val tonTransactionType = when (transactionType) {
-                FilterTransactionType.All -> null
-                FilterTransactionType.Incoming -> TransactionType.Incoming
-                FilterTransactionType.Outgoing -> TransactionType.Outgoing
-                FilterTransactionType.Swap -> return@rxSingle listOf<TransactionRecord>()
-                FilterTransactionType.Approve -> return@rxSingle listOf<TransactionRecord>()
-            }
-
-            tonKit
-                .transactions(from?.transactionHash, tonTransactionType, address, limit.toLong())
-                .map {
-                    createTransactionRecord(it)
-                }
-        }
-    }
-
-    private fun createTransactionRecord(transaction: TonTransactionWithTransfers): TransactionRecord {
-        val amount = transaction.amount?.toBigDecimal()?.movePointLeft(decimals)
-
-        val value = if (transaction.type == TransactionType.Outgoing) {
-            amount?.negate()
-        } else {
-            amount
-        } ?: BigDecimal.ZERO
-
-        val fee = transaction.fee?.toBigDecimal()?.movePointLeft(decimals)
-
-        val type = when (transaction.type) {
-            TransactionType.Incoming -> TonTransactionRecord.Type.Incoming
-            TransactionType.Outgoing -> TonTransactionRecord.Type.Outgoing
-            TransactionType.Unknown -> TonTransactionRecord.Type.Unknown
-        }
-
-        return TonTransactionRecord(
-            uid = transaction.hash,
-            transactionHash = transaction.hash,
-            logicalTime = transaction.lt,
-            blockHeight = null,
-            confirmationsThreshold = null,
-            timestamp = transaction.timestamp,
-            source = wallet.transactionSource,
-            mainValue = TransactionValue.CoinValue(wallet.token, value),
-            fee = fee?.let { TransactionValue.CoinValue(wallet.token, it) },
-            memo = transaction.memo,
-            type = type,
-            transfers = transaction.transfers.map { createTransferRecord(it) }
-        )
-    }
-
-    private fun createTransferRecord(transfer: TonTransfer): TonTransactionTransfer {
-        val amount = transfer.amount.toBigDecimal().movePointLeft(decimals)
-        return TonTransactionTransfer(
-            src = transfer.src.getNonBounceable(),
-            dest = transfer.dest.getNonBounceable(),
-            amount = TransactionValue.CoinValue(wallet.token, amount),
-        )
-    }
-
-    override fun getTransactionRecordsFlowable(
-        token: Token?,
-        transactionType: FilterTransactionType,
-        address: String?,
-    ): Flowable<List<TransactionRecord>> {
-        val tonTransactionType = when (transactionType) {
-            FilterTransactionType.All -> null
-            FilterTransactionType.Incoming -> TransactionType.Incoming
-            FilterTransactionType.Outgoing -> TransactionType.Outgoing
-            FilterTransactionType.Swap -> return Flowable.empty()
-            FilterTransactionType.Approve -> return Flowable.empty()
-        }
-
-        return tonKit.newTransactionsFlow
-            .map {
-                var filtered = it
-
-                if (tonTransactionType != null) {
-                    filtered = filtered.filter { it.type == tonTransactionType }
-                }
-
-                if (address != null) {
-                    val rawAddress = TonAddress.parse(address).toRaw()
-                    filtered = filtered.filter {
-                        it.transfers.any {
-                            it.src.toRaw() == rawAddress || it.dest.toRaw() == rawAddress
-                        }
-                    }
-                }
-
-                filtered
-            }
-            .filter { it.isNotEmpty() }
-            .map {
-                it.map {
-                    createTransactionRecord(it)
-                }
-            }
-            .asFlowable()
-    }
-
-    override fun getTransactionUrl(transactionHash: String): String {
-        return "https://tonscan.org/tx/$transactionHash"
-    }
-
-    private fun convertToAdapterState(syncState: SyncState) = when (syncState) {
-        is SyncState.NotSynced -> AdapterState.NotSynced(syncState.error)
-        is SyncState.Synced -> AdapterState.Synced
-        is SyncState.Syncing -> AdapterState.Syncing()
-    }
-
     override val availableBalance: BigDecimal
         get() = balance
 
-    override suspend fun send(amount: BigDecimal, address: String, memo: String?) {
-        tonKit.send(address, amount.movePointRight(decimals).toBigInteger().toString(), memo)
+    private fun getSendAmount(amount: BigDecimal) = when {
+        amount.compareTo(availableBalance) == 0 -> SendAmount.Max
+        else -> SendAmount.Amount(amount.movePointRight(decimals).toBigInteger())
     }
 
-    override suspend fun estimateFee(): BigDecimal {
-        return tonKit.estimateFee().toBigDecimal().movePointLeft(decimals)
+    override suspend fun send(amount: BigDecimal, address: FriendlyAddress, memo: String?) {
+        tonKit.send(address, getSendAmount(amount), memo)
+    }
+
+    override suspend fun estimateFee(amount: BigDecimal, address: FriendlyAddress, memo: String?): BigDecimal {
+        val estimateFee = tonKit.estimateFee(address, getSendAmount(amount), memo)
+        return estimateFee.toBigDecimal(decimals).stripTrailingZeros()
+    }
+
+    companion object {
+        fun getAmount(kitAmount: Long): BigDecimal {
+            return kitAmount.toBigDecimal().movePointLeft(9).stripTrailingZeros()
+        }
     }
 }
 
 class TonTransactionRecord(
-    uid: String,
-    transactionHash: String,
-    val logicalTime: Long,
-    blockHeight: Int?,
-    confirmationsThreshold: Int?,
-    timestamp: Long,
-    failed: Boolean = false,
-    spam: Boolean = false,
     source: TransactionSource,
-    override val mainValue: TransactionValue,
-    val fee: TransactionValue?,
-    val memo: String?,
-    val type: Type,
-    val transfers: List<TonTransactionTransfer>
+    event: Event,
+    baseToken: Token,
+    val actions: List<Action>
 ) : TransactionRecord(
-    uid,
-    transactionHash,
-    0,
-    blockHeight,
-    confirmationsThreshold,
-    timestamp,
-    failed,
-    spam,
-    source,
+    uid = event.id,
+    transactionHash = event.id,
+    transactionIndex = 0,
+    blockHeight = null,
+    confirmationsThreshold = null,
+    timestamp = event.timestamp,
+    failed = false,
+    spam = event.scam,
+    source = source,
 ) {
-    enum class Type {
-        Incoming, Outgoing, Unknown
+    val lt = event.lt
+    val inProgress = event.inProgress
+    val fee = TransactionValue.CoinValue(baseToken, TonAdapter.getAmount(event.extra.absoluteValue))
+
+    override fun status(lastBlockHeight: Int?) = when {
+        inProgress -> TransactionStatus.Pending
+        else -> TransactionStatus.Completed
     }
 
-    override fun status(lastBlockHeight: Int?) = TransactionStatus.Completed
+    override val mainValue: TransactionValue?
+        get() = actions.singleOrNull()?.let { action ->
+            when (val type = action.type) {
+                is Action.Type.Receive -> type.value
+                is Action.Type.Send -> type.value
+                is Action.Type.Burn -> type.value
+                is Action.Type.Mint -> type.value
+                is Action.Type.ContractCall -> type.value
+                is Action.Type.ContractDeploy,
+                is Action.Type.Swap,
+                is Action.Type.Unsupported -> null
+            }
+        }
+
+    data class Action(
+        val type: Type,
+        val status: TransactionStatus
+    ) {
+        sealed class Type {
+            data class Send(
+                val value: TransactionValue,
+                val to: String,
+                val sentToSelf: Boolean,
+                val comment: String?,
+            ) : Type()
+
+            data class Receive(
+                val value: TransactionValue,
+                val from: String,
+                val comment: String?,
+            ) : Type()
+
+            data class Burn(val value: TransactionValue) : Type()
+
+            data class Mint(val value: TransactionValue) : Type()
+
+            data class Swap(
+                val routerName: String?,
+                val routerAddress: String,
+                val valueIn: TransactionValue,
+                val valueOut: TransactionValue
+            ) : Type()
+
+            data class ContractDeploy(val interfaces: List<String>) : Type()
+
+            data class ContractCall(
+                val address: String,
+                val value: TransactionValue,
+                val operation: String
+            ) : Type()
+
+            data class Unsupported(val type: String) : Type()
+        }
+    }
 }
 
-data class TonTransactionTransfer(val src: String, val dest: String, val amount: TransactionValue.CoinValue)

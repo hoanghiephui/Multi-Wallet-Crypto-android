@@ -41,9 +41,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navGraphViewModels
@@ -69,6 +71,8 @@ import io.horizontalsystems.bankwallet.modules.manageaccount.dialogs.BackupRequi
 import io.horizontalsystems.bankwallet.modules.market.MarketScreen
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchModule
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchViewModel
+import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchModule
+import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchViewModel
 import io.horizontalsystems.bankwallet.modules.rooteddevice.RootedDeviceModule
 import io.horizontalsystems.bankwallet.modules.rooteddevice.RootedDeviceScreen
 import io.horizontalsystems.bankwallet.modules.rooteddevice.RootedDeviceViewModel
@@ -91,32 +95,26 @@ import se.warting.inappupdate.compose.findActivity
 import se.warting.inappupdate.compose.rememberInAppUpdateState
 
 class MainFragment : BaseComposeFragment() {
-
-    private val transactionsViewModel by navGraphViewModels<TransactionsViewModel>(R.id.mainFragment) { TransactionsModule.Factory() }
     private val searchViewModel by viewModels<MarketSearchViewModel> { MarketSearchModule.Factory() }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putBundle("nav_state", findNavController().saveState())
-    }
-
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
-        savedInstanceState?.let {
-            findNavController().restoreState(savedInstanceState.getBundle("nav_state"))
-        }
-    }
-
-
     @Composable
     override fun GetContent(navController: NavController) {
-        NiaBackground {
+        val backStackEntry = navController.safeGetBackStackEntry(R.id.mainFragment)
+
+        backStackEntry?.let {
+            val viewModel = ViewModelProvider(backStackEntry.viewModelStore,  TransactionsModule.Factory())
+                .get(TransactionsViewModel::class.java)
             MainScreenWithRootedDeviceCheck(
-                transactionsViewModel = transactionsViewModel,
+                transactionsViewModel = viewModel,
                 navController = navController,
                 searchViewModel = searchViewModel,
                 mainActivity = (activity as MainActivity)
             )
+        } ?: run {
+            // Back stack entry doesn't exist, restart activity
+            val intent = requireActivity().intent
+            intent.data = null
+            requireActivity().finishAffinity()
+            startActivity(intent)
         }
     }
 
@@ -420,5 +418,13 @@ private fun NotificationPermissionEffect() {
         if (status is PermissionStatus.Denied && !status.shouldShowRationale) {
             notificationsPermissionState.launchPermissionRequest()
         }
+    }
+}
+
+fun NavController.safeGetBackStackEntry(destinationId: Int): NavBackStackEntry? {
+    return try {
+        this.getBackStackEntry(destinationId)
+    } catch (e: IllegalArgumentException) {
+        null
     }
 }

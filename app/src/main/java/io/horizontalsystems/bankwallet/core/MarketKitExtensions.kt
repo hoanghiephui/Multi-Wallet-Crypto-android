@@ -50,6 +50,7 @@ val Token.swappable: Boolean
         BlockchainType.Polygon,
         BlockchainType.Avalanche,
         BlockchainType.Optimism,
+        BlockchainType.Base,
         BlockchainType.Gnosis,
         BlockchainType.Fantom,
         BlockchainType.ArbitrumOne -> true
@@ -70,7 +71,8 @@ val Token.protocolInfo: String
         }
         is TokenType.Eip20,
         is TokenType.Bep2,
-        is TokenType.Spl -> protocolType ?: ""
+        is TokenType.Spl,
+        is TokenType.Jetton -> protocolType ?: ""
         else -> ""
     }
 
@@ -82,6 +84,7 @@ val Token.typeInfo: String
         is TokenType.Eip20 -> type.address.shorten()
         is TokenType.Bep2 -> type.symbol
         is TokenType.Spl -> type.address.shorten()
+        is TokenType.Jetton -> type.address.shorten()
         is TokenType.Unsupported -> ""
     }
 
@@ -90,6 +93,7 @@ val Token.copyableTypeInfo: String?
         is TokenType.Eip20 -> type.address
         is TokenType.Bep2 -> type.symbol
         is TokenType.Spl -> type.address
+        is TokenType.Jetton -> type.address
         else -> null
     }
 
@@ -118,6 +122,7 @@ val TokenQuery.protocolType: String?
         }
 
         is TokenType.Bep2 -> "BEP2"
+        is TokenType.Jetton -> "JETTON"
         else -> blockchainType.title
     }
 
@@ -145,6 +150,7 @@ val TokenQuery.isSupported: Boolean
         BlockchainType.BinanceSmartChain,
         BlockchainType.Polygon,
         BlockchainType.Optimism,
+        BlockchainType.Base,
         BlockchainType.ArbitrumOne,
         BlockchainType.Gnosis,
         BlockchainType.Fantom,
@@ -161,7 +167,7 @@ val TokenQuery.isSupported: Boolean
             tokenType is TokenType.Native || tokenType is TokenType.Eip20
         }
         BlockchainType.Ton -> {
-            tokenType is TokenType.Native
+            tokenType is TokenType.Native || tokenType is TokenType.Jetton
         }
         is BlockchainType.Unsupported -> false
     }
@@ -180,6 +186,7 @@ val Blockchain.description: String
         BlockchainType.Polygon -> "MATIC, ERC20 tokens"
         BlockchainType.Avalanche -> "AVAX, ERC20 tokens"
         BlockchainType.Optimism -> "L2 chain"
+        BlockchainType.Base -> "L2 chain"
         BlockchainType.ArbitrumOne -> "L2 chain"
         BlockchainType.Solana -> "SOL, SPL tokens"
         BlockchainType.Gnosis -> "xDAI, ERC20 tokens"
@@ -190,6 +197,8 @@ val Blockchain.description: String
     }
 
 fun Blockchain.eip20TokenUrl(address: String) = eip3091url?.replace("\$ref", address)
+
+fun Blockchain.jettonUrl(address: String) = "https://tonviewer.com/$address"
 
 fun Blockchain.bep2TokenUrl(symbol: String) = "https://explorer.binance.org/asset/$symbol"
 
@@ -212,6 +221,7 @@ private val blockchainOrderMap: Map<BlockchainType, Int> by lazy {
         BlockchainType.Ton,
         BlockchainType.Solana,
         BlockchainType.Polygon,
+        BlockchainType.Base,
         BlockchainType.Avalanche,
         BlockchainType.Zcash,
         BlockchainType.BitcoinCash,
@@ -240,10 +250,12 @@ val BlockchainType.tokenIconPlaceholder: Int
         BlockchainType.Avalanche -> R.drawable.avalanche_erc20
         BlockchainType.Polygon -> R.drawable.polygon_erc20
         BlockchainType.Optimism -> R.drawable.optimism_erc20
+        BlockchainType.Base -> R.drawable.base_erc20
         BlockchainType.ArbitrumOne -> R.drawable.arbitrum_erc20
         BlockchainType.Gnosis -> R.drawable.gnosis_erc20
         BlockchainType.Fantom -> R.drawable.fantom_erc20
         BlockchainType.Tron -> R.drawable.tron_trc20
+        BlockchainType.Ton -> R.drawable.the_open_network_jetton
         else -> R.drawable.coin_placeholder
     }
 
@@ -262,6 +274,7 @@ val BlockchainType.title: String
     BlockchainType.ArbitrumOne -> "ArbitrumOne"
     BlockchainType.BinanceChain -> "BNB Beacon Coin"
     BlockchainType.Optimism -> "Optimism"
+    BlockchainType.Base -> "Base"
     BlockchainType.Solana -> "Solana"
     BlockchainType.Gnosis -> "Gnosis"
     BlockchainType.Fantom -> "Fantom"
@@ -287,6 +300,7 @@ val BlockchainType.brandColor: Color?
         BlockchainType.Polygon -> Color(0xFF8247E5)
         BlockchainType.Avalanche -> Color(0xFFD74F49)
         BlockchainType.Optimism -> Color(0xFFEB3431)
+        BlockchainType.Base -> Color(0xFF2759F6)
         BlockchainType.ArbitrumOne -> Color(0xFF96BEDC)
         else -> null
     }
@@ -322,6 +336,7 @@ fun BlockchainType.supports(accountType: AccountType): Boolean {
                     || this == BlockchainType.Polygon
                     || this == BlockchainType.Avalanche
                     || this == BlockchainType.Optimism
+                    || this == BlockchainType.Base
                     || this == BlockchainType.ArbitrumOne
                     || this == BlockchainType.Gnosis
                     || this == BlockchainType.Fantom
@@ -331,6 +346,7 @@ fun BlockchainType.supports(accountType: AccountType): Boolean {
                     || this == BlockchainType.Polygon
                     || this == BlockchainType.Avalanche
                     || this == BlockchainType.Optimism
+                    || this == BlockchainType.Base
                     || this == BlockchainType.ArbitrumOne
                     || this == BlockchainType.Gnosis
                     || this == BlockchainType.Fantom
@@ -565,6 +581,7 @@ val BlockchainType.Companion.supported: List<BlockchainType>
         BlockchainType.Polygon,
         BlockchainType.Avalanche,
         BlockchainType.Optimism,
+        BlockchainType.Base,
         BlockchainType.ArbitrumOne,
         BlockchainType.Gnosis,
         BlockchainType.Fantom,

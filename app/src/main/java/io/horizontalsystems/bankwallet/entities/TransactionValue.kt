@@ -1,5 +1,6 @@
 package io.horizontalsystems.bankwallet.entities
 
+import io.horizontalsystems.bankwallet.R
 import io.horizontalsystems.bankwallet.core.alternativeImageUrl
 import io.horizontalsystems.bankwallet.core.badge
 import io.horizontalsystems.bankwallet.core.iconPlaceholder
@@ -27,6 +28,33 @@ sealed class TransactionValue {
     abstract val formattedString: String
 
     open val nftUid: NftUid? = null
+
+    data class JettonValue(
+        val name: String,
+        val symbol: String,
+        override val decimals: Int,
+        val value: BigDecimal,
+        val image: String?
+    ) : TransactionValue() {
+        override val fullName = name
+        override val coinUid = symbol
+        override val coinCode = symbol
+        override val coin = null
+        override val badge = "JETTON"
+        override val coinIconUrl = image
+        override val alternativeCoinIconUrl = null
+        override val coinIconPlaceholder = R.drawable.the_open_network_jetton
+        override val decimalValue = value
+        override val zeroValue: Boolean
+            get() = value.compareTo(BigDecimal.ZERO) == 0
+        override val isMaxValue: Boolean
+            get() = value.isMaxValue(decimals)
+        override val abs: TransactionValue
+            get() = copy(value = value.abs())
+        override val formattedString: String
+            get() = "n/a"
+
+    }
 
     data class CoinValue(val token: Token, val value: BigDecimal) : TransactionValue() {
         override val coin: Coin = token.coin
