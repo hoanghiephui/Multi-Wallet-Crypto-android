@@ -47,8 +47,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.navGraphViewModels
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
@@ -56,7 +54,6 @@ import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
-import io.horizontalsystems.bankwallet.core.findActivity
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
@@ -69,8 +66,6 @@ import io.horizontalsystems.bankwallet.modules.keystore.NoSystemLockWarning
 import io.horizontalsystems.bankwallet.modules.main.MainModule.MainNavigation
 import io.horizontalsystems.bankwallet.modules.manageaccount.dialogs.BackupRequiredDialog
 import io.horizontalsystems.bankwallet.modules.market.MarketScreen
-import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchModule
-import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchViewModel
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchModule
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchViewModel
 import io.horizontalsystems.bankwallet.modules.rooteddevice.RootedDeviceModule
@@ -86,12 +81,10 @@ import io.horizontalsystems.bankwallet.modules.walletconnect.WCManager.SupportSt
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.NiaNavigationBar
 import io.horizontalsystems.bankwallet.ui.compose.NiaNavigationBarItem
-import io.horizontalsystems.bankwallet.ui.compose.components.NiaBackground
 import io.horizontalsystems.bankwallet.ui.extensions.HeaderUpdate
 import io.horizontalsystems.bankwallet.ui.extensions.rememberLifecycleEvent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import se.warting.inappupdate.compose.findActivity
 import se.warting.inappupdate.compose.rememberInAppUpdateState
 
 class MainFragment : BaseComposeFragment() {
@@ -101,8 +94,7 @@ class MainFragment : BaseComposeFragment() {
         val backStackEntry = navController.safeGetBackStackEntry(R.id.mainFragment)
 
         backStackEntry?.let {
-            val viewModel = ViewModelProvider(backStackEntry.viewModelStore,  TransactionsModule.Factory())
-                .get(TransactionsViewModel::class.java)
+            val viewModel = ViewModelProvider(backStackEntry.viewModelStore,  TransactionsModule.Factory())[TransactionsViewModel::class.java]
             MainScreenWithRootedDeviceCheck(
                 transactionsViewModel = viewModel,
                 navController = navController,

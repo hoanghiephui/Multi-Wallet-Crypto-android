@@ -369,7 +369,7 @@
             android:icon="@mipmap/launcher_ivfun"
             android:label="@string/App_Name"
             android:exported="true"
-            android:targetActivity=".modules.main.MainActivity">
+            android:targetActivity="io.horizontalsystems.bankwallet.modules.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -401,7 +401,7 @@
             android:icon="@mipmap/launcher_duck"
             android:label="@string/App_Name"
             android:exported="true"
-            android:targetActivity=".modules.main.MainActivity">
+            android:targetActivity="io.horizontalsystems.bankwallet.modules.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
