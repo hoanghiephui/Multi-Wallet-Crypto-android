@@ -76,6 +76,7 @@ import io.horizontalsystems.bankwallet.core.managers.SystemInfoManager
 import io.horizontalsystems.bankwallet.core.managers.TermsManager
 import io.horizontalsystems.bankwallet.core.managers.TokenAutoEnableManager
 import io.horizontalsystems.bankwallet.core.managers.TonAccountManager
+import io.horizontalsystems.bankwallet.core.managers.TonConnectManager
 import io.horizontalsystems.bankwallet.core.managers.TonKitManager
 import io.horizontalsystems.bankwallet.core.managers.TorManager
 import io.horizontalsystems.bankwallet.core.managers.TransactionAdapterManager
@@ -220,6 +221,7 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         lateinit var backupProvider: BackupProvider
         lateinit var spamManager: SpamManager
         lateinit var statsManager: StatsManager
+        lateinit var tonConnectManager: TonConnectManager
         lateinit var mUserDataRepository: UserDataRepository
     }
     @Inject
@@ -478,6 +480,9 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         )
 
         spamManager = SpamManager(localStorage)
+
+        tonConnectManager = TonConnectManager(this, adapterFactory)
+        tonConnectManager.start()
 
         startTasks()
         setAnalytic()

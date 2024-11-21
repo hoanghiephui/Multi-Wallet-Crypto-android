@@ -4,10 +4,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.tonapps.wallet.data.core.entity.SendRequestEntity
+import com.tonapps.wallet.data.tonconnect.entities.DAppRequestEntity
 import com.walletconnect.web3.wallet.client.Wallet
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.IAccountManager
 import io.horizontalsystems.bankwallet.core.ILocalStorage
+import io.horizontalsystems.bankwallet.core.managers.TonConnectManager
 import io.horizontalsystems.bankwallet.core.managers.UserManager
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCDelegate
 import io.horizontalsystems.core.IKeyStoreManager
@@ -22,11 +25,14 @@ class MainActivityViewModel(
     private val pinComponent: IPinComponent,
     private val systemInfoManager: ISystemInfoManager,
     private val keyStoreManager: IKeyStoreManager,
-    private val localStorage: ILocalStorage
+    private val localStorage: ILocalStorage,
+    private val tonConnectManager: TonConnectManager
 ) : ViewModel() {
 
     val navigateToMainLiveData = MutableLiveData(false)
     val wcEvent = MutableLiveData<Wallet.Model?>()
+    val tcSendRequest = MutableLiveData<SendRequestEntity?>()
+    val tcDappRequest = MutableLiveData<DAppRequestEntity?>()
 
     init {
         viewModelScope.launch {
@@ -39,10 +45,28 @@ class MainActivityViewModel(
                 wcEvent.postValue(it)
             }
         }
+        viewModelScope.launch {
+            tonConnectManager.sendRequestFlow.collect {
+                tcSendRequest.postValue(it)
+            }
+        }
+        viewModelScope.launch {
+            tonConnectManager.dappRequestFlow.collect {
+                tcDappRequest.postValue(it)
+            }
+        }
     }
 
     fun onWcEventHandled() {
         wcEvent.postValue(null)
+    }
+
+    fun onTcSendRequestHandled() {
+        tcSendRequest.postValue(null)
+    }
+
+    fun onTcDappRequestHandled() {
+        tcDappRequest.postValue(null)
     }
 
     fun validate() {
@@ -71,6 +95,8 @@ class MainActivityViewModel(
                 throw MainScreenValidationError.UserAuthentication()
             } catch (e: KeyStoreValidationError.KeyIsInvalid) {
                 throw MainScreenValidationError.KeyInvalidated()
+            } catch (e: RuntimeException) {
+                throw MainScreenValidationError.KeystoreRuntimeException()
             }
         }
     }
@@ -82,7 +108,15 @@ class MainActivityViewModel(
     class Factory : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return MainActivityViewModel(App.userManager, App.accountManager, App.pinComponent, App.systemInfoManager, App.keyStoreManager, App.localStorage) as T
+            return MainActivityViewModel(
+                App.userManager,
+                App.accountManager,
+                App.pinComponent,
+                App.systemInfoManager,
+                App.keyStoreManager,
+                App.localStorage,
+                App.tonConnectManager,
+            ) as T
         }
     }
 }
@@ -93,6 +127,7 @@ sealed class MainScreenValidationError : Exception() {
     class NoSystemLock : MainScreenValidationError()
     class KeyInvalidated : MainScreenValidationError()
     class UserAuthentication : MainScreenValidationError()
+    class KeystoreRuntimeException : MainScreenValidationError()
 
     class UseAppNotWallet: MainScreenValidationError()
 

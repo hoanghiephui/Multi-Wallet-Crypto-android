@@ -3,20 +3,24 @@ package io.horizontalsystems.bankwallet.modules.market
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.MarqueeSpacing
 import androidx.compose.foundation.background
-import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Search
@@ -35,8 +39,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
@@ -45,6 +51,7 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import io.horizontalsystems.bankwallet.core.App
 import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
@@ -58,6 +65,7 @@ import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.core.stats.statPage
 import io.horizontalsystems.bankwallet.core.stats.statSection
 import io.horizontalsystems.bankwallet.core.stats.statTab
+import io.horizontalsystems.bankwallet.entities.Currency
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
 import io.horizontalsystems.bankwallet.modules.main.MainModule
 import io.horizontalsystems.bankwallet.modules.main.MainViewModel
@@ -72,13 +80,20 @@ import io.horizontalsystems.bankwallet.modules.market.toppairs.TopPairsScreen
 import io.horizontalsystems.bankwallet.modules.market.topplatforms.TopPlatforms
 import io.horizontalsystems.bankwallet.modules.metricchart.MetricsType
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
+import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
+import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
+import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.ScrollableTabs
 import io.horizontalsystems.bankwallet.ui.compose.components.TabItem
+import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.caption_bran
 import io.horizontalsystems.bankwallet.ui.compose.components.caption_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.caption_lucian
 import io.horizontalsystems.bankwallet.ui.compose.components.caption_remus
+import io.horizontalsystems.bankwallet.ui.compose.components.micro_grey
+import io.horizontalsystems.marketkit.models.MarketGlobal
+import java.math.BigDecimal
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -188,7 +203,9 @@ fun MarketScreen(
                 .padding(top = 92.dp)
                 .background(ComposeAppTheme.colors.tyler)
         ) {
-            MetricsBoard(navController, uiState.marketOverviewItems)
+            Crossfade(uiState.marketGlobal, label = "") {
+                MetricsBoard(navController, it, uiState.currency)
+            }
             HorizontalDivider(
                 color = ComposeAppTheme.colors.steel10,
                 thickness = 1.dp
@@ -262,46 +279,136 @@ fun TabsSection(
     }
 }
 
+private fun formatFiatShortened(value: BigDecimal, symbol: String): String {
+    return App.numberFormatter.formatFiatShort(value, symbol, 2)
+}
+
+private fun getDiff(it: BigDecimal): String {
+    val sign = if (it >= BigDecimal.ZERO) "+" else "-"
+    return App.numberFormatter.format(it.abs(), 0, 2, sign, "%")
+}
+
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MetricsBoard(
     navController: NavController,
-    marketOverviewItems: List<MarketModule.MarketOverviewViewItem>
+    marketGlobal: MarketGlobal?,
+    currency: Currency
 ) {
     Row(
         modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth()
-            .height(40.dp)
-            .background(ComposeAppTheme.colors.tyler)
-            .basicMarquee(
-                iterations = Int.MAX_VALUE,
-                spacing = MarqueeSpacing(0.dp)
-            ),
-        verticalAlignment = Alignment.CenterVertically
+            .height(IntrinsicSize.Min)
+            .clip(RoundedCornerShape(12.dp))
+            .background(ComposeAppTheme.colors.lawrence)
     ) {
-        HSpacer(4.dp)
-        marketOverviewItems.forEach { item ->
-            Row(
-                modifier = Modifier
-                    .clickable {
-                        openMetricsPage(item.metricsType, navController)
-                    }
-                    .padding(8.dp)
-            ) {
-                HSpacer(12.dp)
-                caption_grey(text = item.title)
-                HSpacer(4.dp)
-                caption_bran(text = item.value)
-                HSpacer(4.dp)
-                if (item.changePositive) {
-                    caption_remus(text = item.change)
-                } else {
-                    caption_lucian(text = item.change)
-                }
-                HSpacer(12.dp)
+        MarketTotalCard(
+            title = stringResource(R.string.MarketGlobalMetrics_TotalMarketCap),
+            value = marketGlobal?.marketCap,
+            change = marketGlobal?.marketCapChange,
+            currency = currency,
+            onClick = {
+                openMetricsPage(MetricsType.TotalMarketCap, navController)
             }
+        )
+
+        VDivider()
+
+        MarketTotalCard(
+            title = stringResource(R.string.MarketGlobalMetrics_Volume),
+            value = marketGlobal?.volume,
+            change = marketGlobal?.volumeChange,
+            currency = currency,
+            onClick = {
+                openMetricsPage(MetricsType.Volume24h, navController)
+            }
+        )
+
+        VDivider()
+
+        MarketTotalCard(
+            title = stringResource(R.string.MarketGlobalMetrics_TvlInDefi),
+            value = marketGlobal?.tvl,
+            change = marketGlobal?.tvlChange,
+            currency = currency,
+            onClick = {
+                openMetricsPage(MetricsType.TvlInDefi, navController)
+            }
+        )
+
+        VDivider()
+
+        MarketTotalCard(
+            title = stringResource(R.string.MarketGlobalMetrics_EtfInflow),
+            value = marketGlobal?.etfTotalInflow,
+            change = marketGlobal?.etfDailyInflow,
+            currency = currency,
+            onClick = {
+                openMetricsPage(MetricsType.Etf, navController)
+            }
+        )
+    }
+}
+
+@Composable
+private fun VDivider() {
+    Box(
+        Modifier
+            .fillMaxHeight()
+            .width(1.dp)
+            .background(color = ComposeAppTheme.colors.steel10)
+    )
+}
+
+@Composable
+private fun RowScope.MarketTotalCard(
+    title: String,
+    value: BigDecimal?,
+    change: BigDecimal?,
+    currency: Currency,
+    onClick: () -> Unit,
+) {
+    val changeStr = change?.let { getDiff(it) }
+    val changePositive = change?.let { it > BigDecimal.ZERO }
+    Column(
+        modifier = Modifier
+            .weight(1f)
+            .padding(12.dp)
+            .clickable(onClick = onClick)
+    ) {
+        micro_grey(
+            text = title,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1
+        )
+        VSpacer(4.dp)
+        caption_bran(
+            text = value?.let { formatFiatShortened(it, currency.symbol) } ?: "---",
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1
+        )
+        VSpacer(4.dp)
+        if (changePositive == null) {
+            caption_grey(
+                text = changeStr ?: "---",
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
+            )
+        } else if (changePositive) {
+            caption_remus(
+                text = changeStr ?: "---",
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
+            )
+        } else {
+            caption_lucian(
+                text = changeStr ?: "---",
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
+            )
         }
-        HSpacer(4.dp)
     }
 }
 

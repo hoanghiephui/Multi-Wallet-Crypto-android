@@ -339,6 +339,11 @@ class MainViewModel(
                 }
             }
 
+//            deeplinkString.startsWith("tc:") -> {
+//                deeplinkPage = DeeplinkPage(R.id.tcListFragment, TonConnectMainFragment.Input(deeplinkString))
+//                tab = MainNavigation.Settings
+//            }
+
             deeplinkString.startsWith("https://unstoppable.money/referral") -> {
                 val userId: String? = deepLink.getQueryParameter("userId")
                 val referralCode: String? = deepLink.getQueryParameter("referralCode")

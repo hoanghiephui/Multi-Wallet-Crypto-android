@@ -43,7 +43,13 @@ class SendEvmConfirmationFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent(navController: NavController) {
-        SendEvmConfirmationScreen(navController, navController.requireInput())
+        val input = try {
+            navController.requireInput<Input>()
+        } catch (e: NullPointerException) {
+            navController.popBackStack()
+            return
+        }
+        SendEvmConfirmationScreen(navController, input)
     }
 
     override val logScreen: String
