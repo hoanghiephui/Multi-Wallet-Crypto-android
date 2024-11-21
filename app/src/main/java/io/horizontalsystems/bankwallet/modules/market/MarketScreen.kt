@@ -3,7 +3,6 @@ package io.horizontalsystems.bankwallet.modules.market
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -42,20 +42,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.traversalIndex
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import io.horizontalsystems.bankwallet.core.App
 import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.core.AdViewState
+import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
@@ -80,10 +80,6 @@ import io.horizontalsystems.bankwallet.modules.market.toppairs.TopPairsScreen
 import io.horizontalsystems.bankwallet.modules.market.topplatforms.TopPlatforms
 import io.horizontalsystems.bankwallet.modules.metricchart.MetricsType
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
-import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
-import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
-import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
-import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.ScrollableTabs
 import io.horizontalsystems.bankwallet.ui.compose.components.TabItem
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
@@ -118,7 +114,10 @@ fun MarketScreen(
         marketViewModel.loadAds(it, BuildConfig.HOME_MARKET_NATIVE)
     }
 
-    Box(Modifier.fillMaxSize()) {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .statusBarsPadding()) {
         Box(
             Modifier
                 .semantics { isTraversalGroup = true }
@@ -128,8 +127,7 @@ fun MarketScreen(
             DockedSearchBar(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .semantics { traversalIndex = -1f }
-                    .padding(top = 33.dp),
+                    .semantics { traversalIndex = -1f },
                 query = text,
                 onQueryChange = {
                     text = it
@@ -200,7 +198,7 @@ fun MarketScreen(
         Column(
             Modifier
                 .fillMaxSize()
-                .padding(top = 92.dp)
+                .padding(top = 60.dp)
                 .background(ComposeAppTheme.colors.tyler)
         ) {
             Crossfade(uiState.marketGlobal, label = "") {
@@ -289,7 +287,6 @@ private fun getDiff(it: BigDecimal): String {
 }
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MetricsBoard(
     navController: NavController,

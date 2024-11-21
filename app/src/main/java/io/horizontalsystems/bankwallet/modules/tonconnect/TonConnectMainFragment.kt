@@ -16,4 +16,7 @@ class TonConnectMainFragment : BaseComposeFragment() {
 
     @Parcelize
     data class Input(val deepLinkUri: String) : Parcelable
+
+    override val logScreen: String
+        get() = "TonConnectMainFragment"
 }

@@ -9,4 +9,7 @@ class TonConnectSendRequestFragment : BaseComposeFragment() {
     override fun GetContent(navController: NavController) {
         TonConnectSendRequestScreen(navController)
     }
+
+    override val logScreen: String
+        get() = "TonConnectSendRequestFragment"
 }

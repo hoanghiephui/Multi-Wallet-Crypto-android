@@ -19,7 +19,6 @@ fun MarketsHorizontalCards(
     val pagerState = rememberPagerState(pageCount = { pageCount })
     HorizontalPager(
         state = pagerState,
-        beyondBoundsPageCount = 1,
         pageSize = object : PageSize {
             override fun Density.calculateMainAxisPageSize(
                 availableSpace: Int,

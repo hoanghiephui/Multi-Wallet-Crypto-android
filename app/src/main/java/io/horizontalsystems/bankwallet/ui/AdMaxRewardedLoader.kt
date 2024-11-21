@@ -61,16 +61,6 @@ class AdMaxRewardedLoader(private val callback: AdRewardedCallback) {
                 rewardedAd.destroy()
             }
 
-            @Deprecated("Deprecated in Java")
-            override fun onRewardedVideoStarted(p0: MaxAd) {
-
-            }
-
-            @Deprecated("Deprecated in Java")
-            override fun onRewardedVideoCompleted(p0: MaxAd) {
-
-            }
-
         })
         rewardedAd.loadAd()
         dialog?.show()

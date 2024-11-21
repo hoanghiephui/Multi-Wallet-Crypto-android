@@ -10,4 +10,7 @@ class TonConnectNewFragment : BaseComposeFragment() {
     override fun GetContent(navController: NavController) {
         TonConnectNewScreen(navController, navController.requireInput())
     }
+
+    override val logScreen: String
+        get() = "TonConnectNewFragment"
 }

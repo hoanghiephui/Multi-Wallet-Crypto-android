@@ -140,7 +140,6 @@ fun RowScope.HsBottomNavigationItem(
     // The color of the Ripple should always the selected color, as we want to show the color
     // before the item is considered selected, and hence before the new contentColor is
     // provided by BottomNavigationTransition.
-    val ripple = rememberRipple(bounded = false, color = selectedContentColor)
 
     Box(
         modifier
@@ -151,7 +150,7 @@ fun RowScope.HsBottomNavigationItem(
                 enabled = enabled,
                 role = Role.Tab,
                 interactionSource = interactionSource,
-                indication = ripple
+                indication = null
             )
             .weight(1f),
         contentAlignment = Alignment.Center

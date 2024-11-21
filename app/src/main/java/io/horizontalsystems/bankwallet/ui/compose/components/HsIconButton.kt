@@ -39,7 +39,7 @@ fun HsIconButton(
                 enabled = enabled,
                 role = Role.Button,
                 interactionSource = interactionSource,
-                indication = rememberRipple(bounded = false, radius = RippleRadius, color = rippleColor)
+                indication = null
             ),
         contentAlignment = Alignment.Center
     ) {

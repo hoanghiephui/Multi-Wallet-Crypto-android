@@ -7,8 +7,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -17,7 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.LocalizedException
 import io.horizontalsystems.bankwallet.core.slideFromRight
@@ -46,8 +47,15 @@ class GuidesFragment : BaseComposeFragment() {
         GuidesScreen(navController)
     }
 
+    override val logScreen: String
+        get() = "GuidesFragment"
+    /*.basicMarquee(
+        iterations = Int.MAX_VALUE,
+        spacing = MarqueeSpacing(0.dp)
+    )*/
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GuidesScreen(navController: NavController) {
     val viewModel = viewModel<GuidesViewModel>(factory = GuidesModule.Factory())
@@ -86,7 +94,8 @@ fun GuidesScreen(navController: NavController) {
                 ViewState.Success -> {
                     if (selectedCategory != null) {
                         Column {
-                            val tabItems = categories.map { TabItem(it.category, it == selectedCategory, it) }
+                            val tabItems =
+                                categories.map { TabItem(it.category, it == selectedCategory, it) }
                             ScrollableTabs(tabItems) { tab ->
                                 viewModel.onSelectCategory(tab)
                             }
@@ -139,7 +148,10 @@ fun GuidesScreen(navController: NavController) {
                                                         MarkdownFragment.Input(guide.markdown, true)
                                                     )
 
-                                                    stat(page = StatPage.Academy, event = StatEvent.OpenArticle(guide.markdown))
+                                                    stat(
+                                                        page = StatPage.Academy,
+                                                        event = StatEvent.OpenArticle(guide.markdown)
+                                                    )
                                                 }
                                             ) {
                                                 body_leah(guide.title)

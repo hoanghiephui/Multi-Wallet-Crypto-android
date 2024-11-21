@@ -136,8 +136,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import java.security.MessageDigest
 import timber.log.Timber
+import java.security.MessageDigest
 import java.util.Collections
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -147,6 +147,7 @@ import androidx.work.Configuration as WorkConfiguration
 @HiltAndroidApp
 class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     companion object : ICoreApp by CoreApp {
         lateinit var appLoVinSdk: AppLovinSdk
         lateinit var appLovinSdkInitialization: AppLovinSdkInitializationConfiguration
@@ -224,6 +225,7 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         lateinit var tonConnectManager: TonConnectManager
         lateinit var mUserDataRepository: UserDataRepository
     }
+
     @Inject
     lateinit var userDataRepository: UserDataRepository
 
@@ -277,7 +279,8 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
 
         blockchainSettingsStorage = BlockchainSettingsStorage(appDatabase)
         evmSyncSourceStorage = EvmSyncSourceStorage(appDatabase)
-        evmSyncSourceManager = EvmSyncSourceManager(appConfigProvider, blockchainSettingsStorage, evmSyncSourceStorage)
+        evmSyncSourceManager =
+            EvmSyncSourceManager(appConfigProvider, blockchainSettingsStorage, evmSyncSourceStorage)
 
         btcBlockchainManager = BtcBlockchainManager(blockchainSettingsStorage, marketKit)
 
@@ -293,7 +296,8 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         userManager = UserManager(accountManager)
 
         val proFeaturesStorage = ProFeaturesStorage(appDatabase)
-        proFeatureAuthorizationManager = ProFeaturesAuthorizationManager(proFeaturesStorage, accountManager, appConfigProvider)
+        proFeatureAuthorizationManager =
+            ProFeaturesAuthorizationManager(proFeaturesStorage, accountManager, appConfigProvider)
 
         enabledWalletsStorage = EnabledWalletsStorage(appDatabase)
         walletStorage = WalletStorage(marketKit, enabledWalletsStorage)
@@ -303,7 +307,12 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
 
         solanaRpcSourceManager = SolanaRpcSourceManager(blockchainSettingsStorage, marketKit)
         val solanaWalletManager = SolanaWalletManager(walletManager, accountManager, marketKit)
-        solanaKitManager = SolanaKitManager(appConfigProvider, solanaRpcSourceManager, solanaWalletManager, backgroundManager)
+        solanaKitManager = SolanaKitManager(
+            appConfigProvider,
+            solanaRpcSourceManager,
+            solanaWalletManager,
+            backgroundManager
+        )
 
         tronKitManager = TronKitManager(appConfigProvider, backgroundManager)
         tonKitManager = TonKitManager(backgroundManager)
@@ -350,7 +359,8 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         )
         tronAccountManager.start()
 
-        val tonAccountManager = TonAccountManager(accountManager, walletManager, tonKitManager, tokenAutoEnableManager)
+        val tonAccountManager =
+            TonAccountManager(accountManager, walletManager, tonKitManager, tokenAutoEnableManager)
         tonAccountManager.start()
 
         systemInfoManager = SystemInfoManager(appConfigProvider)
@@ -362,7 +372,8 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         connectivityManager = ConnectivityManager(backgroundManager)
 
         zcashBirthdayProvider = ZcashBirthdayProvider(this)
-        restoreSettingsManager = RestoreSettingsManager(restoreSettingsStorage, zcashBirthdayProvider)
+        restoreSettingsManager =
+            RestoreSettingsManager(restoreSettingsStorage, zcashBirthdayProvider)
 
         evmLabelManager = EvmLabelManager(
             EvmLabelProvider(),
@@ -407,7 +418,13 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
             backgroundManager = backgroundManager
         )
 
-        statsManager = StatsManager(appDatabase.statsDao(), localStorage, marketKit, appConfigProvider, backgroundManager)
+        statsManager = StatsManager(
+            appDatabase.statsDao(),
+            localStorage,
+            marketKit,
+            appConfigProvider,
+            backgroundManager
+        )
 
         rateAppManager = RateAppManager(walletManager, adapterManager, localStorage)
 
@@ -417,7 +434,8 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         termsManager = TermsManager(localStorage)
 
         marketWidgetManager = MarketWidgetManager()
-        marketFavoritesManager = MarketFavoritesManager(appDatabase, localStorage, marketWidgetManager)
+        marketFavoritesManager =
+            MarketFavoritesManager(appDatabase, localStorage, marketWidgetManager)
 
         marketWidgetRepository = MarketWidgetRepository(
             marketKit,
@@ -429,7 +447,8 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
             currencyManager
         )
 
-        releaseNotesManager = ReleaseNotesManager(systemInfoManager, localStorage, appConfigProvider)
+        releaseNotesManager =
+            ReleaseNotesManager(systemInfoManager, localStorage, appConfigProvider)
 
         setAppTheme()
 
@@ -449,7 +468,8 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         contactsRepository = ContactsRepository(marketKit)
         cexProviderManager = CexProviderManager(accountManager)
         cexAssetManager = CexAssetManager(marketKit, appDatabase.cexAssetsDao())
-        chartIndicatorManager = ChartIndicatorManager(appDatabase.chartIndicatorSettingsDao(), localStorage)
+        chartIndicatorManager =
+            ChartIndicatorManager(appDatabase.chartIndicatorSettingsDao(), localStorage)
 
         backupProvider = BackupProvider(
             localStorage = localStorage,
@@ -554,10 +574,10 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
                 .setMinimumLoggingLevel(Log.DEBUG)
                 .build()
         } else {
-        WorkConfiguration.Builder()
-            .setMinimumLoggingLevel(Log.ERROR)
-            .build()
-    }
+            WorkConfiguration.Builder()
+                .setMinimumLoggingLevel(Log.ERROR)
+                .build()
+        }
 
     override fun localizedContext(): Context {
         return localeAwareContext(this)
@@ -582,18 +602,18 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
             ).signingInfo
 
             when {
-                signingInfo.hasMultipleSigners() -> signingInfo.apkContentsSigners // Send all with apkContentsSigners
-                else -> signingInfo.signingCertificateHistory // Send one with signingCertificateHistory
+                signingInfo?.hasMultipleSigners() == true -> signingInfo.apkContentsSigners // Send all with apkContentsSigners
+                else -> signingInfo?.signingCertificateHistory // Send one with signingCertificateHistory
             }
         } else {
             packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES).signatures
         }
 
-        signatureList.map {
+        signatureList?.map {
             val digest = MessageDigest.getInstance("SHA")
             digest.update(it.toByteArray())
             digest.digest()
-        }
+        } ?: emptyList()
     } catch (e: Exception) {
         // Handle error
         emptyList()
@@ -626,21 +646,16 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
     private fun initApplovin() {
         if (SHOW_ADS) {
             applicationScope.launch {
-                val currentGaid = AdvertisingIdClient.getAdvertisingIdInfo(this@App).id
-                val testDeviceAdvertisingIds = if (currentGaid != null) {
-                    Collections.singletonList(currentGaid)
-                } else emptyList()
                 val initConfig = AppLovinSdkInitializationConfiguration.builder(
                     getString(R.string.APPLOVIN_SDK_KEY),
                     this@App
                 )
                     .setMediationProvider(AppLovinMediationProvider.MAX)
-                    .setTestDeviceAdvertisingIds(testDeviceAdvertisingIds)
                     .build()
                 // Initialize the AppLovin SDK
-                val sdk = AppLovinSdk.getInstance(this@App)
-                appLovinSdkInitialization = initConfig
-                appLoVinSdk = sdk
+                AppLovinSdk.getInstance(this@App).initialize(initConfig) {
+
+                }
             }
 
         }
