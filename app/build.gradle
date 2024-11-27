@@ -51,6 +51,10 @@ android {
         resValue "string", "walletConnectAppMetaDataIcon", "https://raw.githubusercontent.com/hoanghiephui/unstoppable-wallet-android/master/ic_launcher-playstore.png"
         resValue "string", "accountsBackupFileSalt", "unstoppable"
 
+        ndk {
+            abiFilters "armeabi-v7a", "arm64-v8a"
+        }
+
         if (!localProperties['keyApplovin']) {
             logger.warn('keyApplovin must be set for signature verification. ' +
                     'You can add it to local.properties once you have gotten it from Applovin. ' +
@@ -101,7 +105,7 @@ android {
             resValue "string", "ftmscanApiKey", "57YQ2GIRAZNV6M5HIJYYG3XQGGNIPVV8MF"
             resValue "string", "basescanApiKey", "AKEWS351FN9P9E2CFPWRWQVGHYUP7W8SUF"
             resValue "string", "is_release", "false"
-            resValue "string", "guidesUrl", "https://raw.githubusercontent.com/horizontalsystems/Unstoppable-Wallet-Website/master/src/edu.json"
+            resValue "string", "guidesUrl", "https://raw.githubusercontent.com/horizontalsystems/Unstoppable-Wallet-Website/refs/tags/v1.4/src/edu.json"
             resValue "string", "faqUrl", "https://raw.githubusercontent.com/hoanghiephui/Unstoppable-Wallet-Website/compose/src/faq.json"
             resValue "string", "coinsJsonUrl", "https://raw.githubusercontent.com/horizontalsystems/cryptocurrencies/master/coins.json"
             resValue "string", "providerCoinsJsonUrl", "https://raw.githubusercontent.com/horizontalsystems/cryptocurrencies/master/provider.coins.json"
@@ -140,7 +144,7 @@ android {
             resValue "string", "ftmscanApiKey", "JAWRPW27KEMVXMJJ9UKY63CVPH3X5V9SMP"
             resValue "string", "basescanApiKey", "QU4RJVJXQCW812J3234EW9EV815TA6XC55"
             resValue "string", "is_release", "true"
-            resValue "string", "guidesUrl", "https://raw.githubusercontent.com/horizontalsystems/Unstoppable-Wallet-Website/master/src/edu.json"
+            resValue "string", "guidesUrl", "https://raw.githubusercontent.com/horizontalsystems/Unstoppable-Wallet-Website/refs/tags/v1.4/src/edu.json"
             resValue "string", "faqUrl", "https://raw.githubusercontent.com/hoanghiephui/Unstoppable-Wallet-Website/compose/src/faq.json"
             resValue "string", "coinsJsonUrl", "https://raw.githubusercontent.com/horizontalsystems/cryptocurrencies/v0.21/coins.json"
             resValue "string", "providerCoinsJsonUrl", "https://raw.githubusercontent.com/horizontalsystems/cryptocurrencies/v0.21/provider.coins.json"
@@ -196,19 +200,15 @@ android {
 
     configurations.configureEach { c ->
         c.resolutionStrategy.dependencySubstitution {
-            substitute module('org.bouncycastle:bcprov-jdk15on:1.65.01') using module('org.bouncycastle:bcprov-jdk18on:1.77')
-            substitute module('org.bouncycastle:bcprov-jdk15on:1.70') using module('org.bouncycastle:bcprov-jdk18on:1.77')
-            substitute module('org.bouncycastle:bcprov-jdk15on:1.66') using module('org.bouncycastle:bcprov-jdk18on:1.77')
-            substitute module('org.bouncycastle:bcprov-jdk15to18:1.68') using module('org.bouncycastle:bcprov-jdk18on:1.77')
+            substitute module('org.bouncycastle:bcprov-jdk15to18:1.68') using module('org.bouncycastle:bcprov-jdk15on:1.65')
             substitute module('com.google.protobuf:protobuf-java:3.6.1') using module('com.google.protobuf:protobuf-javalite:3.21.1')
             substitute module('net.jcip:jcip-annotations:1.0') using module('com.github.stephenc.jcip:jcip-annotations:1.0-1')
 
-            substitute module('com.tinder.scarlet:scarlet-core:0.1.12') using module('com.walletconnect.Scarlet:scarlet-core:1.0.1')
-            substitute module('com.tinder.scarlet:scarlet:0.1.12') using module('com.walletconnect.Scarlet:scarlet:1.0.1')
-            substitute module('com.tinder.scarlet:websocket-okhttp:0.1.12') using module('com.walletconnect.Scarlet:websocket-okhttp:1.0.1')
-            substitute module('com.tinder.scarlet:stream-adapter-built-in:0.1.12') using module('com.walletconnect.Scarlet:stream-adapter-built-in:1.0.1')
-            substitute module('com.tinder.scarlet:message-adapter-built-in:0.1.12') using module('com.walletconnect.Scarlet:message-adapter-built-in:1.0.1')
-            substitute module('com.tinder.scarlet:lifecycle-android:0.1.12') using module('com.walletconnect.Scarlet:lifecycle-android:1.0.1')
+            substitute module('com.tinder.scarlet:scarlet:0.1.12') using module('com.github.WalletConnect.Scarlet:scarlet:1.0.0')
+            substitute module('com.tinder.scarlet:websocket-okhttp:0.1.12') using module('com.github.WalletConnect.Scarlet:websocket-okhttp:1.0.0')
+            substitute module('com.tinder.scarlet:stream-adapter-rxjava2:0.1.12') using module('com.github.WalletConnect.Scarlet:stream-adapter-rxjava2:1.0.0')
+            substitute module('com.tinder.scarlet:message-adapter-gson:0.1.12') using module('com.github.WalletConnect.Scarlet:message-adapter-gson:1.0.0')
+            substitute module('com.tinder.scarlet:lifecycle-android:0.1.12') using module('com.github.WalletConnect.Scarlet:lifecycle-android:1.0.0')
         }
 
         resolutionStrategy.eachDependency { details ->
@@ -320,13 +320,13 @@ dependencies {
     implementation 'com.github.horizontalsystems:tron-kit-android:dc3dca7'
     // Zcash SDK
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
-    implementation "cash.z.ecc.android:zcash-android-sdk:2.1.1"
+    implementation "cash.z.ecc.android:zcash-android-sdk:2.2.6"
     implementation("io.github.binance:binance-connector-java:3.0.0rc2") {
         exclude group: "org.bouncycastle", module: "bcprov-jdk18on"
     }
 
     // WalletConnect V2
-    implementation(platform("com.walletconnect:android-bom:1.35.2"))
+    implementation(platform("com.walletconnect:android-bom:1.15.0"))
     implementation 'com.walletconnect:web3wallet'
     implementation 'com.walletconnect:android-core'
 
