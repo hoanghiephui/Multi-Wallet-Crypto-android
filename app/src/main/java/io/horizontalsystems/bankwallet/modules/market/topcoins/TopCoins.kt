@@ -4,8 +4,8 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -18,9 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wallet.blockchain.bitcoin.R
-import io.horizontalsystems.bankwallet.core.AdType
-import io.horizontalsystems.bankwallet.core.AdViewState
-import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
+import io.horizontalsystems.bankwallet.AdNativeUiState
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
 import io.horizontalsystems.bankwallet.core.stats.StatSection
@@ -40,13 +38,14 @@ import io.horizontalsystems.bankwallet.ui.compose.components.CoinList
 import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.HeaderSorting
 import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
+import io.horizontalsystems.bankwallet.ui.compose.components.NativeAdView
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TopCoins(
     onCoinClick: (String) -> Unit,
-    nativeAd: AdViewState
+    nativeAd: AdNativeUiState
 ) {
     val viewModel = viewModel<MarketTopCoinsViewModel>(
         factory = MarketTopCoinsViewModel.Factory(
@@ -138,7 +137,11 @@ fun TopCoins(
                         preAdsItem = {
                             item {
                                 VSpacer(12.dp)
-                                MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
+                                NativeAdView(
+                                    nativeAd,
+                                    Modifier
+                                        .height(138.dp)
+                                )
                                 VSpacer(8.dp)
                             }
                         }

@@ -3,7 +3,6 @@ package io.horizontalsystems.bankwallet.modules.market
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -21,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Search
@@ -29,6 +29,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,13 +49,12 @@ import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.AdNativeUiState
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
-import io.horizontalsystems.bankwallet.core.AdViewState
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
@@ -79,6 +79,7 @@ import io.horizontalsystems.bankwallet.modules.market.topcoins.TopCoins
 import io.horizontalsystems.bankwallet.modules.market.toppairs.TopPairsScreen
 import io.horizontalsystems.bankwallet.modules.market.topplatforms.TopPlatforms
 import io.horizontalsystems.bankwallet.modules.metricchart.MetricsType
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.ScrollableTabs
 import io.horizontalsystems.bankwallet.ui.compose.components.TabItem
@@ -103,16 +104,13 @@ fun MarketScreen(
     val uiState = marketViewModel.uiState
     val tabs = marketViewModel.tabs
     var text by rememberSaveable { mutableStateOf("") }
-    var active by rememberSaveable { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(key1 = mainViewModel.currentMainTab, block = {
         if (mainViewModel.currentMainTab != MainModule.MainNavigation.Market) {
-            active = false
+            expanded = false
         }
     })
-    val nativeAd by marketViewModel.adState.collectAsStateWithLifecycle()
-    rememberAdsState {
-        marketViewModel.loadAds(it, BuildConfig.HOME_MARKET_NATIVE)
-    }
+    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.HOME_MARKET_NATIVE, marketViewModel)
 
     Box(
         Modifier
@@ -124,38 +122,52 @@ fun MarketScreen(
                 .zIndex(1f)
                 .fillMaxWidth()
         ) {
+
             DockedSearchBar(
-                modifier = Modifier
+                modifier =
+                Modifier
                     .align(Alignment.TopCenter)
-                    .semantics { traversalIndex = -1f },
-                query = text,
-                onQueryChange = {
-                    text = it
-                    searchViewModel.searchByQuery(it)
-                },
-                onSearch = {
-                    active = false
-                    text = ""
-                },
-                active = active,
-                onActiveChange = { active = it },
-                placeholder = { Text(stringResource(R.string.Market_Search_Hint)) },
-                leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
-                trailingIcon = {
-                    IconButton(onClick = {
-                        active = false
-                        navController.slideFromRight(R.id.marketSearchFragment)
+                    .padding(top = 8.dp)
+                    .semantics {
+                        traversalIndex = 0f
+                    },
+                inputField = {
+                    SearchBarDefaults.InputField(
+                        onSearch = {
+                            expanded = false
+                            text = ""
+                        },
+                        expanded = expanded,
+                        onExpandedChange = { expanded = it },
+                        placeholder = { Text(stringResource(R.string.Market_Search_Hint)) },
+                        leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
+                        trailingIcon = {
+                            IconButton(onClick = {
+                                expanded = false
+                                navController.slideFromRight(R.id.marketSearchFragment)
 
-                        stat(page = StatPage.Markets, event = StatEvent.Open(StatPage.MarketSearch))
-                    }) {
-                        Icon(Icons.Rounded.MoreVert, contentDescription = null)
+                                stat(
+                                    page = StatPage.Markets,
+                                    event = StatEvent.Open(StatPage.MarketSearch)
+                                )
+                            }) {
+                                Icon(Icons.Rounded.MoreVert, contentDescription = null)
 
-                        stat(
-                            page = StatPage.Markets,
-                            event = StatEvent.Open(StatPage.AdvancedSearch)
-                        )
-                    }
+                                stat(
+                                    page = StatPage.Markets,
+                                    event = StatEvent.Open(StatPage.AdvancedSearch)
+                                )
+                            }
+                        },
+                        query = text,
+                        onQueryChange = {
+                            text = it
+                            searchViewModel.searchByQuery(it)
+                        },
+                    )
                 },
+                expanded = expanded,
+                onExpandedChange = { expanded = it },
             ) {
                 Crossfade(targetState = text.isBlank(), label = "") { isSearch ->
                     val uiSearchState = searchViewModel.uiState
@@ -174,7 +186,7 @@ fun MarketScreen(
                         uiSearchState.listId,
                         itemSections = itemSections,
                         onCoinClick = { coin, section ->
-                            active = false
+                            expanded = false
                             text = ""
                             uiSearchState.page
                             searchViewModel.onCoinOpened(coin)
@@ -212,7 +224,7 @@ fun MarketScreen(
                 navController = navController,
                 tabs = tabs,
                 selectedTab = uiState.selectedTab,
-                nativeAd = nativeAd
+                nativeAd = adState
             ) { tab ->
                 marketViewModel.onSelect(tab)
             }
@@ -222,13 +234,12 @@ fun MarketScreen(
     TrackScreenViewEvent("MarketScreen")
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TabsSection(
     navController: NavController,
     tabs: Array<Tab>,
     selectedTab: Tab,
-    nativeAd: AdViewState,
+    nativeAd: AdNativeUiState,
     onTabClick: (Tab) -> Unit
 ) {
     val pagerState = rememberPagerState(initialPage = selectedTab.ordinal) { tabs.size }

@@ -17,16 +17,13 @@ import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
 import com.android.billing.DebugTree
 import com.android.billing.UserDataRepository
-import com.applovin.sdk.AppLovinMediationProvider
 import com.applovin.sdk.AppLovinSdk
 import com.applovin.sdk.AppLovinSdkInitializationConfiguration
-import com.google.android.gms.ads.identifier.AdvertisingIdClient
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.analytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.crashlytics.crashlytics
 import com.wallet.blockchain.bitcoin.BuildConfig
-import com.wallet.blockchain.bitcoin.R
 import com.walletconnect.android.Core
 import com.walletconnect.android.CoreClient
 import com.walletconnect.android.relay.ConnectionType
@@ -138,7 +135,6 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.security.MessageDigest
-import java.util.Collections
 import java.util.logging.Level
 import java.util.logging.Logger
 import javax.inject.Inject
@@ -149,9 +145,6 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
     private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     companion object : ICoreApp by CoreApp {
-        lateinit var appLoVinSdk: AppLovinSdk
-        lateinit var appLovinSdkInitialization: AppLovinSdkInitializationConfiguration
-
         lateinit var preferences: SharedPreferences
         lateinit var feeRateProvider: FeeRateProvider
         lateinit var localStorage: ILocalStorage
@@ -228,6 +221,9 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
 
     @Inject
     lateinit var userDataRepository: UserDataRepository
+
+    @Inject
+    lateinit var applovinConfiguration: AppLovinSdkInitializationConfiguration
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
@@ -565,7 +561,7 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
 
     private fun setAnalytic() {
         Firebase.analytics.setAnalyticsCollectionEnabled(localStorage.isAnalytic)
-        Firebase.crashlytics.setCrashlyticsCollectionEnabled(localStorage.isDetectCrash)
+        Firebase.crashlytics.isCrashlyticsCollectionEnabled = localStorage.isDetectCrash
     }
 
     override val workManagerConfiguration: androidx.work.Configuration
@@ -646,14 +642,7 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
     private fun initApplovin() {
         if (SHOW_ADS) {
             applicationScope.launch {
-                val initConfig = AppLovinSdkInitializationConfiguration.builder(
-                    getString(R.string.APPLOVIN_SDK_KEY),
-                    this@App
-                )
-                    .setMediationProvider(AppLovinMediationProvider.MAX)
-                    .build()
-                // Initialize the AppLovin SDK
-                AppLovinSdk.getInstance(this@App).initialize(initConfig) {
+                AppLovinSdk.getInstance(this@App).initialize(applovinConfiguration) {
 
                 }
             }
