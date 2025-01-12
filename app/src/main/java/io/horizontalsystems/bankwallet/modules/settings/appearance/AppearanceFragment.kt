@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material3.Scaffold
@@ -334,6 +333,7 @@ private fun AppIconSection(appIconOptions: Select<AppIcon>, onAppIconSelect: (Ap
         AppIconsRow(rows[1], appIconOptions.selected, onAppIconSelect)
         AppIconsRow(rows[2], appIconOptions.selected, onAppIconSelect)
         AppIconsRow(rows[3], appIconOptions.selected, onAppIconSelect)
+        AppIconsRow(rows[4], appIconOptions.selected, onAppIconSelect)
     }
 }
 

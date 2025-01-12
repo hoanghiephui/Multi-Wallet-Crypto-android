@@ -2,7 +2,8 @@ package io.horizontalsystems.bankwallet.modules.coin.analytics.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -21,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -43,6 +45,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.StackBarSlice
 import io.horizontalsystems.bankwallet.ui.compose.components.StackedBarChart
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.headline1_bran
+import io.horizontalsystems.bankwallet.ui.compose.components.microSB_claude
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
@@ -51,18 +54,21 @@ import io.horizontalsystems.chartview.ChartMinimal
 @Composable
 fun AnalyticsBlockHeader(
     title: String,
+    isPreview: Boolean = false,
     onInfoClick: (() -> Unit)? = null
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        verticalAlignment = Alignment.CenterVertically
     ) {
         subhead1_grey(text = title)
         onInfoClick?.let {
             HsIconButton(
-                modifier = Modifier.size(20.dp),
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .size(20.dp),
                 onClick = it
             ) {
                 Icon(
@@ -72,6 +78,32 @@ fun AnalyticsBlockHeader(
                 )
             }
         }
+        if (isPreview) {
+            Spacer(Modifier.weight(1f))
+            PremiumBadge()
+        }
+    }
+}
+
+@Composable
+private fun PremiumBadge() {
+    val yellowGradient = Brush.linearGradient(
+        colors = listOf(
+            Color(0xFFFFD000),
+            Color(0xFFFFA800),
+        ),
+    )
+    Box(
+        modifier = Modifier
+            .background(
+                yellowGradient,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .padding(horizontal = 6.dp, vertical = 2.dp)
+    ) {
+        microSB_claude(
+            text = stringResource(R.string.Premium_Title),
+        )
     }
 }
 
@@ -232,8 +264,21 @@ fun AnalyticsContainer(
     titleRow: @Composable (() -> Unit)? = null,
     sectionDescription: @Composable (() -> Unit)? = null,
     bottomRows: @Composable ColumnScope.() -> Unit = {},
+    onClick: (() -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
+    var modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp)
+        .clip(RoundedCornerShape(12.dp))
+        .background(ComposeAppTheme.colors.lawrence)
+
+    if (onClick != null) {
+        modifier = modifier.clickable {
+            onClick.invoke()
+        }
+    }
+
     VSpacer(12.dp)
     sectionTitle?.let {
         HorizontalDivider(
@@ -309,7 +354,7 @@ fun AnalyticsChart(
                 adviceTitle = analyticChart.data.adviceTitle,
                 detailText = analyticChart.data.detailText,
                 sliderPosition = analyticChart.data.sliderPosition
-                )
+            )
         }
     }
 }
@@ -327,6 +372,7 @@ private fun Preview_HoldersBlockLocked() {
             titleRow = {
                 AnalyticsBlockHeader(
                     title = "Holders",
+                    isPreview = true,
                     onInfoClick = {}
                 )
             },
@@ -372,6 +418,7 @@ private fun Preview_AnalyticsBarChartDisabled() {
             titleRow = {
                 AnalyticsBlockHeader(
                     title = "Dex Volume",
+                    isPreview = true,
                     onInfoClick = {}
                 )
             },
@@ -404,6 +451,7 @@ private fun Preview_AnalyticsLineChartDisabled() {
             titleRow = {
                 AnalyticsBlockHeader(
                     title = "Dex Volume",
+                    isPreview = true,
                     onInfoClick = {}
                 )
             },
@@ -442,6 +490,7 @@ private fun Preview_HoldersBlock() {
             titleRow = {
                 AnalyticsBlockHeader(
                     title = "Defi Cap",
+                    isPreview = true,
                     onInfoClick = {}
                 )
             },
@@ -481,6 +530,7 @@ private fun Preview_AnalyticsRatingScale() {
             titleRow = {
                 AnalyticsBlockHeader(
                     title = "Dex Volume",
+                    isPreview = true,
                     onInfoClick = {}
                 )
             },

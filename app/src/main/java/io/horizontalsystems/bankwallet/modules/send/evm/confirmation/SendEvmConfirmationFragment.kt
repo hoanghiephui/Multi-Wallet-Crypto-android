@@ -19,7 +19,6 @@ import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.AppLogger
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
-import io.horizontalsystems.bankwallet.core.requireInput
 import io.horizontalsystems.bankwallet.core.setNavigationResultX
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
@@ -43,13 +42,9 @@ class SendEvmConfirmationFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent(navController: NavController) {
-        val input = try {
-            navController.requireInput<Input>()
-        } catch (e: NullPointerException) {
-            navController.popBackStack()
-            return
+        withInput<Input>(navController) { input ->
+            SendEvmConfirmationScreen(navController, input)
         }
-        SendEvmConfirmationScreen(navController, input)
     }
 
     override val logScreen: String

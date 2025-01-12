@@ -44,8 +44,9 @@ class MarketFiltersService(
     val blockchains = marketKit.blockchains(blockchainTypes.map { it.uid })
     val currencyCode = baseCurrency.code
 
-    var coinCount = CoinList.Top250.itemsCount
+    var coinCount = CoinList.Top200.itemsCount
     var filterMarketCap: Pair<Long?, Long?>? = null
+    var sectorIds: List<Int> = listOf()
     var filterVolume: Pair<Long?, Long?>? = null
     var filterPeriod = TimePeriod.TimePeriod_1D
     var filterPriceChange: Pair<Long?, Long?>? = null
@@ -80,6 +81,12 @@ class MarketFiltersService(
         return getTopMarketList().await().size
     }
 
+    suspend fun getSectors(): List<SectorItem> {
+        return marketKit.categoriesSingle().blockingGet().map { coinCategory ->
+            SectorItem(coinCategory.id, coinCategory.name)
+        }
+    }
+
     private fun getTopMarketList(): Single<Map<Int, MarketInfo>> {
         val topMarketListAsync = if (cache != null) {
             Single.just(cache)
@@ -108,6 +115,7 @@ class MarketFiltersService(
         return filterByRange(filterMarketCap, marketCap.toLong())
                 && filterByRange(filterVolume, totalVolume.toLong())
                 && inBlockchain(marketInfo.fullCoin.tokens)
+                && inSectors(marketInfo.categoryIds, sectorIds)
                 && filterByRange(filterPriceChange, priceChangeValue.toLong())
                 && (!filterPriceCloseToAth || closeToAllTime(marketInfo.athPercentage))
                 && (!filterPriceCloseToAtl || closeToAllTime(marketInfo.atlPercentage))
@@ -156,6 +164,12 @@ class MarketFiltersService(
     private fun inAdvice(tokenAdvice: Advice?): Boolean {
         if (filterTradingSignal.isEmpty()) return true
         return filterTradingSignal.contains(tokenAdvice)
+    }
+
+    private fun inSectors(ids: List<Int>?, selectedSectorIds: List<Int>): Boolean {
+        if (selectedSectorIds.isEmpty()) return true
+        if (ids == null) return false
+        return ids.intersect(selectedSectorIds.toSet()).isNotEmpty()
     }
 
     private fun inBlockchain(tokens: List<Token>): Boolean {

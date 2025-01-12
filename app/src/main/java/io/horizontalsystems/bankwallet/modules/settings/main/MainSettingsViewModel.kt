@@ -15,6 +15,8 @@ import io.horizontalsystems.bankwallet.modules.walletconnect.WCManager
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCSessionManager
 import io.horizontalsystems.core.IPinComponent
 import io.horizontalsystems.core.ISystemInfoManager
+import io.horizontalsystems.subscriptions.core.AdvancedSearch
+import io.horizontalsystems.subscriptions.core.UserSubscriptionManager
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.rx2.asFlow
@@ -70,6 +72,8 @@ class MainSettingsViewModel(
     private var wcCounterType: CounterType? = null
     private var wcSessionsCount = walletConnectSessionCount
     private var wcPendingRequestCount = 0
+    private var showPremiumBanner = !UserSubscriptionManager.isActionAllowed(AdvancedSearch)
+    private var hasSubscription = UserSubscriptionManager.getActiveSubscriptions().isNotEmpty()
 
     init {
         viewModelScope.launch {
@@ -106,6 +110,13 @@ class MainSettingsViewModel(
                 emitState()
             }
         }
+        viewModelScope.launch {
+            UserSubscriptionManager.purchaseStateUpdatedFlow.collect {
+                showPremiumBanner = !UserSubscriptionManager.isActionAllowed(AdvancedSearch)
+                hasSubscription = UserSubscriptionManager.getActiveSubscriptions().isNotEmpty()
+                emitState()
+            }
+        }
         syncCounter()
     }
 
@@ -121,7 +132,9 @@ class MainSettingsViewModel(
             manageWalletShowAlert = !allBackedUp || hasNonStandardAccount,
             securityCenterShowAlert = !isPinSet,
             aboutAppShowAlert = !termsManager.allTermsAccepted,
-            wcCounterType = wcCounterType
+            wcCounterType = wcCounterType,
+            showPremiumBanner = showPremiumBanner,
+            hasSubscription = hasSubscription,
         )
     }
 
@@ -148,5 +161,7 @@ data class MainSettingUiState(
     val manageWalletShowAlert: Boolean,
     val securityCenterShowAlert: Boolean,
     val aboutAppShowAlert: Boolean,
-    val wcCounterType: CounterType?
+    val wcCounterType: CounterType?,
+    val showPremiumBanner: Boolean,
+    val hasSubscription: Boolean,
 )

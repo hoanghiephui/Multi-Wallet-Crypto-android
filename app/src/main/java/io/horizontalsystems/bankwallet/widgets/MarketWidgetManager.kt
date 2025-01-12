@@ -156,8 +156,6 @@ class MarketWidgetManager {
     companion object {
         fun getMarketWidgetTypes(): List<MarketWidgetType> {
             val types = MarketWidgetType.entries.toMutableList()
-            // TopNfts type is hidden for now. It will be removed in next sprints
-            types.remove(MarketWidgetType.TopNfts)
             if (!App.localStorage.marketsTabEnabled) {
                 types.remove(MarketWidgetType.Watchlist)
             }

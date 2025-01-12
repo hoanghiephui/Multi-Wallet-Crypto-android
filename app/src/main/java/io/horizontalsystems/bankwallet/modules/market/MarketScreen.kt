@@ -78,6 +78,7 @@ import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchViewMod
 import io.horizontalsystems.bankwallet.modules.market.topcoins.TopCoins
 import io.horizontalsystems.bankwallet.modules.market.toppairs.TopPairsScreen
 import io.horizontalsystems.bankwallet.modules.market.topplatforms.TopPlatforms
+import io.horizontalsystems.bankwallet.modules.market.topsectors.TopSectorsScreen
 import io.horizontalsystems.bankwallet.modules.metricchart.MetricsType
 import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
@@ -262,28 +263,15 @@ fun TabsSection(
         userScrollEnabled = false
     ) { page ->
         when (tabs[page]) {
-            Tab.Coins -> {
-                TopCoins(
+            Tab.Coins -> TopCoins(
                     onCoinClick = { onCoinClick(it, navController) },
                     nativeAd = nativeAd
                 )
-            }
-
-            Tab.Watchlist -> {
-                MarketFavoritesScreen(navController)
-            }
-
-            Tab.Posts -> {
-                MarketPostsScreen()
-            }
-
-            Tab.Platform -> {
-                TopPlatforms(navController)
-            }
-
-            Tab.Pairs -> {
-                TopPairsScreen()
-            }
+            Tab.Watchlist -> MarketFavoritesScreen(navController)
+            Tab.Posts -> MarketPostsScreen()
+            Tab.Platform -> TopPlatforms(navController)
+            Tab.Pairs -> TopPairsScreen()
+            Tab.Sectors -> TopSectorsScreen(navController)
         }
     }
 }

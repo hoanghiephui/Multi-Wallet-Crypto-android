@@ -69,6 +69,7 @@ fun TopPlatforms(
 
     HSSwipeRefresh(
             refreshing = uiState.isRefreshing,
+            topPadding = 44,
             onRefresh = {
                 viewModel.refresh()
                 stat(page = StatPage.Markets, section = StatSection.Platforms, event = StatEvent.Refresh)

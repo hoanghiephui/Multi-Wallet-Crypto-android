@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -42,7 +41,6 @@ import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
-import io.horizontalsystems.bankwallet.core.getInput
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.stat
@@ -55,7 +53,6 @@ import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.Select
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
-import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryCircle
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryToggle
 import io.horizontalsystems.bankwallet.ui.compose.components.DescriptionCard
@@ -64,7 +61,6 @@ import io.horizontalsystems.bankwallet.ui.compose.components.HeaderSorting
 import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
-import io.horizontalsystems.bankwallet.ui.compose.components.ScreenMessageWithAction
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.captionSB_grey
@@ -74,26 +70,8 @@ class CoinRankFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent(navController: NavController) {
-        val type = navController.getInput<RankType>()
-
-        type?.let { rankType ->
-            CoinRankScreen(
-                rankType,
-                navController,
-            )
-        } ?: run {
-            ScreenMessageWithAction(
-                text = stringResource(R.string.Error),
-                icon = R.drawable.ic_error_48
-            ) {
-                ButtonPrimaryYellow(
-                    modifier = Modifier
-                        .padding(horizontal = 48.dp)
-                        .fillMaxWidth(),
-                    title = stringResource(R.string.Button_Close),
-                    onClick = { navController.popBackStack() }
-                )
-            }
+        withInput<RankType>(navController) { type ->
+            CoinRankScreen(type, navController)
         }
     }
     override val logScreen: String

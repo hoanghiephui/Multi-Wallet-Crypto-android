@@ -31,7 +31,6 @@ import com.android.billing.UserDataRepository
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.navigateWithTermsAccepted
-import io.horizontalsystems.bankwallet.core.requireInput
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.core.stats.StatEntity
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
@@ -60,11 +59,9 @@ class ManageAccountsFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent(navController: NavController) {
-        ManageAccountsScreen(
-            navController,
-            navController.requireInput(),
-            userDataRepository
-        )
+        withInput<ManageAccountsModule.Mode>(navController) { input ->
+            ManageAccountsScreen(navController, input, userDataRepository)
+        }
     }
 
     override val logScreen: String

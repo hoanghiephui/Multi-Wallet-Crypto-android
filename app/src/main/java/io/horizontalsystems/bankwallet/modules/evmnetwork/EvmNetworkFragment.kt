@@ -46,7 +46,6 @@ import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.composablePopup
 import io.horizontalsystems.bankwallet.core.imageUrl
-import io.horizontalsystems.bankwallet.core.requireInput
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
 import io.horizontalsystems.bankwallet.core.stats.stat
@@ -76,10 +75,9 @@ class EvmNetworkFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent(navController: NavController) {
-        EvmNetworkNavHost(
-            navController,
-            navController.requireInput()
-        )
+        withInput<Blockchain>(navController) { input ->
+            EvmNetworkNavHost(navController, input)
+        }
     }
 
     override val logScreen: String

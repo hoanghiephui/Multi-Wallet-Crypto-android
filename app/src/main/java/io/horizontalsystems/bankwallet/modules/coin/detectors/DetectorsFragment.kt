@@ -6,7 +6,6 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -37,7 +36,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
-import io.horizontalsystems.bankwallet.core.requireInput
 import io.horizontalsystems.bankwallet.modules.coin.detectors.DetectorsModule.DetectorsTab
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
@@ -58,16 +56,17 @@ class DetectorsFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent(navController: NavController) {
-        val input = navController.requireInput<Input>()
-        val viewModel = viewModel<DetectorsViewModel>(
-            factory = DetectorsModule.Factory(input.title, input.issues)
-        )
-        DetectorsScreen(
-            viewModel = viewModel,
-            onBackClick = {
-                navController.popBackStack()
-            },
-        )
+        withInput<Input>(navController) { input ->
+            val viewModel = viewModel<DetectorsViewModel>(
+                factory = DetectorsModule.Factory(input.title, input.issues)
+            )
+            DetectorsScreen(
+                viewModel = viewModel,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+            )
+        }
     }
 
     @Parcelize

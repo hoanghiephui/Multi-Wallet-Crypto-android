@@ -62,6 +62,7 @@ fun TopCoins(
 
     HSSwipeRefresh(
         refreshing = uiState.isRefreshing,
+        topPadding = 44,
         onRefresh = {
             viewModel.refresh()
 

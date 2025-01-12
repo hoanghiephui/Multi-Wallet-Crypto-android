@@ -68,7 +68,6 @@ import io.horizontalsystems.bankwallet.core.managers.SolanaKitManager
 import io.horizontalsystems.bankwallet.core.managers.SolanaRpcSourceManager
 import io.horizontalsystems.bankwallet.core.managers.SolanaWalletManager
 import io.horizontalsystems.bankwallet.core.managers.SpamManager
-import io.horizontalsystems.bankwallet.core.managers.SubscriptionManager
 import io.horizontalsystems.bankwallet.core.managers.SystemInfoManager
 import io.horizontalsystems.bankwallet.core.managers.TermsManager
 import io.horizontalsystems.bankwallet.core.managers.TokenAutoEnableManager
@@ -103,8 +102,6 @@ import io.horizontalsystems.bankwallet.modules.balance.BalanceViewTypeManager
 import io.horizontalsystems.bankwallet.modules.chart.ChartIndicatorManager
 import io.horizontalsystems.bankwallet.modules.contacts.ContactsRepository
 import io.horizontalsystems.bankwallet.modules.market.favorites.MarketFavoritesMenuService
-import io.horizontalsystems.bankwallet.modules.market.topnftcollections.TopNftCollectionsRepository
-import io.horizontalsystems.bankwallet.modules.market.topnftcollections.TopNftCollectionsViewItemFactory
 import io.horizontalsystems.bankwallet.modules.market.topplatforms.TopPlatformsRepository
 import io.horizontalsystems.bankwallet.modules.pin.PinComponent
 import io.horizontalsystems.bankwallet.modules.pin.core.PinDbStorage
@@ -122,12 +119,16 @@ import io.horizontalsystems.bankwallet.widgets.MarketWidgetManager
 import io.horizontalsystems.bankwallet.widgets.MarketWidgetRepository
 import io.horizontalsystems.bankwallet.widgets.MarketWidgetWorker
 import io.horizontalsystems.core.BackgroundManager
+import io.horizontalsystems.core.BackgroundManagerState.AllActivitiesDestroyed
+import io.horizontalsystems.core.BackgroundManagerState.EnterBackground
+import io.horizontalsystems.core.BackgroundManagerState.EnterForeground
 import io.horizontalsystems.core.CoreApp
 import io.horizontalsystems.core.ICoreApp
 import io.horizontalsystems.core.security.EncryptionManager
 import io.horizontalsystems.core.security.KeyStoreManager
 import io.horizontalsystems.ethereumkit.core.EthereumKit
 import io.horizontalsystems.hdwalletkit.Mnemonic
+import io.horizontalsystems.subscriptions.core.UserSubscriptionManager
 import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -208,7 +209,6 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         lateinit var marketWidgetManager: MarketWidgetManager
         lateinit var marketWidgetRepository: MarketWidgetRepository
         lateinit var contactsRepository: ContactsRepository
-        lateinit var subscriptionManager: SubscriptionManager
         lateinit var cexProviderManager: CexProviderManager
         lateinit var cexAssetManager: CexAssetManager
         lateinit var chartIndicatorManager: ChartIndicatorManager
@@ -257,13 +257,11 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         appConfigProvider = appConfig
 
         torKitManager = TorManager(instance, localStorage)
-        subscriptionManager = SubscriptionManager()
 
         marketKit = MarketKitWrapper(
             context = this,
             hsApiBaseUrl = appConfig.marketApiBaseUrl,
             hsApiKey = appConfig.marketApiKey,
-            subscriptionManager = subscriptionManager
         )
 
         priceManager = PriceManager(localStorage)
@@ -437,8 +435,6 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
             marketKit,
             marketFavoritesManager,
             MarketFavoritesMenuService(localStorage, marketWidgetManager),
-            TopNftCollectionsRepository(marketKit),
-            TopNftCollectionsViewItemFactory(numberFormatter),
             TopPlatformsRepository(marketKit),
             currencyManager
         )
@@ -497,7 +493,12 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
 
         spamManager = SpamManager(localStorage)
 
-        tonConnectManager = TonConnectManager(this, adapterFactory)
+        tonConnectManager = TonConnectManager(
+            context = this,
+            adapterFactory = adapterFactory,
+            appName = "Unstoppable Wallet",
+            appVersion = appConfigProvider.appVersion
+        )
         tonConnectManager.start()
 
         startTasks()
@@ -602,6 +603,7 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
                 else -> signingInfo?.signingCertificateHistory // Send one with signingCertificateHistory
             }
         } else {
+            @Suppress("DEPRECATION")
             packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES).signatures
         }
 
@@ -636,6 +638,16 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
 
             evmLabelManager.sync()
             contactsRepository.initialize()
+        }
+
+        coroutineScope.launch {
+            backgroundManager.stateFlow.collect { state ->
+                when (state) {
+                    EnterForeground -> UserSubscriptionManager.onResume()
+                    EnterBackground -> UserSubscriptionManager.pause()
+                    AllActivitiesDestroyed -> Unit
+                }
+            }
         }
     }
 

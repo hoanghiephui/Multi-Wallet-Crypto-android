@@ -27,7 +27,6 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
-import io.horizontalsystems.bankwallet.core.requireInput
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.market.tvl.TvlModule
@@ -48,16 +47,17 @@ import io.horizontalsystems.bankwallet.ui.compose.components.SortMenu
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_jacob
+import io.horizontalsystems.marketkit.models.Coin
 
 class CoinTreasuriesFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent(navController: NavController) {
-        CoinTreasuriesScreen(
-            viewModel(
-                factory = CoinTreasuriesModule.Factory(navController.requireInput())
+        withInput<Coin>(navController) { input ->
+            CoinTreasuriesScreen(
+                viewModel(factory = CoinTreasuriesModule.Factory(input))
             )
-        )
+        }
     }
 
     override val logScreen: String

@@ -28,7 +28,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
-import io.horizontalsystems.bankwallet.core.requireInput
 import io.horizontalsystems.bankwallet.core.shorten
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.MajorHolderItem
@@ -61,13 +60,13 @@ class CoinMajorHoldersFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent(navController: NavController) {
-        val input = navController.requireInput<Input>()
-
-        CoinMajorHoldersScreen(
-            input.coinUid,
-            input.blockchain,
-            navController,
-        )
+        withInput<Input>(navController) { input ->
+            CoinMajorHoldersScreen(
+                input.coinUid,
+                input.blockchain,
+                navController,
+            )
+        }
     }
 
     override val logScreen: String

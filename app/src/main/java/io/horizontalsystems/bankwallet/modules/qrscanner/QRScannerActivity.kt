@@ -217,7 +217,7 @@ private fun ScannerView(onScan: (String) -> Unit) {
         }
     }
     AndroidView(factory = { barcodeView })
-    LifecycleResumeEffect(true) {
+    LifecycleResumeEffect(Unit) {
         barcodeView.resume()
 
         onPauseOrDispose {

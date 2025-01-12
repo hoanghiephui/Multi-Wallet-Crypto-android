@@ -10,7 +10,6 @@ import io.horizontalsystems.bankwallet.core.managers.TonConnectManager
 import io.horizontalsystems.bankwallet.core.managers.TonKitWrapper
 import io.horizontalsystems.bankwallet.core.managers.toTonWalletFullAccess
 import io.horizontalsystems.bankwallet.core.meta
-import io.horizontalsystems.bankwallet.entities.Currency
 import io.horizontalsystems.bankwallet.modules.transactions.TransactionSource
 import io.horizontalsystems.marketkit.models.BlockchainType
 import io.horizontalsystems.marketkit.models.TokenQuery
@@ -30,7 +29,6 @@ class TonConnectSendRequestViewModel(
     private val transactionSigner = tonConnectManager.transactionSigner
     private val tonConnectKit = App.tonConnectManager.kit
     private var tonTransactionRecord: TonTransactionRecord? = null
-    private var currency = App.currencyManager.baseCurrency
 
     private var tonWallet: TonWallet.FullAccess? = null
     private var tonKitWrapper: TonKitWrapper? = null
@@ -38,7 +36,6 @@ class TonConnectSendRequestViewModel(
 
     override fun createState() = TonConnectSendRequestUiState(
         tonTransactionRecord = tonTransactionRecord,
-        currency = currency,
         error = error,
         confirmEnabled = sendRequestEntity != null && tonWallet != null,
         rejectEnabled = sendRequestEntity != null
@@ -81,7 +78,7 @@ class TonConnectSendRequestViewModel(
             error = TonConnectSendRequestError.Other("Token Ton not found")
             return
         }
-        
+
         val transactionSource = TransactionSource(token.blockchain, account, token.type.meta)
 
         val tonTransactionConverter = tonConnectManager.adapterFactory.tonTransactionConverter(
@@ -121,7 +118,6 @@ sealed class TonConnectSendRequestError : Error() {
 
 data class TonConnectSendRequestUiState(
     val tonTransactionRecord: TonTransactionRecord?,
-    val currency: Currency,
     val error: TonConnectSendRequestError?,
     val confirmEnabled: Boolean,
     val rejectEnabled: Boolean,

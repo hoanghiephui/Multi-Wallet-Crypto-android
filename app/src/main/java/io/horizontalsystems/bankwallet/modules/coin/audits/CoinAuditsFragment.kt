@@ -25,7 +25,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
-import io.horizontalsystems.bankwallet.core.requireInput
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.CellFooter
@@ -42,19 +41,20 @@ class CoinAuditsFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent(navController: NavController) {
-        val input = navController.requireInput<Input>()
-        val viewModel = viewModel<CoinAuditsViewModel>(
-            factory = CoinAuditsModule.Factory(input.audits)
-        )
-        CoinAuditsScreen(
-            viewModel = viewModel,
-            onPressBack = {
-                navController.popBackStack()
-            },
-            onClickReportUrl = {
-                LinkHelper.openLinkInAppBrowser(requireContext(), it)
-            }
-        )
+        withInput<Input>(navController) { input ->
+            val viewModel = viewModel<CoinAuditsViewModel>(
+                factory = CoinAuditsModule.Factory(input.audits)
+            )
+            CoinAuditsScreen(
+                viewModel = viewModel,
+                onPressBack = {
+                    navController.popBackStack()
+                },
+                onClickReportUrl = {
+                    LinkHelper.openLinkInAppBrowser(requireContext(), it)
+                }
+            )
+        }
     }
 
     override val logScreen: String

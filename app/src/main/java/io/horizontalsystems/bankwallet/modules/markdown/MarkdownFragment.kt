@@ -12,7 +12,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
-import io.horizontalsystems.bankwallet.core.getInput
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
@@ -25,16 +24,15 @@ class MarkdownFragment : BaseComposeFragment() {
 
     @Composable
     override fun GetContent(navController: NavController) {
-        val input = navController.getInput<Input>()
-        NiaBackground {
+        withInput<Input>(navController) { input ->
             MarkdownScreen(
-                handleRelativeUrl = input?.handleRelativeUrl ?: false,
-                showAsPopup = input?.showAsPopup ?: false,
-                markdownUrl = input?.markdownUrl ?: "",
+                handleRelativeUrl = input.handleRelativeUrl,
+                showAsPopup = input.showAsPopup,
+                markdownUrl = input.markdownUrl,
                 onCloseClick = { navController.popBackStack() },
                 onUrlClick = { url ->
                     navController.slideFromRight(
-                        R.id.markdownFragment, MarkdownFragment.Input(url)
+                        R.id.markdownFragment, Input(url)
                     )
                 }
             )

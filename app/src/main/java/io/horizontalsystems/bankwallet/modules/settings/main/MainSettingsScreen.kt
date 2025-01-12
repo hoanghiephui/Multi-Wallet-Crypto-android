@@ -55,10 +55,12 @@ import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.BadgeText
 import io.horizontalsystems.bankwallet.ui.compose.components.CellSingleLineLawrenceSection
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
+import io.horizontalsystems.bankwallet.ui.compose.components.PremiumHeader
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.caption_grey
+import io.horizontalsystems.bankwallet.ui.compose.components.cell.SectionPremiumUniversalLawrence
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_grey
 import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
 import se.warting.inappupdate.compose.findActivity
@@ -115,8 +117,16 @@ private fun SettingSections(
             )
         }
     )
+    if (uiState.showPremiumBanner) {
+        PremiumBanner(
+            onClick = {
+                navController.slideFromBottom(R.id.buySubscriptionFragment)
+            }
+        )
+        VSpacer(20.dp)
+    }
 
-    VSpacer(32.dp)
+    VSpacer(12.dp)
 
     CellUniversalLawrenceSection(
         listOf {
@@ -204,21 +214,21 @@ private fun SettingSections(
                     }
                 }
             )
-//        }, {
-//            HsSettingCell(
-//                title = R.string.Settings_TonConnect,
-//                icon = R.drawable.ic_ton_connect_24,
-//                value = null,
-//                counterBadge = null,
-//                onClick = {
-//                    navController.slideFromRight(R.id.tcListFragment)
-//
-//                    stat(
-//                        page = StatPage.Settings,
-//                        event = StatEvent.Open(StatPage.TonConnect)
-//                    )
-//                }
-//            )
+        }, {
+            HsSettingCell(
+                title = R.string.Settings_TonConnect,
+                icon = R.drawable.ic_ton_connect_24,
+                value = null,
+                counterBadge = null,
+                onClick = {
+                    navController.slideFromRight(R.id.tcListFragment)
+
+                    stat(
+                        page = StatPage.Settings,
+                        event = StatEvent.Open(StatPage.TonConnect)
+                    )
+                }
+            )
         }, {
             HsSettingCell(
                 R.string.BackupManager_Title,
@@ -251,6 +261,17 @@ private fun SettingSections(
             },
             {
                 HsSettingCell(
+                    R.string.Settings_Privacy,
+                    R.drawable.ic_eye_20,
+                    onClick = {
+                        navController.slideFromRight(R.id.privacySettingsFragment)
+
+                        stat(page = StatPage.AboutApp, event = StatEvent.Open(StatPage.Privacy))
+                    }
+                )
+            },
+            {
+                HsSettingCell(
                     R.string.Contacts,
                     R.drawable.ic_user_20,
                     onClick = {
@@ -271,6 +292,16 @@ private fun SettingSections(
                         navController.slideFromRight(R.id.appearanceFragment)
 
                         stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.Appearance))
+                    }
+                )
+            },
+            {
+                HsSettingCell(
+                    R.string.Settings_Subscription,
+                    R.drawable.ic_star_24,
+                    value = if (uiState.hasSubscription) stringResource(R.string.SettingsSubscription_Active) else null,
+                    onClick = {
+                        navController.slideFromRight(R.id.subscriptionFragment)
                     }
                 )
             },
@@ -307,28 +338,43 @@ private fun SettingSections(
     VSpacer(32.dp)
 
     CellUniversalLawrenceSection(
-        listOf({
-            HsSettingCell(
-                R.string.Settings_Faq,
-                R.drawable.ic_faq_20,
-                onClick = {
-                    navController.slideFromRight(R.id.faqListFragment)
+        listOf(
+            {
+                HsSettingCell(
+                    R.string.Settings_BotSupport,
+                    R.drawable.ic_ai_assistant_24,
+                    onClick = {
 
-                    stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.Faq))
-                }
-            )
-        }, {
-            HsSettingCell(
-                R.string.Guides_Title,
-                R.drawable.ic_academy_20,
-                onClick = {
-                    navController.slideFromRight(R.id.academyFragment)
-
-                    stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.Academy))
-                }
-            )
-        })
+                    }
+                )
+            },
+        )
     )
+
+    VSpacer(24.dp)
+
+    PremiumHeader()
+
+    SectionPremiumUniversalLawrence {
+        HsSettingCell(
+            R.string.Settings_VipSupport,
+            R.drawable.ic_support_yellow_24,
+            onClick = {
+
+            }
+        )
+        Divider(
+            thickness = 1.dp,
+            color = ComposeAppTheme.colors.steel10,
+        )
+        HsSettingCell(
+            R.string.Settings_VipClub,
+            R.drawable.ic_club_yellow_24,
+            onClick = {
+
+            }
+        )
+    }
 
     VSpacer(32.dp)
 
@@ -365,6 +411,60 @@ private fun SettingSections(
                 },
             )
         })
+    )
+
+    VSpacer(24.dp)
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 32.dp)
+            .height(32.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        subhead1_grey(text = stringResource(id = R.string.Settings_JoinUnstoppables).uppercase())
+    }
+    CellUniversalLawrenceSection(
+        listOf({
+            HsSettingCell(
+                R.string.Settings_Telegram,
+                R.drawable.ic_telegram_24,
+                onClick = {
+                    LinkHelper.openLinkInAppBrowser(context, App.appConfigProvider.appTelegramLink)
+
+                    stat(
+                        page = StatPage.Settings,
+                        event = StatEvent.Open(StatPage.ExternalTelegram)
+                    )
+                }
+            )
+        }, {
+            HsSettingCell(
+                R.string.Settings_Twitter,
+                R.drawable.ic_twitter_24,
+                onClick = {
+                    LinkHelper.openLinkInAppBrowser(context, App.appConfigProvider.appTwitterLink)
+
+                    stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.ExternalTwitter))
+                }
+            )
+        })
+    )
+
+    VSpacer(32.dp)
+
+    CellUniversalLawrenceSection(
+        listOf {
+            HsSettingCell(
+                R.string.Settings_Donate,
+                R.drawable.ic_heart_24,
+                onClick = {
+                    navController.slideFromRight(R.id.donateTokenSelectFragment)
+
+                    stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.Donate))
+                }
+            )
+        }
     )
 
     VSpacer(32.dp)

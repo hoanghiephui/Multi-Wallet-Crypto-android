@@ -9,7 +9,6 @@ import com.android.billing.UserDataRepository
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.Clearable
 import io.horizontalsystems.bankwallet.core.ILocalStorage
-import io.horizontalsystems.bankwallet.core.managers.SubscriptionManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
@@ -21,7 +20,6 @@ class CoinViewModel(
     private val service: CoinService,
     private val clearables: List<Clearable>,
     private val localStorage: ILocalStorage,
-    private val subscriptionManager: SubscriptionManager,
     userDataRepository: UserDataRepository,
 ) : ViewModel() {
 
@@ -34,7 +32,6 @@ class CoinViewModel(
     var successMessage by mutableStateOf<Int?>(null)
         private set
 
-    private var subscriptionInfoShown: Boolean = false
     val screenState = userDataRepository.userData.map {
         it.hasPrivilege
     }.stateIn(
@@ -67,14 +64,6 @@ class CoinViewModel(
 
     fun onSuccessMessageShown() {
         successMessage = null
-    }
-
-    fun shouldShowSubscriptionInfo():Boolean {
-        return !subscriptionManager.hasSubscription() && !subscriptionInfoShown
-    }
-
-    fun subscriptionInfoShown() {
-        subscriptionInfoShown = true
     }
 
 }

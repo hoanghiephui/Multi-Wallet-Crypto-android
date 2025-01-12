@@ -38,7 +38,6 @@ import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.market.MarketDataValue
-import io.horizontalsystems.bankwallet.modules.market.overview.TopPairViewItem
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryWithIcon
@@ -65,7 +64,7 @@ fun TopPairsScreen() {
     }
 
     HSSwipeRefresh(
-        refreshing = uiState.isRefreshing,
+        topPadding = 44,refreshing = uiState.isRefreshing,
         onRefresh = viewModel::refresh
     ) {
         Crossfade(uiState.viewState, label = "",

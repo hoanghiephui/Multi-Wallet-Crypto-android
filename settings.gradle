@@ -3,6 +3,10 @@ include ':app'
 include ':core'
 include ':components:icons'
 include ':components:chartview'
+include ':subscriptions-core'
+include ':subscriptions-google-play'
+include ':subscriptions-dev'
+
 include ':in-app-update'
 project(":in-app-update").projectDir = new File("In-App-Update/inappupdatecompose")
 include ':lightweightlibrary'

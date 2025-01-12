@@ -2,10 +2,10 @@ package io.horizontalsystems.bankwallet.modules.main
 
 import android.Manifest
 import android.os.Build
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.BadgedBox
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
@@ -31,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +43,8 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.viewModels
+import androidx.compose.ui.unit.dp
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -54,6 +59,7 @@ import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.managers.RateAppManager
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
@@ -89,6 +95,8 @@ import se.warting.inappupdate.compose.rememberInAppUpdateState
 
 class MainFragment : BaseComposeFragment() {
     private val searchViewModel by viewModels<MarketSearchViewModel> { MarketSearchModule.Factory() }
+    private val mainActivityViewModel by activityViewModels<MainActivityViewModel>()
+
     @Composable
     override fun GetContent(navController: NavController) {
         val backStackEntry = navController.safeGetBackStackEntry(R.id.mainFragment)
@@ -99,11 +107,13 @@ class MainFragment : BaseComposeFragment() {
                 transactionsViewModel = viewModel,
                 navController = navController,
                 searchViewModel = searchViewModel,
-                mainActivity = (activity as MainActivity)
+                mainActivity = (activity as MainActivity),
+                mainActivityViewModel = mainActivityViewModel
             )
         } ?: run {
             // Back stack entry doesn't exist, restart activity
-            requireActivity().recreate()
+            val intent = Intent(context, MainActivity::class.java)
+            requireActivity().startActivity(intent)
         }
     }
 
@@ -129,13 +139,14 @@ private fun MainScreenWithRootedDeviceCheck(
     navController: NavController,
     rootedDeviceViewModel: RootedDeviceViewModel = viewModel(factory = RootedDeviceModule.Factory()),
     searchViewModel: MarketSearchViewModel,
-    mainActivity: MainActivity
+    mainActivity: MainActivity,
+    mainActivityViewModel: MainActivityViewModel
 ) {
     if (rootedDeviceViewModel.showRootedDeviceWarning) {
         RootedDeviceScreen { rootedDeviceViewModel.ignoreRootedDeviceWarning() }
     } else {
         MainScreen(
-            transactionsViewModel,
+            mainActivityViewModel,transactionsViewModel,
             navController,
             searchViewModel = searchViewModel,
             mainActivity = mainActivity
@@ -148,12 +159,21 @@ private fun MainScreenWithRootedDeviceCheck(
 )
 @Composable
 private fun MainScreen(
+    mainActivityViewModel: MainActivityViewModel,
     transactionsViewModel: TransactionsViewModel,
     fragmentNavController: NavController,
     viewModel: MainViewModel = viewModel(factory = MainModule.Factory()),
     searchViewModel: MarketSearchViewModel,
     mainActivity: MainActivity
 ) {
+    val activityIntent by mainActivityViewModel.intentLiveData.observeAsState()
+    LaunchedEffect(activityIntent) {
+        activityIntent?.data?.let {
+            mainActivityViewModel.intentHandled()
+            viewModel.handleDeepLink(it)
+        }
+    }
+
     val uiState = viewModel.uiState
     val selectedPage = uiState.selectedTabIndex
     val pagerState = rememberPagerState(initialPage = selectedPage) { uiState.mainNavItems.size }
@@ -169,16 +189,6 @@ private fun MainScreen(
             mainActivity.showBillingPlusDialog()
         }
     })
-
-    LaunchedEffect(Unit) {
-        mainActivity.let { activity ->
-            activity.intent?.data?.let { uri ->
-                viewModel.handleDeepLink(uri)
-                activity.intent?.data = null //clear intent data
-            }
-        }
-    }
-
 
     ModalBottomSheetLayout(
         sheetState = modalBottomSheetState,

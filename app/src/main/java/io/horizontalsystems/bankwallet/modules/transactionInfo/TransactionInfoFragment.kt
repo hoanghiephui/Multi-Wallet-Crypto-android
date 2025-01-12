@@ -292,8 +292,11 @@ fun TransactionInfoSection(
                         }
                     }
 
-                    else -> {
-                        //do nothing
+                    is TransactionInfoViewItem.Description -> {
+
+                    }
+                    is TransactionInfoViewItem.WarningMessage -> {
+
                     }
                 }
             }

@@ -28,7 +28,7 @@ import io.horizontalsystems.bankwallet.modules.billing.showBillingPlusDialog
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
 import io.horizontalsystems.bankwallet.modules.main.MainModule.MainNavigation
 import io.horizontalsystems.bankwallet.modules.market.topplatforms.Platform
-import io.horizontalsystems.bankwallet.modules.nft.collection.NftCollectionFragment
+import io.horizontalsystems.bankwallet.modules.tonconnect.TonConnectMainFragment
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCManager
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCSessionManager
 import io.horizontalsystems.bankwallet.modules.walletconnect.list.WCListFragment
@@ -305,15 +305,6 @@ class MainViewModel(
                         }
                     }
 
-                    deeplinkString.contains("nft-collection") -> {
-                        val blockchainTypeUid = deepLink.getQueryParameter("blockchainTypeUid")
-                        if (uid != null && blockchainTypeUid != null) {
-                            deeplinkPage = DeeplinkPage(R.id.nftCollectionFragment, NftCollectionFragment.Input(uid, blockchainTypeUid))
-
-                            stat(page = StatPage.Widget, event = StatEvent.Open(StatPage.TopNftCollections))
-                        }
-                    }
-
                     deeplinkString.contains("top-platforms") -> {
                         val title = deepLink.getQueryParameter("title")
                         if (title != null && uid != null) {
@@ -339,10 +330,14 @@ class MainViewModel(
                 }
             }
 
-//            deeplinkString.startsWith("tc:") -> {
-//                deeplinkPage = DeeplinkPage(R.id.tcListFragment, TonConnectMainFragment.Input(deeplinkString))
-//                tab = MainNavigation.Settings
-//            }
+            deeplinkString.startsWith("unstoppable.money:") ||
+            deeplinkString.startsWith("tc:") -> {
+                val v = deepLink.getQueryParameter("v")?.toIntOrNull()
+                if (v != null) {
+                    deeplinkPage = DeeplinkPage(R.id.tcListFragment, TonConnectMainFragment.Input(deeplinkString))
+                    tab = MainNavigation.Settings
+                }
+            }
 
             deeplinkString.startsWith("https://unstoppable.money/referral") -> {
                 val userId: String? = deepLink.getQueryParameter("userId")

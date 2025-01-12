@@ -21,7 +21,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
-import io.horizontalsystems.bankwallet.core.getInput
 import io.horizontalsystems.bankwallet.core.managers.FaqManager
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.Account
@@ -38,12 +37,9 @@ class BackupKeyFragment : BaseComposeFragment(screenshotEnabled = false) {
 
     @Composable
     override fun GetContent(navController: NavController) {
-        val account = navController.getInput<Account>()
-        if (account == null) {
-            navController.popBackStack(R.id.mainFragment, false)
-            return
+        withInput<Account>(navController) { account ->
+            RecoveryPhraseScreen(navController, account)
         }
-        RecoveryPhraseScreen(navController, account)
     }
 
     override var logScreen: String
