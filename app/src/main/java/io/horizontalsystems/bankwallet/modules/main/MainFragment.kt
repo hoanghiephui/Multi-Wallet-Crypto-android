@@ -1,8 +1,8 @@
 package io.horizontalsystems.bankwallet.modules.main
 
 import android.Manifest
-import android.os.Build
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.BackHandler
@@ -20,9 +20,6 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BadgedBox
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
@@ -42,9 +39,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.fragment.app.viewModels
-import androidx.compose.ui.unit.dp
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.LifecycleEventEffect
@@ -59,7 +55,6 @@ import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
-import io.horizontalsystems.bankwallet.core.managers.RateAppManager
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
@@ -102,7 +97,10 @@ class MainFragment : BaseComposeFragment() {
         val backStackEntry = navController.safeGetBackStackEntry(R.id.mainFragment)
 
         backStackEntry?.let {
-            val viewModel = ViewModelProvider(backStackEntry.viewModelStore,  TransactionsModule.Factory())[TransactionsViewModel::class.java]
+            val viewModel = ViewModelProvider(
+                backStackEntry.viewModelStore,
+                TransactionsModule.Factory()
+            )[TransactionsViewModel::class.java]
             MainScreenWithRootedDeviceCheck(
                 transactionsViewModel = viewModel,
                 navController = navController,
@@ -146,7 +144,7 @@ private fun MainScreenWithRootedDeviceCheck(
         RootedDeviceScreen { rootedDeviceViewModel.ignoreRootedDeviceWarning() }
     } else {
         MainScreen(
-            mainActivityViewModel,transactionsViewModel,
+            mainActivityViewModel, transactionsViewModel,
             navController,
             searchViewModel = searchViewModel,
             mainActivity = mainActivity
@@ -154,9 +152,6 @@ private fun MainScreenWithRootedDeviceCheck(
     }
 }
 
-@OptIn(
-    ExperimentalMaterialApi::class, ExperimentalFoundationApi::class
-)
 @Composable
 private fun MainScreen(
     mainActivityViewModel: MainActivityViewModel,

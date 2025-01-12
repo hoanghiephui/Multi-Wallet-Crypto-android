@@ -58,7 +58,7 @@ class EvmPrivateKeyFragment : BaseComposeFragment(screenshotEnabled = false) {
         get() = "EvmPrivateKeyFragment"
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EvmPrivateKeyScreen(
     navController: NavController,

@@ -60,7 +60,7 @@ class BaseCurrencySettingsFragment : BaseComposeFragment() {
         get() = "BaseCurrencySettingsFragment"
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class,
+@OptIn(ExperimentalMaterial3Api::class,
     ExperimentalMaterial3Api::class
 )
 @Composable

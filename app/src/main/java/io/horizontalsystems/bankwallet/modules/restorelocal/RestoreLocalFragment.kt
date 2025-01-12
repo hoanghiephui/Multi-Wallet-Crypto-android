@@ -277,7 +277,7 @@ private fun RestoreLocalScreen(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BackupFileItems(
     viewModel: RestoreLocalViewModel,

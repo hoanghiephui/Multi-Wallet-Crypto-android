@@ -78,7 +78,7 @@ class CoinRankFragment : BaseComposeFragment() {
         get() = "CoinRankFragment"
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun CoinRankScreen(
     type: RankType,

@@ -66,7 +66,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.diffText
 import io.horizontalsystems.bankwallet.ui.extensions.RotatingCircleProgressView
 import io.horizontalsystems.core.helpers.HudHelper
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun BalanceForAccountCex(navController: NavController, accountViewItem: AccountViewItem) {
     val viewModel = viewModel<BalanceCexViewModel>(factory = BalanceModule.FactoryCex())

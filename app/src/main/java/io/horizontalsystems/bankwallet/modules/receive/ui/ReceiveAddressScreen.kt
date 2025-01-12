@@ -112,7 +112,7 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReceiveAddressScreen(
     title: String,

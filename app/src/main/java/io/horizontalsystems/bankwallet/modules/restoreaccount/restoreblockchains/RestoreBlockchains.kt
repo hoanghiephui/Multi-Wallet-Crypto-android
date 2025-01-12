@@ -59,7 +59,7 @@ import io.horizontalsystems.marketkit.models.Blockchain
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageWalletsScreen(
     mainViewModel: RestoreViewModel,

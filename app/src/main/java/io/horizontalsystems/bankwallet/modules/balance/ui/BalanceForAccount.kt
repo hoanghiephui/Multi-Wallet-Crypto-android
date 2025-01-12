@@ -68,7 +68,7 @@ import io.horizontalsystems.core.helpers.HudHelper
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BalanceForAccount(navController: NavController, accountViewItem: AccountViewItem) {
     val viewModel = viewModel<BalanceViewModel>(factory = BalanceModule.Factory())

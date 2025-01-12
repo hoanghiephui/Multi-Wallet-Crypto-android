@@ -61,7 +61,7 @@ enum class ContactsScreenBottomSheetType {
     ReplaceAddressConfirmation, RestoreContactsConfirmation
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ContactsScreen(
     viewModel: ContactsViewModel,

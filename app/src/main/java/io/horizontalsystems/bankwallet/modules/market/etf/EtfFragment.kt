@@ -98,7 +98,7 @@ class EtfFragment : BaseComposeFragment() {
         get() = "EtfFragment"
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun EtfPage(
     viewModel: EtfViewModel,

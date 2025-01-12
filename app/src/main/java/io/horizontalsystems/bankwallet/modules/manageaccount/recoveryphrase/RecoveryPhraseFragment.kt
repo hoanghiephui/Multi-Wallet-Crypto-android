@@ -59,7 +59,7 @@ class RecoveryPhraseFragment : BaseComposeFragment(screenshotEnabled = false) {
         get() = "RecoveryPhraseFragment"
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RecoveryPhraseScreen(
     navController: NavController,

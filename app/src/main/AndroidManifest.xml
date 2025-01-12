@@ -466,7 +466,7 @@
             android:icon="@mipmap/launcher_pepe"
             android:label="@string/App_Name"
             android:exported="true"
-            android:targetActivity=".modules.main.MainActivity">
+            android:targetActivity="io.horizontalsystems.bankwallet.modules.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -505,7 +505,7 @@
             android:icon="@mipmap/launcher_doge"
             android:label="@string/App_Name"
             android:exported="true"
-            android:targetActivity=".modules.main.MainActivity">
+            android:targetActivity="io.horizontalsystems.bankwallet.modules.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -544,7 +544,7 @@
             android:icon="@mipmap/launcher_gigachad"
             android:label="@string/App_Name"
             android:exported="true"
-            android:targetActivity=".modules.main.MainActivity">
+            android:targetActivity="io.horizontalsystems.bankwallet.modules.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -583,7 +583,7 @@
             android:icon="@mipmap/launcher_plflag"
             android:label="@string/App_Name"
             android:exported="true"
-            android:targetActivity=".modules.main.MainActivity">
+            android:targetActivity="io.horizontalsystems.bankwallet.modules.main.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

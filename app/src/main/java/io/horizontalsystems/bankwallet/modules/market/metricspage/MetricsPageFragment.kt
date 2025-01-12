@@ -78,7 +78,7 @@ class MetricsPageFragment : BaseComposeFragment() {
         navController.slideFromRight(R.id.coinFragment, arguments)
     }
 
-    @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
     @Composable
     fun MetricsPage(
         viewModel: MetricsPageViewModel,

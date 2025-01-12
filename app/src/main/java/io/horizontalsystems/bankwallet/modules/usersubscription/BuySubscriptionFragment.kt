@@ -25,6 +25,9 @@ class BuySubscriptionFragment : BaseComposeFragment() {
             onClose = { navController.popBackStack() })
     }
 
+    override val logScreen: String
+        get() = "BuySubscriptionFragment"
+
     @Parcelize
     data class Input(val action: IPaidAction) : Parcelable
 

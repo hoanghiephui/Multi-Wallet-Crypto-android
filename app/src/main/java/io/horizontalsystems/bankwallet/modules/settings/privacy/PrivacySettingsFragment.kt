@@ -59,8 +59,7 @@ class PrivacySettingsFragment : BaseComposeFragment() {
         SecurityTorSettingsModule.Factory()
     }
 
-@OptIn(ExperimentalMaterial3Api::class)
-    @Composable
+@Composable
     override fun GetContent(navController: NavController) {
         PrivacyScreen(
             navController = navController,
@@ -69,6 +68,9 @@ class PrivacySettingsFragment : BaseComposeFragment() {
             restartApp = { restartApp() },
         )
     }
+
+    override val logScreen: String
+        get() = "PrivacySettingsFragment"
 
     private fun showAppRestartAlert() {
         val warningTitle = if (torViewModel.torCheckEnabled) {
@@ -115,6 +117,7 @@ class PrivacySettingsFragment : BaseComposeFragment() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PrivacyScreen(
     navController: NavController,

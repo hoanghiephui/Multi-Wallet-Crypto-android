@@ -61,7 +61,7 @@ import io.horizontalsystems.bankwallet.ui.extensions.BottomSheetHeader
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SendBtcAdvancedSettingsScreen(
     fragmentNavController: NavController,

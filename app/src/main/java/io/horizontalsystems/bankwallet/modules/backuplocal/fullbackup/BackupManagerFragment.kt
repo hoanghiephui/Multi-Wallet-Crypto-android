@@ -84,7 +84,7 @@ class BackupManagerFragment : BaseComposeFragment() {
         get() = "BackupManagerFragment"
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BackupManagerScreen(
     onBackClick: () -> Unit,

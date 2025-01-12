@@ -80,7 +80,7 @@ class AppearanceFragment : BaseComposeFragment() {
         set(value) {}
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppearanceScreen(navController: NavController) {
     val viewModel = viewModel<AppearanceViewModel>(factory = AppearanceModule.Factory())

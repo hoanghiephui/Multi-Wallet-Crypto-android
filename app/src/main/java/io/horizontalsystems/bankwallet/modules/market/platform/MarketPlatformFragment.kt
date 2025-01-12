@@ -76,7 +76,7 @@ class MarketPlatformFragment : BaseComposeFragment() {
         get() = "MarketPlatformFragment"
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun PlatformScreen(
     factory: ViewModelProvider.Factory,

@@ -76,7 +76,7 @@ class DetectorsFragment : BaseComposeFragment() {
         get() = "DetectorsFragment"
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DetectorsScreen(
     viewModel: DetectorsViewModel,

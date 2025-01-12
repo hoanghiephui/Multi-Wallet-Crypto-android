@@ -71,7 +71,7 @@ enum class ContactScreenBottomSheetType {
     DeleteConfirmation, DiscardChangesConfirmation
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContactScreen(
     viewModel: ContactViewModel,

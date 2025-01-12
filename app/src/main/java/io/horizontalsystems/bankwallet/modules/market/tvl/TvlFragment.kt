@@ -87,7 +87,7 @@ class TvlFragment : BaseComposeFragment() {
         }
     }
 
-    @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
     @Composable
     private fun TvlScreen(
         tvlViewModel: TvlViewModel,
