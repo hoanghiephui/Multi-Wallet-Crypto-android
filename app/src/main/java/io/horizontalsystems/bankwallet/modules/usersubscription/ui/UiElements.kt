@@ -18,19 +18,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material3.Icon
-import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.Surface
-import androidx.compose.material.Tab
-import androidx.compose.material.TabRow
-import androidx.compose.material.TabRowDefaults
-import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.material3.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -119,7 +119,7 @@ fun SelectSubscriptionBottomSheet(
     }
 
     uiState.purchase?.let {
-        if(it.status == HSPurchase.Status.Purchased) {
+        if (it.status == HSPurchase.Status.Purchased) {
             onPurchase(type)
         }
     }
@@ -176,7 +176,7 @@ fun SelectSubscriptionBottomSheet(
                     activity?.let {
                         viewModel.launchPurchaseFlow(
                             subscriptionId = subscriptionId,
-                            planId = uiState.basePlans[selectedItemIndex.value].id,
+                            planId = uiState.basePlans[selectedItemIndex.intValue].id,
                             activity = it
                         )
                     }
@@ -237,7 +237,7 @@ fun SubscriptionOption(
                 }
             }
 
-            Row() {
+            Row {
                 subhead2_jacob(price)
                 if (note.isNotEmpty()) {
                     HSpacer(4.dp)
@@ -263,7 +263,7 @@ fun PlanItems(
                 click = { onItemClick(item) }
             )
             if (index < items.size - 1) {
-                Divider(color = ComposeAppTheme.colors.steel20)
+                HorizontalDivider(color = ComposeAppTheme.colors.steel20)
             }
         }
     }
@@ -446,10 +446,10 @@ fun SubscriptionTabs(
         TabRow(
             selectedTabIndex = selectedTabIndex.value,
             modifier = modifier,
-            backgroundColor = ComposeAppTheme.colors.transparent, // Dark background
+            containerColor = ComposeAppTheme.colors.transparent, // Dark background
             contentColor = Color(0xFFEDD716),
             indicator = { tabPositions ->
-                TabRowDefaults.Indicator(
+                SecondaryIndicator(
                     Modifier
                         .tabIndicatorOffset(tabPositions[selectedTabIndex.value])
                         .height(0.dp), // No indicator line

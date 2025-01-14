@@ -13,11 +13,12 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Scaffold
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -64,7 +65,7 @@ fun SelectSubscriptionScreen(
     val subscriptions = uiState.subscriptions
 
     val coroutineScope = rememberCoroutineScope()
-    val selectedTabIndex = remember { mutableStateOf(0) }
+    val selectedTabIndex = remember { mutableIntStateOf(0) }
     val plansModalBottomSheetState =
         androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val infoModalBottomSheetState =
@@ -72,11 +73,11 @@ fun SelectSubscriptionScreen(
     var isPlanSelectBottomSheetVisible by remember { mutableStateOf(false) }
     var isInfoBottomSheetVisible by remember { mutableStateOf(false) }
     val scrollScope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(initialPage = selectedTabIndex.value) { 2 }
+    val pagerState = rememberPagerState(initialPage = selectedTabIndex.intValue) { 2 }
     var infoBottomSheetAction: IPaidAction? = null
 
     Scaffold(
-        backgroundColor = ComposeAppTheme.colors.tyler,
+        containerColor = ComposeAppTheme.colors.tyler,
         topBar = {
             TitleCenteredTopBar(
                 title = stringResource(R.string.Premium_Title),
@@ -115,7 +116,6 @@ fun SelectSubscriptionScreen(
 
                     Column(
                         modifier = Modifier
-                            .padding(paddingValues)
                             .weight(1f)
                             .verticalScroll(rememberScrollState())
                     ) {
