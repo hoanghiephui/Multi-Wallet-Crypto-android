@@ -9,6 +9,7 @@ import io.horizontalsystems.subscriptions.core.IPaidAction
 import io.horizontalsystems.subscriptions.core.PricingPhase
 import io.horizontalsystems.subscriptions.core.Subscription
 import io.horizontalsystems.subscriptions.core.SubscriptionService
+import androidx.core.content.edit
 
 class SubscriptionServiceDev(context: Context) : SubscriptionService {
     private val prefs: SharedPreferences by lazy {
@@ -24,7 +25,7 @@ class SubscriptionServiceDev(context: Context) : SubscriptionService {
     }
 
     private fun setActiveSubscription(subscription: String?) {
-        prefs.edit().putString(KEY_ACTIVE_SUBSCRIPTION, subscription).commit()
+        prefs.edit(commit = true) { putString(KEY_ACTIVE_SUBSCRIPTION, subscription) }
     }
 
     override fun getBasePlans(subscriptionId: String): List<BasePlan> =
