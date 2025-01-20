@@ -8,30 +8,26 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material.OutlinedTextField
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -39,6 +35,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -94,42 +92,47 @@ fun SearchBar(
             androidx.compose.material3.SearchBar(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .fillMaxWidth(),
-                query = text,
-                onQueryChange = {
-                    text = it
-                    onSearchTextChanged.invoke(it)
-                    searchClear = it.isNotEmpty()
+                    .semantics { traversalIndex = 0f },
+                inputField = {
+                    SearchBarDefaults.InputField(
+                        query = text,
+                        onQueryChange = {
+                            text = it
+                            onSearchTextChanged(it)
+                            searchClear = it.isNotEmpty()
+                        },
+                        onSearch = {
+                            active = false
+                            searchMode = false
+                            keyboardController?.hide()
+                        },
+                        expanded = active,
+                        onExpandedChange = { active = it },
+                        placeholder = { Text(hint) },
+                        leadingIcon = {
+                            IconButton(onClick = {
+                                active = false
+                                searchMode = false
+                                keyboardController?.hide()
+                                onSearchTextChanged("")
+                            }) {
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                            }
+                        },
+                        trailingIcon = {
+                            if (searchClear) {
+                                IconButton(onClick = {
+                                    searchClear = false
+                                    text = ""
+                                }) {
+                                    Icon(Icons.Default.Clear, contentDescription = null)
+                                }
+                            }
+                        },
+                    )
                 },
-                onSearch = {
-                    active = false
-                    searchMode = false
-                    keyboardController?.hide()
-                },
-                active = active,
-                onActiveChange = {
-                    active = it
-                },
-                placeholder = { Text(hint) },
-                leadingIcon = {
-                    IconButton(onClick = {
-                        active = false
-                        searchMode = false
-                        keyboardController?.hide()
-                    }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
-                    }
-                },
-                trailingIcon = {
-                    if (searchClear) {
-                        IconButton(onClick = {
-                            searchClear = false
-                            text = ""
-                        }) {
-                            Icon(Icons.Default.Clear, contentDescription = null)
-                        }
-                    }
-                },
+                expanded = active,
+                onExpandedChange = { active = it },
             ) {
                 content.invoke()
             }
@@ -139,7 +142,6 @@ fun SearchBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @ExperimentalAnimationApi
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBar(
     title: String,
@@ -159,9 +161,7 @@ fun SearchBar(
     val backgroundColor: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors()
 
     TopAppBar(
-        modifier = Modifier
-            .windowInsetsPadding(TopAppBarDefaults.windowInsets)
-,        title = {
+        modifier = Modifier, title = {
             title3_leah(
                 text = if (searchMode) "" else title,
                 maxLines = 1,
@@ -172,19 +172,19 @@ fun SearchBar(
         navigationIcon = {
             HsIconButton(onClick = {
                 if (searchMode && !searchOnlyMode) {
-                        searchText = ""
-                        onSearchTextChanged.invoke("")
-                        searchMode = false
-                    } else {
-                        onClose.invoke()
-                    }
-                }) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_back),
-                        contentDescription = stringResource(R.string.Button_Back),
-                    )
+                    searchText = ""
+                    onSearchTextChanged.invoke("")
+                    searchMode = false
+                } else {
+                    onClose.invoke()
                 }
-            },
+            }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_back),
+                    contentDescription = stringResource(R.string.Button_Back),
+                )
+            }
+        },
         actions = {
             if (searchMode) {
                 OutlinedTextField(
@@ -206,12 +206,10 @@ fun SearchBar(
                         )
                     },
                     textStyle = ComposeAppTheme.typography.body,
-                    colors = TextFieldDefaults.textFieldColors(
+                    colors = TextFieldDefaults.colors(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        backgroundColor = Color.Transparent,
                         cursorColor = ComposeAppTheme.colors.jacob,
-                        textColor = ComposeAppTheme.colors.leah
                     ),
                     maxLines = 1,
                     singleLine = true,

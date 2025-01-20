@@ -55,7 +55,12 @@ class ConfiguredTokenInfoDialog : BaseComposableBottomSheetFragment() {
             )
             setContent {
                 val navController = findNavController()
-                ConfiguredTokenInfo(navController, navController.requireInput<Token>())
+                val token = navController.requireInput<Token>()
+                token?.let {
+                    ConfiguredTokenInfo(navController, token)
+                } ?: run {
+                    navController.popBackStack()
+                }
             }
         }
     }

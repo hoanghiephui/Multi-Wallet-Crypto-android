@@ -37,7 +37,10 @@ import kotlinx.parcelize.Parcelize
 class SendFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
-        val input = navController.requireInput<Input>()
+        val input = navController.requireInput<Input>() ?: run {
+            navController.popBackStack()
+            return
+        }
         val wallet = input.wallet
         val title = input.title
         val sendEntryPointDestId = input.sendEntryPointDestId
@@ -107,16 +110,14 @@ class SendFragment : BaseComposeFragment() {
                     BlockchainType.Gnosis,
                     BlockchainType.Fantom,
                     BlockchainType.ArbitrumOne -> {
-                        setContent {
-                            SendEvmNavHost(
-                                title,
-                                findNavController(),
-                                amountInputModeViewModel,
-                                prefilledData,
-                                wallet,
-                                predefinedAddress
-                            )
-                        }
+                        SendEvmNavHost(
+                            title,
+                            findNavController(),
+                            amountInputModeViewModel,
+                            prefilledData,
+                            wallet,
+                            predefinedAddress
+                        )
                     }
 
             BlockchainType.Solana -> {

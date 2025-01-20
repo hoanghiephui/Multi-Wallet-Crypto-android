@@ -39,7 +39,11 @@ class FeeSettingsInfoDialog : BaseComposableBottomSheetFragment() {
                 val input = navController.requireInput<Input>()
 
                 ComposeAppTheme {
-                    FeeSettingsInfoScreen(input.title, input.text) { dismiss() }
+                    input?.let {
+                        FeeSettingsInfoScreen(input.title, input.text) { dismiss() }
+                    } ?: run {
+                        navController.popBackStack()
+                    }
                 }
             }
         }

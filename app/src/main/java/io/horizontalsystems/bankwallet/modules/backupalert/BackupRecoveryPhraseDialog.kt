@@ -55,7 +55,12 @@ class BackupRecoveryPhraseDialog : BaseComposableBottomSheetFragment() {
             )
             setContent {
                 val navController = findNavController()
-                BackupRecoveryPhraseScreen(navController, navController.requireInput())
+                val account = navController.requireInput<Account>()
+                account?.let {
+                    BackupRecoveryPhraseScreen(navController, account)
+                } ?: run {
+                    navController.popBackStack()
+                }
             }
         }
     }

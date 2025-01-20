@@ -50,9 +50,13 @@ class UnlinkAccountDialog : BaseComposableBottomSheetFragment() {
             )
             setContent {
                 val navController = findNavController()
-
+                val account = navController.requireInput<Account>()
                 ComposeAppTheme {
-                    UnlinkAccountScreen(navController, navController.requireInput())
+                    account?.let {
+                        UnlinkAccountScreen(navController, account)
+                    } ?: run {
+                        navController.popBackStack()
+                    }
                 }
             }
         }

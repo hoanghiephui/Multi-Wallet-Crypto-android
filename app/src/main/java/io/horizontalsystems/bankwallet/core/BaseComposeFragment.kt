@@ -70,7 +70,9 @@ abstract class BaseComposeFragment(
             navController.popBackStack()
             return
         }
-        content(input)
+        input?.let { content(it) } ?: run {
+            navController.popBackStack()
+        }
     }
 
     @Composable

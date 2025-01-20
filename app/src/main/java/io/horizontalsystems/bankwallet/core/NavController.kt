@@ -155,8 +155,8 @@ inline fun <reified T: Parcelable> Bundle.getInputX() : T? {
     return parcelable("input")
 }
 
-inline fun <reified T: Parcelable> NavController.requireInput() : T {
-    return getInput()!!
+inline fun <reified T: Parcelable> NavController.requireInput() : T? {
+    return getInput()
 }
 
 fun <T: Parcelable> NavController.setNavigationResultX(result: T) {

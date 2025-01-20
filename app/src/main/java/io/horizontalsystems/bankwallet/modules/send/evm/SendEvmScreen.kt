@@ -18,11 +18,12 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Scaffold
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +35,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
@@ -81,6 +83,7 @@ import io.horizontalsystems.core.helpers.HudHelper
 import io.horizontalsystems.marketkit.models.Token
 import java.math.BigDecimal
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SendEvmScreen(
     title: String,
@@ -141,7 +144,8 @@ fun SendEvmScreen(
                     )
                 )
             },
-            backgroundColor = ComposeAppTheme.colors.tyler,
+            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.background,
         ) {
             Box(
                 modifier = Modifier
@@ -210,8 +214,8 @@ fun SendEvmScreen(
                     )
 
                     VSpacer(16.dp)
-                    Spacer(modifier = Modifier.height(12.dp))
                     MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
+                    Spacer(modifier = Modifier.height(12.dp))
                     ButtonPrimaryYellow(
                         modifier = Modifier
                             .fillMaxWidth()
