@@ -79,7 +79,7 @@ fun SendTonScreen(
 
         SendScreen(
             title = title,
-            onCloseClick = { navController.popBackStack() }
+            onBack = { navController.popBackStack() }
         ) {
             AvailableBalance(
                 coinCode = wallet.coin.code,

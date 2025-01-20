@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,6 +24,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
@@ -134,6 +137,7 @@ fun SearchBar(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @ExperimentalAnimationApi
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -155,7 +159,9 @@ fun SearchBar(
     val backgroundColor: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors()
 
     TopAppBar(
-        title = {
+        modifier = Modifier
+            .windowInsetsPadding(TopAppBarDefaults.windowInsets)
+,        title = {
             title3_leah(
                 text = if (searchMode) "" else title,
                 maxLines = 1,

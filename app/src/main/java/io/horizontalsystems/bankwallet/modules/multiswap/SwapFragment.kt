@@ -8,11 +8,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -35,8 +39,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
@@ -389,19 +395,28 @@ private fun SwapScreenInner(
             if (amountInputHasFocus && keyboardState == Keyboard.Opened) {
                 val hasNonZeroBalance =
                     uiState.availableBalance != null && uiState.availableBalance > BigDecimal.ZERO
-
-                SuggestionsBar(
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                    onDelete = {
-                        onEnterAmount.invoke(null)
-                    },
-                    onSelect = {
-                        focusManager.clearFocus()
-                        onEnterAmountPercentage.invoke(it)
-                    },
-                    selectEnabled = hasNonZeroBalance,
-                    deleteEnabled = uiState.amountIn != null,
-                )
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        // Add IME (keyboard) padding to push content above keyboard
+                        .windowInsetsPadding(
+                            WindowInsets.ime
+                        )
+                        .systemBarsPadding()
+                ) {
+                    SuggestionsBar(
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        onDelete = {
+                            onEnterAmount.invoke(null)
+                        },
+                        onSelect = {
+                            focusManager.clearFocus()
+                            onEnterAmountPercentage.invoke(it)
+                        },
+                        selectEnabled = hasNonZeroBalance,
+                        deleteEnabled = uiState.amountIn != null,
+                    )
+                }
             }
         }
     }
@@ -724,7 +739,7 @@ private fun CoinSelector(
 }
 
 @Composable
-private fun FiatAmountInput(
+fun FiatAmountInput(
     value: BigDecimal?,
     currency: Currency,
     onValueChange: (BigDecimal?) -> Unit,
@@ -797,9 +812,10 @@ private fun Selector(
 }
 
 @Composable
-private fun AmountInput(
+fun AmountInput(
     value: BigDecimal?,
     onValueChange: (BigDecimal?) -> Unit,
+    focusRequester: FocusRequester = FocusRequester()
 ) {
     var amount by rememberSaveable {
         mutableStateOf(value)
@@ -824,6 +840,7 @@ private fun AmountInput(
     BasicTextField(
         modifier = Modifier
             .fillMaxWidth()
+            .focusRequester(focusRequester)
             .onFocusChanged {
                 setCursorToEndOnFocused = it.isFocused
 

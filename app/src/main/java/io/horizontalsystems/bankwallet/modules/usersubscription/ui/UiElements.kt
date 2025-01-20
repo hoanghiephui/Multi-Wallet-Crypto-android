@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,6 +32,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults.SecondaryIndicator
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -380,6 +382,7 @@ fun ButtonPrimaryCustomColor(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TitleCenteredTopBar(
     title: String,
@@ -388,6 +391,7 @@ fun TitleCenteredTopBar(
 ) {
     Box(
         modifier = modifier
+            .windowInsetsPadding(TopAppBarDefaults.windowInsets)
             .height(64.dp)
             .fillMaxWidth(),
     ) {

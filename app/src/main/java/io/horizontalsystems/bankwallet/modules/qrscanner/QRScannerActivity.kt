@@ -83,7 +83,6 @@ class QRScannerActivity : BaseActivity() {
                 )
             }
         }
-        setStatusBarTransparent()
     }
 
     private fun onScan(address: String?) {

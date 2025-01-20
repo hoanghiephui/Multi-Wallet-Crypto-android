@@ -3,9 +3,12 @@ package io.horizontalsystems.bankwallet.ui.compose.components
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -114,9 +117,12 @@ fun AppBar(
     menuItems: List<IMenuItem> = listOf(),
     showSpinner: Boolean = false,
     colors: TopAppBarColors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent),
-    scrollBehavior: TopAppBarScrollBehavior? = null
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
 ) {
     TopAppBar(
+        modifier = Modifier
+            .windowInsetsPadding(windowInsets),
         scrollBehavior = scrollBehavior,
         title = title,
         colors = colors,

@@ -16,7 +16,7 @@ import io.horizontalsystems.bankwallet.modules.send.binance.SendBinanceViewModel
 import io.horizontalsystems.bankwallet.modules.send.bitcoin.SendBitcoinModule
 import io.horizontalsystems.bankwallet.modules.send.bitcoin.SendBitcoinNavHost
 import io.horizontalsystems.bankwallet.modules.send.bitcoin.SendBitcoinViewModel
-import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmScreen
+import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmNavHost
 import io.horizontalsystems.bankwallet.modules.send.solana.SendSolanaModule
 import io.horizontalsystems.bankwallet.modules.send.solana.SendSolanaScreen
 import io.horizontalsystems.bankwallet.modules.send.solana.SendSolanaViewModel
@@ -98,23 +98,26 @@ class SendFragment : BaseComposeFragment() {
                 )
             }
 
-            BlockchainType.Ethereum,
-            BlockchainType.BinanceSmartChain,
-            BlockchainType.Polygon,
-            BlockchainType.Avalanche,
-            BlockchainType.Optimism,
-            BlockchainType.Base,BlockchainType.Gnosis,
-            BlockchainType.Fantom,
-            BlockchainType.ArbitrumOne -> {
-                SendEvmScreen(
-                    title,
-                    findNavController(),
-                    amountInputModeViewModel,
-                    prefilledData,
-                    wallet,
-                    predefinedAddress
-                )
-            }
+                    BlockchainType.Ethereum,
+                    BlockchainType.BinanceSmartChain,
+                    BlockchainType.Polygon,
+                    BlockchainType.Avalanche,
+                    BlockchainType.Optimism,
+                    BlockchainType.Base,
+                    BlockchainType.Gnosis,
+                    BlockchainType.Fantom,
+                    BlockchainType.ArbitrumOne -> {
+                        setContent {
+                            SendEvmNavHost(
+                                title,
+                                findNavController(),
+                                amountInputModeViewModel,
+                                prefilledData,
+                                wallet,
+                                predefinedAddress
+                            )
+                        }
+                    }
 
             BlockchainType.Solana -> {
                 val factory = SendSolanaModule.Factory(wallet, predefinedAddress)
