@@ -19,8 +19,8 @@ import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.AppLogger
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
-import io.horizontalsystems.bankwallet.core.setNavigationResultX
 import io.horizontalsystems.bankwallet.core.slideFromBottom
+import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
 import io.horizontalsystems.bankwallet.core.stats.stat
@@ -29,7 +29,6 @@ import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmData
 import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmModule
 import io.horizontalsystems.bankwallet.modules.sendevmtransaction.SendEvmTransactionView
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
-import io.horizontalsystems.core.SnackbarDuration
 import io.horizontalsystems.core.helpers.HudHelper
 import io.horizontalsystems.ethereumkit.models.Address
 import io.horizontalsystems.ethereumkit.models.TransactionData
@@ -120,7 +119,7 @@ private fun SendEvmConfirmationScreen(
 
                     coroutineScope.launch {
                         buttonEnabled = false
-                        HudHelper.showInProcessMessage(view, R.string.Send_Sending, SnackbarDuration.INDEFINITE)
+//                        HudHelper.showInProcessMessage(view, R.string.Send_Sending, SnackbarDuration.INDEFINITE)
 
                         val result = try {
                             logger.info("sending tx")
@@ -138,8 +137,10 @@ private fun SendEvmConfirmationScreen(
                         }
 
                         buttonEnabled = true
-                        navController.setNavigationResultX(result)
-                        navController.popBackStack()
+                        navController.slideFromRight(R.id.sendEvmProcessingFragment)
+                        //todo refactor this part
+//                        navController.setNavigationResultX(result)
+//                        navController.popBackStack()
                     }
                 },
                 enabled = uiState.sendEnabled && buttonEnabled
@@ -156,3 +157,4 @@ private fun SendEvmConfirmationScreen(
         )
     }
 }
+
