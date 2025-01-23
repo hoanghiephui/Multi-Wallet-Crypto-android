@@ -29,6 +29,7 @@ android {
         versionCode 27
         versionName "0.2.7"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        resConfigs "de", "es", "en", "fa", "fr", "ko", "pt", "pt-rBR", "ru", "tr", "zh"
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas".toString())
@@ -310,7 +311,7 @@ dependencies {
     //debugImplementation leakCanary
 
     // Wallet kits
-    implementation 'com.github.horizontalsystems:ton-kit-android:969fe77'
+    implementation 'com.github.horizontalsystems:ton-kit-android:1cb4c1e'
     implementation 'com.github.horizontalsystems:bitcoin-kit-android:4a34f53'
     implementation 'com.github.horizontalsystems:ethereum-kit-android:0c770e3'
     implementation 'com.github.horizontalsystems:blockchain-fee-rate-kit-android:1d3bd49'
