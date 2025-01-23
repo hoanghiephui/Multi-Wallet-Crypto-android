@@ -17,9 +17,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -39,6 +39,7 @@ import io.horizontalsystems.bankwallet.modules.address.AddressParserViewModel
 import io.horizontalsystems.bankwallet.modules.address.HSAddressInput
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
 import io.horizontalsystems.bankwallet.modules.sendtokenselect.PrefilledData
+import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
@@ -305,10 +306,10 @@ private fun AddressSuggestions(
         ) {
             contacts.forEachIndexed { index, contact ->
                 if (index != 0) {
-                    Divider(
+                    HorizontalDivider(
                         modifier = Modifier.fillMaxWidth(),
-                        color = ComposeAppTheme.colors.steel20,
-                        thickness = 0.5.dp
+                        thickness = 0.5.dp,
+                        color = ComposeAppTheme.colors.steel20
                     )
                 }
                 Column(
