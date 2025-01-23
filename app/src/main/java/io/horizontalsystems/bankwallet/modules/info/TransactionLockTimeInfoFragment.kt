@@ -29,7 +29,9 @@ class TransactionLockTimeInfoFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Input>(navController) { input ->
-            InfoScreen(input.lockTime, navController)
+            input?.let {
+                InfoScreen(input.lockTime, navController)
+            } ?: navController.popBackStack()
         }
     }
 

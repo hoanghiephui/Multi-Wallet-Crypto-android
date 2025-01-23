@@ -51,13 +51,15 @@ class SelectBlockchainsFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Input>(navController) { input ->
-            SelectBlockchainsScreen(
-                input.accountType,
-                input.accountName,
-                navController,
-                input.popOffOnSuccess,
-                input.popOffInclusive
-            )
+            input?.let {
+                SelectBlockchainsScreen(
+                    input.accountType,
+                    input.accountName,
+                    navController,
+                    input.popOffOnSuccess,
+                    input.popOffInclusive
+                )
+            } ?: navController.popBackStack()
         }
     }
 

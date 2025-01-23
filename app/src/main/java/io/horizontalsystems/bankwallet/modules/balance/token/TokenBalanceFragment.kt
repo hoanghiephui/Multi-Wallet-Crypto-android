@@ -16,15 +16,22 @@ class TokenBalanceFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Wallet>(navController) { wallet ->
-            val viewModel by viewModels<TokenBalanceViewModel> { TokenBalanceModule.Factory(wallet) }
-            val transactionsViewModel by navGraphViewModels<TransactionsViewModel>(R.id.mainFragment) { TransactionsModule.Factory() }
-
-            NiaBackground {
-                TokenBalanceScreen(
-                    viewModel,
-                    transactionsViewModel,
-                    navController
-                )
+            wallet?.let {
+                val viewModel by viewModels<TokenBalanceViewModel> {
+                    TokenBalanceModule.Factory(
+                        wallet
+                    )
+                }
+                val transactionsViewModel by navGraphViewModels<TransactionsViewModel>(R.id.mainFragment) { TransactionsModule.Factory() }
+                NiaBackground {
+                    TokenBalanceScreen(
+                        viewModel,
+                        transactionsViewModel,
+                        navController
+                    )
+                }
+            } ?: run {
+                navController.popBackStack()
             }
         }
     }

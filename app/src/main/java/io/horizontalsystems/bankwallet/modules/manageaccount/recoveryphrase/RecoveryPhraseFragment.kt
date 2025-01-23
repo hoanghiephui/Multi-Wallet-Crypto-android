@@ -51,7 +51,9 @@ class RecoveryPhraseFragment : BaseComposeFragment(screenshotEnabled = false) {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Account>(navController) { input ->
-            RecoveryPhraseScreen(navController, input)
+            input?.let { account ->
+                RecoveryPhraseScreen(navController, account)
+            } ?: navController.popBackStack()
         }
     }
 

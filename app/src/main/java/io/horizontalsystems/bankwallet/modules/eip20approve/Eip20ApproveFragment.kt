@@ -45,7 +45,11 @@ class Eip20ApproveFragment(override val logScreen: String = "Eip20ApproveFragmen
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Input>(navController) { input ->
-            Eip20ApproveScreen(navController, input)
+            input?.let {
+                Eip20ApproveScreen(navController, it)
+            } ?: run {
+                navController.popBackStack()
+            }
         }
     }
 

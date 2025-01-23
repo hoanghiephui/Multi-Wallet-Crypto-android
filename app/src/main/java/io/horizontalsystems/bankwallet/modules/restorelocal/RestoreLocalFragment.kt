@@ -80,14 +80,16 @@ class RestoreLocalFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Input>(navController) { input ->
-            RestoreLocalNavHost(
-                input.jsonFile,
-                input.fileName,
-                input.statPage,
-                navController,
-                input.popOffOnSuccess,
-                input.popOffInclusive
-            ) { activity?.let { MainModule.startAsNewTask(it) } }
+            input?.let {
+                RestoreLocalNavHost(
+                    input.jsonFile,
+                    input.fileName,
+                    input.statPage,
+                    navController,
+                    input.popOffOnSuccess,
+                    input.popOffInclusive
+                ) { activity?.let { MainModule.startAsNewTask(it) } }
+            } ?: navController.popBackStack()
         }
     }
 

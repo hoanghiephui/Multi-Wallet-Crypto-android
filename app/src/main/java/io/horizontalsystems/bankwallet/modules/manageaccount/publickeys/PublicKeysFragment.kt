@@ -35,7 +35,9 @@ class PublicKeysFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Account>(navController) { account ->
-            ManageAccountScreen(navController, account)
+            account?.let {
+                ManageAccountScreen(navController, it)
+            } ?: navController.popBackStack()
         }
     }
 

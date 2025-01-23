@@ -47,16 +47,18 @@ class MarketCategoryFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<CoinCategory>(navController) { input ->
-            val factory = MarketCategoryModule.Factory(input)
-            val chartViewModel = viewModel<ChartViewModel>(factory = factory)
-            val viewModel = viewModel<MarketCategoryViewModel>(factory = factory)
+            input?.let {
+                val factory = MarketCategoryModule.Factory(input)
+                val chartViewModel = viewModel<ChartViewModel>(factory = factory)
+                val viewModel = viewModel<MarketCategoryViewModel>(factory = factory)
 
-            CategoryScreen(
-                viewModel = viewModel,
-                chartViewModel = chartViewModel,
-                onCloseButtonClick = { navController.popBackStack() },
-                onCoinClick = { coinUid -> onCoinClick(coinUid, navController) }
-            )
+                CategoryScreen(
+                    viewModel = viewModel,
+                    chartViewModel = chartViewModel,
+                    onCloseButtonClick = { navController.popBackStack() },
+                    onCoinClick = { coinUid -> onCoinClick(coinUid, navController) }
+                )
+            } ?: navController.popBackStack()
         }
     }
 

@@ -58,18 +58,20 @@ class MarketPlatformFragment : BaseComposeFragment() {
     override fun GetContent(navController: NavController) {
 
         withInput<Platform>(navController) { platform ->
-            val factory = MarketPlatformModule.Factory(platform)
+            platform?.let {
+                val factory = MarketPlatformModule.Factory(platform)
 
-            PlatformScreen(
-                factory = factory,
-                onCloseButtonClick = { navController.popBackStack() },
-                onCoinClick = { coinUid ->
-                    val arguments = CoinFragment.Input(coinUid)
-                    navController.slideFromRight(R.id.coinFragment, arguments)
+                PlatformScreen(
+                    factory = factory,
+                    onCloseButtonClick = { navController.popBackStack() },
+                    onCoinClick = { coinUid ->
+                        val arguments = CoinFragment.Input(coinUid)
+                        navController.slideFromRight(R.id.coinFragment, arguments)
 
-                    stat(page = StatPage.TopPlatform, event = StatEvent.OpenCoin(coinUid))
-                }
-            )
+                        stat(page = StatPage.TopPlatform, event = StatEvent.OpenCoin(coinUid))
+                    }
+                )
+            } ?: navController.popBackStack()
         }
     }
     override val logScreen: String

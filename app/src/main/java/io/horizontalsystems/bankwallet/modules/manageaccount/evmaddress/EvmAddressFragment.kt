@@ -39,7 +39,9 @@ class EvmAddressFragment : BaseComposeFragment(screenshotEnabled = false) {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Input>(navController) { input ->
-            EvmAddressScreen(input.evmAddress, navController)
+            input?.let {
+                EvmAddressScreen(input.evmAddress, navController)
+            } ?: navController.popBackStack()
         }
     }
 

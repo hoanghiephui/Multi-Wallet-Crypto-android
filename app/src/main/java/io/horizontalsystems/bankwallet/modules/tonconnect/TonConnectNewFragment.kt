@@ -9,7 +9,11 @@ class TonConnectNewFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<DAppRequestEntity>(navController) { input ->
-            TonConnectNewScreen(navController, input)
+            input?.let {
+                TonConnectNewScreen(navController, input)
+            } ?: run {
+                navController.popBackStack()
+            }
         }
     }
 

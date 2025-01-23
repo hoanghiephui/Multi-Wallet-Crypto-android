@@ -50,7 +50,9 @@ class EvmPrivateKeyFragment : BaseComposeFragment(screenshotEnabled = false) {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Input>(navController) { input ->
-            EvmPrivateKeyScreen(navController, input.evmPrivateKey)
+            input?.let {
+                EvmPrivateKeyScreen(navController, input.evmPrivateKey)
+            } ?: navController.popBackStack()
         }
     }
 

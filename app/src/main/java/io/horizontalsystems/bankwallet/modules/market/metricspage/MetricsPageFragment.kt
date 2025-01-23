@@ -58,14 +58,16 @@ class MetricsPageFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<MetricsType>(navController) { metricsType ->
-            val factory = MetricsPageModule.Factory(metricsType)
-            val chartViewModel by viewModels<ChartViewModel> { factory }
-            val viewModel by viewModels<MetricsPageViewModel> { factory }
-            MetricsPage(viewModel, chartViewModel, navController) {
-                onCoinClick(it, navController)
+            metricsType?.let {
+                val factory = MetricsPageModule.Factory(metricsType)
+                val chartViewModel by viewModels<ChartViewModel> { factory }
+                val viewModel by viewModels<MetricsPageViewModel> { factory }
+                MetricsPage(viewModel, chartViewModel, navController) {
+                    onCoinClick(it, navController)
 
-                stat(page = metricsType.statPage, event = StatEvent.OpenCoin(it))
-            }
+                    stat(page = metricsType.statPage, event = StatEvent.OpenCoin(it))
+                }
+            } ?: navController.popBackStack()
         }
     }
 

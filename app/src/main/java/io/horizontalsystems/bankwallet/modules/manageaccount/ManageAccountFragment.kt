@@ -61,7 +61,9 @@ class ManageAccountFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Input>(navController) { input ->
-            ManageAccountScreen(navController, input.accountId)
+            input?.let {
+                ManageAccountScreen(navController, input.accountId)
+            } ?: navController.popBackStack()
         }
     }
 

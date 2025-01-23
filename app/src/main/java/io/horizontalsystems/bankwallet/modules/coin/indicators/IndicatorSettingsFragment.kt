@@ -16,6 +16,7 @@ class IndicatorSettingsFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Input>(navController) { input ->
+            input ?: return@withInput
             val indicatorSetting =
                 App.chartIndicatorManager.getChartIndicatorSetting(input.indicatorId)
 

@@ -38,7 +38,9 @@ class BackupKeyFragment : BaseComposeFragment(screenshotEnabled = false) {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Account>(navController) { account ->
-            RecoveryPhraseScreen(navController, account)
+            account?.let {
+                RecoveryPhraseScreen(navController, account)
+            } ?: navController.popBackStack()
         }
     }
 

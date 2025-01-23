@@ -34,7 +34,9 @@ class TransactionSpeedUpCancelFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Input>(navController) { input ->
-            TransactionSpeedUpCancelScreen(navController, input)
+            input?.let {
+                TransactionSpeedUpCancelScreen(navController, it)
+            } ?: navController.popBackStack()
         }
     }
 

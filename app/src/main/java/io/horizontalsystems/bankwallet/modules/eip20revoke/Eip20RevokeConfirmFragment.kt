@@ -42,7 +42,9 @@ class Eip20RevokeConfirmFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Input>(navController) { input ->
-            Eip20RevokeScreen(navController, input)
+            input?.let {
+                Eip20RevokeScreen(navController, it)
+            } ?: navController.popBackStack()
         }
     }
 

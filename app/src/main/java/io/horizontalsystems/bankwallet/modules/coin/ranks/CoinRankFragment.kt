@@ -71,7 +71,11 @@ class CoinRankFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<RankType>(navController) { type ->
-            CoinRankScreen(type, navController)
+            type?.let {
+                CoinRankScreen(it, navController)
+            } ?: run {
+                navController.popBackStack()
+            }
         }
     }
     override val logScreen: String

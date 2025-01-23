@@ -54,8 +54,12 @@ class CexAssetFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<CexAsset>(navController) { asset ->
-            val viewModel by viewModels<CexAssetViewModel> { CexAssetViewModel.Factory(asset) }
-            CexAssetScreen(viewModel, navController)
+            asset?.let {
+                val viewModel by viewModels<CexAssetViewModel> { CexAssetViewModel.Factory(asset) }
+                CexAssetScreen(viewModel, navController)
+            } ?: run {
+                navController.popBackStack()
+            }
         }
     }
     override val logScreen: String

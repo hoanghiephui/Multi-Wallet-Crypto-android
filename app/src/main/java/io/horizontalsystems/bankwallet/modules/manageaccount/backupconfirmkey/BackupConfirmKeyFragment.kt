@@ -44,7 +44,9 @@ class BackupConfirmKeyFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Account>(navController) { input ->
-            RecoveryPhraseVerifyScreen(navController, input)
+            input?.let {
+                RecoveryPhraseVerifyScreen(navController, input)
+            } ?: navController.popBackStack()
         }
     }
 

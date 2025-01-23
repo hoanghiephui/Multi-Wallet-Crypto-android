@@ -29,7 +29,9 @@ class CoinAnalyticsInfoFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<AnalyticInfo>(navController) { input ->
-            CoinAnalyticsInfoScreen(input) { navController.popBackStack() }
+            input?.let {
+                CoinAnalyticsInfoScreen(it) { navController.popBackStack() }
+            } ?: navController.popBackStack()
         }
     }
     override val logScreen: String

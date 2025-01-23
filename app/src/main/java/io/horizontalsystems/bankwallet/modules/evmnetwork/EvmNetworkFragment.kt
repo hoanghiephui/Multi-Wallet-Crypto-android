@@ -76,7 +76,9 @@ class EvmNetworkFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Blockchain>(navController) { input ->
-            EvmNetworkNavHost(navController, input)
+            input?.let {
+                EvmNetworkNavHost(navController, input)
+            } ?: navController.popBackStack()
         }
     }
 

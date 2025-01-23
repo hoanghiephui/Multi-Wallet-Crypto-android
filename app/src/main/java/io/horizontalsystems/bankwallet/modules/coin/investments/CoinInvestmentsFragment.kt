@@ -52,15 +52,22 @@ class CoinInvestmentsFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Input>(navController) { input ->
-            CoinInvestmentsScreen(
-                viewModel = viewModel(factory = CoinInvestmentsModule.Factory(input.coinUid)),
-                onClickNavigation = {
-                    navController.popBackStack()
-                },
-                onClickFundUrl = {
-                    LinkHelper.openLinkInAppBrowser(requireContext(), it)
-                }
-            )
+            input?.let {
+                val viewModel = viewModel<CoinInvestmentsViewModel>(
+                    factory = CoinInvestmentsModule.Factory(input.coinUid)
+                )
+                CoinInvestmentsScreen(
+                    viewModel = viewModel,
+                    onClickNavigation = {
+                        navController.popBackStack()
+                    },
+                    onClickFundUrl = {
+                        LinkHelper.openLinkInAppBrowser(requireContext(), it)
+                    }
+                )
+            } ?: run {
+                navController.popBackStack()
+            }
         }
     }
 

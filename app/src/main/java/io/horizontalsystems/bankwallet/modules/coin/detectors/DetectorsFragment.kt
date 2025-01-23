@@ -57,15 +57,19 @@ class DetectorsFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Input>(navController) { input ->
-            val viewModel = viewModel<DetectorsViewModel>(
-                factory = DetectorsModule.Factory(input.title, input.issues)
-            )
-            DetectorsScreen(
-                viewModel = viewModel,
-                onBackClick = {
-                    navController.popBackStack()
-                },
-            )
+            input?.let {
+                val viewModel = viewModel<DetectorsViewModel>(
+                    factory = DetectorsModule.Factory(input.title, input.issues)
+                )
+                DetectorsScreen(
+                    viewModel = viewModel,
+                    onBackClick = {
+                        navController.popBackStack()
+                    },
+                )
+            } ?: run {
+                navController.popBackStack()
+            }
         }
     }
 

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.annotation.LayoutRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -13,10 +14,12 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import com.android.billing.UserDataRepository
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.wallet.blockchain.bitcoin.R
 import dagger.hilt.android.AndroidEntryPoint
 import io.horizontalsystems.bankwallet.analytics.AnalyticsHelper
 import io.horizontalsystems.bankwallet.analytics.LocalAnalyticsHelper
@@ -49,7 +52,7 @@ abstract class BaseComposeFragment(
             setContent {
                 CompositionLocalProvider(
                     LocalAnalyticsHelper provides analyticsHelper,
-                    androidx.lifecycle.compose.LocalLifecycleOwner provides androidx.compose.ui.platform.LocalLifecycleOwner.current
+                    LocalLifecycleOwner provides LocalLifecycleOwner.current
                 ) {
                     ComposeAppTheme {
                         GetContent(findNavController())
@@ -62,17 +65,17 @@ abstract class BaseComposeFragment(
     @Composable
     protected inline fun <reified T : Parcelable> withInput(
         navController: NavController,
-        content: @Composable (T) -> Unit
+        content: @Composable (T?) -> Unit
     ) {
+        val context = requireContext()
         val input = try {
             navController.requireInput<T>()
         } catch (e: NullPointerException) {
+            Toast.makeText(context, getText(R.string.SyncError), Toast.LENGTH_SHORT).show()
             navController.popBackStack()
             return
         }
-        input?.let { content(it) } ?: run {
-            navController.popBackStack()
-        }
+        content(input)
     }
 
     @Composable

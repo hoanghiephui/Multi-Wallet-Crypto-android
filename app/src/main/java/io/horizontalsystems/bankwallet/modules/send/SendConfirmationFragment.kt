@@ -27,6 +27,7 @@ class SendConfirmationFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Input>(navController) { input ->
+            input ?: return@withInput
             when (input.type) {
                 Type.Bitcoin -> {
                     val sendBitcoinViewModel by navGraphViewModels<SendBitcoinViewModel>(R.id.sendXFragment)

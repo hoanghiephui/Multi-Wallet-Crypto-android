@@ -49,10 +49,14 @@ class BtcBlockchainSettingsFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Blockchain>(navController) { input ->
-            val viewModel = viewModel<BtcBlockchainSettingsViewModel>(
-                factory = BtcBlockchainSettingsModule.Factory(input)
-            )
-            BtcBlockchainSettingsScreen(viewModel, navController)
+            input?.let {
+                val viewModel = viewModel<BtcBlockchainSettingsViewModel>(
+                    factory = BtcBlockchainSettingsModule.Factory(input)
+                )
+                BtcBlockchainSettingsScreen(viewModel, navController)
+            } ?: run {
+                navController.popBackStack()
+            }
         }
     }
 

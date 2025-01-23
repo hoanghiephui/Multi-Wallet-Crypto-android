@@ -40,13 +40,15 @@ class OverallScoreInfoFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<ScoreCategory>(navController) { scoreCategory ->
-            val categoryScores = getScores(scoreCategory)
-            InfoScreen(
-                scoreCategory.title,
-                scoreCategory.description,
-                categoryScores,
-                navController
-            )
+            scoreCategory?.let {
+                val categoryScores = getScores(scoreCategory)
+                InfoScreen(
+                    scoreCategory.title,
+                    scoreCategory.description,
+                    categoryScores,
+                    navController
+                )
+            } ?: navController.popBackStack()
         }
     }
     override val logScreen: String

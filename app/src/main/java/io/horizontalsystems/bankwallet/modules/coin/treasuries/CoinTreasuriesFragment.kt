@@ -54,9 +54,13 @@ class CoinTreasuriesFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Coin>(navController) { input ->
-            CoinTreasuriesScreen(
-                viewModel(factory = CoinTreasuriesModule.Factory(input))
-            )
+            input?.let {
+                CoinTreasuriesScreen(
+                    viewModel(factory = CoinTreasuriesModule.Factory(input))
+                )
+            } ?: run {
+                navController.popBackStack()
+            }
         }
     }
 

@@ -45,11 +45,13 @@ class TransactionDoubleSpendInfoFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Input>(navController) { input ->
-            InfoScreen(
-                txHash = input.transactionHash,
-                conflictingTxHash = input.conflictingTransactionHash,
-                onBackClick = { navController.popBackStack() }
-            )
+            input?.let {
+                InfoScreen(
+                    txHash = input.transactionHash,
+                    conflictingTxHash = input.conflictingTransactionHash,
+                    onBackClick = { navController.popBackStack() }
+                )
+            } ?: navController.popBackStack()
         }
     }
 

@@ -42,7 +42,9 @@ class SendEvmConfirmationFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Input>(navController) { input ->
-            SendEvmConfirmationScreen(navController, input)
+            input?.let {
+                SendEvmConfirmationScreen(navController, it)
+            } ?: navController.popBackStack()
         }
     }
 

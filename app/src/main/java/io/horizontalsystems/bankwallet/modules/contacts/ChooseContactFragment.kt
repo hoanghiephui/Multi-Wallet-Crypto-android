@@ -53,7 +53,11 @@ class ChooseContactFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<BlockchainType>(navController) { blockchainType ->
-            ChooseContactScreen(blockchainType, navController)
+            blockchainType?.let {
+                ChooseContactScreen(blockchainType, navController)
+            } ?: run {
+                navController.popBackStack()
+            }
         }
     }
     override val logScreen: String

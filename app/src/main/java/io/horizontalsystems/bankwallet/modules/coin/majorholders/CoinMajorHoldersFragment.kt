@@ -61,11 +61,15 @@ class CoinMajorHoldersFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
         withInput<Input>(navController) { input ->
-            CoinMajorHoldersScreen(
-                input.coinUid,
-                input.blockchain,
-                navController,
-            )
+            input?.let {
+                CoinMajorHoldersScreen(
+                    input.coinUid,
+                    input.blockchain,
+                    navController,
+                )
+            } ?: run {
+                navController.popBackStack()
+            }
         }
     }
 
