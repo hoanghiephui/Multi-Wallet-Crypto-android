@@ -96,7 +96,7 @@ fun GuidesScreen(navController: NavController) {
                         Column {
                             val tabItems =
                                 categories.map { TabItem(it.category, it == selectedCategory, it) }
-                            ScrollableTabs(tabItems) { tab ->
+                            ScrollableTabs(tabs = tabItems) { tab ->
                                 viewModel.onSelectCategory(tab)
                             }
                             val listState = rememberSaveable(

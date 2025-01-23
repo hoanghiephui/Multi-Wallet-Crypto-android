@@ -438,7 +438,7 @@ private fun FilterTypeTabs(
         TabItem(stringResource(it.item.title), it.selected, it.item)
     }
 
-    ScrollableTabs(tabItems) { transactionType ->
+    ScrollableTabs(tabs = tabItems) { transactionType ->
         onTransactionTypeClick.invoke(transactionType)
     }
 }

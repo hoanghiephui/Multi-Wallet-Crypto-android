@@ -102,7 +102,7 @@ private fun FaqScreen(
                                     it
                                 )
                             }
-                        ScrollableTabs(tabItems) { tab ->
+                        ScrollableTabs(tabs = tabItems) { tab ->
                             viewModel.onSelectSection(tab)
                         }
 

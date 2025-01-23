@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,7 +55,10 @@ import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TopPairsScreen() {
+fun TopPairsScreen(
+    isRefreshing: (Boolean) -> Unit,
+    onSetRefreshCallback: (refresh: () -> Unit) -> Unit,
+) {
     val viewModel = viewModel<TopPairsViewModel>(factory = TopPairsViewModel.Factory())
     val uiState = viewModel.uiState
     val context = LocalContext.current
@@ -63,62 +67,66 @@ fun TopPairsScreen() {
         LazyListState(0, 0)
     }
 
-    HSSwipeRefresh(
-        topPadding = 44,refreshing = uiState.isRefreshing,
-        onRefresh = viewModel::refresh
-    ) {
-        Crossfade(uiState.viewState, label = "",
-            modifier = Modifier
-                .background(color = MaterialTheme.colorScheme.background)) { viewState ->
-            when (viewState) {
-                ViewState.Loading -> {
-                    Loading()
-                }
+    LaunchedEffect(uiState) {
+        isRefreshing(uiState.isRefreshing)
+    }
+    onSetRefreshCallback {
+        viewModel.refresh()
+    }
 
-                is ViewState.Error -> {
-                    ListErrorView(
-                        stringResource(R.string.SyncError),
-                        viewModel::onErrorClick
-                    )
-                }
+    Crossfade(
+        uiState.viewState, label = "",
+        modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.background)
+    ) { viewState ->
+        when (viewState) {
+            ViewState.Loading -> {
+                Loading()
+            }
 
-                ViewState.Success -> {
-                    LazyColumn(
-                        state = state,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        stickyHeader {
-                            HeaderSorting(borderBottom = true) {
-                                HSpacer(width = 16.dp)
-                                ButtonSecondaryWithIcon(
-                                    modifier = Modifier.height(28.dp),
-                                    onClick = {
-                                        viewModel.toggleSorting()
-                                    },
-                                    title = stringResource(R.string.Market_Volume),
-                                    iconRight = painterResource(
-                                        if (uiState.sortDescending) R.drawable.ic_arrow_down_20 else R.drawable.ic_arrow_up_20
-                                    ),
+            is ViewState.Error -> {
+                ListErrorView(
+                    stringResource(R.string.SyncError),
+                    viewModel::onErrorClick
+                )
+            }
+
+            ViewState.Success -> {
+                LazyColumn(
+                    state = state,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    stickyHeader {
+                        HeaderSorting(borderBottom = true) {
+                            HSpacer(width = 16.dp)
+                            ButtonSecondaryWithIcon(
+                                modifier = Modifier.height(28.dp),
+                                onClick = {
+                                    viewModel.toggleSorting()
+                                },
+                                title = stringResource(R.string.Market_Volume),
+                                iconRight = painterResource(
+                                    if (uiState.sortDescending) R.drawable.ic_arrow_down_20 else R.drawable.ic_arrow_up_20
+                                ),
+                            )
+                            HSpacer(width = 16.dp)
+                        }
+                    }
+                    itemsIndexed(uiState.items) { _, item ->
+                        TopPairItem(item, borderBottom = true) { topPairViewItem ->
+                            topPairViewItem.tradeUrl?.let {
+                                LinkHelper.openLinkInAppBrowser(context, it)
+
+                                stat(
+                                    page = StatPage.Markets,
+                                    section = StatSection.Pairs,
+                                    event = StatEvent.Open(StatPage.ExternalMarketPair)
                                 )
-                                HSpacer(width = 16.dp)
                             }
                         }
-                        itemsIndexed(uiState.items) { _, item ->
-                            TopPairItem(item, borderBottom = true) { topPairViewItem ->
-                                topPairViewItem.tradeUrl?.let {
-                                    LinkHelper.openLinkInAppBrowser(context, it)
-
-                                    stat(
-                                        page = StatPage.Markets,
-                                        section = StatSection.Pairs,
-                                        event = StatEvent.Open(StatPage.ExternalMarketPair)
-                                    )
-                                }
-                            }
-                        }
-                        item {
-                            VSpacer(height = 32.dp)
-                        }
+                    }
+                    item {
+                        VSpacer(height = 32.dp)
                     }
                 }
             }

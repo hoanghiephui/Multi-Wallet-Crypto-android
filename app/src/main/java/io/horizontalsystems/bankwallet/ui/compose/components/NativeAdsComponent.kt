@@ -22,8 +22,8 @@ import io.horizontalsystems.bankwallet.AdNativeUiState
 
 @Composable
 fun NativeAdView(
+    modifier: Modifier = Modifier,
     adsState: AdNativeUiState,
-    modifier: Modifier = Modifier.height(300.dp),
     isProcessIndicator: Boolean = true
 ) {
     AnimatedContent(adsState, label = "native_ads") { state ->

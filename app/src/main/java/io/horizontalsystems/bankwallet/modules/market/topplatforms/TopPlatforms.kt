@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -62,81 +63,82 @@ fun TopPlatforms(
     viewModel: TopPlatformsViewModel = viewModel(
         factory = TopPlatformsModule.Factory(null)
     ),
+    isRefreshing: (Boolean) -> Unit,
+    onSetRefreshCallback: (refresh: () -> Unit) -> Unit,
 ) {
     var openPeriodSelector by rememberSaveable { mutableStateOf(false) }
     var openSortingSelector by rememberSaveable { mutableStateOf(false) }
     val uiState = viewModel.uiState
 
-    HSSwipeRefresh(
-            refreshing = uiState.isRefreshing,
-            topPadding = 44,
-            onRefresh = {
-                viewModel.refresh()
-                stat(page = StatPage.Markets, section = StatSection.Platforms, event = StatEvent.Refresh)
+    LaunchedEffect(uiState) {
+        isRefreshing(uiState.isRefreshing)
+    }
+    onSetRefreshCallback {
+        viewModel.refresh()
+        stat(page = StatPage.Markets, section = StatSection.Platforms, event = StatEvent.Refresh)
+    }
+    Crossfade(
+        uiState.viewState, label = "",
+        modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.background)
+    ) { state ->
+        when (state) {
+            ViewState.Loading -> {
+                Loading()
             }
-    ) {
-        Crossfade(
-            uiState.viewState, label = "",
-            modifier = Modifier
-                .background(color = MaterialTheme.colorScheme.background)
-        ) { state ->
-                when (state) {
-                    ViewState.Loading -> {
-                        Loading()
-                    }
 
-                    is ViewState.Error -> {
-                        ListErrorView(
-                            stringResource(R.string.SyncError),
-                            viewModel::onErrorClick
-                        )
-                    }
+            is ViewState.Error -> {
+                ListErrorView(
+                    stringResource(R.string.SyncError),
+                    viewModel::onErrorClick
+                )
+            }
 
-                    ViewState.Success -> {
-                        if (uiState.viewItems.isNotEmpty()) {
-                            TopPlatformsList(
-                                viewItems = uiState.viewItems,
-                                sortingField = uiState.sortingField,
-                                timeDuration = uiState.timePeriod,
-                                onItemClick = {
-                                    navController.slideFromRight(
-                                        R.id.marketPlatformFragment,
-                                        it
-                                    )
-
-                                    stat(
-                                        page = StatPage.Markets,
-                                        section = StatSection.Platforms,
-                                        event = StatEvent.OpenPlatform(it.uid)
-                                    )
-                                },
-                                preItems = {
-                                    stickyHeader {
-                                        HeaderSorting(borderBottom = true) {
-                                            HSpacer(width = 16.dp)
-                                            OptionController(
-                                                uiState.sortingField.titleResId,
-                                                onOptionClick = {
-                                                    openSortingSelector = true
-                                                }
-                                            )
-                                            HSpacer(width = 12.dp)
-                                            OptionController(
-                                                uiState.timePeriod.titleResId,
-                                                onOptionClick = {
-                                                    openPeriodSelector = true
-                                                }
-                                            )
-                                            HSpacer(width = 16.dp)
-                                        }
-                                    }
-                                }
+            ViewState.Success -> {
+                if (uiState.viewItems.isNotEmpty()) {
+                    TopPlatformsList(
+                        viewItems = uiState.viewItems,
+                        sortingField = uiState.sortingField,
+                        timeDuration = uiState.timePeriod,
+                        onItemClick = {
+                            navController.slideFromRight(
+                                R.id.marketPlatformFragment,
+                                it
                             )
+
+                            stat(
+                                page = StatPage.Markets,
+                                section = StatSection.Platforms,
+                                event = StatEvent.OpenPlatform(it.uid)
+                            )
+                        },
+                        preItems = {
+                            stickyHeader {
+                                HeaderSorting(borderBottom = true) {
+                                    HSpacer(width = 16.dp)
+                                    OptionController(
+                                        uiState.sortingField.titleResId,
+                                        onOptionClick = {
+                                            openSortingSelector = true
+                                        }
+                                    )
+                                    HSpacer(width = 12.dp)
+                                    OptionController(
+                                        uiState.timePeriod.titleResId,
+                                        onOptionClick = {
+                                            openPeriodSelector = true
+                                        }
+                                    )
+                                    HSpacer(width = 16.dp)
+                                }
+                            }
                         }
-                    }
+                    )
                 }
             }
         }
+    }
+
 
     //Dialogs
     if (openPeriodSelector) {

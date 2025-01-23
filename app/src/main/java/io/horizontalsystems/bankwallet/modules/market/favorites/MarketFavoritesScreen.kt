@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -45,7 +46,9 @@ import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MarketFavoritesScreen(
-    navController: NavController
+    navController: NavController,
+    isRefreshing: (Boolean) -> Unit,
+    onSetRefreshCallback: (refresh: () -> Unit) -> Unit,
 ) {
     val viewModel = viewModel<MarketFavoritesViewModel>(factory = MarketFavoritesModule.Factory())
     val uiState = viewModel.uiState
@@ -54,129 +57,129 @@ fun MarketFavoritesScreen(
     var scrollToTopAfterUpdate by rememberSaveable { mutableStateOf(false) }
     var manualOrderEnabled by rememberSaveable { mutableStateOf(false) }
 
-    HSSwipeRefresh(
-        refreshing = uiState.isRefreshing,
-        topPadding = 44,
-        onRefresh = {
-            viewModel.refresh()
+    LaunchedEffect(uiState) {
+        isRefreshing(uiState.isRefreshing)
+    }
+    onSetRefreshCallback {
+        viewModel.refresh()
 
-            stat(
-                page = StatPage.Markets,
-                section = StatSection.Watchlist,
-                event = StatEvent.Refresh
-            )
-        }
-    ) {
-        Crossfade(
-            targetState = uiState.viewState,
-            modifier = Modifier
-                .background(color = MaterialTheme.colorScheme.background)
-                .fillMaxHeight(), label = ""
-        ) { viewState ->
-            when (viewState) {
-                ViewState.Loading -> {
-                    Loading()
-                }
+        stat(
+            page = StatPage.Markets,
+            section = StatSection.Watchlist,
+            event = StatEvent.Refresh
+        )
+    }
 
-                is ViewState.Error -> {
-                    ListErrorView(stringResource(R.string.SyncError), viewModel::onErrorClick)
-                }
+    Crossfade(
+        targetState = uiState.viewState,
+        modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.background)
+            .fillMaxHeight(), label = ""
+    ) { viewState ->
+        when (viewState) {
+            ViewState.Loading -> {
+                Loading()
+            }
 
-                ViewState.Success -> {
-                    if (uiState.viewItems.isEmpty()) {
-                        ListEmptyView(
-                            text = stringResource(R.string.Market_Tab_Watchlist_EmptyList),
-                            icon = R.drawable.ic_rate_24
-                        )
-                    } else {
-                        CoinListOrderable(
-                            items = uiState.viewItems,
-                            scrollToTop = scrollToTopAfterUpdate,
-                            onAddFavorite = { /*not used */ },
-                            onRemoveFavorite = { uid ->
-                                viewModel.removeFromFavorites(uid)
+            is ViewState.Error -> {
+                ListErrorView(stringResource(R.string.SyncError), viewModel::onErrorClick)
+            }
 
-                                stat(
-                                    page = StatPage.Markets,
-                                    section = StatSection.Watchlist,
-                                    event = StatEvent.RemoveFromWatchlist(uid)
-                                )
-                            },
-                            onCoinClick = { coinUid ->
-                                val arguments = CoinFragment.Input(coinUid)
-                                navController.slideFromRight(R.id.coinFragment, arguments)
+            ViewState.Success -> {
+                if (uiState.viewItems.isEmpty()) {
+                    ListEmptyView(
+                        text = stringResource(R.string.Market_Tab_Watchlist_EmptyList),
+                        icon = R.drawable.ic_rate_24
+                    )
+                } else {
+                    CoinListOrderable(
+                        items = uiState.viewItems,
+                        scrollToTop = scrollToTopAfterUpdate,
+                        onAddFavorite = { /*not used */ },
+                        onRemoveFavorite = { uid ->
+                            viewModel.removeFromFavorites(uid)
 
-                                stat(
-                                    page = StatPage.Markets,
-                                    section = StatSection.Watchlist,
-                                    event = StatEvent.OpenCoin(coinUid)
-                                )
-                            },
-                            onReorder = { from, to ->
-                                viewModel.reorder(from, to)
-                            },
-                            canReorder = uiState.sortingField == WatchlistSorting.Manual,
-                            showReorderArrows = uiState.sortingField == WatchlistSorting.Manual && manualOrderEnabled,
-                            enableManualOrder = {
-                                manualOrderEnabled = true
-                            },
-                            preItems = {
-                                stickyHeader {
-                                    HeaderSorting(
-                                        borderBottom = true,
-                                    ) {
-                                        HSpacer(width = 16.dp)
-                                        OptionController(
-                                            uiState.sortingField.titleResId,
-                                            onOptionClick = {
-                                                openSortingSelector = true
-                                            }
-                                        )
-                                        if (uiState.sortingField == WatchlistSorting.Manual) {
-                                            HSpacer(width = 12.dp)
-                                            ButtonSecondaryCircle(
-                                                icon = R.drawable.ic_edit_20,
-                                                tint = if (manualOrderEnabled) ComposeAppTheme.colors.dark else ComposeAppTheme.colors.leah,
-                                                background = if (manualOrderEnabled) ComposeAppTheme.colors.jacob else ComposeAppTheme.colors.steel20,
-                                            ) {
-                                                manualOrderEnabled = !manualOrderEnabled
-                                            }
+                            stat(
+                                page = StatPage.Markets,
+                                section = StatSection.Watchlist,
+                                event = StatEvent.RemoveFromWatchlist(uid)
+                            )
+                        },
+                        onCoinClick = { coinUid ->
+                            val arguments = CoinFragment.Input(coinUid)
+                            navController.slideFromRight(R.id.coinFragment, arguments)
+
+                            stat(
+                                page = StatPage.Markets,
+                                section = StatSection.Watchlist,
+                                event = StatEvent.OpenCoin(coinUid)
+                            )
+                        },
+                        onReorder = { from, to ->
+                            viewModel.reorder(from, to)
+                        },
+                        canReorder = uiState.sortingField == WatchlistSorting.Manual,
+                        showReorderArrows = uiState.sortingField == WatchlistSorting.Manual && manualOrderEnabled,
+                        enableManualOrder = {
+                            manualOrderEnabled = true
+                        },
+                        preItems = {
+                            stickyHeader {
+                                HeaderSorting(
+                                    borderBottom = true,
+                                ) {
+                                    HSpacer(width = 16.dp)
+                                    OptionController(
+                                        uiState.sortingField.titleResId,
+                                        onOptionClick = {
+                                            openSortingSelector = true
                                         }
+                                    )
+                                    if (uiState.sortingField == WatchlistSorting.Manual) {
                                         HSpacer(width = 12.dp)
-                                        OptionController(
-                                            uiState.period.titleResId,
-                                            onOptionClick = {
-                                                openPeriodSelector = true
-                                            }
-                                        )
-                                        HSpacer(width = 12.dp)
-                                        SignalButton(
-                                            turnedOn = uiState.showSignal,
-                                            onToggle = {
-                                                if (it) {
-                                                    navController.slideFromBottomForResult<MarketSignalsFragment.Result>(
-                                                        R.id.marketSignalsFragment
-                                                    ) {
-                                                        if (it.enabled) {
-                                                            viewModel.showSignals()
-                                                        }
-                                                    }
-                                                } else {
-                                                    viewModel.hideSignals()
-                                                }
-                                            })
-                                        HSpacer(width = 16.dp)
+                                        ButtonSecondaryCircle(
+                                            icon = R.drawable.ic_edit_20,
+                                            tint = if (manualOrderEnabled) ComposeAppTheme.colors.dark else ComposeAppTheme.colors.leah,
+                                            background = if (manualOrderEnabled) ComposeAppTheme.colors.jacob else ComposeAppTheme.colors.steel20,
+                                        ) {
+                                            manualOrderEnabled = !manualOrderEnabled
+                                        }
                                     }
+                                    HSpacer(width = 12.dp)
+                                    OptionController(
+                                        uiState.period.titleResId,
+                                        onOptionClick = {
+                                            openPeriodSelector = true
+                                        }
+                                    )
+                                    HSpacer(width = 12.dp)
+                                    SignalButton(
+                                        turnedOn = uiState.showSignal,
+                                        onToggle = {
+                                            if (it) {
+                                                navController.slideFromBottomForResult<MarketSignalsFragment.Result>(
+                                                    R.id.marketSignalsFragment
+                                                ) {
+                                                    if (it.enabled) {
+                                                        viewModel.showSignals()
+                                                    }
+                                                }
+                                            } else {
+                                                viewModel.hideSignals()
+                                            }
+                                        })
+                                    HSpacer(width = 16.dp)
                                 }
                             }
-                        )
-                        if (scrollToTopAfterUpdate) {
-                            scrollToTopAfterUpdate = false
                         }
+                    )
+                    if (scrollToTopAfterUpdate) {
+                        scrollToTopAfterUpdate = false
                     }
                 }
             }
         }
+
     }
 
     if (openSortingSelector) {

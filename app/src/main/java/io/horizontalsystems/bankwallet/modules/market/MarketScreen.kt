@@ -20,17 +20,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.MoreVert
-import androidx.compose.material.icons.rounded.Search
-import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.SearchBarDefaults
-import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,17 +30,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.isTraversalGroup
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.BuildConfig
@@ -63,7 +50,6 @@ import io.horizontalsystems.bankwallet.core.stats.StatPage
 import io.horizontalsystems.bankwallet.core.stats.StatSection
 import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.core.stats.statPage
-import io.horizontalsystems.bankwallet.core.stats.statSection
 import io.horizontalsystems.bankwallet.core.stats.statTab
 import io.horizontalsystems.bankwallet.entities.Currency
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
@@ -72,8 +58,6 @@ import io.horizontalsystems.bankwallet.modules.main.MainViewModel
 import io.horizontalsystems.bankwallet.modules.market.MarketModule.Tab
 import io.horizontalsystems.bankwallet.modules.market.favorites.MarketFavoritesScreen
 import io.horizontalsystems.bankwallet.modules.market.posts.MarketPostsScreen
-import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchResults
-import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchSection
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchViewModel
 import io.horizontalsystems.bankwallet.modules.market.topcoins.TopCoins
 import io.horizontalsystems.bankwallet.modules.market.toppairs.TopPairsScreen
@@ -81,7 +65,10 @@ import io.horizontalsystems.bankwallet.modules.market.topplatforms.TopPlatforms
 import io.horizontalsystems.bankwallet.modules.market.topsectors.TopSectorsScreen
 import io.horizontalsystems.bankwallet.modules.metricchart.MetricsType
 import io.horizontalsystems.bankwallet.rememberAdNativeView
+import io.horizontalsystems.bankwallet.ui.CollapsingAppBarNestedScrollConnection
+import io.horizontalsystems.bankwallet.ui.CollapsingLayout
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
+import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
 import io.horizontalsystems.bankwallet.ui.compose.components.ScrollableTabs
 import io.horizontalsystems.bankwallet.ui.compose.components.TabItem
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
@@ -92,6 +79,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.caption_remus
 import io.horizontalsystems.bankwallet.ui.compose.components.micro_grey
 import io.horizontalsystems.marketkit.models.MarketGlobal
 import java.math.BigDecimal
+
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -112,8 +100,55 @@ fun MarketScreen(
         }
     })
     val (adState, reloadAd) = rememberAdNativeView(BuildConfig.HOME_MARKET_NATIVE, marketViewModel)
+    var isRefreshing by remember {
+        mutableStateOf(false)
+    }
+    var onRefresh: (() -> Unit)? = null
 
-    Box(
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        HSSwipeRefresh(
+            modifier = Modifier.statusBarsPadding(),
+            refreshing = isRefreshing,
+            topPadding = 0,
+            onRefresh = {
+                onRefresh?.invoke()
+                reloadAd()
+            }
+        ) {
+            CollapsingLayout(
+                expandedContent = { modifier ->
+                    Crossfade(uiState.marketGlobal, label = "") {
+                        MetricsBoard(navController, it, uiState.currency)
+                    }
+                },
+                collapsedContent = { modifier ->
+
+                }
+            ) { modifier ->
+                TabsSection(
+                    navController = navController,
+                    tabs = tabs,
+                    selectedTab = uiState.selectedTab,
+                    nativeAd = adState,
+                    isRefreshing = {
+                        isRefreshing = it
+                    },
+                    onSetRefreshCallback = { refreshCallback ->
+                        onRefresh = refreshCallback
+                    },
+                    onTabClick = { tab ->
+                        marketViewModel.onSelect(tab)
+                    }
+                )
+            }
+        }
+    }
+
+
+    /*Box(
         Modifier
             .fillMaxSize()
             .statusBarsPadding()) {
@@ -230,7 +265,7 @@ fun MarketScreen(
                 marketViewModel.onSelect(tab)
             }
         }
-    }
+    }*/
 
     TrackScreenViewEvent("MarketScreen")
 }
@@ -241,7 +276,9 @@ fun TabsSection(
     tabs: Array<Tab>,
     selectedTab: Tab,
     nativeAd: AdNativeUiState,
-    onTabClick: (Tab) -> Unit
+    onTabClick: (Tab) -> Unit,
+    isRefreshing: (Boolean) -> Unit,
+    onSetRefreshCallback: (refresh: () -> Unit) -> Unit,
 ) {
     val pagerState = rememberPagerState(initialPage = selectedTab.ordinal) { tabs.size }
 
@@ -254,7 +291,10 @@ fun TabsSection(
         TabItem(stringResource(id = it.titleResId), it == selectedTab, it)
     }
 
-    ScrollableTabs(tabItems) {
+    ScrollableTabs(
+        modifier = Modifier,
+        tabs = tabItems
+    ) {
         onTabClick(it)
     }
 
@@ -264,14 +304,39 @@ fun TabsSection(
     ) { page ->
         when (tabs[page]) {
             Tab.Coins -> TopCoins(
-                    onCoinClick = { onCoinClick(it, navController) },
-                    nativeAd = nativeAd
-                )
-            Tab.Watchlist -> MarketFavoritesScreen(navController)
-            Tab.Posts -> MarketPostsScreen()
-            Tab.Platform -> TopPlatforms(navController)
-            Tab.Pairs -> TopPairsScreen()
-            Tab.Sectors -> TopSectorsScreen(navController)
+                onCoinClick = { onCoinClick(it, navController) },
+                nativeAd = nativeAd,
+                isRefreshing = isRefreshing,
+                onSetRefreshCallback = onSetRefreshCallback
+            )
+
+            Tab.Watchlist -> MarketFavoritesScreen(
+                navController = navController,
+                isRefreshing = isRefreshing,
+                onSetRefreshCallback = onSetRefreshCallback
+            )
+
+            Tab.Posts -> MarketPostsScreen(
+                isRefreshing = isRefreshing,
+                onSetRefreshCallback = onSetRefreshCallback
+            )
+
+            Tab.Platform -> TopPlatforms(
+                navController = navController,
+                isRefreshing = isRefreshing,
+                onSetRefreshCallback = onSetRefreshCallback
+            )
+
+            Tab.Pairs -> TopPairsScreen(
+                isRefreshing = isRefreshing,
+                onSetRefreshCallback = onSetRefreshCallback
+            )
+
+            Tab.Sectors -> TopSectorsScreen(
+                navController = navController,
+                isRefreshing = isRefreshing,
+                onSetRefreshCallback = onSetRefreshCallback
+            )
         }
     }
 }

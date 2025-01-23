@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -32,54 +33,65 @@ import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
 import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
 
 @Composable
-fun MarketPostsScreen(viewModel: MarketPostsViewModel = viewModel(factory = MarketPostsModule.Factory())) {
+fun MarketPostsScreen(
+    viewModel: MarketPostsViewModel = viewModel(factory = MarketPostsModule.Factory()),
+    isRefreshing: (Boolean) -> Unit,
+    onSetRefreshCallback: (refresh: () -> Unit) -> Unit,
+) {
     val items by viewModel.itemsLiveData.observeAsState(listOf())
     val isRefreshing by viewModel.isRefreshingLiveData.observeAsState(false)
     val viewState by viewModel.viewStateLiveData.observeAsState()
     val context = LocalContext.current
 
-    HSSwipeRefresh(
-        refreshing = isRefreshing,
-        onRefresh = {
-            viewModel.refresh()
+    LaunchedEffect(isRefreshing) {
+        isRefreshing(isRefreshing)
+    }
+    onSetRefreshCallback {
+        viewModel.refresh()
 
-            stat(page = StatPage.Markets, section = StatSection.News, event = StatEvent.Refresh)
-        }
-    ) {
-        Crossfade(
-            viewState, label = "MarketPostsScreen",
-            modifier = Modifier
-                .background(color = MaterialTheme.colorScheme.background)
-        ) { viewState ->
-            when (viewState) {
-                ViewState.Loading -> {
-                    Loading()
-                }
-                is ViewState.Error -> {
-                    ListErrorView(stringResource(R.string.SyncError), viewModel::onErrorClick)
-                }
-                ViewState.Success -> {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(items) { postItem ->
-                            Spacer(modifier = Modifier.height(12.dp))
-                            CellNews(
-                                source = postItem.source,
-                                title = postItem.title,
-                                body = postItem.body,
-                                date = postItem.timeAgo,
-                            ) {
-                                LinkHelper.openLinkInAppBrowser(context, postItem.url)
+        stat(page = StatPage.Markets, section = StatSection.News, event = StatEvent.Refresh)
+    }
 
-                                stat(page = StatPage.Markets, section = StatSection.News, event = StatEvent.Open(StatPage.ExternalNews))
-                            }
-                        }
-                        item {
-                            Spacer(modifier = Modifier.height(12.dp))
+    Crossfade(
+        viewState, label = "MarketPostsScreen",
+        modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.background)
+    ) { viewState ->
+        when (viewState) {
+            ViewState.Loading -> {
+                Loading()
+            }
+
+            is ViewState.Error -> {
+                ListErrorView(stringResource(R.string.SyncError), viewModel::onErrorClick)
+            }
+
+            ViewState.Success -> {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(items) { postItem ->
+                        Spacer(modifier = Modifier.height(12.dp))
+                        CellNews(
+                            source = postItem.source,
+                            title = postItem.title,
+                            body = postItem.body,
+                            date = postItem.timeAgo,
+                        ) {
+                            LinkHelper.openLinkInAppBrowser(context, postItem.url)
+
+                            stat(
+                                page = StatPage.Markets,
+                                section = StatSection.News,
+                                event = StatEvent.Open(StatPage.ExternalNews)
+                            )
                         }
                     }
+                    item {
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
                 }
-                null -> {}
             }
+
+            null -> {}
         }
     }
 

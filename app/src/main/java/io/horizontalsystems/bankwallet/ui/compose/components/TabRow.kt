@@ -62,9 +62,14 @@ fun <T> Tabs(tabs: List<TabItem<T>>, onClick: (T) -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun <T> ScrollableTabs(tabs: List<TabItem<T>>, onClick: (T) -> Unit) {
+fun <T> ScrollableTabs(
+    modifier: Modifier = Modifier,
+    tabs: List<TabItem<T>>,
+    onClick: (T) -> Unit
+) {
     val selectedIndex = tabs.indexOfFirst { it.selected }
     PrimaryScrollableTabRow(
+        modifier = modifier,
         selectedTabIndex = selectedIndex,
         containerColor = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.onSurface,

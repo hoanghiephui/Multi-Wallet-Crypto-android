@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -53,7 +54,9 @@ import io.horizontalsystems.marketkit.models.CoinCategory
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TopSectorsScreen(
-    navController: NavController
+    navController: NavController,
+    isRefreshing: (Boolean) -> Unit,
+    onSetRefreshCallback: (refresh: () -> Unit) -> Unit,
 ) {
     val viewModel = viewModel<TopSectorsViewModel>(factory = TopSectorsViewModel.Factory())
     val uiState = viewModel.uiState
@@ -65,69 +68,70 @@ fun TopSectorsScreen(
             LazyListState(0, 0)
         }
 
-    Column() {
-        HSSwipeRefresh(
-            topPadding = 44,
-            refreshing = uiState.isRefreshing,
-            onRefresh = viewModel::refresh
-        ) {
-            Crossfade(uiState.viewState, label = "") { viewState ->
-                when (viewState) {
-                    ViewState.Loading -> {
-                        Loading()
-                    }
+    LaunchedEffect(uiState) {
+        isRefreshing(uiState.isRefreshing)
+    }
+    onSetRefreshCallback {
+        viewModel.refresh()
+    }
 
-                    is ViewState.Error -> {
-                        ListErrorView(
-                            stringResource(R.string.SyncError),
-                            viewModel::onErrorClick
-                        )
-                    }
+    Crossfade(uiState.viewState, label = "") { viewState ->
+        when (viewState) {
+            ViewState.Loading -> {
+                Loading()
+            }
 
-                    ViewState.Success -> {
-                        LazyColumn(
-                            state = state,
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            stickyHeader {
-                                HeaderSorting(borderBottom = true) {
-                                    HSpacer(width = 16.dp)
-                                    OptionController(
-                                        uiState.sortingField.titleResId,
-                                        onOptionClick = {
-                                            openSortingSelector = true
-                                        }
-                                    )
-                                    HSpacer(width = 12.dp)
-                                    OptionController(
-                                        uiState.timePeriod.titleResId,
-                                        onOptionClick = {
-                                            openPeriodSelector = true
-                                        }
-                                    )
-                                    HSpacer(width = 16.dp)
+            is ViewState.Error -> {
+                ListErrorView(
+                    stringResource(R.string.SyncError),
+                    viewModel::onErrorClick
+                )
+            }
+
+            ViewState.Success -> {
+                LazyColumn(
+                    state = state,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    stickyHeader {
+                        HeaderSorting(borderBottom = true) {
+                            HSpacer(width = 16.dp)
+                            OptionController(
+                                uiState.sortingField.titleResId,
+                                onOptionClick = {
+                                    openSortingSelector = true
                                 }
-                            }
-                            itemsIndexed(uiState.items) { i, item ->
-                                TopSectorItem(
-                                    item,
-                                    borderBottom = true
-                                ) { coinCategory ->
-                                    navController.slideFromBottom(
-                                        R.id.marketCategoryFragment,
-                                        coinCategory
-                                    )
+                            )
+                            HSpacer(width = 12.dp)
+                            OptionController(
+                                uiState.timePeriod.titleResId,
+                                onOptionClick = {
+                                    openPeriodSelector = true
                                 }
-                            }
-                            item {
-                                VSpacer(height = 32.dp)
-                            }
+                            )
+                            HSpacer(width = 16.dp)
                         }
+                    }
+                    itemsIndexed(uiState.items) { i, item ->
+                        TopSectorItem(
+                            item,
+                            borderBottom = true
+                        ) { coinCategory ->
+                            navController.slideFromBottom(
+                                R.id.marketCategoryFragment,
+                                coinCategory
+                            )
+                        }
+                    }
+                    item {
+                        VSpacer(height = 32.dp)
                     }
                 }
             }
         }
+
     }
+
     //Dialogs
     if (openPeriodSelector) {
         AlertGroup(

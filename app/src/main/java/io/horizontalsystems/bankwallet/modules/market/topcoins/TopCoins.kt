@@ -4,6 +4,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -45,7 +46,9 @@ import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 @Composable
 fun TopCoins(
     onCoinClick: (String) -> Unit,
-    nativeAd: AdNativeUiState
+    nativeAd: AdNativeUiState,
+    isRefreshing: (Boolean) -> Unit,
+    onSetRefreshCallback: (refresh: () -> Unit) -> Unit,
 ) {
     val viewModel = viewModel<MarketTopCoinsViewModel>(
         factory = MarketTopCoinsViewModel.Factory(
@@ -59,98 +62,107 @@ fun TopCoins(
     var openPeriodSelector by rememberSaveable { mutableStateOf(false) }
 
     val uiState = viewModel.uiState
+    LaunchedEffect(uiState) {
+        isRefreshing(uiState.isRefreshing)
+    }
+    onSetRefreshCallback {
+        viewModel.refresh()
 
-    HSSwipeRefresh(
-        refreshing = uiState.isRefreshing,
-        topPadding = 44,
-        onRefresh = {
-            viewModel.refresh()
+        stat(page = StatPage.Markets, section = StatSection.Coins, event = StatEvent.Refresh)
+    }
 
-            stat(page = StatPage.Markets, section = StatSection.Coins, event = StatEvent.Refresh)
-        }
-    ) {
-        Crossfade(uiState.viewState, label = "",
-            modifier = Modifier
-                .background(color = MaterialTheme.colorScheme.background)
-        ) { viewState ->
-            when (viewState) {
-                ViewState.Loading -> {
-                    Loading()
+    Crossfade(
+        uiState.viewState, label = "",
+        modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.background)
+    ) { viewState ->
+        when (viewState) {
+            ViewState.Loading -> {
+                Loading()
+            }
+
+            is ViewState.Error -> {
+                ListErrorView(stringResource(R.string.SyncError), viewModel::refresh)
+            }
+
+            ViewState.Success -> {
+                val listState = rememberLazyListState()
+
+                LaunchedEffect(uiState.period, uiState.topMarket, uiState.sortingField) {
+                    listState.scrollToItem(0)
                 }
 
-                is ViewState.Error -> {
-                    ListErrorView(stringResource(R.string.SyncError), viewModel::refresh)
-                }
+                CoinList(
+                    listState = listState,
+                    items = uiState.viewItems,
+                    scrollToTop = false,
+                    onAddFavorite = { uid ->
+                        viewModel.onAddFavorite(uid)
 
-                ViewState.Success -> {
-                    val listState = rememberLazyListState()
+                        stat(
+                            page = StatPage.Markets,
+                            section = StatSection.Coins,
+                            event = StatEvent.AddToWatchlist(uid)
+                        )
 
-                    LaunchedEffect(uiState.period, uiState.topMarket, uiState.sortingField) {
-                        listState.scrollToItem(0)
-                    }
+                    },
+                    onRemoveFavorite = { uid ->
+                        viewModel.onRemoveFavorite(uid)
 
-                    CoinList(
-                        listState = listState,
-                        items = uiState.viewItems,
-                        scrollToTop = false,
-                        onAddFavorite = { uid ->
-                            viewModel.onAddFavorite(uid)
-
-                            stat(page = StatPage.Markets, section = StatSection.Coins, event = StatEvent.AddToWatchlist(uid))
-
-                        },
-                        onRemoveFavorite = { uid ->
-                            viewModel.onRemoveFavorite(uid)
-
-                            stat(page = StatPage.Markets, section = StatSection.Coins, event = StatEvent.RemoveFromWatchlist(uid))
-                        },
-                        onCoinClick = onCoinClick,
-                        preItems = {
-                            stickyHeader {
-                                HeaderSorting(
-                                    borderBottom = true,
-                                ) {
-                                    HSpacer(width = 16.dp)
-                                    OptionController(
-                                        uiState.sortingField.titleResId,
-                                        onOptionClick = {
-                                            openSortingSelector = true
-                                        }
-                                    )
-                                    HSpacer(width = 12.dp)
-                                    OptionController(
-                                        uiState.topMarket.titleResId,
-                                        onOptionClick = {
-                                            openTopSelector = true
-                                        }
-                                    )
-                                    HSpacer(width = 12.dp)
-                                    OptionController(
-                                        uiState.period.titleResId,
-                                        onOptionClick = {
-                                            openPeriodSelector = true
-                                        }
-                                    )
-                                    HSpacer(width = 16.dp)
-                                }
-                            }
-                        },
-                        preAdsItem = {
-                            item {
-                                VSpacer(12.dp)
-                                NativeAdView(
-                                    nativeAd,
-                                    Modifier
-                                        .height(138.dp)
+                        stat(
+                            page = StatPage.Markets,
+                            section = StatSection.Coins,
+                            event = StatEvent.RemoveFromWatchlist(uid)
+                        )
+                    },
+                    onCoinClick = onCoinClick,
+                    preItems = {
+                        stickyHeader {
+                            HeaderSorting(
+                                borderBottom = true,
+                            ) {
+                                HSpacer(width = 16.dp)
+                                OptionController(
+                                    uiState.sortingField.titleResId,
+                                    onOptionClick = {
+                                        openSortingSelector = true
+                                    }
                                 )
-                                VSpacer(8.dp)
+                                HSpacer(width = 12.dp)
+                                OptionController(
+                                    uiState.topMarket.titleResId,
+                                    onOptionClick = {
+                                        openTopSelector = true
+                                    }
+                                )
+                                HSpacer(width = 12.dp)
+                                OptionController(
+                                    uiState.period.titleResId,
+                                    onOptionClick = {
+                                        openPeriodSelector = true
+                                    }
+                                )
+                                HSpacer(width = 16.dp)
                             }
                         }
-                    )
-                }
+                    },
+                    preAdsItem = {
+                        item {
+                            VSpacer(12.dp)
+                            NativeAdView(
+                                adsState = nativeAd,
+                                modifier = Modifier
+                                    .padding(horizontal = 8.dp)
+                                    .height(138.dp)
+                            )
+                            VSpacer(8.dp)
+                        }
+                    }
+                )
             }
         }
     }
+
 
     if (openSortingSelector) {
         AlertGroup(
@@ -160,7 +172,11 @@ fun TopCoins(
                 viewModel.onSelectSortingField(selected)
                 openSortingSelector = false
 
-                stat(page = StatPage.Markets, section = StatSection.Coins, event = StatEvent.SwitchSortType(selected.statSortType))
+                stat(
+                    page = StatPage.Markets,
+                    section = StatSection.Coins,
+                    event = StatEvent.SwitchSortType(selected.statSortType)
+                )
             },
             onDismiss = {
                 openSortingSelector = false
@@ -175,7 +191,11 @@ fun TopCoins(
                 viewModel.onSelectTopMarket(it)
                 openTopSelector = false
 
-                stat(page = StatPage.Markets, section = StatSection.Coins, event = StatEvent.SwitchMarketTop(it.statMarketTop))
+                stat(
+                    page = StatPage.Markets,
+                    section = StatSection.Coins,
+                    event = StatEvent.SwitchMarketTop(it.statMarketTop)
+                )
             },
             onDismiss = {
                 openTopSelector = false
@@ -190,7 +210,11 @@ fun TopCoins(
                 viewModel.onSelectPeriod(selected)
                 openPeriodSelector = false
 
-                stat(page = StatPage.Markets, section = StatSection.Coins, event = StatEvent.SwitchPeriod(selected.statPeriod))
+                stat(
+                    page = StatPage.Markets,
+                    section = StatSection.Coins,
+                    event = StatEvent.SwitchPeriod(selected.statPeriod)
+                )
             },
             onDismiss = {
                 openPeriodSelector = false
