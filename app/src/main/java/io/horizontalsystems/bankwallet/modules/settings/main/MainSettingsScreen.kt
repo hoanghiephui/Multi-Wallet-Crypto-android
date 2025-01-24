@@ -26,6 +26,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,6 +59,7 @@ import io.horizontalsystems.bankwallet.modules.contacts.ContactsFragment
 import io.horizontalsystems.bankwallet.modules.contacts.Mode
 import io.horizontalsystems.bankwallet.modules.manageaccount.dialogs.BackupRequiredDialog
 import io.horizontalsystems.bankwallet.modules.manageaccounts.ManageAccountsModule
+import io.horizontalsystems.bankwallet.modules.settings.vipsupport.VipSupportBottomSheet
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCAccountTypeNotSupportedDialog
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCManager
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
@@ -74,6 +83,7 @@ fun SettingsScreen(
     navController: NavController,
     viewModel: MainSettingsViewModel = viewModel(factory = MainSettingsModule.Factory()),
 ) {
+    var isVipSupportVisible by remember { mutableStateOf(false) }
     val scrollBehavior =
         TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     Scaffold(
@@ -91,9 +101,18 @@ fun SettingsScreen(
             .verticalScroll(rememberScrollState())
             .padding(it)) {
             Spacer(modifier = Modifier.height(12.dp))
-            SettingSections(viewModel, navController)
+            SettingSections(
+                    viewModel = viewModel,
+                    navController = navController,
+                    openVipSupport = {
+                        isVipSupportVisible = true
+                    })
             //SettingsFooter(viewModel.appVersion, viewModel.companyWebPage)
         }
+        VipSupportBottomSheet(
+            isBottomSheetVisible = isVipSupportVisible,
+            close = { isVipSupportVisible = false }
+        )
     }
     TrackScreenViewEvent("SettingsScreen")
 }
@@ -101,7 +120,8 @@ fun SettingsScreen(
 @Composable
 private fun SettingSections(
     viewModel: MainSettingsViewModel,
-    navController: NavController
+    navController: NavController,
+    openVipSupport: () -> Unit
 ) {
     val uiState = viewModel.uiState
     val context = LocalContext.current
@@ -362,9 +382,7 @@ private fun SettingSections(
         HsSettingCell(
             R.string.Settings_VipSupport,
             R.drawable.ic_support_yellow_24,
-            onClick = {
-
-            }
+            onClick = openVipSupport
         )
         Divider(
             thickness = 1.dp,
