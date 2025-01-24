@@ -24,6 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.horizontalsystems.bankwallet.analytics.AnalyticsHelper
 import io.horizontalsystems.bankwallet.analytics.LocalAnalyticsHelper
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
+import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -118,6 +119,7 @@ abstract class BaseComposeFragment(
             )
             logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle)
         }
+        Timber.d("CurrentScreen: $screenName")
     }
 
 }

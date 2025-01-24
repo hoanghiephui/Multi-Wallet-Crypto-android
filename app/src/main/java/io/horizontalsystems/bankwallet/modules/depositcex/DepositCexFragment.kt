@@ -28,6 +28,7 @@ import io.horizontalsystems.bankwallet.modules.receive.sharedViewModel
 import io.horizontalsystems.bankwallet.modules.receive.ui.ReceiveAddressScreen
 import io.horizontalsystems.bankwallet.modules.receive.ui.UsedAddressScreen
 import io.horizontalsystems.bankwallet.modules.receive.ui.UsedAddressesParams
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 
 class DepositCexFragment : BaseComposeFragment() {
 
@@ -82,10 +83,8 @@ fun CexDepositScreen(
                 val addressViewModel =
                     viewModel<DepositAddressViewModel>(factory = DepositAddressViewModel.Factory(cexAsset, viewModel.network))
                 val context = LocalContext.current
-                val nativeAd by addressViewModel.adState.collectAsStateWithLifecycle()
-                LaunchedEffect(key1 = BuildConfig.TOKEN_BALANCE_NATIVE, block = {
-                    addressViewModel.loadAds(context, BuildConfig.TOKEN_BALANCE_NATIVE)
-                })
+                val (adState, reloadAd) = rememberAdNativeView(BuildConfig.TOKEN_BALANCE_NATIVE, addressViewModel)
+
                 ReceiveAddressScreen(
                     title = stringResource(R.string.CexDeposit_Title, cexAsset.id),
                     uiState = addressViewModel.uiState,
@@ -104,7 +103,7 @@ fun CexDepositScreen(
                     },
                     onBackPress = navigateBack(fragmentNavController, navController),
                     closeModule = { fragmentNavController.popBackStack() },
-                    nativeAd = nativeAd,
+                    nativeAd = adState,
                 )
             }
             composablePage(USED_ADDRESS_SCREEN) { entry ->

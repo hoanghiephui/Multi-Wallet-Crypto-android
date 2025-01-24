@@ -13,16 +13,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -51,6 +48,7 @@ import io.horizontalsystems.bankwallet.modules.send.bitcoin.advanced.FeeRateCaut
 import io.horizontalsystems.bankwallet.modules.send.bitcoin.advanced.SendBtcAdvancedSettingsScreen
 import io.horizontalsystems.bankwallet.modules.send.bitcoin.utxoexpert.UtxoExpertModeScreen
 import io.horizontalsystems.bankwallet.modules.sendtokenselect.PrefilledData
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
@@ -142,16 +140,13 @@ fun SendBitcoinScreen(
     val proceedEnabled = uiState.canBeSend
     val amountInputType = amountInputModeViewModel.inputType
     val feeRateCaution = uiState.feeRateCaution
-    val context = LocalContext.current
     val rate = viewModel.coinRate
-    val nativeAd by viewModel.adState.collectAsStateWithLifecycle()
+    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.SEND_COIN_NATIVE, viewModel)
     val paymentAddressViewModel = viewModel<AddressParserViewModel>(
         factory = AddressParserModule.Factory(wallet.token, prefilledData?.amount)
     )
     val amountUnique = paymentAddressViewModel.amountUnique
-    LaunchedEffect(key1 = BuildConfig.SEND_COIN_NATIVE, block = {
-        viewModel.loadAds(context, BuildConfig.SEND_COIN_NATIVE)
-    })
+
     ComposeAppTheme {
         val focusRequester = remember { FocusRequester() }
 
@@ -259,7 +254,7 @@ fun SendBitcoinScreen(
                     )
                 }
                 Spacer(modifier = Modifier.height(12.dp))
-                MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
+                MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
 
                 ButtonPrimaryYellow(
                     modifier = Modifier

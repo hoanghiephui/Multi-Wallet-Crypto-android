@@ -59,6 +59,7 @@ import io.horizontalsystems.bankwallet.modules.qrscanner.QRScannerActivity
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCAccountTypeNotSupportedDialog
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCManager
 import io.horizontalsystems.bankwallet.modules.walletconnect.list.WalletConnectListViewModel
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
@@ -87,11 +88,7 @@ fun BalanceForAccount(navController: NavController, accountViewItem: AccountView
         HudHelper.showErrorMessage(view, text = message)
         viewModel.errorShown()
     }
-    val nativeAd by viewModel.adState.collectAsStateWithLifecycle()
-    LaunchedEffect(key1 = BuildConfig.BALANCE_NATIVE, block = {
-        viewModel.loadAds(context,
-            BuildConfig.BALANCE_NATIVE)
-    })
+    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.BALANCE_NATIVE, viewModel)
 
     when (viewModel.connectionResult) {
         WalletConnectListViewModel.ConnectionResult.Error -> {
@@ -213,7 +210,7 @@ fun BalanceForAccount(navController: NavController, accountViewItem: AccountView
                             navController,
                             uiState,
                             viewModel.totalUiState,
-                            nativeAd
+                            adState
                         )
                     }
 

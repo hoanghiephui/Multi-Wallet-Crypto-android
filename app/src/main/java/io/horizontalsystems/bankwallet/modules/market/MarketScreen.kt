@@ -1,7 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.market
 
 import android.annotation.SuppressLint
-import android.content.Context
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,11 +27,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -53,19 +50,16 @@ import io.horizontalsystems.bankwallet.core.stats.statPage
 import io.horizontalsystems.bankwallet.core.stats.statTab
 import io.horizontalsystems.bankwallet.entities.Currency
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
-import io.horizontalsystems.bankwallet.modules.main.MainModule
 import io.horizontalsystems.bankwallet.modules.main.MainViewModel
 import io.horizontalsystems.bankwallet.modules.market.MarketModule.Tab
 import io.horizontalsystems.bankwallet.modules.market.favorites.MarketFavoritesScreen
 import io.horizontalsystems.bankwallet.modules.market.posts.MarketPostsScreen
-import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchViewModel
 import io.horizontalsystems.bankwallet.modules.market.topcoins.TopCoins
 import io.horizontalsystems.bankwallet.modules.market.toppairs.TopPairsScreen
 import io.horizontalsystems.bankwallet.modules.market.topplatforms.TopPlatforms
 import io.horizontalsystems.bankwallet.modules.market.topsectors.TopSectorsScreen
 import io.horizontalsystems.bankwallet.modules.metricchart.MetricsType
 import io.horizontalsystems.bankwallet.rememberAdNativeView
-import io.horizontalsystems.bankwallet.ui.CollapsingAppBarNestedScrollConnection
 import io.horizontalsystems.bankwallet.ui.CollapsingLayout
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
@@ -85,20 +79,12 @@ import java.math.BigDecimal
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MarketScreen(
-    navController: NavController,
-    searchViewModel: MarketSearchViewModel,
-    mainViewModel: MainViewModel
+    navController: NavController
 ) {
     val marketViewModel = viewModel<MarketViewModel>(factory = MarketModule.Factory())
     val uiState = marketViewModel.uiState
     val tabs = marketViewModel.tabs
-    var text by rememberSaveable { mutableStateOf("") }
-    var expanded by rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(key1 = mainViewModel.currentMainTab, block = {
-        if (mainViewModel.currentMainTab != MainModule.MainNavigation.Market) {
-            expanded = false
-        }
-    })
+
     val (adState, reloadAd) = rememberAdNativeView(BuildConfig.HOME_MARKET_NATIVE, marketViewModel)
     var isRefreshing by remember {
         mutableStateOf(false)
@@ -148,124 +134,7 @@ fun MarketScreen(
     }
 
 
-    /*Box(
-        Modifier
-            .fillMaxSize()
-            .statusBarsPadding()) {
-        Box(
-            Modifier
-                .semantics { isTraversalGroup = true }
-                .zIndex(1f)
-                .fillMaxWidth()
-        ) {
 
-            DockedSearchBar(
-                modifier =
-                Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 8.dp)
-                    .semantics {
-                        traversalIndex = 0f
-                    },
-                inputField = {
-                    SearchBarDefaults.InputField(
-                        onSearch = {
-                            expanded = false
-                            text = ""
-                        },
-                        expanded = expanded,
-                        onExpandedChange = { expanded = it },
-                        placeholder = { Text(stringResource(R.string.Market_Search_Hint)) },
-                        leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
-                        trailingIcon = {
-                            IconButton(onClick = {
-                                expanded = false
-                                navController.slideFromRight(R.id.marketSearchFragment)
-
-                                stat(
-                                    page = StatPage.Markets,
-                                    event = StatEvent.Open(StatPage.MarketSearch)
-                                )
-                            }) {
-                                Icon(Icons.Rounded.MoreVert, contentDescription = null)
-
-                                stat(
-                                    page = StatPage.Markets,
-                                    event = StatEvent.Open(StatPage.AdvancedSearch)
-                                )
-                            }
-                        },
-                        query = text,
-                        onQueryChange = {
-                            text = it
-                            searchViewModel.searchByQuery(it)
-                        },
-                    )
-                },
-                expanded = expanded,
-                onExpandedChange = { expanded = it },
-            ) {
-                Crossfade(targetState = text.isBlank(), label = "") { isSearch ->
-                    val uiSearchState = searchViewModel.uiState
-                    val itemSections =
-                        if (!isSearch && uiSearchState.page is MarketSearchViewModel.Page.SearchResults)
-                            mapOf(
-                                MarketSearchSection.SearchResults to uiSearchState.page.items
-                            )
-                        else if (uiSearchState.page is MarketSearchViewModel.Page.Discovery)
-                            mapOf(
-                                MarketSearchSection.Popular to uiSearchState.page.popular.take(6),
-                            ) else mapOf()
-
-                    MarketSearchResults(
-                        modifier = Modifier,
-                        uiSearchState.listId,
-                        itemSections = itemSections,
-                        onCoinClick = { coin, section ->
-                            expanded = false
-                            text = ""
-                            uiSearchState.page
-                            searchViewModel.onCoinOpened(coin)
-                            navController.slideFromRight(
-                                R.id.coinFragment,
-                                CoinFragment.Input(coin.uid)
-                            )
-                            stat(
-                                page = StatPage.MarketSearch,
-                                section = section.statSection,
-                                event = StatEvent.OpenCoin(coin.uid)
-                            )
-                        }
-                    ) { favorited, coinUid ->
-                        searchViewModel.onFavoriteClick(favorited, coinUid)
-                    }
-                }
-            }
-        }
-
-        Column(
-            Modifier
-                .fillMaxSize()
-                .padding(top = 60.dp)
-                .background(ComposeAppTheme.colors.tyler)
-        ) {
-            Crossfade(uiState.marketGlobal, label = "") {
-                MetricsBoard(navController, it, uiState.currency)
-            }
-            HorizontalDivider(
-                color = ComposeAppTheme.colors.steel10,
-                thickness = 1.dp
-            )
-            TabsSection(
-                navController = navController,
-                tabs = tabs,
-                selectedTab = uiState.selectedTab,
-                nativeAd = adState
-            ) { tab ->
-                marketViewModel.onSelect(tab)
-            }
-        }
-    }*/
 
     TrackScreenViewEvent("MarketScreen")
 }
@@ -510,24 +379,4 @@ private fun onCoinClick(coinUid: String, navController: NavController) {
     navController.slideFromRight(R.id.coinFragment, arguments)
 
     stat(page = StatPage.Markets, section = StatSection.Coins, event = StatEvent.OpenCoin(coinUid))
-}
-
-data class AdsState(
-    val loadAds: (Context) -> Unit
-)
-
-@Composable
-fun rememberAdsState(
-    loadAds: (Context) -> Unit
-): AdsState {
-    val context = LocalContext.current
-    LaunchedEffect(key1 = BuildConfig.HOME_MARKET_NATIVE) {
-        loadAds(context)
-    }
-    return remember(
-        loadAds,
-        context
-    ) {
-        AdsState(loadAds)
-    }
 }

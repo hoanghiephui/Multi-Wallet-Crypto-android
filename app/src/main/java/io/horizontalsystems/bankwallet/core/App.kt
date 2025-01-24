@@ -17,6 +17,8 @@ import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
 import com.android.billing.DebugTree
 import com.android.billing.UserDataRepository
+import com.android.billing.network.AppDispatcher
+import com.android.billing.network.Dispatcher
 import com.applovin.sdk.AppLovinSdk
 import com.applovin.sdk.AppLovinSdkInitializationConfiguration
 import com.google.firebase.Firebase
@@ -130,10 +132,12 @@ import io.horizontalsystems.ethereumkit.core.EthereumKit
 import io.horizontalsystems.hdwalletkit.Mnemonic
 import io.horizontalsystems.subscriptions.core.UserSubscriptionManager
 import io.reactivex.plugins.RxJavaPlugins
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.security.MessageDigest
 import java.util.logging.Level
@@ -143,7 +147,6 @@ import androidx.work.Configuration as WorkConfiguration
 
 @HiltAndroidApp
 class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
-    private val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     companion object : ICoreApp by CoreApp {
         lateinit var preferences: SharedPreferences
@@ -226,6 +229,10 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
     lateinit var applovinConfiguration: AppLovinSdkInitializationConfiguration
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
+
+    @Dispatcher(AppDispatcher.IO)
+    @Inject
+    lateinit var ioDispatcher: CoroutineDispatcher
 
     override fun onCreate() {
         super.onCreate()
@@ -653,36 +660,17 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
 
     private fun initApplovin() {
         if (SHOW_ADS) {
-            applicationScope.launch {
-                AppLovinSdk.getInstance(this@App).initialize(applovinConfiguration) {
-
+            CoroutineScope(ioDispatcher).launch {
+                withContext(ioDispatcher) {
+                    AppLovinSdk.getInstance(this@App).settings.also {
+                        it.setExtraParameter("disable_sensor_data_collection", "true")
+                        it.setVerboseLogging(BuildConfig.DEBUG)
+                    }
+                    AppLovinSdk.getInstance(this@App).initialize(applovinConfiguration) {
+                        Timber.d("Applovin: $it")
+                    }
                 }
             }
-
         }
-    }
-
-    private class AdjustLifecycleCallbacks : ActivityLifecycleCallbacks {
-        override fun onActivityCreated(activity: Activity, bundle: Bundle?) {
-
-        }
-
-        override fun onActivityStarted(activity: Activity) {
-
-        }
-
-        override fun onActivityResumed(activity: Activity) {
-
-        }
-
-        override fun onActivityPaused(activity: Activity) {
-
-        }
-
-        override fun onActivityStopped(activity: Activity) {}
-
-        override fun onActivitySaveInstanceState(activity: Activity, bundle: Bundle) {}
-
-        override fun onActivityDestroyed(activity: Activity) {}
     }
 }

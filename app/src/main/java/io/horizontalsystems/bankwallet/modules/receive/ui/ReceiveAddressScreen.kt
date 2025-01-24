@@ -21,7 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
@@ -29,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SideEffect
@@ -68,9 +68,9 @@ import io.github.alexzhirkevich.qrose.options.QrPixelShape
 import io.github.alexzhirkevich.qrose.options.roundCorners
 import io.github.alexzhirkevich.qrose.rememberQrCodePainter
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.AdNativeUiState
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.core.AdType
-import io.horizontalsystems.bankwallet.core.AdViewState
 import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.UsedAddress
 import io.horizontalsystems.bankwallet.core.stats.StatEntity
@@ -123,7 +123,7 @@ fun ReceiveAddressScreen(
     showUsedAddresses: (List<UsedAddress>, List<UsedAddress>) -> Unit,
     onBackPress: () -> Unit,
     closeModule: () -> Unit,
-    nativeAd: AdViewState,
+    nativeAd: AdNativeUiState,
 ) {
     val localView = LocalView.current
     val openAmountDialog = remember { mutableStateOf(false) }
@@ -254,7 +254,7 @@ fun ReceiveAddressScreen(
                                         }
 
                                         if (uiState.usedAddresses.isNotEmpty()) {
-                                            Divider(
+                                            HorizontalDivider(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 thickness = 1.dp,
                                                 color = ComposeAppTheme.colors.steel10
@@ -431,7 +431,7 @@ private fun AdditionalDataSection(
     val localView = LocalView.current
 
     items.forEach { item ->
-        Divider(
+        HorizontalDivider(
             modifier = Modifier.fillMaxWidth(),
             thickness = 1.dp,
             color = ComposeAppTheme.colors.steel20
@@ -587,7 +587,7 @@ fun AmountInputDialog(
                 )
             }
 
-            Divider(
+            HorizontalDivider(
                 modifier = Modifier.padding(horizontal = 24.dp),
                 thickness = 1.dp,
                 color = ComposeAppTheme.colors.jacob

@@ -32,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
@@ -41,8 +40,6 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
@@ -62,6 +59,7 @@ import io.horizontalsystems.bankwallet.modules.multiswap.FiatAmountInput
 import io.horizontalsystems.bankwallet.modules.multiswap.SuggestionsBar
 import io.horizontalsystems.bankwallet.modules.send.evm.confirmation.SendEvmConfirmationFragment
 import io.horizontalsystems.bankwallet.modules.sendtokenselect.PrefilledData
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.Keyboard
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
@@ -115,11 +113,8 @@ fun SendEvmScreen(
         }
     }
 
-    val nativeAd by viewModel.adState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-    LaunchedEffect(key1 = BuildConfig.SEND_COIN_NATIVE, block = {
-        viewModel.loadAds(context, BuildConfig.SEND_COIN_NATIVE)
-    })
+    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.SEND_COIN_NATIVE, viewModel)
+
     ComposeAppTheme {
         val focusRequester = remember { FocusRequester() }
 
@@ -214,7 +209,7 @@ fun SendEvmScreen(
                     )
 
                     VSpacer(16.dp)
-                    MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
+                    MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
                     Spacer(modifier = Modifier.height(12.dp))
                     ButtonPrimaryYellow(
                         modifier = Modifier

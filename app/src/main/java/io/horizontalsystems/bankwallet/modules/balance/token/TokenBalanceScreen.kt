@@ -64,6 +64,7 @@ import io.horizontalsystems.bankwallet.modules.syncerror.SyncErrorDialog
 import io.horizontalsystems.bankwallet.modules.transactions.TransactionViewItem
 import io.horizontalsystems.bankwallet.modules.transactions.TransactionsViewModel
 import io.horizontalsystems.bankwallet.modules.transactions.transactionList
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryCircle
@@ -91,11 +92,8 @@ fun TokenBalanceScreen(
     navController: NavController
 ) {
     val uiState = viewModel.uiState
-    val context = LocalContext.current
-    val nativeAd by viewModel.adState.collectAsStateWithLifecycle()
-    LaunchedEffect(key1 = BuildConfig.TOKEN_BALANCE_NATIVE, block = {
-        viewModel.loadAds(context, BuildConfig.TOKEN_BALANCE_NATIVE)
-    })
+    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.TOKEN_BALANCE_NATIVE, viewModel)
+
     Scaffold(
         containerColor = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.background,
@@ -115,13 +113,13 @@ fun TokenBalanceScreen(
                     TokenBalanceHeader(balanceViewItem = it, navController = navController, viewModel = viewModel)
                 }
                 if (transactionItems == null) {
-                    MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
+                    MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
                     ListEmptyView(
                         text = stringResource(R.string.Transactions_WaitForSync),
                         icon = R.drawable.ic_clock
                     )
                 } else {
-                    MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
+                    MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
                     ListEmptyView(
                         text = stringResource(R.string.Transactions_EmptyList),
                         icon = R.drawable.ic_outgoingraw
@@ -137,7 +135,7 @@ fun TokenBalanceScreen(
                     }
                 }
                 item {
-                    MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
+                    MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
                 }
                 transactionList(
                     transactionsMap = transactionItems,

@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import java.util.UUID
+import androidx.core.content.edit
 
 class LocalStorageManager(
     private val preferences: SharedPreferences
@@ -98,7 +99,7 @@ class LocalStorageManager(
     override var chartIndicatorsEnabled: Boolean
         get() = preferences.getBoolean("chartIndicatorsEnabled", false)
         set(enabled) {
-            preferences.edit().putBoolean("chartIndicatorsEnabled", enabled).apply()
+            preferences.edit { putBoolean("chartIndicatorsEnabled", enabled) }
         }
 
     override var amountInputType: AmountInputType?
@@ -120,25 +121,25 @@ class LocalStorageManager(
     override var marketSearchRecentCoinUids: List<String>
         get() = preferences.getString("marketSearchRecentCoinUids", null)?.split(",") ?: listOf()
         set(value) {
-            preferences.edit().putString("marketSearchRecentCoinUids", value.joinToString(",")).apply()
+            preferences.edit { putString("marketSearchRecentCoinUids", value.joinToString(",")) }
         }
 
     override var zcashAccountIds: Set<String>
         get() = preferences.getStringSet("zcashAccountIds", setOf()) ?: setOf()
         set(value) {
-            preferences.edit().putStringSet("zcashAccountIds", value).apply()
+            preferences.edit { putStringSet("zcashAccountIds", value) }
         }
 
     override var baseCurrencyCode: String?
         get() = preferences.getString(BASE_CURRENCY_CODE, null)
         set(value) {
-            preferences.edit().putString(BASE_CURRENCY_CODE, value).apply()
+            preferences.edit { putString(BASE_CURRENCY_CODE, value) }
         }
 
     override var authToken: String?
         get() = preferences.getString(AUTH_TOKEN, null)
         set(value) {
-            preferences.edit().putString(AUTH_TOKEN, value).apply()
+            preferences.edit { putString(AUTH_TOKEN, value) }
         }
 
     override val appId: String?
@@ -146,7 +147,7 @@ class LocalStorageManager(
             return when (val id = preferences.getString(APP_ID, null)) {
                 null -> {
                     val newId = UUID.randomUUID().toString()
-                    preferences.edit().putString(APP_ID, newId).apply()
+                    preferences.edit { putString(APP_ID, newId) }
                     newId
                 }
                 else -> id
@@ -156,13 +157,13 @@ class LocalStorageManager(
     override var baseBitcoinProvider: String?
         get() = preferences.getString(BASE_BITCOIN_PROVIDER, null)
         set(value) {
-            preferences.edit().putString(BASE_BITCOIN_PROVIDER, value).apply()
+            preferences.edit { putString(BASE_BITCOIN_PROVIDER, value) }
         }
 
     override var baseLitecoinProvider: String?
         get() = preferences.getString(BASE_LITECOIN_PROVIDER, null)
         set(value) {
-            preferences.edit().putString(BASE_LITECOIN_PROVIDER, value).apply()
+            preferences.edit { putString(BASE_LITECOIN_PROVIDER, value) }
         }
 
     override var baseEthereumProvider: String?

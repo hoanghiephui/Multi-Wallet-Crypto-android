@@ -22,7 +22,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -55,13 +54,12 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.AdNativeUiState
 import io.horizontalsystems.bankwallet.core.AdType
-import io.horizontalsystems.bankwallet.core.AdViewState
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.badge
@@ -77,6 +75,7 @@ import io.horizontalsystems.bankwallet.entities.CoinValue
 import io.horizontalsystems.bankwallet.entities.Currency
 import io.horizontalsystems.bankwallet.modules.evmfee.FeeSettingsInfoDialog
 import io.horizontalsystems.bankwallet.modules.multiswap.providers.IMultiSwapProvider
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ColoredTextStyle
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.Keyboard
@@ -126,10 +125,7 @@ fun SwapScreen(navController: NavController, tokenIn: Token?) {
     )
     val uiState = viewModel.uiState
     val context = LocalContext.current
-    LaunchedEffect(key1 = BuildConfig.SWAP_COIN_NATIVE, block = {
-        viewModel.loadAds(context, BuildConfig.SWAP_COIN_NATIVE)
-    })
-    val nativeAd by viewModel.adState.collectAsStateWithLifecycle()
+    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.SWAP_COIN_NATIVE, viewModel)
     SwapScreenInner(
         uiState = uiState,
         onClickClose = navController::popBackStack,
@@ -180,7 +176,7 @@ fun SwapScreen(navController: NavController, tokenIn: Token?) {
             viewModel.onActionCompleted()
         },
         navController = navController,
-        nativeAd = nativeAd
+        nativeAd = adState
     )
 }
 
@@ -202,7 +198,7 @@ private fun SwapScreenInner(
     onActionStarted: () -> Unit,
     onActionCompleted: () -> Unit,
     navController: NavController,
-    nativeAd: AdViewState
+    nativeAd: AdNativeUiState
 ) {
     LifecycleResumeEffect(uiState.timeout) {
         if (uiState.timeout) {

@@ -23,10 +23,9 @@ import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.entities.Account
 import io.horizontalsystems.bankwallet.entities.AccountType
 import io.horizontalsystems.bankwallet.entities.LaunchPage
-import io.horizontalsystems.bankwallet.modules.billing.BillingPlusUiState
-import io.horizontalsystems.bankwallet.modules.billing.showBillingPlusDialog
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
 import io.horizontalsystems.bankwallet.modules.main.MainModule.MainNavigation
+import io.horizontalsystems.bankwallet.modules.main.MainModule.NavigationViewItem
 import io.horizontalsystems.bankwallet.modules.market.topplatforms.Platform
 import io.horizontalsystems.bankwallet.modules.tonconnect.TonConnectMainFragment
 import io.horizontalsystems.bankwallet.modules.walletconnect.WCManager
@@ -78,12 +77,14 @@ class MainViewModel(
                 MainNavigation.Market,
                 MainNavigation.Balance,
                 MainNavigation.Transactions,
+                MainNavigation.Search,
                 MainNavigation.Settings,
             )
         } else {
             listOf(
                 MainNavigation.Balance,
                 MainNavigation.Transactions,
+                MainNavigation.Search,
                 MainNavigation.Settings,
             )
         }
@@ -230,7 +231,7 @@ class MainViewModel(
 
     private fun getNavItem(item: MainNavigation, selected: Boolean) = when (item) {
         MainNavigation.Market -> {
-            MainModule.NavigationViewItem(
+            NavigationViewItem(
                 mainNavItem = item,
                 selected = selected,
                 enabled = true,
@@ -238,7 +239,7 @@ class MainViewModel(
         }
 
         MainNavigation.Transactions -> {
-            MainModule.NavigationViewItem(
+            NavigationViewItem(
                 mainNavItem = item,
                 selected = selected,
                 enabled = transactionsEnabled,
@@ -246,7 +247,7 @@ class MainViewModel(
         }
 
         MainNavigation.Settings -> {
-            MainModule.NavigationViewItem(
+            NavigationViewItem(
                 mainNavItem = item,
                 selected = selected,
                 enabled = true,
@@ -255,12 +256,21 @@ class MainViewModel(
         }
 
         MainNavigation.Balance -> {
-            MainModule.NavigationViewItem(
+            NavigationViewItem(
                 mainNavItem = item,
                 selected = selected,
                 enabled = true,
             )
         }
+
+        MainNavigation.Search -> {
+            NavigationViewItem(
+                mainNavItem = item,
+                selected = selected,
+                enabled = true,
+            )
+        }
+
     }
 
     private fun getTabIndexToOpen(): Int {

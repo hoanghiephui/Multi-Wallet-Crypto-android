@@ -15,12 +15,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,7 +28,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -95,7 +92,7 @@ private fun CoinRankScreen(
     val viewItems = viewModel.uiState.rankViewItems
 
     Scaffold(
-        containerColor = Color.Transparent,
+        containerColor = ComposeAppTheme.colors.tyler,
         contentColor = MaterialTheme.colorScheme.background,
         topBar = {
             AppBar(
@@ -144,11 +141,13 @@ private fun CoinRankScreen(
                         }
 
                         stickyHeader {
-                            HeaderSorting {
+                            HeaderSorting(
+                                background = ComposeAppTheme.colors.tyler
+                            ) {
                                 ButtonSecondaryCircle(
                                     modifier = Modifier.padding(start = 16.dp),
                                     icon = if (uiState.sortDescending) R.drawable.ic_sort_l2h_20 else R.drawable.ic_sort_h2l_20,
-                                    onClick = { viewModel.toggleSortType() }
+                                    onClick = { viewModel.toggleSortType() },
                                 )
                                 Spacer(Modifier.weight(1f))
                                 periodSelect?.let {

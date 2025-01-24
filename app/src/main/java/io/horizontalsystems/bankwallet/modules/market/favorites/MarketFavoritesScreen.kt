@@ -135,7 +135,7 @@ fun MarketFavoritesScreen(
                                             openSortingSelector = true
                                         }
                                     )
-                                    if (uiState.sortingField == WatchlistSorting.Manual) {
+                                    if (uiState.sortingField == WatchlistSorting.Manual && uiState.viewItems.size >= 2) {
                                         HSpacer(width = 12.dp)
                                         ButtonSecondaryCircle(
                                             icon = R.drawable.ic_edit_20,

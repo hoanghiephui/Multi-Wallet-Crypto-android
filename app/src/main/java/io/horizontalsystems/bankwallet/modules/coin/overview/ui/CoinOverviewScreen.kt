@@ -66,6 +66,7 @@ import io.horizontalsystems.bankwallet.modules.managewallets.ManageWalletsModule
 import io.horizontalsystems.bankwallet.modules.managewallets.ManageWalletsViewModel
 import io.horizontalsystems.bankwallet.modules.markdown.MarkdownFragment
 import io.horizontalsystems.bankwallet.modules.zcashconfigure.ZcashConfigure
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ChartBinance
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
@@ -110,13 +111,7 @@ fun CoinOverviewScreen(
     val context = LocalContext.current
 
     val coinSymbol = "${fullCoin.coin.code}USDT"
-    val nativeAd by viewModel.adState.collectAsStateWithLifecycle()
-    LaunchedEffect(key1 = BuildConfig.TRANSACTION_NATIVE, block = {
-        viewModel.loadAds(
-            context,
-            BuildConfig.TRANSACTION_NATIVE
-        )
-    })
+    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.TRANSACTION_NATIVE, viewModel)
 
     LaunchedEffect(key1 = Unit, block = {
         binanceViewModel.onBinanceAvailable(coinSymbol)
@@ -281,7 +276,7 @@ fun CoinOverviewScreen(
                                 }
 
                                 Spacer(modifier = Modifier.height(8.dp))
-                                MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
+                                MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
 
                                 if (overview.marketData.isNotEmpty()) {
                                     Spacer(modifier = Modifier.height(12.dp))

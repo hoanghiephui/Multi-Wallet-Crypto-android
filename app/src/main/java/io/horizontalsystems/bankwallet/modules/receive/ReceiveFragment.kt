@@ -42,6 +42,7 @@ import io.horizontalsystems.bankwallet.modules.receive.viewmodels.BchAddressType
 import io.horizontalsystems.bankwallet.modules.receive.viewmodels.DerivationSelectViewModel
 import io.horizontalsystems.bankwallet.modules.receive.viewmodels.ReceiveAddressViewModel
 import io.horizontalsystems.bankwallet.modules.receive.viewmodels.ReceiveSharedViewModel
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.core.helpers.HudHelper
 
 class ReceiveFragment : BaseComposeFragment() {
@@ -93,10 +94,8 @@ fun ReceiveScreen(
 
                 val addressViewModel = viewModel<ReceiveAddressViewModel>(factory = ReceiveModule.Factory(walletNonNull))
                 val context = LocalContext.current
-                val nativeAd by addressViewModel.adState.collectAsStateWithLifecycle()
-                LaunchedEffect(key1 = BuildConfig.TOKEN_BALANCE_NATIVE, block = {
-                    addressViewModel.loadAds(context, BuildConfig.TOKEN_BALANCE_NATIVE)
-                })
+                val (adState, reloadAd) = rememberAdNativeView(BuildConfig.TOKEN_BALANCE_NATIVE, addressViewModel)
+
                 ReceiveAddressScreen(
                     title = stringResource(R.string.Deposit_Title, walletNonNull.coin.code),
                     uiState = addressViewModel.uiState,
@@ -115,7 +114,7 @@ fun ReceiveScreen(
                     },
                     onBackPress = navigateBack(fragmentNavController, navController),
                     closeModule = { fragmentNavController.popBackStack() },
-                    nativeAd = nativeAd
+                    nativeAd = adState
                 )
             }
             composablePage(USED_ADDRESSES_SCREEN) { entry ->

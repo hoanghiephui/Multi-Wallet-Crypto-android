@@ -14,8 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -40,10 +40,10 @@ fun HeaderStick(
             .background(ComposeAppTheme.colors.tyler)
     ) {
         if (borderTop) {
-            Divider(
+            HorizontalDivider(
+                modifier = Modifier.align(Alignment.TopCenter),
                 thickness = 1.dp,
-                color = ComposeAppTheme.colors.steel10,
-                modifier = Modifier.align(Alignment.TopCenter)
+                color = ComposeAppTheme.colors.steel10
             )
         }
 
@@ -110,18 +110,18 @@ fun HeaderSorting(
             .background(background)
     ) {
         if (borderTop) {
-            Divider(
+            HorizontalDivider(
+                modifier = Modifier.align(Alignment.TopCenter),
                 thickness = 1.dp,
-                color = ComposeAppTheme.colors.steel10,
-                modifier = Modifier.align(Alignment.TopCenter)
+                color = ComposeAppTheme.colors.steel10
             )
         }
 
         if (borderBottom) {
-            Divider(
+            HorizontalDivider(
+                modifier = Modifier.align(Alignment.BottomCenter),
                 thickness = 1.dp,
-                color = ComposeAppTheme.colors.steel10,
-                modifier = Modifier.align(Alignment.BottomCenter)
+                color = ComposeAppTheme.colors.steel10
             )
         }
 
@@ -159,7 +159,7 @@ fun PremiumHeader() {
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun Preview_HeaderText() {
     ComposeAppTheme {

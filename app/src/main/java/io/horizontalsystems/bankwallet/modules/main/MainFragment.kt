@@ -72,6 +72,7 @@ import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchViewMod
 import io.horizontalsystems.bankwallet.modules.rooteddevice.RootedDeviceModule
 import io.horizontalsystems.bankwallet.modules.rooteddevice.RootedDeviceScreen
 import io.horizontalsystems.bankwallet.modules.rooteddevice.RootedDeviceViewModel
+import io.horizontalsystems.bankwallet.modules.search.SearchScreen
 import io.horizontalsystems.bankwallet.modules.settings.main.SettingsScreen
 import io.horizontalsystems.bankwallet.modules.tor.TorStatusView
 import io.horizontalsystems.bankwallet.modules.transactions.TransactionsModule
@@ -245,8 +246,6 @@ private fun MainScreen(
                     when (uiState.mainNavItems[page].mainNavItem) {
                         MainNavigation.Market -> MarketScreen(
                             fragmentNavController,
-                            searchViewModel,
-                            viewModel
                         )
 
                         MainNavigation.Balance -> {
@@ -280,6 +279,12 @@ private fun MainScreen(
                         )
 
                         MainNavigation.Settings -> SettingsScreen(fragmentNavController)
+                        MainNavigation.Search -> {
+                            SearchScreen(
+                                searchViewModel,
+                                fragmentNavController
+                            )
+                        }
                     }
                 }
             }

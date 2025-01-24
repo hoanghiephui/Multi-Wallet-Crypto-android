@@ -41,6 +41,7 @@ import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Chart
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.metricchart.MetricsType
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
@@ -89,11 +90,8 @@ class MetricsPageFragment : BaseComposeFragment() {
         onCoinClick: (String) -> Unit,
     ) {
         val uiState = viewModel.uiState
-        val nativeAd by viewModel.adState.collectAsStateWithLifecycle()
-        val context = LocalContext.current
-        LaunchedEffect(key1 = BuildConfig.METRICS_NATIVE, block = {
-            viewModel.loadAds(context, BuildConfig.METRICS_NATIVE)
-        })
+        val (adState, reloadAd) = rememberAdNativeView(BuildConfig.METRICS_NATIVE, viewModel)
+
         Column(Modifier.background(color = MaterialTheme.colorScheme.background)) {
             AppBar(
                 menuItems = listOf(
@@ -111,6 +109,7 @@ class MetricsPageFragment : BaseComposeFragment() {
                 refreshing = uiState.isRefreshing,
                 onRefresh = {
                     viewModel.refresh()
+                    reloadAd()
                 }
             ) {
                 Crossfade(uiState.viewState, label = "") { viewState ->
@@ -163,7 +162,7 @@ class MetricsPageFragment : BaseComposeFragment() {
                                 }
                                 item {
                                     Spacer(modifier = Modifier.height(12.dp))
-                                    MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
+                                    MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
                                 }
                                 items(uiState.viewItems) { viewItem ->
                                     MarketCoinClear(

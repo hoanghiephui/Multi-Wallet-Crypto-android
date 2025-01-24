@@ -549,6 +549,7 @@ enum class StatTab(val key: String) {
     Pairs("pairs"),
     Sectors("sectors"),
     Platforms("platforms"),
+    Search("search"),
 }
 
 enum class StatSortType(val key: String) {

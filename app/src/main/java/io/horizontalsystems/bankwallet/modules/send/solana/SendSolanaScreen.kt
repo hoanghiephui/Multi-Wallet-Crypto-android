@@ -33,6 +33,7 @@ import io.horizontalsystems.bankwallet.modules.availablebalance.AvailableBalance
 import io.horizontalsystems.bankwallet.modules.send.SendConfirmationFragment
 import io.horizontalsystems.bankwallet.modules.send.SendScreen
 import io.horizontalsystems.bankwallet.modules.sendtokenselect.PrefilledData
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 import io.horizontalsystems.core.helpers.HudHelper
@@ -55,11 +56,8 @@ fun SendSolanaScreen(
     val amountCaution = uiState.amountCaution
     val proceedEnabled = uiState.canBeSend
     val amountInputType = amountInputModeViewModel.inputType
-    val nativeAd by viewModel.adState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-    LaunchedEffect(key1 = BuildConfig.SEND_COIN_NATIVE, block = {
-        viewModel.loadAds(context, BuildConfig.SEND_COIN_NATIVE)
-    })
+    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.SEND_COIN_NATIVE, viewModel)
+
     val paymentAddressViewModel = viewModel<AddressParserViewModel>(
         factory = AddressParserModule.Factory(wallet.token, prefilledData?.amount)
     )
@@ -120,7 +118,7 @@ fun SendSolanaScreen(
                 }
             }
             Spacer(modifier = Modifier.height(12.dp))
-            MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
+            MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
 
             ButtonPrimaryYellow(
                 modifier = Modifier

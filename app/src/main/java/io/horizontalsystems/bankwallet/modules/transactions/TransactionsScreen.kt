@@ -26,7 +26,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
@@ -35,12 +34,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.BuildConfig
@@ -58,6 +55,7 @@ import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.balance.BalanceAccountsViewModel
 import io.horizontalsystems.bankwallet.modules.balance.BalanceModule
 import io.horizontalsystems.bankwallet.modules.balance.BalanceScreenState
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
@@ -82,13 +80,9 @@ fun TransactionsScreen(
     navController: NavController,
     viewModel: TransactionsViewModel
 ) {
-    val accountsViewModel = viewModel<BalanceAccountsViewModel>(factory = BalanceModule.AccountsFactory())
-    val context = LocalContext.current
-    val nativeAd by accountsViewModel.adState.collectAsStateWithLifecycle()
-    LaunchedEffect(key1 = BuildConfig.TRANSACTION_NATIVE, block = {
-        accountsViewModel.loadAds(context,
-            BuildConfig.TRANSACTION_NATIVE)
-    })
+    val accountsViewModel =
+        viewModel<BalanceAccountsViewModel>(factory = BalanceModule.AccountsFactory())
+    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.TRANSACTION_NATIVE, viewModel)
 
     val filterTypes by viewModel.filterTypesLiveData.observeAsState()
     val showFilterAlertDot by viewModel.filterResetEnabled.observeAsState(false)
@@ -105,79 +99,83 @@ fun TransactionsScreen(
                 MenuItem(
                     title = TranslatableString.ResString(R.string.Transactions_Filter),
                     icon = R.drawable.ic_manage_2_24,
-                        showAlertDot = showFilterAlertDot,
+                    showAlertDot = showFilterAlertDot,
                     onClick = {
                         navController.slideFromRight(R.id.transactionFilterFragment)
 
-                stat(page = StatPage.Transactions, event = StatEvent.Open(StatPage.TransactionFilter))
-                        },)
+                        stat(
+                            page = StatPage.Transactions,
+                            event = StatEvent.Open(StatPage.TransactionFilter)
+                        )
+                    },
+                )
             )
         )
         filterTypes?.let { filterTypes ->
             FilterTypeTabs(
                 filterTypes = filterTypes,
                 onTransactionTypeClick = {
-                        viewModel.setFilterTransactionType(it)
+                    viewModel.setFilterTransactionType(it)
 
-                        stat(page = StatPage.Transactions, event = StatEvent.SwitchTab(it.statTab))
-                    }
+                    stat(page = StatPage.Transactions, event = StatEvent.SwitchTab(it.statTab))
+                }
             )
         }
 
-            Crossfade(uiState.viewState, label = "") { viewState ->
-                if (viewState == ViewState.Success) {
-                    transactions?.let { transactionItems ->
-                        if (transactionItems.isEmpty()) {
-                            if (syncing) {
-                                ScreenMessageWithAction(
-                                    text = stringResource(R.string.Transactions_WaitForSync),
-                                    icon = R.drawable.ic_clock
-                                ) {
-                                    MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
-                                }
-                            } else {
-                                ScreenMessageWithAction(
-                                    text = stringResource(R.string.Transactions_EmptyList),
-                                    icon = R.drawable.ic_outgoingraw
-                                ) {
-                                    MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
-                                }
+        Crossfade(uiState.viewState, label = "") { viewState ->
+            if (viewState == ViewState.Success) {
+                transactions?.let { transactionItems ->
+                    if (transactionItems.isEmpty()) {
+                        if (syncing) {
+                            ScreenMessageWithAction(
+                                text = stringResource(R.string.Transactions_WaitForSync),
+                                icon = R.drawable.ic_clock
+                            ) {
+                                MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
                             }
                         } else {
-                            val listState = rememberSaveable(
-                                uiState.transactionListId,
-                                (accountsViewModel.balanceScreenState as? BalanceScreenState.HasAccount)?.accountViewItem?.id,
-                                saver = LazyListState.Saver
+                            ScreenMessageWithAction(
+                                text = stringResource(R.string.Transactions_EmptyList),
+                                icon = R.drawable.ic_outgoingraw
                             ) {
-                                LazyListState(0, 0)
+                                MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
                             }
+                        }
+                    } else {
+                        val listState = rememberSaveable(
+                            uiState.transactionListId,
+                            (accountsViewModel.balanceScreenState as? BalanceScreenState.HasAccount)?.accountViewItem?.id,
+                            saver = LazyListState.Saver
+                        ) {
+                            LazyListState(0, 0)
+                        }
 
-                            val onClick: (TransactionViewItem) -> Unit = remember {
-                                {
-                                    onTransactionClick(
-                                        it,
-                                        viewModel,
-                                        navController
-                                    )
-                                }
-                            }
-
-                            LazyColumn(state = listState) {
-                                item {
-                                    MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
-                                }
-                                transactionList(
-                                    transactionsMap = transactionItems,
-                                    willShow = { viewModel.willShow(it) },
-                                    onClick = onClick,
-                                    onBottomReached = { viewModel.onBottomReached() }
+                        val onClick: (TransactionViewItem) -> Unit = remember {
+                            {
+                                onTransactionClick(
+                                    it,
+                                    viewModel,
+                                    navController
                                 )
                             }
+                        }
+
+                        LazyColumn(state = listState) {
+                            item {
+                                MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
+                            }
+                            transactionList(
+                                transactionsMap = transactionItems,
+                                willShow = { viewModel.willShow(it) },
+                                onClick = onClick,
+                                onBottomReached = { viewModel.onBottomReached() }
+                            )
                         }
                     }
                 }
             }
         }
+    }
     TrackScreenViewEvent("TransactionsScreen")
 }
 
@@ -265,12 +263,15 @@ fun TransactionCell(item: TransactionViewItem, position: SectionItemPosition, on
             SectionItemPosition.First -> {
                 Modifier.clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
             }
+
             SectionItemPosition.Last -> {
                 Modifier.clip(RoundedCornerShape(bottomStart = 12.dp, bottomEnd = 12.dp))
             }
+
             SectionItemPosition.Single -> {
                 Modifier.clip(RoundedCornerShape(12.dp))
             }
+
             else -> Modifier
         }
 
@@ -306,6 +307,7 @@ fun TransactionCell(item: TransactionViewItem, position: SectionItemPosition, on
                             contentDescription = null
                         )
                     }
+
                     is TransactionViewItem.Icon.Platform -> {
                         Icon(
                             modifier = Modifier.size(32.dp),
@@ -314,8 +316,10 @@ fun TransactionCell(item: TransactionViewItem, position: SectionItemPosition, on
                             contentDescription = null
                         )
                     }
+
                     is TransactionViewItem.Icon.Regular -> {
-                        val shape = if (icon.rectangle) RoundedCornerShape(CornerSize(4.dp)) else CircleShape
+                        val shape =
+                            if (icon.rectangle) RoundedCornerShape(CornerSize(4.dp)) else CircleShape
                         HsImage(
                             modifier = Modifier
                                 .size(32.dp)
@@ -325,9 +329,12 @@ fun TransactionCell(item: TransactionViewItem, position: SectionItemPosition, on
                             placeholder = icon.placeholder
                         )
                     }
+
                     is TransactionViewItem.Icon.Double -> {
-                        val backShape = if (icon.back.rectangle) RoundedCornerShape(CornerSize(4.dp)) else CircleShape
-                        val frontShape = if (icon.front.rectangle) RoundedCornerShape(CornerSize(4.dp)) else CircleShape
+                        val backShape =
+                            if (icon.back.rectangle) RoundedCornerShape(CornerSize(4.dp)) else CircleShape
+                        val frontShape =
+                            if (icon.front.rectangle) RoundedCornerShape(CornerSize(4.dp)) else CircleShape
                         HsImage(
                             modifier = Modifier
                                 .align(Alignment.TopStart)
@@ -359,6 +366,7 @@ fun TransactionCell(item: TransactionViewItem, position: SectionItemPosition, on
                             placeholder = icon.front.placeholder,
                         )
                     }
+
                     is TransactionViewItem.Icon.ImageResource -> {}
                 }
             }
