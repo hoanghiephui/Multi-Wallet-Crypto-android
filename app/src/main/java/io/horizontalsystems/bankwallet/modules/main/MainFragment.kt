@@ -6,6 +6,9 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,12 +34,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.activityViewModels
@@ -180,6 +187,8 @@ private fun MainScreen(
     val updateState = rememberInAppUpdateState()
     val manager: ReviewManager = ReviewManagerFactory.create(mainActivity)
     val openPro by viewModel.openPro.collectAsStateWithLifecycle()
+    val bottomBarHeight = remember { mutableFloatStateOf(0f) }
+    val bottomBarOffsetHeightPx = remember { mutableFloatStateOf(0f) }
     LaunchedEffect(key1 = openPro, block = {
         if (openPro) {
             mainActivity.showBillingPlusDialog()
@@ -204,17 +213,29 @@ private fun MainScreen(
                     if (uiState.torEnabled) {
                         TorStatusView()
                     }
-                    NiaBottomBar(
-                        destinations = uiState.mainNavItems,
-                        onNavigateToDestination = {
-                            viewModel.onSelect(it.mainNavItem)
-                            stat(
-                                page = StatPage.Main,
-                                event = StatEvent.SwitchTab(it.mainNavItem.statTab)
+                    AnimatedVisibility(
+                        visible = true,
+                        enter = slideInVertically(initialOffsetY = { it }),
+                        exit = slideOutVertically(targetOffsetY = { it })
+                    ) {
+                        NiaBottomBar(
+                            destinations = uiState.mainNavItems,
+                            onNavigateToDestination = {
+                                viewModel.onSelect(it.mainNavItem)
+                                stat(
+                                    page = StatPage.Main,
+                                    event = StatEvent.SwitchTab(it.mainNavItem.statTab)
 
-                            )
-                        }
-                    )
+                                )
+                            },
+                            bottomBarVisibility = true,
+                            modifier = Modifier
+                                .testTag("MfxBottomBar")
+                                .onGloballyPositioned { coordinates ->
+                                    bottomBarHeight.floatValue = coordinates.size.height.toFloat()
+                                },
+                        )
+                    }
                 }
             }
         ) { padding ->
@@ -373,9 +394,11 @@ private fun NiaBottomBar(
     destinations: List<MainModule.NavigationViewItem>,
     onNavigateToDestination: (MainModule.NavigationViewItem) -> Unit,
     modifier: Modifier = Modifier,
+    bottomBarVisibility: Boolean,
 ) {
     NiaNavigationBar(
         modifier = modifier,
+        visibility = bottomBarVisibility
     ) {
         destinations.forEach { destination ->
             val selected = destination.selected
