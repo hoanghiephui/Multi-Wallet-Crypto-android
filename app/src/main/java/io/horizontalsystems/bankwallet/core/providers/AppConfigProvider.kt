@@ -151,4 +151,21 @@ class AppConfigProvider(localStorage: ILocalStorage) {
         ).toList().sortedBy { (key, _) -> key.order }.toMap()
     }
 
+    val spamCoinValueLimits: Map<String, Double> = mapOf(
+        "tether" to 0.01,
+        "usd-coin" to 0.01,
+        "dai" to 0.01,
+        "binance-usd" to 0.01,
+        "binance-peg-busd" to 0.01,
+        "stasis-eurs" to 0.01,
+    )
+
+    val chainalysisBaseUrl by lazy {
+        Translator.getString(R.string.chainalysisBaseUrl)
+    }
+
+    val chainalysisApiKey by lazy {
+        Translator.getString(R.string.chainalysisApiKey)
+    }
+
 }

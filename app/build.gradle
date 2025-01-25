@@ -119,6 +119,8 @@ android {
             resValue "string", "udnApiKey", "r2phzgatt_zt9-hd_wyvdjrdsrimnxgokm7knyag1malzgcz"
             resValue "string", "oneInchApiKey", "3EttyCzgWb2GLFIRoPIUYM0M4uKAVEcq"
             resValue "string", "blocksDecodedEthereumRpc", "https://api-dev.blocksdecoded.com/v1/ethereum-rpc/mainnet"
+            resValue "string", "chainalysisBaseUrl", "https://public.chainalysis.com/api/v1/"
+            resValue "string", "chainalysisApiKey", "928bb256db73f1cb93e1b3366a145d9fbe06e28581c8b665b82ad70bbfef1db4"
         }
 
         appcenterdebug {
@@ -313,10 +315,10 @@ dependencies {
     // Wallet kits
     implementation 'com.github.horizontalsystems:ton-kit-android:1cb4c1e'
     implementation 'com.github.horizontalsystems:bitcoin-kit-android:4a34f53'
-    implementation 'com.github.horizontalsystems:ethereum-kit-android:0c770e3'
+    implementation 'com.github.horizontalsystems:ethereum-kit-android:201296c'
     implementation 'com.github.horizontalsystems:blockchain-fee-rate-kit-android:1d3bd49'
     implementation 'com.github.horizontalsystems:binance-chain-kit-android:c1509a2'
-    implementation 'com.github.horizontalsystems:market-kit-android:8c9fc42'
+    implementation 'com.github.horizontalsystems:market-kit-android:0ea65ac'
     implementation 'com.github.horizontalsystems:solana-kit-android:ce738d8'
     implementation 'com.github.horizontalsystems:tron-kit-android:dc3dca7'
     // Zcash SDK
