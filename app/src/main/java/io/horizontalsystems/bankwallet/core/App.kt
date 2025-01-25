@@ -31,7 +31,6 @@ import com.walletconnect.android.CoreClient
 import com.walletconnect.android.relay.ConnectionType
 import com.walletconnect.web3.wallet.client.Wallet
 import com.walletconnect.web3.wallet.client.Web3Wallet
-import io.horizontalsystems.bankwallet.BuildConfig
 import io.horizontalsystems.bankwallet.core.address.AddressSecurityCheckerChain
 import dagger.hilt.android.HiltAndroidApp
 import io.horizontalsystems.bankwallet.core.BaseViewModel.Companion.SHOW_ADS

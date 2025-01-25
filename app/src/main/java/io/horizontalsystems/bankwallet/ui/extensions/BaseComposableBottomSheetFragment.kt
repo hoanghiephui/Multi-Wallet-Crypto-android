@@ -73,6 +73,7 @@ open class BaseComposableBottomSheetFragment : BottomSheetDialogFragment() {
 
 @Composable
 fun BottomSheetHeader(
+    modifier: Modifier = Modifier,
     iconPainter: Painter,
     title: String,
     onCloseClick: () -> Unit,
@@ -81,6 +82,7 @@ fun BottomSheetHeader(
     content: @Composable (ColumnScope.() -> Unit),
 ) {
     BottomSheetHeader(
+        modifier = modifier,
         iconPainter = iconPainter,
         titleContent = {
             Text(
@@ -138,14 +140,15 @@ fun BottomSheetHeaderMultiline(
 
 @Composable
 private fun BottomSheetHeader(
+    modifier: Modifier = Modifier,
     iconPainter: Painter,
-    titleContent: @Composable() (RowScope.() -> Unit),
+    titleContent: @Composable (RowScope.() -> Unit),
     onCloseClick: () -> Unit,
     iconTint: ColorFilter?,
-    content: @Composable() (ColumnScope.() -> Unit)
+    content: @Composable (ColumnScope.() -> Unit)
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp))
             .verticalScroll(rememberScrollState())
