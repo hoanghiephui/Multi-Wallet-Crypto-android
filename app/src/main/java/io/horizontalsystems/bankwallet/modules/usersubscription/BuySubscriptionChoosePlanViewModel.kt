@@ -45,7 +45,7 @@ class BuySubscriptionChoosePlanViewModel : ViewModelUiState<BuySubscriptionChoos
 
                 purchase = hsPurchase
                 if (hsPurchase == null) {
-                    error = Throwable("Purchase failed")
+                    error = Throwable("Purchase failed") // TODO retry when error
                 }
             } catch (e: Throwable) {
                 error = e

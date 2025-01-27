@@ -13,7 +13,7 @@ object UserSubscriptionManager {
 
     private val predefinedSubscriptions = listOf(
         Subscription(
-            id = "test.subscription_1",
+            id = "product.subscription_1",
             name = "PRO",
             description = "",
             actions = listOf(

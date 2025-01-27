@@ -14,10 +14,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,7 +41,7 @@ fun PremiumSubscribedScreen(
     onCloseClick: () -> Unit
 ) {
     Scaffold(
-        backgroundColor = ComposeAppTheme.colors.tyler,
+        containerColor = ComposeAppTheme.colors.tyler,
         topBar = {
             TitleCenteredTopBar(
                 title = stringResource(R.string.Premium_Title),
@@ -112,7 +112,7 @@ fun PremiumSubscribedScreen(
                             ) {
                                 //todo
                             }
-                            Divider(color = ComposeAppTheme.colors.steel20)
+                            HorizontalDivider(color = ComposeAppTheme.colors.steel20)
                             VipItem(
                                 icon = R.drawable.prem_chat_support_24,
                                 title = R.string.Premium_UpgradeFeature_VipClub,

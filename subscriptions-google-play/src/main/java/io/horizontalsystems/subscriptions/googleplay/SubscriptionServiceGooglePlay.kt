@@ -203,7 +203,7 @@ class SubscriptionServiceGooglePlay(
                     it.resume(HSPurchase(HSPurchase.Status.Purchased))
                 }
                 BillingClient.BillingResponseCode.USER_CANCELED -> {
-                    it.resume(null)
+                    it.resume(HSPurchase(HSPurchase.Status.Cancel))
                 }
                 else -> {
                     it.resumeWithException(HSPurchaseFailure(billingResult.responseCode.toString(), billingResult.debugMessage))

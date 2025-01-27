@@ -4,7 +4,7 @@ data class HSPurchase(
     val status: Status
 ) {
     enum class Status {
-        Pending, Purchased
+        Pending, Purchased, Cancel
     }
 }
 
