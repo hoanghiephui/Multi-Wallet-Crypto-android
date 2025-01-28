@@ -55,7 +55,7 @@ fun SearchBar(
     title: String
 ) {
     var text by rememberSaveable { mutableStateOf("") }
-    var active by rememberSaveable { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
     var searchMode by remember { mutableStateOf(false) }
     var searchClear by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -65,13 +65,20 @@ fun SearchBar(
             icon = R.drawable.icon_search,
             onClick = {
                 searchMode = true
-                active = true
+                expanded = true
                 keyboardController?.show()
             },
             tint = MaterialTheme.colorScheme.onSurface
         )
     ).also {
         it.addAll(menuItems)
+    }
+    val color = if (expanded) {
+        SearchBarDefaults.colors(
+            containerColor = ComposeAppTheme.colors.tyler
+        )
+    } else {
+        SearchBarDefaults.colors()
     }
     Box(
         Modifier
@@ -102,16 +109,16 @@ fun SearchBar(
                             searchClear = it.isNotEmpty()
                         },
                         onSearch = {
-                            active = false
+                            expanded = false
                             searchMode = false
                             keyboardController?.hide()
                         },
-                        expanded = active,
-                        onExpandedChange = { active = it },
+                        expanded = expanded,
+                        onExpandedChange = { expanded = it },
                         placeholder = { Text(hint) },
                         leadingIcon = {
                             IconButton(onClick = {
-                                active = false
+                                expanded = false
                                 searchMode = false
                                 keyboardController?.hide()
                                 onSearchTextChanged("")
@@ -131,8 +138,9 @@ fun SearchBar(
                         },
                     )
                 },
-                expanded = active,
-                onExpandedChange = { active = it },
+                expanded = expanded,
+                onExpandedChange = { expanded = it },
+                colors = color
             ) {
                 content.invoke()
             }

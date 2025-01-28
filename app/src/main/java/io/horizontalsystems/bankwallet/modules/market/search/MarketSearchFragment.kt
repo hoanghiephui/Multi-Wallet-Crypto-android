@@ -143,7 +143,11 @@ fun MarketSearchScreen(viewModel: MarketSearchViewModel, navController: NavContr
                         R.id.coinFragment,
                         CoinFragment.Input(coin.uid)
                     )
-                    stat(page = StatPage.MarketSearch, section = section.statSection, event = StatEvent.OpenCoin(coin.uid))
+                    stat(
+                        page = StatPage.MarketSearch,
+                        section = section.statSection,
+                        event = StatEvent.OpenCoin(coin.uid)
+                    )
                 }
             ) { favorited, coinUid ->
                 viewModel.onFavoriteClick(favorited, coinUid)
@@ -166,7 +170,8 @@ fun MarketSearchResults(
     vararg inputs: Any?,
     itemSections: Map<MarketSearchSection, List<CoinItem>>,
     onCoinClick: (Coin, MarketSearchSection) -> Unit,
-    onFavoriteClick: (Boolean, String) -> Unit,
+    backgroundColor: Color = ComposeAppTheme.colors.tyler,
+    onFavoriteClick: (Boolean, String) -> Unit
 ) {
     if (itemSections.all { (_, items) -> items.isEmpty() }) {
         ListEmptyView(
@@ -236,7 +241,8 @@ fun MarketSearchResults(
                                 contentDescription = stringResource(if (item.favourited) R.string.CoinPage_Unfavorite else R.string.CoinPage_Favorite),
                             )
                         }
-                        val cardId = (section.title.getOrNull()?.let { stringResource(id = it) } ?: "") + coin.uid
+                        val cardId = (section.title.getOrNull()?.let { stringResource(id = it) }
+                            ?: "") + coin.uid
                         DraggableCardSimple(
                             key = cardId,
                             isRevealed = revealedCardId == cardId,
@@ -250,7 +256,7 @@ fun MarketSearchResults(
                                 revealedCardId = null
                             },
                             content = {
-                                Box(modifier = Modifier.background(ComposeAppTheme.colors.tyler)) {
+                                Box(modifier = Modifier.background(backgroundColor)) {
                                     MarketCoin(
                                         coinCode = coin.code,
                                         coinName = coin.name,
@@ -271,9 +277,6 @@ fun MarketSearchResults(
                     thickness = 1.dp,
                     color = ComposeAppTheme.colors.steel10,
                 )
-            }
-            item {
-                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }

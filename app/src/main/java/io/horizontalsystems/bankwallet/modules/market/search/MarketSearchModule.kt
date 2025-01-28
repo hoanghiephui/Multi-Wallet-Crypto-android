@@ -3,6 +3,7 @@ package io.horizontalsystems.bankwallet.modules.market.search
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import io.horizontalsystems.bankwallet.core.App
+import io.horizontalsystems.bankwallet.modules.market.topsectors.TopSectorsRepository
 import io.horizontalsystems.marketkit.models.CoinCategory
 import io.horizontalsystems.marketkit.models.FullCoin
 import java.math.BigDecimal
@@ -17,6 +18,9 @@ object MarketSearchModule {
                 App.marketFavoritesManager,
                 MarketSearchService(App.marketKit),
                 MarketDiscoveryService(App.marketKit, App.localStorage),
+                TopSectorsRepository(App.marketKit),
+                App.currencyManager,
+                App.numberFormatter
             ) as T
         }
     }

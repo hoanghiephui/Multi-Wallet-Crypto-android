@@ -76,7 +76,6 @@ import java.math.BigDecimal
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MarketScreen(
     navController: NavController
