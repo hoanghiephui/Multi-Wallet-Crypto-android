@@ -43,9 +43,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -230,7 +230,6 @@ private fun MainScreen(
                             },
                             bottomBarVisibility = true,
                             modifier = Modifier
-                                .testTag("MfxBottomBar")
                                 .onGloballyPositioned { coordinates ->
                                     bottomBarHeight.floatValue = coordinates.size.height.toFloat()
                                 },
@@ -417,7 +416,13 @@ private fun NiaBottomBar(
                         contentDescription = stringResource(destination.mainNavItem.titleRes)
                     )
                 },
-                label = { Text(stringResource(destination.mainNavItem.titleRes)) },
+                label = {
+                    Text(
+                        stringResource(destination.mainNavItem.titleRes),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
                 modifier = Modifier,
                 enabled = destination.enabled
             )

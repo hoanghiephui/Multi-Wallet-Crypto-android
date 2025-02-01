@@ -3,13 +3,16 @@ package io.horizontalsystems.bankwallet.modules.search
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -18,6 +21,7 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,6 +36,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isTraversalGroup
@@ -50,7 +55,10 @@ import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchResults
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchSection
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchViewModel
+import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchViewModel.MainPage
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
+import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_grey
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -176,31 +184,95 @@ fun SearchScreen(
                 }
             }
 
-            LazyHorizontalGrid(
-                rows = GridCells.Fixed(3),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(start = 16.dp, top = 80.dp, end = 16.dp, bottom = 16.dp),
-                modifier = Modifier
-                    // LazyHorizontalGrid has to be constrained in height.
-                    // However, we can't set a fixed height because the horizontal grid contains
-                    // vertical text that can be rescaled.
-                    // When the fontScale is at most 1, we know that the horizontal grid will be at most
-                    // 240dp tall, so this is an upper bound for when the font scale is at most 1.
-                    // When the fontScale is greater than 1, the height required by the text inside the
-                    // horizontal grid will increase by at most the same factor, so 240sp is a valid
-                    // upper bound for how much space we need in that case.
-                    // The maximum of these two bounds is therefore a valid upper bound in all cases.
-                    .heightIn(max = max(350.dp, with(LocalDensity.current) { 350.sp.toDp() }))
-                    .fillMaxWidth()
-                    .semantics { traversalIndex = 1f },
+            LazyColumn(
+                contentPadding = PaddingValues(
+                    start = 16.dp,
+                    top = 80.dp,
+                    end = 16.dp,
+                    bottom = 16.dp
+                ),
             ) {
-                when(val state = mainState) {
-                    is MarketSearchViewModel.MainPage.LoadingPage -> {
-
+                discovery(
+                    mainState = mainState,
+                    navController = navController,
+                    interestsItemModifier = Modifier.layout { measurable, constraints ->
+                        val placeable = measurable.measure(
+                            constraints.copy(
+                                maxWidth = constraints.maxWidth + 32.dp.roundToPx(),
+                            ),
+                        )
+                        layout(placeable.width, placeable.height) {
+                            placeable.place(0, 0)
+                        }
+                    },
+                    onRetry = {
+                        searchViewModel.fetchItems()
                     }
-                    is MarketSearchViewModel.MainPage.LoadedPage -> {
-                        items(state.items) { item ->
+                )
+            }
+
+        }
+    }
+}
+
+private fun LazyListScope.discovery(
+    interestsItemModifier: Modifier = Modifier,
+    mainState: MainPage,
+    navController: NavController,
+    onRetry: () -> Unit
+) {
+    item {
+        when (mainState) {
+            is MainPage.LoadingPage -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(280.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                    )
+                }
+            }
+
+            is MainPage.LoadedPage -> {
+                Column(modifier = interestsItemModifier) {
+                    subhead1_grey(
+                        modifier = Modifier.padding(16.dp),
+                        text = "Discovery",
+                        maxLines = 1,
+                    )
+
+                    LazyHorizontalGrid(
+                        rows = GridCells.Fixed(3),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        contentPadding = PaddingValues(
+                            start = 16.dp,
+                            top = 0.dp,
+                            end = 16.dp,
+                            bottom = 16.dp
+                        ),
+                        modifier = Modifier
+                            // LazyHorizontalGrid has to be constrained in height.
+                            // However, we can't set a fixed height because the horizontal grid contains
+                            // vertical text that can be rescaled.
+                            // When the fontScale is at most 1, we know that the horizontal grid will be at most
+                            // 240dp tall, so this is an upper bound for when the font scale is at most 1.
+                            // When the fontScale is greater than 1, the height required by the text inside the
+                            // horizontal grid will increase by at most the same factor, so 240sp is a valid
+                            // upper bound for how much space we need in that case.
+                            // The maximum of these two bounds is therefore a valid upper bound in all cases.
+                            .heightIn(
+                                max = max(
+                                    280.dp,
+                                    with(LocalDensity.current) { 280.sp.toDp() })
+                            )
+                            .fillMaxWidth()
+                            .semantics { traversalIndex = 1f },
+                    ) {
+                        items(mainState.items) { item ->
                             SingleTopicButton(
                                 viewItem = item,
                                 onClick = {
@@ -212,10 +284,15 @@ fun SearchScreen(
                             )
                         }
                     }
-                    else -> {
-
-                    }
                 }
+
+            }
+
+            else -> {
+                ListErrorView(
+                    stringResource(id = R.string.BalanceSyncError_Title),
+                    onClick = onRetry
+                )
             }
         }
     }

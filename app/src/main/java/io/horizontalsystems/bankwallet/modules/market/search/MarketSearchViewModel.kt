@@ -67,9 +67,7 @@ class MarketSearchViewModel(
         }
 
         marketDiscoveryService.start()
-        viewModelScope.launch {
-            fetchItems()
-        }
+        fetchItems()
     }
 
     private fun handleUpdatedDiscoveryState(discoveryState: MarketDiscoveryService.State) {
@@ -133,47 +131,53 @@ class MarketSearchViewModel(
         marketSearchService.setQuery("")
     }
 
-    private suspend fun fetchItems(forceRefresh: Boolean = false) =
-        withContext(Dispatchers.Default) {
-            try {
-                val topSectors =
-                    topSectorsRepository.get(currencyManager.baseCurrency, forceRefresh)
+    fun fetchItems(forceRefresh: Boolean = false) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    _mainState.update {
+                        MainPage.LoadingPage
+                    }
+                    val topSectors =
+                        topSectorsRepository.get(currencyManager.baseCurrency, forceRefresh)
 
-                val topCategoryWithDiffList = topSectors.filter {
-                    it.coinCategory.uid in listOf(
-                        "blockchains",
-                        "dexes",
-                        "lending",
-                        "yield_aggregators",
-                        "investment_tools",
-                        "oracles",
-                        "gaming",
-                        "scaling",
-                        "privacy",
-                        "exchange_tokens",
-                        "wallets"
-                    )
-                }.map {
-                    TopSectorWithDiff(
-                        it.coinCategory,
-                        it.coinCategory.diff24H,
-                        it.topCoins
-                    )
-                }
-                val sortedTopSectors =
-                    topCategoryWithDiffList.sortedByDescendingNullLast { it.coinCategory.marketCap }
-                val items = sortedTopSectors.map { getViewItem(it) }
-                _mainState.update {
-                    MainPage.LoadedPage(items)
-                }
-            } catch (e: CancellationException) {
-                // no-op
-            } catch (e: Throwable) {
-                _mainState.update {
-                    MainPage.ErrorPage
+                    val topCategoryWithDiffList = topSectors.filter {
+                        it.coinCategory.uid in listOf(
+                            "blockchains",
+                            "dexes",
+                            "lending",
+                            "yield_aggregators",
+                            "investment_tools",
+                            "oracles",
+                            "gaming",
+                            "scaling",
+                            "privacy",
+                            "exchange_tokens",
+                            "wallets"
+                        )
+                    }.map {
+                        TopSectorWithDiff(
+                            it.coinCategory,
+                            it.coinCategory.diff24H,
+                            it.topCoins
+                        )
+                    }
+                    val sortedTopSectors =
+                        topCategoryWithDiffList.sortedByDescendingNullLast { it.coinCategory.marketCap }
+                    val items = sortedTopSectors.map { getViewItem(it) }
+                    _mainState.update {
+                        MainPage.LoadedPage(items)
+                    }
+                } catch (e: CancellationException) {
+                    // no-op
+                } catch (e: Throwable) {
+                    _mainState.update {
+                        MainPage.ErrorPage
+                    }
                 }
             }
         }
+    }
 
     private fun getViewItem(item: TopSectorWithDiff) =
         TopSectorViewItem(

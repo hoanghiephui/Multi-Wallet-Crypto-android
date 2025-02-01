@@ -16,13 +16,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -33,8 +29,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -173,8 +167,6 @@ fun MarketSearchResults(
         )
     } else {
         val keyboardController = LocalSoftwareKeyboardController.current
-        val coroutineScope = rememberCoroutineScope()
-        var revealedCardId by remember(*inputs) { mutableStateOf<String?>(null) }
         val nestedScrollConnection = remember {
             object : NestedScrollConnection {
                 override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
@@ -209,7 +201,7 @@ fun MarketSearchResults(
                             .fillMaxWidth()
                             .height(IntrinsicSize.Max)
                     ) {
-                        Box(modifier = Modifier.background(ComposeAppTheme.colors.tyler)) {
+                        Box(modifier = Modifier.background(backgroundColor)) {
                             MarketCoin(
                                 coinUid = coin.uid,
                                 coinCode = coin.code,
@@ -238,7 +230,7 @@ fun MarketSearchResults(
 }
 
 @Composable
-private fun MarketCoin(
+fun MarketCoin(
     coinUid: String,
     coinCode: String,
     coinName: String,
@@ -259,7 +251,7 @@ private fun MarketCoin(
                 modifier = Modifier.padding(end = 16.dp),
                 icon = R.drawable.ic_checkmark_20,
                 contentDescription = stringResource(R.string.CoinPage_Favorite),
-                tint = ComposeAppTheme.colors.dark,
+                tint = ComposeAppTheme.colors.light,
                 background = ComposeAppTheme.colors.yellowD,
                 onClick = {
                     onFavoriteClick(true, coinUid)
