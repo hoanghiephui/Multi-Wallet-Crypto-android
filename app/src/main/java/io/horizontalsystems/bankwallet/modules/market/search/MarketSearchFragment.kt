@@ -2,17 +2,14 @@ package io.horizontalsystems.bankwallet.modules.market.search
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
@@ -23,13 +20,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -39,6 +34,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,10 +54,10 @@ import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.core.stats.statSection
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchModule.CoinItem
-import io.horizontalsystems.bankwallet.modules.walletconnect.list.ui.DraggableCardSimple
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
+import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryCircle
 import io.horizontalsystems.bankwallet.ui.compose.components.HeaderStick
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.HsImage
@@ -72,10 +68,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.SectionItemBordered
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.marketkit.models.Coin
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.util.Optional
-import kotlin.jvm.optionals.getOrNull
 
 class MarketSearchFragment : BaseComposeFragment() {
     @Composable
@@ -216,58 +209,19 @@ fun MarketSearchResults(
                             .fillMaxWidth()
                             .height(IntrinsicSize.Max)
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .background(if (item.favourited) ComposeAppTheme.colors.lucian else ComposeAppTheme.colors.jacob)
-                                .align(Alignment.CenterEnd)
-                                .width(100.dp)
-                                .clickable {
-                                    onFavoriteClick(
-                                        item.favourited,
-                                        coin.uid
-                                    )
-
-                                    coroutineScope.launch {
-                                        delay(200)
-                                        revealedCardId = null
-                                    }
-                                },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                painter = painterResource(id = if (item.favourited) R.drawable.ic_star_off_24 else R.drawable.ic_star_24),
-                                tint = ComposeAppTheme.colors.claude,
-                                contentDescription = stringResource(if (item.favourited) R.string.CoinPage_Unfavorite else R.string.CoinPage_Favorite),
+                        Box(modifier = Modifier.background(ComposeAppTheme.colors.tyler)) {
+                            MarketCoin(
+                                coinUid = coin.uid,
+                                coinCode = coin.code,
+                                coinName = coin.name,
+                                coinIconUrl = coin.imageUrl,
+                                alternativeCoinIconUrl = coin.alternativeImageUrl,
+                                coinIconPlaceholder = item.fullCoin.iconPlaceholder,
+                                favourited = item.favourited,
+                                onFavoriteClick = onFavoriteClick,
+                                onClick = { onCoinClick(coin, section) },
                             )
                         }
-                        val cardId = (section.title.getOrNull()?.let { stringResource(id = it) }
-                            ?: "") + coin.uid
-                        DraggableCardSimple(
-                            key = cardId,
-                            isRevealed = revealedCardId == cardId,
-                            cardOffset = 100f,
-                            onReveal = {
-                                if (revealedCardId != cardId) {
-                                    revealedCardId = cardId
-                                }
-                            },
-                            onConceal = {
-                                revealedCardId = null
-                            },
-                            content = {
-                                Box(modifier = Modifier.background(backgroundColor)) {
-                                    MarketCoin(
-                                        coinCode = coin.code,
-                                        coinName = coin.name,
-                                        coinIconUrl = coin.imageUrl,
-                                        alternativeCoinIconUrl = coin.alternativeImageUrl,
-                                        coinIconPlaceholder = item.fullCoin.iconPlaceholder,
-                                        onClick = { onCoinClick(coin, section) }
-                                    )
-                                }
-                            }
-                        )
                     }
                 }
             }
@@ -285,11 +239,14 @@ fun MarketSearchResults(
 
 @Composable
 private fun MarketCoin(
+    coinUid: String,
     coinCode: String,
     coinName: String,
     coinIconUrl: String,
     alternativeCoinIconUrl: String?,
     coinIconPlaceholder: Int,
+    favourited: Boolean,
+    onFavoriteClick: (Boolean, String) -> Unit,
     onClick: () -> Unit,
 ) {
 
@@ -297,6 +254,28 @@ private fun MarketCoin(
         borderTop = true,
         onClick = onClick
     ) {
+        if (favourited) {
+            ButtonSecondaryCircle(
+                modifier = Modifier.padding(end = 16.dp),
+                icon = R.drawable.ic_checkmark_20,
+                contentDescription = stringResource(R.string.CoinPage_Favorite),
+                tint = ComposeAppTheme.colors.dark,
+                background = ComposeAppTheme.colors.yellowD,
+                onClick = {
+                    onFavoriteClick(true, coinUid)
+                }
+            )
+        } else {
+            ButtonSecondaryCircle(
+                modifier = Modifier.padding(end = 16.dp),
+                icon = R.drawable.ic_plus_20,
+                contentDescription = stringResource(R.string.CoinPage_Favorite),
+                onClick = {
+                    onFavoriteClick(false, coinUid)
+                }
+            )
+        }
+
         HsImage(
             url = coinIconUrl,
             alternativeUrl = alternativeCoinIconUrl,
@@ -330,12 +309,15 @@ fun MarketCoinPreview() {
     val coin = Coin("ether", "Ethereum", "ETH")
     ComposeAppTheme {
         MarketCoin(
+            coin.uid,
             coin.code,
             coin.name,
             coin.imageUrl,
             null,
             R.drawable.coin_placeholder,
-            {},
+            false,
+            { _, _ -> },
+            {}
         )
     }
 }
