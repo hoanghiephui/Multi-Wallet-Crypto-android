@@ -39,10 +39,11 @@ import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryTransp
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 
 @Composable
-fun BalanceNoAccount(navController: NavController,
-                     viewModel: BalanceAccountsViewModel
+fun BalanceNoAccount(
+    navController: NavController,
+    viewModel: BalanceAccountsViewModel
 ) {
-    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.BALANCE_NATIVE, viewModel)
+    val (adState, _) = rememberAdNativeView(BuildConfig.BALANCE_NATIVE, viewModel)
 
     Column(
         modifier = Modifier
@@ -68,7 +69,7 @@ fun BalanceNoAccount(navController: NavController,
             )
         }
         Spacer(Modifier.height(15.dp))
-        MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
+        MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
         Spacer(Modifier.height(15.dp))
         ButtonPrimaryYellow(
             modifier = Modifier

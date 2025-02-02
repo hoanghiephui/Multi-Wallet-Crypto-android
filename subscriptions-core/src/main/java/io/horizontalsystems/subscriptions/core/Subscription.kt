@@ -4,7 +4,7 @@ data class Subscription(
     val id: String,
     val name: String,
     val description: String,
-    val actions: List<IPaidAction>
+    val actions: List<IPaidAction>,
 )
 
 data class BasePlan(

@@ -168,6 +168,7 @@ fun CoinOverviewScreen(
         onRefresh = {
             viewModel.refresh()
             chartViewModel.refresh()
+            reloadAd()
         },
         content = {
             Crossfade(viewState, label = "") { viewState ->
@@ -276,7 +277,7 @@ fun CoinOverviewScreen(
                                 }
 
                                 Spacer(modifier = Modifier.height(8.dp))
-                                MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
+                                MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
 
                                 if (overview.marketData.isNotEmpty()) {
                                     Spacer(modifier = Modifier.height(12.dp))
@@ -406,7 +407,7 @@ private fun CandlestickChart(
                     volumeData,
                     seriesFlow,
                     volumeFlow,
-                    LocalLifecycleOwner.current,
+                    androidx.lifecycle.compose.LocalLifecycleOwner.current,
                     object : ListenerChart {
                         override fun onChartTouchDown() {
                             scrollingEnabled(false)
@@ -484,9 +485,9 @@ fun Error(message: String) {
 }
 
 @Composable
-fun Loading() {
+fun Loading(modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(

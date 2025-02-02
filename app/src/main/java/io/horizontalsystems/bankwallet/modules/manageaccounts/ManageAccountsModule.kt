@@ -5,7 +5,6 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.android.billing.UserDataRepository
 import io.horizontalsystems.bankwallet.core.App
 import kotlinx.parcelize.Parcelize
 
@@ -13,11 +12,10 @@ object ManageAccountsModule {
     @Parcelize
     data class Input(val popOffOnSuccess: Int, val popOffInclusive: Boolean) : Parcelable
 
-    class Factory(private val mode: Mode,
-                  private val userDataRepository: UserDataRepository,) : ViewModelProvider.Factory {
+    class Factory(private val mode: Mode) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            return ManageAccountsViewModel(App.accountManager, mode, userDataRepository) as T
+            return ManageAccountsViewModel(App.accountManager, mode) as T
         }
     }
 

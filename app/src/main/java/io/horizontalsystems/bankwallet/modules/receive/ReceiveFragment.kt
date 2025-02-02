@@ -2,14 +2,11 @@ package io.horizontalsystems.bankwallet.modules.receive
 
 import android.content.Intent
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
@@ -99,8 +96,8 @@ fun ReceiveScreen(
                 ReceiveAddressScreen(
                     title = stringResource(R.string.Deposit_Title, walletNonNull.coin.code),
                     uiState = addressViewModel.uiState,
-                    onErrorClick = { addressViewModel.onErrorClick() },
                     setAmount = { amount -> addressViewModel.setAmount(amount) },
+                    onErrorClick = { addressViewModel.onErrorClick() },
                     onShareClick = { address ->
                         context.startActivity(Intent().apply {
                             action = Intent.ACTION_SEND
@@ -114,7 +111,8 @@ fun ReceiveScreen(
                     },
                     onBackPress = navigateBack(fragmentNavController, navController),
                     closeModule = { fragmentNavController.popBackStack() },
-                    nativeAd = adState
+                    nativeAd = adState,
+                    navController = navController
                 )
             }
             composablePage(USED_ADDRESSES_SCREEN) { entry ->

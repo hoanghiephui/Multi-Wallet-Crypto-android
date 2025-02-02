@@ -16,14 +16,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,7 +36,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
@@ -92,7 +89,7 @@ fun TokenBalanceScreen(
     navController: NavController
 ) {
     val uiState = viewModel.uiState
-    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.TOKEN_BALANCE_NATIVE, viewModel)
+    val (adState, _) = rememberAdNativeView(BuildConfig.TOKEN_BALANCE_NATIVE, viewModel)
 
     Scaffold(
         containerColor = Color.Transparent,
@@ -110,16 +107,20 @@ fun TokenBalanceScreen(
         if (transactionItems.isNullOrEmpty()) {
             Column(Modifier.padding(paddingValues)) {
                 uiState.balanceViewItem?.let {
-                    TokenBalanceHeader(balanceViewItem = it, navController = navController, viewModel = viewModel)
+                    TokenBalanceHeader(
+                        balanceViewItem = it,
+                        navController = navController,
+                        viewModel = viewModel
+                    )
                 }
                 if (transactionItems == null) {
-                    MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
+                    MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
                     ListEmptyView(
                         text = stringResource(R.string.Transactions_WaitForSync),
                         icon = R.drawable.ic_clock
                     )
                 } else {
-                    MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
+                    MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
                     ListEmptyView(
                         text = stringResource(R.string.Transactions_EmptyList),
                         icon = R.drawable.ic_outgoingraw
@@ -131,16 +132,27 @@ fun TokenBalanceScreen(
             LazyColumn(Modifier.padding(paddingValues), state = listState) {
                 item {
                     uiState.balanceViewItem?.let {
-                        TokenBalanceHeader(balanceViewItem = it, navController = navController, viewModel = viewModel)
+                        TokenBalanceHeader(
+                            balanceViewItem = it,
+                            navController = navController,
+                            viewModel = viewModel
+                        )
                     }
                 }
                 item {
-                    MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
+                    MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
                 }
                 transactionList(
                     transactionsMap = transactionItems,
                     willShow = { viewModel.willShow(it) },
-                    onClick = { onTransactionClick(it, viewModel, transactionsViewModel, navController) },
+                    onClick = {
+                        onTransactionClick(
+                            it,
+                            viewModel,
+                            transactionsViewModel,
+                            navController
+                        )
+                    },
                     onBottomReached = { viewModel.onBottomReached() }
                 )
             }
@@ -204,7 +216,8 @@ private fun TokenBalanceHeader(
         VSpacer(height = 6.dp)
         if (balanceViewItem.syncingTextValue != null) {
             body_grey(
-                text = balanceViewItem.syncingTextValue + (balanceViewItem.syncedUntilTextValue?.let { " - $it" } ?: ""),
+                text = balanceViewItem.syncingTextValue + (balanceViewItem.syncedUntilTextValue?.let { " - $it" }
+                    ?: ""),
                 maxLines = 1,
             )
         } else {
@@ -273,7 +286,10 @@ private fun LockedBalanceCell(
         HsIconButton(
             modifier = Modifier.size(20.dp),
             onClick = {
-                navController.slideFromBottom(R.id.feeSettingsInfoDialog, FeeSettingsInfoDialog.Input(infoTitle, infoText))
+                navController.slideFromBottom(
+                    R.id.feeSettingsInfoDialog,
+                    FeeSettingsInfoDialog.Input(infoTitle, infoText)
+                )
             }
         ) {
             Icon(
@@ -342,7 +358,12 @@ private fun WalletIcon(
     }
 }
 
-private fun onSyncErrorClicked(viewItem: BalanceViewItem, viewModel: TokenBalanceViewModel, navController: NavController, view: View) {
+private fun onSyncErrorClicked(
+    viewItem: BalanceViewItem,
+    viewModel: TokenBalanceViewModel,
+    navController: NavController,
+    view: View
+) {
     when (val syncErrorDetails = viewModel.getSyncErrorDetails(viewItem)) {
         is BalanceViewModel.SyncError.Dialog -> {
             val wallet = syncErrorDetails.wallet
@@ -362,7 +383,11 @@ private fun onSyncErrorClicked(viewItem: BalanceViewItem, viewModel: TokenBalanc
 
 
 @Composable
-private fun ButtonsRow(viewItem: BalanceViewItem, navController: NavController, viewModel: TokenBalanceViewModel) {
+private fun ButtonsRow(
+    viewItem: BalanceViewItem,
+    navController: NavController,
+    viewModel: TokenBalanceViewModel
+) {
     val onClickReceive = {
         try {
             val wallet = viewModel.getWalletForReceive()
@@ -398,13 +423,19 @@ private fun ButtonsRow(viewItem: BalanceViewItem, navController: NavController, 
                 modifier = Modifier.weight(1f),
                 title = stringResource(R.string.Balance_Send),
                 onClick = {
-                    val sendTitle = Translator.getString(R.string.Send_Title, viewItem.wallet.token.fullCoin.coin.code)
+                    val sendTitle = Translator.getString(
+                        R.string.Send_Title,
+                        viewItem.wallet.token.fullCoin.coin.code
+                    )
                     navController.slideFromRight(
                         R.id.sendXFragment,
                         SendFragment.Input(viewItem.wallet, sendTitle)
                     )
 
-                    stat(page = StatPage.TokenPage, event = StatEvent.OpenSend(viewItem.wallet.token))
+                    stat(
+                        page = StatPage.TokenPage,
+                        event = StatEvent.OpenSend(viewItem.wallet.token)
+                    )
                 },
                 enabled = viewItem.sendEnabled
             )
@@ -413,7 +444,7 @@ private fun ButtonsRow(viewItem: BalanceViewItem, navController: NavController, 
                 ButtonPrimaryDefault(
                     modifier = Modifier.weight(1f),
                     title = stringResource(R.string.Balance_Receive),
-                    onClick =  onClickReceive,
+                    onClick = onClickReceive,
                 )
             } else {
                 ButtonPrimaryCircle(

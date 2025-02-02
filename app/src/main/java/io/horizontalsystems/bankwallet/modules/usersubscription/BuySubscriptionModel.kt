@@ -7,6 +7,8 @@ import io.horizontalsystems.subscriptions.core.AdvancedSearch
 import io.horizontalsystems.subscriptions.core.BasePlan
 import io.horizontalsystems.subscriptions.core.DuressMode
 import io.horizontalsystems.subscriptions.core.IPaidAction
+import io.horizontalsystems.subscriptions.core.MultiWallet
+import io.horizontalsystems.subscriptions.core.NoAds
 import io.horizontalsystems.subscriptions.core.PricingPhase
 import io.horizontalsystems.subscriptions.core.PrivacyMode
 import io.horizontalsystems.subscriptions.core.TokenInsights
@@ -15,6 +17,7 @@ import io.horizontalsystems.subscriptions.core.TradeSignals
 import io.horizontalsystems.subscriptions.core.TransactionSpeedTools
 import io.horizontalsystems.subscriptions.core.VIPClub
 import io.horizontalsystems.subscriptions.core.VIPSupport
+import io.horizontalsystems.subscriptions.core.Watchlist
 
 object BuySubscriptionModel {
 
@@ -30,6 +33,9 @@ object BuySubscriptionModel {
             PrivacyMode -> R.string.Premium_UpgradeFeature_PrivacyMode
             VIPSupport -> R.string.Premium_UpgradeFeature_VipSupport
             VIPClub -> R.string.Premium_UpgradeFeature_VipClub
+            Watchlist -> R.string.Market_Tab_Watchlist
+            MultiWallet -> R.string.Premium_UpgradeFeature_MultiWallet
+            NoAds -> R.string.Premium_UpgradeFeature_NoAds
             else -> throw IllegalArgumentException("Unknown IPaidAction")
         }
 
@@ -45,6 +51,9 @@ object BuySubscriptionModel {
             PrivacyMode -> R.string.Premium_UpgradeFeature_PrivacyMode_Description
             VIPSupport -> R.string.Premium_UpgradeFeature_VipSupport_Description
             VIPClub -> R.string.Premium_UpgradeFeature_VipClub_Description
+            Watchlist -> R.string.Hud_Added_To_Watchlist
+            MultiWallet -> R.string.Premium_UpgradeFeature_MultiWallet_Description
+            NoAds -> R.string.Premium_UpgradeFeature_NoAds_Description
             else -> throw IllegalArgumentException("Unknown IPaidAction")
         }
 
@@ -60,6 +69,9 @@ object BuySubscriptionModel {
             PrivacyMode -> R.string.Premium_UpgradeFeature_PrivacyMode_BigDescription
             VIPSupport -> R.string.Premium_UpgradeFeature_VipSupport_BigDescription
             VIPClub -> R.string.Premium_UpgradeFeature_VipClub_BigDescription
+            Watchlist -> R.string.Hud_Added_To_Watchlist
+            MultiWallet -> R.string.Premium_UpgradeFeature_MultiWallet_BigDescription
+            NoAds -> R.string.Premium_UpgradeFeature_NoAds_BigDescription
             else -> throw IllegalArgumentException("Unknown IPaidAction")
         }
 
@@ -75,13 +87,16 @@ object BuySubscriptionModel {
             PrivacyMode -> R.drawable.prem_fraud_24
             VIPSupport -> R.drawable.prem_vip_support_24
             VIPClub -> R.drawable.prem_chat_support_24
+            Watchlist -> R.drawable.star_filled_yellow_16
+            MultiWallet -> R.drawable.ic_in_wallet_dark_24
+            NoAds -> R.drawable.baseline_ads_click_24
             else -> throw IllegalArgumentException("Unknown IPaidAction")
         }
 
     fun BasePlan.stringRepresentation(): String {
-        return pricingPhases.map {
+        return pricingPhases.joinToString(" then ") {
             "${it.formattedPrice} / ${it.period()}"
-        }.joinToString(" then ")
+        }
     }
 
     //billing periods: P1M, P3M, P6M, P1Y

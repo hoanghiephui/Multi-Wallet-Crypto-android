@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -26,10 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,7 +49,6 @@ import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
 import io.horizontalsystems.bankwallet.core.stats.stat
-import io.horizontalsystems.bankwallet.modules.billing.showBillingPlusDialog
 import io.horizontalsystems.bankwallet.modules.contacts.ContactsFragment
 import io.horizontalsystems.bankwallet.modules.contacts.Mode
 import io.horizontalsystems.bankwallet.modules.manageaccount.dialogs.BackupRequiredDialog
@@ -75,7 +69,6 @@ import io.horizontalsystems.bankwallet.ui.compose.components.caption_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.cell.SectionPremiumUniversalLawrence
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_grey
 import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
-import se.warting.inappupdate.compose.findActivity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,16 +90,18 @@ fun SettingsScreen(
             )
         }
     ) {
-        Column(modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .padding(it)) {
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(it)
+        ) {
             Spacer(modifier = Modifier.height(12.dp))
             SettingSections(
-                    viewModel = viewModel,
-                    navController = navController,
-                    openVipSupport = {
-                        isVipSupportVisible = true
-                    })
+                viewModel = viewModel,
+                navController = navController,
+                openVipSupport = {
+                    isVipSupportVisible = true
+                })
             //SettingsFooter(viewModel.appVersion, viewModel.companyWebPage)
         }
         VipSupportBottomSheet(
@@ -126,20 +121,6 @@ private fun SettingSections(
     val uiState = viewModel.uiState
     val context = LocalContext.current
 
-    CellUniversalLawrenceSection(
-        listOf {
-            HsSettingCell(
-                R.string.billing_plus_title,
-                R.drawable.ic_heart_filled_24,
-                ComposeAppTheme.colors.jacob,
-                onClick = {
-                    context.findActivity().showBillingPlusDialog()
-
-                    stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.Donate))
-                }
-            )
-        }
-    )
     if (uiState.showPremiumBanner) {
         PremiumBanner(
             onClick = {
@@ -150,22 +131,6 @@ private fun SettingSections(
     }
 
     VSpacer(12.dp)
-
-    CellUniversalLawrenceSection(
-        listOf {
-            HsSettingCell(
-                R.string.Settings_GetYourTokens,
-                R.drawable.ic_uwt2_24,
-                ComposeAppTheme.colors.jacob,
-                onClick = {
-                    LinkHelper.openLinkInAppBrowser(context, "https://t.me/BeUnstoppable_bot")
-                }
-            )
-        }
-    )
-
-    VSpacer(32.dp)
-
     CellUniversalLawrenceSection(
         listOf({
             HsSettingCell(
@@ -358,7 +323,7 @@ private fun SettingSections(
         )
     )
 
-    VSpacer(32.dp)
+    /*VSpacer(32.dp)
 
     CellUniversalLawrenceSection(
         listOf(
@@ -385,7 +350,7 @@ private fun SettingSections(
             iconTint = ComposeAppTheme.colors.jacob,
             onClick = openVipSupport
         )
-    }
+    }*/
 
     VSpacer(32.dp)
 
@@ -414,7 +379,7 @@ private fun SettingSections(
         })
     )
 
-    VSpacer(24.dp)
+    /*VSpacer(24.dp)
 
     Row(
         modifier = Modifier
@@ -466,7 +431,7 @@ private fun SettingSections(
                 }
             )
         }
-    )
+    )*/
 
     VSpacer(32.dp)
 }
@@ -582,7 +547,7 @@ private fun shareAppLink(appLink: String, context: Context) {
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 private fun PreviewSettingsScreen() {
     ComposeAppTheme {

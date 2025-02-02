@@ -98,7 +98,7 @@ fun PremiumSubscribedScreen(
                             .fillMaxWidth()
                             .padding(horizontal = 32.dp)
                     )
-                    if (type == PremiumPlanType.VipPlan) {
+                    /*if (type == PremiumPlanType.VipPlan) {
                         VSpacer(24.dp)
                         Column(
                             modifier = Modifier
@@ -120,7 +120,7 @@ fun PremiumSubscribedScreen(
                                 //todo
                             }
                         }
-                    }
+                    }*/
                     VSpacer(24.dp)
                 }
                 Column(

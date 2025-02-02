@@ -254,7 +254,7 @@ fun SendBitcoinScreen(
                     )
                 }
                 Spacer(modifier = Modifier.height(12.dp))
-                MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
+                MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, fragmentNavController)
 
                 ButtonPrimaryYellow(
                     modifier = Modifier

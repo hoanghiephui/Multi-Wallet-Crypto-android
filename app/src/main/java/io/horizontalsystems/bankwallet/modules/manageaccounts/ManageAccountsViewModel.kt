@@ -5,11 +5,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.billing.UserDataRepository
 import io.horizontalsystems.bankwallet.core.IAccountManager
 import io.horizontalsystems.bankwallet.core.managers.ActiveAccountState
 import io.horizontalsystems.bankwallet.entities.Account
 import io.horizontalsystems.bankwallet.modules.manageaccounts.ManageAccountsModule.AccountViewItem
+import io.horizontalsystems.subscriptions.core.UserSubscriptionManager
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -19,13 +19,12 @@ import kotlinx.coroutines.reactive.asFlow
 class ManageAccountsViewModel(
     private val accountManager: IAccountManager,
     private val mode: ManageAccountsModule.Mode,
-    userDataRepository: UserDataRepository,
 ) : ViewModel() {
 
     var viewItems by mutableStateOf<Pair<List<AccountViewItem>, List<AccountViewItem>>?>(null)
     var finish by mutableStateOf(false)
-    val screenState = userDataRepository.userData.map {
-        it.hasPrivilege
+    val purchaseStateUpdated = UserSubscriptionManager.purchaseStateUpdatedFlow.map {
+        UserSubscriptionManager.getActiveSubscriptions().isNotEmpty()
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),

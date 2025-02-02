@@ -209,7 +209,7 @@ fun SendEvmScreen(
                     )
 
                     VSpacer(16.dp)
-                    MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
+                    MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
                     Spacer(modifier = Modifier.height(12.dp))
                     ButtonPrimaryYellow(
                         modifier = Modifier

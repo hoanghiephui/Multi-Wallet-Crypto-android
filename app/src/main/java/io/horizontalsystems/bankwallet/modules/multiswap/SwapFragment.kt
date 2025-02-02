@@ -125,7 +125,7 @@ fun SwapScreen(navController: NavController, tokenIn: Token?) {
     )
     val uiState = viewModel.uiState
     val context = LocalContext.current
-    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.SWAP_COIN_NATIVE, viewModel)
+    val (adState, _) = rememberAdNativeView(BuildConfig.SWAP_COIN_NATIVE, viewModel)
     SwapScreenInner(
         uiState = uiState,
         onClickClose = navController::popBackStack,
@@ -383,7 +383,7 @@ private fun SwapScreenInner(
                     }
                 }
                 VSpacer(height = 10.dp)
-                MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
+                MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL, navController)
                 VSpacer(height = 32.dp)
             }
 

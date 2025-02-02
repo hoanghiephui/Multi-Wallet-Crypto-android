@@ -34,3 +34,12 @@ object VIPSupport : IPaidAction
 
 @Parcelize
 object VIPClub : IPaidAction
+
+@Parcelize
+object Watchlist: IPaidAction
+
+@Parcelize
+object MultiWallet: IPaidAction
+
+@Parcelize
+object NoAds: IPaidAction

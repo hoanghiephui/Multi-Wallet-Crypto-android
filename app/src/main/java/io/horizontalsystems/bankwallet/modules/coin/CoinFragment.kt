@@ -1,7 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.coin
 
 import android.os.Parcelable
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -9,9 +8,9 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,7 +19,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.FragmentManager
@@ -28,22 +26,20 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.navGraphViewModels
 import com.applovin.mediation.ads.MaxRewardedAd
-import com.android.billing.UserDataRepository
 import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.getInput
+import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
 import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.core.stats.statTab
-import io.horizontalsystems.bankwallet.modules.billing.showBillingPlusDialog
 import io.horizontalsystems.bankwallet.modules.coin.analytics.CoinAnalyticsScreen
 import io.horizontalsystems.bankwallet.modules.coin.coinmarkets.CoinMarketsScreen
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.CoinOverviewScreen
 import io.horizontalsystems.bankwallet.ui.AdMaxRewardedLoader
 import io.horizontalsystems.bankwallet.ui.AdRewardedCallback
-import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
@@ -55,16 +51,16 @@ import io.horizontalsystems.bankwallet.ui.compose.components.body_jacob
 import io.horizontalsystems.core.helpers.HudHelper
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
-import se.warting.inappupdate.compose.findActivity
 
 class CoinFragment : BaseComposeFragment(), AdRewardedCallback {
     private val adMaxRewardedLoader = AdMaxRewardedLoader(this)
     private var viewModel: CoinViewModel? = null
+
     @Composable
     override fun GetContent(navController: NavController) {
         val input = navController.getInput<Input>()
         val coinUid = input?.coinUid ?: ""
-        viewModel = coinViewModel(coinUid, userDataRepository)
+        viewModel = coinViewModel(coinUid)
 
         CoinScreen(
             coinUid,
@@ -79,11 +75,11 @@ class CoinFragment : BaseComposeFragment(), AdRewardedCallback {
     override val logScreen: String
         get() = "CoinFragment"
 
-    private fun coinViewModel(coinUid: String,
-                              userDataRepository: UserDataRepository
+    private fun coinViewModel(
+        coinUid: String
     ): CoinViewModel? = try {
         val viewModel by navGraphViewModels<CoinViewModel>(R.id.coinFragment) {
-            CoinModule.Factory(coinUid, userDataRepository)
+            CoinModule.Factory(coinUid)
         }
         viewModel
     } catch (e: Exception) {
@@ -135,9 +131,8 @@ fun CoinTabs(
     val pagerState = rememberPagerState(initialPage = 0) { tabs.size }
     val coroutineScope = rememberCoroutineScope()
     val view = LocalView.current
-    val isPlusMode by viewModel.screenState.collectAsStateWithLifecycle()
+    val isPlusMode = viewModel.purchaseStateUpdated
     var openAlertDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current
 
     Scaffold(
         containerColor = Color.Transparent,
@@ -174,7 +169,10 @@ fun CoinTabs(
                                     onClick = {
                                         if (isPlusMode) {
                                             viewModel.onFavoriteClick()
-                                            stat(page = StatPage.CoinPage, event = StatEvent.AddToWatchlist(viewModel.fullCoin.coin.uid))
+                                            stat(
+                                                page = StatPage.CoinPage,
+                                                event = StatEvent.AddToWatchlist(viewModel.fullCoin.coin.uid)
+                                            )
                                         } else {
                                             openAlertDialog = true
                                         }
@@ -254,7 +252,7 @@ fun CoinTabs(
                 dismissButton = {
                     TextButton(onClick = {
                         openAlertDialog = false
-                        context.findActivity().showBillingPlusDialog()
+                        navController.slideFromBottom(R.id.buySubscriptionFragment)
                     }) {
                         Text(text = stringResource(id = R.string.billing_plus_title))
                     }

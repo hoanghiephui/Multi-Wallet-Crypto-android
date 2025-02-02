@@ -6,12 +6,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,7 +16,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -27,17 +23,16 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.android.billing.UserDataRepository
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.navigateWithTermsAccepted
+import io.horizontalsystems.bankwallet.core.paidAction
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.core.stats.StatEntity
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
 import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.modules.backupalert.BackupAlert
-import io.horizontalsystems.bankwallet.modules.billing.showBillingPlusDialog
 import io.horizontalsystems.bankwallet.modules.manageaccount.ManageAccountFragment
 import io.horizontalsystems.bankwallet.modules.manageaccounts.ManageAccountsModule.AccountViewItem
 import io.horizontalsystems.bankwallet.modules.manageaccounts.ManageAccountsModule.ActionViewItem
@@ -52,8 +47,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.body_jacob
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_lucian
-import io.horizontalsystems.core.parcelable
-import se.warting.inappupdate.compose.findActivity
+import io.horizontalsystems.subscriptions.core.MultiWallet
 
 class ManageAccountsFragment : BaseComposeFragment() {
 
@@ -61,7 +55,7 @@ class ManageAccountsFragment : BaseComposeFragment() {
     override fun GetContent(navController: NavController) {
         withInput<ManageAccountsModule.Mode>(navController) { input ->
             input?.let {
-                ManageAccountsScreen(navController, it, userDataRepository)
+                ManageAccountsScreen(navController, it)
             } ?: navController.popBackStack()
         }
     }
@@ -72,20 +66,14 @@ class ManageAccountsFragment : BaseComposeFragment() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ManageAccountsScreen(navController: NavController, mode: ManageAccountsModule.Mode,
-                         userDataRepository: UserDataRepository,) {
+fun ManageAccountsScreen(navController: NavController, mode: ManageAccountsModule.Mode) {
     BackupAlert(navController)
-    var openAlertDialog by remember { mutableStateOf(false) }
     val viewModel = viewModel<ManageAccountsViewModel>(
-        factory = ManageAccountsModule.Factory(
-            mode,
-            userDataRepository
-        )
+        factory = ManageAccountsModule.Factory(mode)
     )
-    val isPlusMode by viewModel.screenState.collectAsStateWithLifecycle()
+    val isPlusMode by viewModel.purchaseStateUpdated.collectAsStateWithLifecycle()
     val viewItems = viewModel.viewItems
     val finish = viewModel.finish
-    val context = LocalContext.current
     if (finish) {
         navController.popBackStack()
     }
@@ -113,8 +101,15 @@ fun ManageAccountsScreen(navController: NavController, mode: ManageAccountsModul
                 }
 
                 val args = when (mode) {
-                    ManageAccountsModule.Mode.Manage -> ManageAccountsModule.Input(R.id.manageAccountsFragment, false)
-                    ManageAccountsModule.Mode.Switcher -> ManageAccountsModule.Input(R.id.manageAccountsFragment, true)
+                    ManageAccountsModule.Mode.Manage -> ManageAccountsModule.Input(
+                        R.id.manageAccountsFragment,
+                        false
+                    )
+
+                    ManageAccountsModule.Mode.Switcher -> ManageAccountsModule.Input(
+                        R.id.manageAccountsFragment,
+                        true
+                    )
                 }
 
                 val actions = listOf(
@@ -123,20 +118,39 @@ fun ManageAccountsScreen(navController: NavController, mode: ManageAccountsModul
                             navController.navigateWithTermsAccepted {
                                 navController.slideFromRight(R.id.createAccountFragment, args)
                             }
-                            stat(page = StatPage.ManageWallets, event = StatEvent.Open(StatPage.NewWallet))
+                            stat(
+                                page = StatPage.ManageWallets,
+                                event = StatEvent.Open(StatPage.NewWallet)
+                            )
                         } else {
-                            openAlertDialog = true
+                            navController.paidAction(MultiWallet) {
+                                navController.navigateWithTermsAccepted {
+                                    navController.slideFromRight(R.id.createAccountFragment, args)
+                                }
+                            }
                         }
                     },
-                    ActionViewItem(R.drawable.ic_download_20, R.string.ManageAccounts_ImportWallet) {
+                    ActionViewItem(
+                        R.drawable.ic_download_20,
+                        R.string.ManageAccounts_ImportWallet
+                    ) {
                         navController.slideFromRight(R.id.importWalletFragment, args)
 
-                        stat(page = StatPage.ManageWallets, event = StatEvent.Open(StatPage.ImportWallet))
+                        stat(
+                            page = StatPage.ManageWallets,
+                            event = StatEvent.Open(StatPage.ImportWallet)
+                        )
                     },
-                    ActionViewItem(R.drawable.icon_binocule_20, R.string.ManageAccounts_WatchAddress) {
+                    ActionViewItem(
+                        R.drawable.icon_binocule_20,
+                        R.string.ManageAccounts_WatchAddress
+                    ) {
                         navController.slideFromRight(R.id.watchAddressFragment, args)
 
-                        stat(page = StatPage.ManageWallets, event = StatEvent.Open(StatPage.WatchWallet))
+                        stat(
+                            page = StatPage.ManageWallets,
+                            event = StatEvent.Open(StatPage.WatchWallet)
+                        )
                     }
                 )
                 CellUniversalLawrenceSection(actions) {
@@ -157,29 +171,14 @@ fun ManageAccountsScreen(navController: NavController, mode: ManageAccountsModul
             }
         }
     }
-    if (openAlertDialog) {
-        AlertDialog(
-            title = {
-                body_jacob(text = stringResource(id = R.string.billing_plus_title))
-            },
-            text = {
-                Text(text = stringResource(id = R.string.billing_plus_description))
-            },
-            onDismissRequest = { openAlertDialog = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    openAlertDialog = false
-                    context.findActivity().showBillingPlusDialog()
-                }) {
-                    Text(text = "Ok")
-                }
-            }
-        )
-    }
 }
 
 @Composable
-private fun AccountsSection(accounts: List<AccountViewItem>, viewModel: ManageAccountsViewModel, navController: NavController) {
+private fun AccountsSection(
+    accounts: List<AccountViewItem>,
+    viewModel: ManageAccountsViewModel,
+    navController: NavController
+) {
     CellUniversalLawrenceSection(items = accounts) { accountViewItem ->
         RowUniversal(
             onClick = {

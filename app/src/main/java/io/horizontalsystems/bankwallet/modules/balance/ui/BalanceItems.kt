@@ -362,7 +362,7 @@ fun BalanceItems(
 
             item {
                 Spacer(modifier = Modifier.height(8.dp))
-                MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
+                MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL, navController)
             }
 
             item {

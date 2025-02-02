@@ -131,14 +131,14 @@ fun TransactionsScreen(
                                 text = stringResource(R.string.Transactions_WaitForSync),
                                 icon = R.drawable.ic_clock
                             ) {
-                                MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
+                                MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
                             }
                         } else {
                             ScreenMessageWithAction(
                                 text = stringResource(R.string.Transactions_EmptyList),
                                 icon = R.drawable.ic_outgoingraw
                             ) {
-                                MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
+                                MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
                             }
                         }
                     } else {
@@ -162,7 +162,7 @@ fun TransactionsScreen(
 
                         LazyColumn(state = listState) {
                             item {
-                                MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
+                                MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
                             }
                             transactionList(
                                 transactionsMap = transactionItems,

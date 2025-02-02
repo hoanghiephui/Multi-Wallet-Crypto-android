@@ -23,6 +23,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.SheetState
@@ -169,6 +170,12 @@ fun SelectSubscriptionBottomSheet(
                 style = ComposeAppTheme.typography.subhead2,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 32.dp, vertical = 12.dp)
+            )
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.billing_policy),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             VSpacer(24.dp)
             ButtonPrimaryYellow(

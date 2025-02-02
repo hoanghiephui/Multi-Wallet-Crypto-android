@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import io.horizontalsystems.bankwallet.AdNativeUiState
+import io.horizontalsystems.bankwallet.core.BaseViewModel.Companion.SHOW_ADS
 
 @Composable
 fun NativeAdView(

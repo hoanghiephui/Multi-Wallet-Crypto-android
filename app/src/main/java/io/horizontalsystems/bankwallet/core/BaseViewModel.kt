@@ -5,11 +5,13 @@ import com.applovin.mediation.MaxAd
 import com.applovin.mediation.MaxAdRevenueListener
 import com.applovin.mediation.MaxAdViewAdListener
 import com.applovin.mediation.MaxError
+import io.horizontalsystems.subscriptions.core.NoAds
+import io.horizontalsystems.subscriptions.core.UserSubscriptionManager
 import timber.log.Timber
 
 abstract class BaseViewModel : ViewModel(), MaxAdViewAdListener, MaxAdRevenueListener {
     companion object {
-        const val SHOW_ADS = true
+        val SHOW_ADS get() = !UserSubscriptionManager.isActionAllowed(NoAds)
     }
 
     override fun onAdLoaded(ad: MaxAd) {

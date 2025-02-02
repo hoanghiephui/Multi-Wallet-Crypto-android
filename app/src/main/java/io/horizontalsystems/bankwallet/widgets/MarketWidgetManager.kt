@@ -11,12 +11,11 @@ import coil.request.ErrorResult
 import coil.request.ImageRequest
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
+import io.horizontalsystems.subscriptions.core.UserSubscriptionManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.net.UnknownHostException
@@ -24,7 +23,7 @@ import java.net.UnknownHostException
 class MarketWidgetManager {
 
     private var coroutineScope: CoroutineScope? = CoroutineScope(Dispatchers.Default)
-
+    private var hasSubscription = UserSubscriptionManager.getActiveSubscriptions().isNotEmpty()
     fun updateWatchListWidgets() {
         coroutineScope?.launch {
             val context = App.instance
@@ -65,7 +64,6 @@ class MarketWidgetManager {
     private suspend fun updateData(glanceId: GlanceId) {
         val context = App.instance
         val marketRepository = App.marketWidgetRepository
-        val userDataRepository = App.mUserDataRepository
         var state = getAppWidgetState(context, MarketWidgetStateDefinition, glanceId)
         val imagePathCache = buildMap {
             state.items.forEach { item ->
@@ -73,10 +71,13 @@ class MarketWidgetManager {
             }
         }
         var marketItems = marketRepository.getMarketItems(state.type)
-        marketItems = marketItems.map { it.copy(imageLocalPath = imagePathCache[it.imageRemoteUrl]) }
-
-        val isPlusMode = userDataRepository.userData.map { it.isPlusMode }.first()
-        state = state.copy(items = marketItems, loading = false, error = null, isPlusUser = isPlusMode)
+        marketItems =
+            marketItems.map { it.copy(imageLocalPath = imagePathCache[it.imageRemoteUrl]) }
+        hasSubscription = UserSubscriptionManager.purchaseStateUpdatedFlow.map {
+            UserSubscriptionManager.getActiveSubscriptions().isNotEmpty()
+        }.first()
+        state =
+            state.copy(items = marketItems, loading = false, error = null, isPlusUser = hasSubscription)
         setWidgetState(context, glanceId, state)
 
         marketItems = marketItems.map { item ->
@@ -92,7 +93,7 @@ class MarketWidgetManager {
             state.copy(
                 items = marketItems,
                 updateTimestampMillis = System.currentTimeMillis(),
-                isPlusUser = isPlusMode
+                isPlusUser = hasSubscription
             )
         setWidgetState(context, glanceId, state)
     }
@@ -122,14 +123,19 @@ class MarketWidgetManager {
             }
         }
 
-        val localPath = context.imageLoader.diskCache?.openSnapshot(downloadedUrl)?.use { snapshot ->
-            snapshot.data.toFile().path
-        }
+        val localPath =
+            context.imageLoader.diskCache?.openSnapshot(downloadedUrl)?.use { snapshot ->
+                snapshot.data.toFile().path
+            }
 
         return localPath
     }
 
-    private suspend fun setWidgetState(context: Context, glanceId: GlanceId, state: MarketWidgetState) {
+    private suspend fun setWidgetState(
+        context: Context,
+        glanceId: GlanceId,
+        state: MarketWidgetState
+    ) {
         updateAppWidgetState(context, MarketWidgetStateDefinition, glanceId) {
             state
         }

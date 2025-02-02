@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.AdNativeUiState
+import io.horizontalsystems.bankwallet.core.BaseViewModel.Companion.SHOW_ADS
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
 import io.horizontalsystems.bankwallet.core.stats.StatSection
@@ -147,15 +148,17 @@ fun TopCoins(
                         }
                     },
                     preAdsItem = {
-                        item {
-                            VSpacer(12.dp)
-                            NativeAdView(
-                                adsState = nativeAd,
-                                modifier = Modifier
-                                    .padding(horizontal = 8.dp)
-                                    .height(138.dp)
-                            )
-                            VSpacer(8.dp)
+                        if (SHOW_ADS) {
+                            item {
+                                VSpacer(12.dp)
+                                NativeAdView(
+                                    adsState = nativeAd,
+                                    modifier = Modifier
+                                        .padding(horizontal = 8.dp)
+                                        .height(138.dp)
+                                )
+                                VSpacer(8.dp)
+                            }
                         }
                     }
                 )

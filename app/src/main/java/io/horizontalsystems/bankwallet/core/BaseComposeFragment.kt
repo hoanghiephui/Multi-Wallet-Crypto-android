@@ -17,7 +17,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
-import com.android.billing.UserDataRepository
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.wallet.blockchain.bitcoin.R
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,8 +31,6 @@ abstract class BaseComposeFragment(
     @LayoutRes layoutResId: Int = 0,
     private val screenshotEnabled: Boolean = true
 ) : Fragment(layoutResId) {
-    @Inject
-    lateinit var userDataRepository: UserDataRepository
 
     @Inject
     lateinit var analyticsHelper: AnalyticsHelper

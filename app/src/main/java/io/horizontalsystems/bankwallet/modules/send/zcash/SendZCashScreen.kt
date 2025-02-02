@@ -138,7 +138,7 @@ fun SendZCashScreen(
                 navController = navController
             )
             Spacer(modifier = Modifier.height(12.dp))
-            MaxTemplateNativeAdViewComposable(adState, AdType.SMALL)
+            MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
             ButtonPrimaryYellow(
                 modifier = Modifier
                     .fillMaxWidth()

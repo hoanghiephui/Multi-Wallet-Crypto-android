@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.navigation.NavHostController
 import io.github.alexzhirkevich.qrose.options.QrBallShape
 import io.github.alexzhirkevich.qrose.options.QrErrorCorrectionLevel
 import io.github.alexzhirkevich.qrose.options.QrFrameShape
@@ -124,6 +125,7 @@ fun ReceiveAddressScreen(
     onBackPress: () -> Unit,
     closeModule: () -> Unit,
     nativeAd: AdNativeUiState,
+    navController: NavHostController,
 ) {
     val localView = LocalView.current
     val openAmountDialog = remember { mutableStateOf(false) }
@@ -282,7 +284,7 @@ fun ReceiveAddressScreen(
                                         }
                                     }
                                     VSpacer(12.dp)
-                                    MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL)
+                                    MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL, navController)
                                     VSpacer(45.dp)
 
                                     ActionButtonsRow(

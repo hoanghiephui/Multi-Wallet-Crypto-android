@@ -2,11 +2,8 @@ package io.horizontalsystems.bankwallet.modules.depositcex
 
 import android.content.Intent
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -104,6 +101,7 @@ fun CexDepositScreen(
                     onBackPress = navigateBack(fragmentNavController, navController),
                     closeModule = { fragmentNavController.popBackStack() },
                     nativeAd = adState,
+                    navController = navController
                 )
             }
             composablePage(USED_ADDRESS_SCREEN) { entry ->

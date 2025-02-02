@@ -17,6 +17,7 @@ object UserSubscriptionManager {
             name = "PRO",
             description = "",
             actions = listOf(
+                MultiWallet,
                 TokenInsights,
                 AdvancedSearch,
                 TradeSignals,
@@ -25,6 +26,7 @@ object UserSubscriptionManager {
                 AddressVerification,
                 Tor,
                 PrivacyMode,
+                Watchlist
             )
         ),
         Subscription(
@@ -32,8 +34,8 @@ object UserSubscriptionManager {
             name = "VIP",
             description = "",
             actions = listOf(
-                VIPSupport,
-                VIPClub,
+                NoAds,
+                MultiWallet,
                 TokenInsights,
                 AdvancedSearch,
                 TradeSignals,
@@ -42,6 +44,7 @@ object UserSubscriptionManager {
                 AddressVerification,
                 Tor,
                 PrivacyMode,
+                Watchlist
             )
         ),
     )

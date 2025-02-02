@@ -12,7 +12,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.BaseActivity
 import io.horizontalsystems.bankwallet.core.slideFromBottom
-import io.horizontalsystems.bankwallet.modules.billing.BillingPlusViewModel
 import io.horizontalsystems.bankwallet.modules.intro.IntroActivity
 import io.horizontalsystems.bankwallet.modules.keystore.KeyStoreActivity
 import io.horizontalsystems.bankwallet.modules.lockscreen.LockScreenActivity
@@ -36,8 +35,6 @@ class MainActivity : BaseActivity() {
         setIntent(intent)
         viewModel.setIntent(intent)
     }
-
-    private val billingViewModel by viewModels<BillingPlusViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
@@ -67,9 +64,11 @@ class MainActivity : BaseActivity() {
                     is Wallet.Model.SessionRequest -> {
                         navController.slideFromBottom(R.id.wcRequestFragment)
                     }
+
                     is Wallet.Model.SessionProposal -> {
                         navController.slideFromBottom(R.id.wcSessionFragment)
                     }
+
                     else -> {}
                 }
 
@@ -89,7 +88,6 @@ class MainActivity : BaseActivity() {
                 viewModel.onTcDappRequestHandled()
             }
         }
-        billingViewModel.onVerify(this)
         Sync.initialize(this)
 
         viewModel.setIntent(intent)

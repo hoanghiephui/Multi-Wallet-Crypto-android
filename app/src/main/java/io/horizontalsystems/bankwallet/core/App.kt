@@ -1,12 +1,10 @@
 package io.horizontalsystems.bankwallet.core
 
-import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
-import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
@@ -16,7 +14,6 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
 import com.android.billing.DebugTree
-import com.android.billing.UserDataRepository
 import com.android.billing.network.AppDispatcher
 import com.android.billing.network.Dispatcher
 import com.applovin.sdk.AppLovinSdk
@@ -31,9 +28,9 @@ import com.walletconnect.android.CoreClient
 import com.walletconnect.android.relay.ConnectionType
 import com.walletconnect.web3.wallet.client.Wallet
 import com.walletconnect.web3.wallet.client.Web3Wallet
-import io.horizontalsystems.bankwallet.core.address.AddressSecurityCheckerChain
 import dagger.hilt.android.HiltAndroidApp
 import io.horizontalsystems.bankwallet.core.BaseViewModel.Companion.SHOW_ADS
+import io.horizontalsystems.bankwallet.core.address.AddressSecurityCheckerChain
 import io.horizontalsystems.bankwallet.core.factories.AccountFactory
 import io.horizontalsystems.bankwallet.core.factories.AdapterFactory
 import io.horizontalsystems.bankwallet.core.factories.AddressSecurityCheckerFactory
@@ -139,7 +136,6 @@ import io.reactivex.plugins.RxJavaPlugins
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -224,11 +220,7 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         lateinit var statsManager: StatsManager
         lateinit var tonConnectManager: TonConnectManager
         lateinit var addressSecurityCheckerChain: AddressSecurityCheckerChain
-        lateinit var mUserDataRepository: UserDataRepository
     }
-
-    @Inject
-    lateinit var userDataRepository: UserDataRepository
 
     @Inject
     lateinit var applovinConfiguration: AppLovinSdkInitializationConfiguration
@@ -256,7 +248,6 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         initApplovin()
         instance = this
         preferences = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        mUserDataRepository = this.userDataRepository
         LocalStorageManager(preferences).apply {
             localStorage = this
             pinSettingsStorage = this
@@ -343,8 +334,17 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         walletActivator = WalletActivator(walletManager, marketKit)
         tokenAutoEnableManager = TokenAutoEnableManager(appDatabase.tokenAutoEnabledBlockchainDao())
 
-        spamManager = SpamManager(localStorage, coinManager, SpamAddressStorage(appDatabase.spamAddressDao()), marketKit, appConfigProvider )
-        addressSecurityCheckerChain = AddressSecurityCheckerFactory(spamManager, appConfigProvider).securityCheckerChain(BlockchainType.Ethereum)
+        spamManager = SpamManager(
+            localStorage,
+            coinManager,
+            SpamAddressStorage(appDatabase.spamAddressDao()),
+            marketKit,
+            appConfigProvider
+        )
+        addressSecurityCheckerChain =
+            AddressSecurityCheckerFactory(spamManager, appConfigProvider).securityCheckerChain(
+                BlockchainType.Ethereum
+            )
 
         val evmAccountManagerFactory = EvmAccountManagerFactory(
             accountManager,
@@ -666,16 +666,13 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
     }
 
     private fun initApplovin() {
-        if (SHOW_ADS) {
-            CoroutineScope(ioDispatcher).launch {
-                withContext(ioDispatcher) {
-                    AppLovinSdk.getInstance(this@App).settings.also {
-                        it.setExtraParameter("disable_sensor_data_collection", "true")
-                        it.setVerboseLogging(BuildConfig.DEBUG)
-                    }
-                    AppLovinSdk.getInstance(this@App).initialize(applovinConfiguration) {
-                        Timber.d("Applovin: $it")
-                    }
+        CoroutineScope(ioDispatcher).launch {
+            withContext(ioDispatcher) {
+                AppLovinSdk.getInstance(this@App).settings.also {
+                    it.setVerboseLogging(BuildConfig.DEBUG)
+                }
+                AppLovinSdk.getInstance(this@App).initialize(applovinConfiguration) {
+                    Timber.d("Applovin: $it")
                 }
             }
         }
