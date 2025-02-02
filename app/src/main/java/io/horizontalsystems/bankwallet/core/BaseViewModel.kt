@@ -11,7 +11,7 @@ import timber.log.Timber
 
 abstract class BaseViewModel : ViewModel(), MaxAdViewAdListener, MaxAdRevenueListener {
     companion object {
-        val SHOW_ADS get() = !UserSubscriptionManager.isActionAllowed(NoAds)
+        val SHOW_ADS = true// get() = !UserSubscriptionManager.isActionAllowed(NoAds)
     }
 
     override fun onAdLoaded(ad: MaxAd) {

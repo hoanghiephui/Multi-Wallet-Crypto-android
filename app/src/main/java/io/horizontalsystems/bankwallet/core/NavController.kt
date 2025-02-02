@@ -86,13 +86,16 @@ fun NavController.ensurePinSet(descriptionResId: Int, action: () -> Unit) {
     if (App.pinComponent.isPinSet) {
         action.invoke()
     } else {
-        slideFromRightForResult<SetPinFragment.Result>(R.id.setPinFragment, SetPinFragment.Input(descriptionResId)) {
+        slideFromRightForResult<SetPinFragment.Result>(
+            R.id.setPinFragment,
+            SetPinFragment.Input(descriptionResId)
+        ) {
             action.invoke()
         }
     }
 }
 
-fun <T: Parcelable> NavController.slideFromBottomForResult(
+fun <T : Parcelable> NavController.slideFromBottomForResult(
     @IdRes resId: Int,
     input: Parcelable? = null,
     onResult: (T) -> Unit
@@ -107,7 +110,7 @@ fun <T: Parcelable> NavController.slideFromBottomForResult(
     navigateForResult(resId, input, navOptions, onResult)
 }
 
-fun <T: Parcelable> NavController.slideFromRightForResult(
+fun <T : Parcelable> NavController.slideFromRightForResult(
     @IdRes resId: Int,
     input: Parcelable? = null,
     onResult: (T) -> Unit
@@ -137,7 +140,10 @@ private fun <T : Parcelable> NavController.navigateForResult(
     navigate(resId, bundle, navOptions)
 }
 
-private fun <T: Parcelable> NavController.getNavigationResultX(key: String, onResult: (T) -> Unit) {
+private fun <T : Parcelable> NavController.getNavigationResultX(
+    key: String,
+    onResult: (T) -> Unit
+) {
     currentBackStackEntry?.let { backStackEntry ->
         backStackEntry.savedStateHandle.getLiveData<T>(key).observe(backStackEntry) {
             onResult.invoke(it)
@@ -147,19 +153,19 @@ private fun <T: Parcelable> NavController.getNavigationResultX(key: String, onRe
     }
 }
 
-inline fun <reified T: Parcelable> NavController.getInput() : T? {
+inline fun <reified T : Parcelable> NavController.getInput(): T? {
     return currentBackStackEntry?.arguments?.getInputX()
 }
 
-inline fun <reified T: Parcelable> Bundle.getInputX() : T? {
+inline fun <reified T : Parcelable> Bundle.getInputX(): T? {
     return parcelable("input")
 }
 
-inline fun <reified T: Parcelable> NavController.requireInput() : T? {
+inline fun <reified T : Parcelable> NavController.requireInput(): T? {
     return getInput()
 }
 
-fun <T: Parcelable> NavController.setNavigationResultX(result: T) {
+fun <T : Parcelable> NavController.setNavigationResultX(result: T) {
     val resultKey = currentBackStackEntry?.arguments?.getString("resultKey")
 
     if (resultKey == null) {

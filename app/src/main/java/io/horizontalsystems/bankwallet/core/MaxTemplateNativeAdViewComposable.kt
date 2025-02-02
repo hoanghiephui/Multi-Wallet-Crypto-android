@@ -77,6 +77,8 @@ fun MaxTemplateNativeAdViewComposable(
                     }
                 }
             }
+
+            AdNativeUiState.Nothing -> Unit
         }
     }
 }

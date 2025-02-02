@@ -178,7 +178,6 @@ fun Note(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BalanceItems(
     balanceViewItems: List<BalanceViewItem2>,

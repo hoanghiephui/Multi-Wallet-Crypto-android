@@ -1,5 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.send.evm.processing
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -29,9 +31,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.applovin.mediation.ads.MaxInterstitialAd
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.findActivity
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
+import io.horizontalsystems.bankwallet.rememberInterstitialAd
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
@@ -67,6 +73,15 @@ class SendEvmProcessingFragment : BaseComposeFragment() {
 private fun SendEvmProcessingScreen(
     navController: NavController
 ) {
+    val rememberInterstitialAd =
+        rememberInterstitialAd(
+            adUnitId = BuildConfig.SEND_FULL,
+            revenueListener = null,
+            onDismissAd = {
+                navController.popBackStack(R.id.mainFragment, false)
+            }
+        )
+    val context = LocalContext.current
     Scaffold(
         containerColor = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.background,
@@ -77,7 +92,7 @@ private fun SendEvmProcessingScreen(
                         title = TranslatableString.ResString(R.string.Button_Close),
                         icon = R.drawable.ic_close,
                         onClick = {
-                            navController.popBackStack()
+                            showAd(rememberInterstitialAd, context, navController)
                         }
                     )
                 )
@@ -168,10 +183,25 @@ private fun SendEvmProcessingScreen(
                         .padding(horizontal = 24.dp),
                     title = stringResource(R.string.Button_Done),
                     onClick = {
-
+                        // TODO
+                        showAd(rememberInterstitialAd, context, navController)
                     },
                 )
             }
+        }
+    }
+}
+
+private fun showAd(
+    rememberInterstitialAd: MaxInterstitialAd?,
+    context: Context,
+    navController: NavController
+) {
+    rememberInterstitialAd?.let {
+        if (it.isReady) {
+            it.showAd(context.findActivity())
+        } else {
+            navController.popBackStack(R.id.mainFragment, false)
         }
     }
 }

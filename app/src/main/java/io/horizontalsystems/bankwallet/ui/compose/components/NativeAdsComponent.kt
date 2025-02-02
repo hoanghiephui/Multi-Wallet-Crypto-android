@@ -65,6 +65,8 @@ fun NativeAdView(
                     )
                 }
             }
+
+            AdNativeUiState.Nothing -> Unit
         }
     }
 }

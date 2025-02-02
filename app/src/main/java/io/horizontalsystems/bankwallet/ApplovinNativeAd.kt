@@ -2,7 +2,6 @@ package io.horizontalsystems.bankwallet
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -16,6 +15,7 @@ import com.applovin.mediation.MaxError
 import com.applovin.mediation.nativeAds.MaxNativeAdListener
 import com.applovin.mediation.nativeAds.MaxNativeAdLoader
 import com.applovin.mediation.nativeAds.MaxNativeAdView
+import io.horizontalsystems.bankwallet.core.BaseViewModel.Companion.SHOW_ADS
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -25,6 +25,9 @@ fun rememberAdNativeView(
     adUnitId: String,
     revenueListener: MaxAdRevenueListener
 ): Pair<AdNativeUiState, () -> Unit> {
+    if (!SHOW_ADS) {
+        return Pair(AdNativeUiState.Nothing) {}
+    }
     val context = LocalContext.current
     var loadedAd by remember {
         mutableStateOf<AdNativeUiState>(AdNativeUiState.Loading)
@@ -107,6 +110,7 @@ fun rememberAdNativeView(
 }
 
 sealed interface AdNativeUiState {
+    data object Nothing : AdNativeUiState
     data object Loading : AdNativeUiState
     data object LoadError : AdNativeUiState
     data class Success(

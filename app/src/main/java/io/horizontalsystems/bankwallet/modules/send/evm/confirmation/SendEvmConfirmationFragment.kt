@@ -78,7 +78,6 @@ class SendEvmConfirmationFragment : BaseComposeFragment() {
     data class Result(val success: Boolean) : Parcelable
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SendEvmConfirmationScreen(
     navController: NavController,
