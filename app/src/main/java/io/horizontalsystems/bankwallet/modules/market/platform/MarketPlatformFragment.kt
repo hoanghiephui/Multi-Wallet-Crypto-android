@@ -69,7 +69,8 @@ class MarketPlatformFragment : BaseComposeFragment() {
                         navController.slideFromRight(R.id.coinFragment, arguments)
 
                         stat(page = StatPage.TopPlatform, event = StatEvent.OpenCoin(coinUid))
-                    }
+                    },
+                    navController = navController
                 )
             } ?: navController.popBackStack()
         }
@@ -86,6 +87,7 @@ private fun PlatformScreen(
     onCoinClick: (String) -> Unit,
     viewModel: MarketPlatformViewModel = viewModel(factory = factory),
     chartViewModel: ChartViewModel = viewModel(factory = factory),
+    navController: NavController
 ) {
 
     val uiState = viewModel.uiState
@@ -159,7 +161,8 @@ private fun PlatformScreen(
                                                 )
                                             }
                                         }
-                                    }
+                                    },
+                                    navController = navController
                                 )
                                 if (scrollToTopAfterUpdate) {
                                     scrollToTopAfterUpdate = false

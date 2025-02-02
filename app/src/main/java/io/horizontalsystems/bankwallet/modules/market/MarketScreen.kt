@@ -175,7 +175,8 @@ fun TabsSection(
                 onCoinClick = { onCoinClick(it, navController) },
                 nativeAd = nativeAd,
                 isRefreshing = isRefreshing,
-                onSetRefreshCallback = onSetRefreshCallback
+                onSetRefreshCallback = onSetRefreshCallback,
+                navController = navController
             )
 
             Tab.Watchlist -> MarketFavoritesScreen(

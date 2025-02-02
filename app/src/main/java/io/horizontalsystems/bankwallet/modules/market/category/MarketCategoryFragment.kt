@@ -56,7 +56,8 @@ class MarketCategoryFragment : BaseComposeFragment() {
                     viewModel = viewModel,
                     chartViewModel = chartViewModel,
                     onCloseButtonClick = { navController.popBackStack() },
-                    onCoinClick = { coinUid -> onCoinClick(coinUid, navController) }
+                    onCoinClick = { coinUid -> onCoinClick(coinUid, navController) },
+                    navController = navController
                 )
             } ?: navController.popBackStack()
         }
@@ -81,6 +82,7 @@ fun CategoryScreen(
     chartViewModel: ChartViewModel,
     onCloseButtonClick: () -> Unit,
     onCoinClick: (String) -> Unit,
+    navController: NavController
 ) {
     var scrollToTopAfterUpdate by rememberSaveable { mutableStateOf(false) }
     val viewItemState by viewModel.viewStateLiveData.observeAsState(ViewState.Loading)
@@ -151,7 +153,8 @@ fun CategoryScreen(
                                                 }
                                             }
                                         }
-                                    }
+                                    },
+                                    navController = navController
                                 )
                                 if (scrollToTopAfterUpdate) {
                                     scrollToTopAfterUpdate = false

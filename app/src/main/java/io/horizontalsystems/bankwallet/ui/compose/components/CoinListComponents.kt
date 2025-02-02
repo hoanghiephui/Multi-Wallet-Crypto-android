@@ -53,17 +53,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.alternativeImageUrl
 import io.horizontalsystems.bankwallet.core.iconPlaceholder
 import io.horizontalsystems.bankwallet.core.imageUrl
+import io.horizontalsystems.bankwallet.core.navigateWithTermsAccepted
+import io.horizontalsystems.bankwallet.core.paidAction
+import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.modules.market.ImageSource
 import io.horizontalsystems.bankwallet.modules.market.MarketViewItem
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchModule.DiscoveryItem
 import io.horizontalsystems.bankwallet.modules.walletconnect.list.ui.DraggableCardSimple
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
+import io.horizontalsystems.subscriptions.core.MultiWallet
+import io.horizontalsystems.subscriptions.core.Watchlist
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -77,7 +83,8 @@ fun CoinList(
     onCoinClick: (String) -> Unit,
     userScrollEnabled: Boolean = true,
     preItems: LazyListScope.() -> Unit,
-    preAdsItem: LazyListScope.() -> Unit = {}
+    preAdsItem: LazyListScope.() -> Unit = {},
+    navController: NavController
 ) {
     val coroutineScope = rememberCoroutineScope()
     var revealedCardId by remember { mutableStateOf<String?>(null) }
@@ -101,7 +108,9 @@ fun CoinList(
                             if (item.favorited) {
                                 onRemoveFavorite(item.coinUid)
                             } else {
-                                onAddFavorite(item.coinUid)
+                                navController.paidAction(Watchlist) {
+                                    onAddFavorite(item.coinUid)
+                                }
                             }
                             coroutineScope.launch {
                                 delay(200)

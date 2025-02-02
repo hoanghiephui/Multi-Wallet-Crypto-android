@@ -138,7 +138,8 @@ private fun SearchResultsScreen(
                                         HSpacer(width = 16.dp)
                                     }
                                 }
-                            }
+                            },
+                            navController = navController
                         )
                         if (scrollToTopAfterUpdate) {
                             scrollToTopAfterUpdate = false
