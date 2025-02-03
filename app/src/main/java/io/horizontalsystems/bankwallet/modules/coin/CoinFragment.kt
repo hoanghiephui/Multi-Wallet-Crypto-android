@@ -11,6 +11,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,10 +21,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.navGraphViewModels
 import com.applovin.mediation.ads.MaxRewardedAd
@@ -133,12 +135,15 @@ fun CoinTabs(
     val view = LocalView.current
     val isPlusMode = viewModel.purchaseStateUpdated
     var openAlertDialog by remember { mutableStateOf(false) }
-
+    val scrollBehavior =
+        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         containerColor = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.background,
         topBar = {
             AppBar(
+                scrollBehavior = scrollBehavior,
                 title = viewModel.fullCoin.coin.code,
                 navigationIcon = {
                     HsBackButton(onClick = { navController.popBackStack() })

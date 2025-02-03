@@ -360,7 +360,7 @@ dependencies {
     appcenterdebugImplementation project(':subscriptions-dev')
     appcenterreleaseImplementation project(':subscriptions-dev')
 
-    implementation platform('androidx.compose:compose-bom:2025.01.00')
+    implementation platform('androidx.compose:compose-bom:2025.01.01')
     // Integration with activities
     implementation 'androidx.activity:activity-compose:1.10.0'
     // Compose Material Design
@@ -413,7 +413,7 @@ dependencies {
     api 'com.jaredrummler:android-shell:1.0.0'
     api 'com.offbynull.portmapper:portmapper:2.0.5'
     implementation("com.applovin:applovin-sdk:13.1.0")
-    implementation 'com.applovin.mediation:bytedance-adapter:6.4.0.6.0'
+    implementation 'com.applovin.mediation:bytedance-adapter:6.4.0.6.1'
     implementation 'com.google.android.exoplayer:exoplayer:2.19.1'
     implementation("com.google.android.gms:play-services-ads-identifier:18.2.0")
     implementation("com.android.billingclient:billing:7.1.1")

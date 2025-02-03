@@ -5,6 +5,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -101,32 +105,34 @@ fun HsImage(
     modifier: Modifier,
     colorFilter: ColorFilter? = null
 ) {
-    val fallback = placeholder ?: R.drawable.coin_placeholder
-    when {
-        url != null -> Image(
-            painter = rememberAsyncImagePainter(
-                model = url,
-                error = alternativeUrl?.let {
-                    rememberAsyncImagePainter(
-                        model = alternativeUrl,
-                        error = painterResource(fallback)
-                    )
-                } ?: painterResource(fallback)
-            ),
-            contentDescription = null,
-            modifier = modifier,
-            colorFilter = colorFilter,
-            contentScale = ContentScale.FillBounds
-        )
+    val fallbackPainter = painterResource(placeholder ?: R.drawable.coin_placeholder)
+    var currentUrl by remember { mutableStateOf(url) }
+    var loadFailed by remember { mutableStateOf(false) }
 
-        else -> Image(
-            painter = painterResource(fallback),
-            contentDescription = null,
-            modifier = modifier,
-            colorFilter = colorFilter
-        )
-    }
+    val painter = rememberAsyncImagePainter(
+        model = currentUrl,
+        onError = {
+            if (!loadFailed && alternativeUrl != null) {
+                // Khi URL đầu tiên lỗi, thử chuyển sang alternativeUrl
+                currentUrl = alternativeUrl
+                loadFailed = true
+            } else {
+                // Khi cả URL và alternativeUrl đều lỗi, dùng fallback
+                currentUrl = null
+            }
+        }
+    )
+
+    Image(
+        painter = if (currentUrl == null) fallbackPainter else painter,
+        contentDescription = null,
+        modifier = modifier,
+        colorFilter = colorFilter,
+        contentScale = ContentScale.FillBounds
+    )
 }
+
+
 
 @Composable
 fun NftIcon(

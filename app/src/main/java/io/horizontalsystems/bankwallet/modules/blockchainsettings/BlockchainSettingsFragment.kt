@@ -13,8 +13,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -54,32 +56,33 @@ private fun BlockchainSettingsScreen(
     navController: NavController,
     viewModel: BlockchainSettingsViewModel = viewModel(factory = BlockchainSettingsModule.Factory()),
 ) {
-
-    Surface(color = MaterialTheme.colorScheme.background) {
-        Column {
+    Scaffold(
+        containerColor = Color.Transparent,
+        contentColor = MaterialTheme.colorScheme.background,
+        topBar = {
             AppBar(
                 title = stringResource(R.string.BlockchainSettings_Title),
                 navigationIcon = {
                     HsBackButton(onClick = { navController.popBackStack() })
                 },
             )
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
-            ) {
-                Spacer(Modifier.height(12.dp))
-                BlockchainSettingsBlock(
-                    btcLikeChains = viewModel.btcLikeChains,
-                    otherChains = viewModel.otherChains,
-                    navController = navController
-                )
-                Spacer(Modifier.height(44.dp))
-            }
+        }
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(it)
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
+        ) {
+            Spacer(Modifier.height(12.dp))
+            BlockchainSettingsBlock(
+                btcLikeChains = viewModel.btcLikeChains,
+                otherChains = viewModel.otherChains,
+                navController = navController
+            )
+            Spacer(Modifier.height(44.dp))
         }
     }
-
 }
 
 @Composable
@@ -107,21 +110,33 @@ private fun onClick(
 ) {
     when (item.blockchainItem) {
         is BlockchainSettingsModule.BlockchainItem.Btc -> {
-            navController.slideFromBottom(R.id.btcBlockchainSettingsFragment, item.blockchainItem.blockchain)
+            navController.slideFromBottom(
+                R.id.btcBlockchainSettingsFragment,
+                item.blockchainItem.blockchain
+            )
 
-            stat(page = StatPage.BlockchainSettings, event = StatEvent.OpenBlockchainSettingsBtc(item.blockchainItem.blockchain.uid))
+            stat(
+                page = StatPage.BlockchainSettings,
+                event = StatEvent.OpenBlockchainSettingsBtc(item.blockchainItem.blockchain.uid)
+            )
         }
 
         is BlockchainSettingsModule.BlockchainItem.Evm -> {
             navController.slideFromBottom(R.id.evmNetworkFragment, item.blockchainItem.blockchain)
 
-            stat(page = StatPage.BlockchainSettings, event = StatEvent.OpenBlockchainSettingsEvm(item.blockchainItem.blockchain.uid))
+            stat(
+                page = StatPage.BlockchainSettings,
+                event = StatEvent.OpenBlockchainSettingsEvm(item.blockchainItem.blockchain.uid)
+            )
         }
 
         is BlockchainSettingsModule.BlockchainItem.Solana -> {
             navController.slideFromBottom(R.id.solanaNetworkFragment)
 
-            stat(page = StatPage.BlockchainSettings, event = StatEvent.Open(StatPage.BlockchainSettingsSolana))
+            stat(
+                page = StatPage.BlockchainSettings,
+                event = StatEvent.Open(StatPage.BlockchainSettingsSolana)
+            )
         }
     }
 }

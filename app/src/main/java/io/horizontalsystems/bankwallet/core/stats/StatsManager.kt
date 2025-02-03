@@ -151,7 +151,7 @@ class StatsManager(
                 if (stats.isNotEmpty()) {
                     val statsArray = "[${stats.joinToString { it.json }}]"
 //                    Log.e("e", "send $statsArray")
-                    marketKit.sendStats(statsArray, appConfigProvider.appVersion, appConfigProvider.appId).blockingGet()
+                    //marketKit.sendStats(statsArray, appConfigProvider.appVersion, appConfigProvider.appId).blockingGet()
 
                     stats.chunked(sqliteMaxVariableNumber).forEach { chunk ->
                         statsDao.delete(chunk.map { it.id })

@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -78,13 +79,17 @@ fun ManageAccountsScreen(navController: NavController, mode: ManageAccountsModul
         navController.popBackStack()
     }
 
-    Column(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
-        AppBar(
-            title = stringResource(R.string.ManageAccounts_Title),
-            navigationIcon = { HsBackButton(onClick = { navController.popBackStack() }) }
-        )
-
-        LazyColumn {
+    Scaffold(
+        containerColor = Color.Transparent,
+        contentColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            AppBar(
+                title = stringResource(R.string.ManageAccounts_Title),
+                navigationIcon = { HsBackButton(onClick = { navController.popBackStack() }) }
+            )
+        }
+    ) {
+        LazyColumn(modifier = Modifier.padding(it)) {
             item {
                 Spacer(modifier = Modifier.height(12.dp))
 

@@ -24,6 +24,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -59,40 +60,41 @@ fun CoinMarketsScreen(
     val viewItemState by viewModel.viewStateLiveData.observeAsState()
     val viewItems by viewModel.viewItemsLiveData.observeAsState()
 
-    Surface(color = MaterialTheme.colorScheme.background) {
-        Crossfade(viewItemState, label = "") { viewItemState ->
-            when (viewItemState) {
-                ViewState.Loading -> {
-                    Loading()
-                }
-                is ViewState.Error -> {
-                    ListErrorView(stringResource(R.string.SyncError), onClick = viewModel::onErrorClick)
-                }
-                ViewState.Success -> {
-                    viewItems?.let { items ->
-                        Column(modifier = Modifier.fillMaxSize()) {
-                            if (items.isEmpty()) {
-                                ListEmptyView(
-                                    text = stringResource(R.string.CoinPage_NoDataAvailable),
-                                    icon = R.drawable.ic_no_data
-                                )
-                            } else {
-                                CoinMarketsMenu(
-                                    viewModel.verifiedMenu,
-                                ) {
-                                    viewModel.toggleVerifiedType(it)
-                                    scrollToTopAfterUpdate = true
-                                }
-                                CoinMarketList(items, scrollToTopAfterUpdate)
-                                if (scrollToTopAfterUpdate) {
-                                    scrollToTopAfterUpdate = false
-                                }
+    Crossfade(viewItemState, label = "") { viewItemState ->
+        when (viewItemState) {
+            ViewState.Loading -> {
+                Loading()
+            }
+
+            is ViewState.Error -> {
+                ListErrorView(stringResource(R.string.SyncError), onClick = viewModel::onErrorClick)
+            }
+
+            ViewState.Success -> {
+                viewItems?.let { items ->
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        if (items.isEmpty()) {
+                            ListEmptyView(
+                                text = stringResource(R.string.CoinPage_NoDataAvailable),
+                                icon = R.drawable.ic_no_data
+                            )
+                        } else {
+                            CoinMarketsMenu(
+                                viewModel.verifiedMenu,
+                            ) {
+                                viewModel.toggleVerifiedType(it)
+                                scrollToTopAfterUpdate = true
+                            }
+                            CoinMarketList(items, scrollToTopAfterUpdate)
+                            if (scrollToTopAfterUpdate) {
+                                scrollToTopAfterUpdate = false
                             }
                         }
                     }
                 }
-                null -> {}
             }
+
+            null -> {}
         }
     }
 }
@@ -105,7 +107,10 @@ fun CoinMarketsMenu(
 
     var verifiedType by remember { mutableStateOf(menuVerified) }
 
-    HeaderSorting(borderTop = true, borderBottom = true) {
+    HeaderSorting(
+        borderTop = true, borderBottom = true,
+        background = Color.Transparent
+    ) {
         Spacer(Modifier.weight(1f))
         ButtonSecondaryToggle(
             modifier = Modifier.padding(end = 16.dp),

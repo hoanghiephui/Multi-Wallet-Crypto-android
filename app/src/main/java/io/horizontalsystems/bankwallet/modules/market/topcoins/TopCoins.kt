@@ -56,7 +56,7 @@ fun TopCoins(
     val viewModel = viewModel<MarketTopCoinsViewModel>(
         factory = MarketTopCoinsViewModel.Factory(
             TopMarket.Top100,
-            SortingField.TopGainers,
+            SortingField.HighestCap,
         )
     )
 
