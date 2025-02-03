@@ -187,7 +187,7 @@ private fun onTransactionClick(
 ) {
     val transactionItem = viewModel.getTransactionItem(transactionViewItem) ?: return
 
-    viewModel.tmpItemToShow = transactionItem
+    viewModel.tmpTransactionRecordToShow = transactionItem.record
 
     navController.slideFromBottom(R.id.transactionInfoFragment)
 

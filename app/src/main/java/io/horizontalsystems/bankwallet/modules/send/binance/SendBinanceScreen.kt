@@ -16,10 +16,9 @@ import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.core.slideFromRight
-import io.horizontalsystems.bankwallet.entities.Address
 import io.horizontalsystems.bankwallet.modules.address.AddressParserModule
 import io.horizontalsystems.bankwallet.modules.address.AddressParserViewModel
-import io.horizontalsystems.bankwallet.modules.address.HSAddressInput
+import io.horizontalsystems.bankwallet.modules.address.HSAddressCell
 import io.horizontalsystems.bankwallet.modules.amount.AmountInputModeViewModel
 import io.horizontalsystems.bankwallet.modules.amount.HSAmountInput
 import io.horizontalsystems.bankwallet.modules.availablebalance.AvailableBalance
@@ -28,9 +27,10 @@ import io.horizontalsystems.bankwallet.modules.memo.HSMemoInput
 import io.horizontalsystems.bankwallet.modules.send.SendConfirmationFragment
 import io.horizontalsystems.bankwallet.modules.send.SendScreen
 import io.horizontalsystems.bankwallet.modules.send.bitcoin.advanced.FeeRateCaution
-import io.horizontalsystems.bankwallet.modules.sendtokenselect.PrefilledData
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
+import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
+import java.math.BigDecimal
 
 @Composable
 fun SendBinanceScreen(
@@ -39,20 +39,19 @@ fun SendBinanceScreen(
     viewModel: SendBinanceViewModel,
     amountInputModeViewModel: AmountInputModeViewModel,
     sendEntryPointDestId: Int,
-    prefilledData: PrefilledData?,
+    amount: BigDecimal?,
 ) {
     val wallet = viewModel.wallet
     val uiState = viewModel.uiState
 
     val availableBalance = uiState.availableBalance
-    val addressError = uiState.addressError
     val amountCaution = uiState.amountCaution
     val fee = uiState.fee
     val proceedEnabled = uiState.canBeSend
     val amountInputType = amountInputModeViewModel.inputType
 
     val paymentAddressViewModel = viewModel<AddressParserViewModel>(
-        factory = AddressParserModule.Factory(wallet.token, prefilledData?.amount)
+        factory = AddressParserModule.Factory(wallet.token, amount)
     )
     val amountUnique = paymentAddressViewModel.amountUnique
 
@@ -67,16 +66,16 @@ fun SendBinanceScreen(
             title = title,
             onBack = { navController.popBackStack() }
         ) {
-            AvailableBalance(
-                coinCode = wallet.coin.code,
-                coinDecimal = viewModel.coinMaxAllowedDecimals,
-                fiatDecimal = viewModel.fiatMaxAllowedDecimals,
-                availableBalance = availableBalance,
-                amountInputType = amountInputType,
-                rate = viewModel.coinRate
-            )
+            if (uiState.showAddressInput) {
+                HSAddressCell(
+                    title = stringResource(R.string.Send_Confirmation_To),
+                    value = uiState.address.hex
+                ) {
+                    navController.popBackStack()
+                }
+                VSpacer(16.dp)
+            }
 
-            Spacer(modifier = Modifier.height(12.dp))
             HSAmountInput(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 focusRequester = focusRequester,
@@ -96,29 +95,24 @@ fun SendBinanceScreen(
                 amountUnique = amountUnique
             )
 
-            if (uiState.showAddressInput) {
-                Spacer(modifier = Modifier.height(12.dp))
-                HSAddressInput(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    initial = prefilledData?.address?.let { Address(it) },
-                    tokenQuery = wallet.token.tokenQuery,
-                    coinCode = wallet.coin.code,
-                    error = addressError,
-                    textPreprocessor = paymentAddressViewModel,
-                    navController = navController
-                ) {
-                    viewModel.onEnterAddress(it)
-                }
-            }
+            VSpacer(8.dp)
+            AvailableBalance(
+                coinCode = wallet.coin.code,
+                coinDecimal = viewModel.coinMaxAllowedDecimals,
+                fiatDecimal = viewModel.fiatMaxAllowedDecimals,
+                availableBalance = availableBalance,
+                amountInputType = amountInputType,
+                rate = viewModel.coinRate
+            )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            VSpacer(16.dp)
             HSMemoInput(
                 maxLength = viewModel.memoMaxLength
             ) {
                 viewModel.onEnterMemo(it)
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             HSFee(
                 coinCode = viewModel.feeToken.coin.code,
                 coinDecimal = viewModel.feeTokenMaxAllowedDecimals,
@@ -130,7 +124,7 @@ fun SendBinanceScreen(
 
             uiState.feeCaution?.let { caution ->
                 FeeRateCaution(
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp),
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp),
                     feeRateCaution = caution
                 )
             }
@@ -138,7 +132,7 @@ fun SendBinanceScreen(
             ButtonPrimaryYellow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 24.dp),
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
                 title = stringResource(R.string.Send_DialogProceed),
                 onClick = {
                     navController.slideFromRight(

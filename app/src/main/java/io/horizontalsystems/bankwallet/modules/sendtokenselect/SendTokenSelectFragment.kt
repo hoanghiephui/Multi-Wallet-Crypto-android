@@ -11,7 +11,7 @@ import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.getInput
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.slideFromRight
-import io.horizontalsystems.bankwallet.modules.send.SendFragment
+import io.horizontalsystems.bankwallet.modules.send.address.EnterAddressFragment
 import io.horizontalsystems.bankwallet.modules.tokenselect.TokenSelectScreen
 import io.horizontalsystems.bankwallet.modules.tokenselect.TokenSelectViewModel
 import io.horizontalsystems.core.helpers.HudHelper
@@ -28,7 +28,6 @@ class SendTokenSelectFragment : BaseComposeFragment() {
 
         val blockchainTypes = input?.blockchainTypes
         val tokenTypes = input?.tokenTypes
-        val prefilledData = input?.prefilledData
         val view = LocalView.current
         TokenSelectScreen(
             navController = navController,
@@ -39,12 +38,13 @@ class SendTokenSelectFragment : BaseComposeFragment() {
                     it.sendEnabled -> {
                         val sendTitle = Translator.getString(R.string.Send_Title, it.wallet.token.fullCoin.coin.code)
                         navController.slideFromRight(
-                            R.id.sendXFragment,
-                            SendFragment.Input(
+                            R.id.enterAddressFragment,
+                            EnterAddressFragment.Input(
                                 wallet = it.wallet,
-                                sendEntryPointDestId = R.id.sendTokenSelectFragment,
                                 title = sendTitle,
-                                prefilledAddressData = prefilledData,
+                                sendEntryPointDestId = R.id.sendTokenSelectFragment,
+                                address = input?.address,
+                                amount = input?.amount,
                             )
                         )
                     }
@@ -69,17 +69,5 @@ class SendTokenSelectFragment : BaseComposeFragment() {
         val tokenTypes: List<TokenType>?,
         val address: String,
         val amount: BigDecimal?,
-    ) : Parcelable {
-        val prefilledData: PrefilledData
-            get() = PrefilledData(address, amount)
-    }
-
-    override val logScreen: String
-        get() = "SendTokenSelectFragment"
+    ) : Parcelable
 }
-
-@Parcelize
-data class PrefilledData(
-    val address: String,
-    val amount: BigDecimal? = null,
-) : Parcelable

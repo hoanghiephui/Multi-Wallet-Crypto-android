@@ -11,6 +11,7 @@ import io.horizontalsystems.bankwallet.core.HSCaution
 import io.horizontalsystems.bankwallet.core.ISendTonAdapter
 import io.horizontalsystems.bankwallet.core.LocalizedException
 import io.horizontalsystems.bankwallet.core.ViewModelUiState
+import io.horizontalsystems.bankwallet.core.managers.RecentAddressManager
 import io.horizontalsystems.bankwallet.entities.Address
 import io.horizontalsystems.bankwallet.entities.Wallet
 import io.horizontalsystems.bankwallet.modules.contacts.ContactsRepository
@@ -18,6 +19,7 @@ import io.horizontalsystems.bankwallet.modules.send.SendConfirmationData
 import io.horizontalsystems.bankwallet.modules.send.SendResult
 import io.horizontalsystems.bankwallet.modules.xrate.XRateService
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
+import io.horizontalsystems.marketkit.models.BlockchainType
 import io.horizontalsystems.marketkit.models.Token
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,6 +39,8 @@ class SendTonViewModel(
     val coinMaxAllowedDecimals: Int,
     private val contactsRepo: ContactsRepository,
     private val showAddressInput: Boolean,
+    private val address: Address,
+    private val recentAddressManager: RecentAddressManager
 ): ViewModelUiState<SendTonUiState>() {
     val blockchainType = wallet.token.blockchainType
     val feeTokenMaxAllowedDecimals = feeToken.decimals
@@ -84,6 +88,8 @@ class SendTonViewModel(
                 feeCoinRate = it
             }
         }
+
+        addressService.setAddress(address)
     }
 
     override fun createState() = SendTonUiState(
@@ -94,14 +100,11 @@ class SendTonViewModel(
         showAddressInput = showAddressInput,
         fee = feeState.fee,
         feeInProgress = feeState.inProgress,
+        address = address
     )
 
     fun onEnterAmount(amount: BigDecimal?) {
         amountService.setAmount(amount)
-    }
-
-    fun onEnterAddress(address: Address?) {
-        addressService.setAddress(address)
     }
 
     fun getConfirmationData(): SendConfirmationData {
@@ -143,8 +146,10 @@ class SendTonViewModel(
 
             adapter.send(amountState.amount!!, addressState.tonAddress!!, memo)
 
-            sendResult = SendResult.Sent
+            sendResult = SendResult.Sent()
             logger.info("success")
+
+            recentAddressManager.setRecentAddress(addressState.address!!, BlockchainType.Ton)
         } catch (e: Throwable) {
             sendResult = SendResult.Failed(createCaution(e))
             logger.warning("failed", e)
@@ -189,4 +194,5 @@ data class SendTonUiState(
     val showAddressInput: Boolean,
     val fee: BigDecimal?,
     val feeInProgress: Boolean,
+    val address: Address,
 )

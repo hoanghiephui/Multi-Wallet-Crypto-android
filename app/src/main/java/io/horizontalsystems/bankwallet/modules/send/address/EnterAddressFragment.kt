@@ -1,5 +1,6 @@
-package io.horizontalsystems.bankwallet.modules.send.evm
+package io.horizontalsystems.bankwallet.modules.send.address
 
+import android.os.Parcelable
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -30,18 +31,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tonapps.tonkeeper.api.shortAddress
 import com.wallet.blockchain.bitcoin.R
-import io.horizontalsystems.bankwallet.entities.Address
+import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.requireInput
+import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.Wallet
+import io.horizontalsystems.bankwallet.modules.address.AddressParserModule
 import io.horizontalsystems.bankwallet.modules.address.AddressParserViewModel
-import io.horizontalsystems.bankwallet.modules.address.HSAddressInput
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
-import io.horizontalsystems.bankwallet.modules.sendtokenselect.PrefilledData
+import io.horizontalsystems.bankwallet.modules.send.SendFragment
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
+import io.horizontalsystems.bankwallet.ui.compose.components.FormsInputAddress
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.TextImportantError
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
@@ -50,37 +55,42 @@ import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_lucian
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_remus
+import kotlinx.parcelize.Parcelize
+import java.math.BigDecimal
+
+class EnterAddressFragment : BaseComposeFragment() {
+    @Composable
+    override fun GetContent(navController: NavController) {
+        EnterAddressScreen(navController, navController.requireInput())
+    }
+
+    @Parcelize
+    data class Input(
+        val wallet: Wallet,
+        val title: String,
+        val sendEntryPointDestId: Int? = null,
+        val address: String? = null,
+        val amount: BigDecimal? = null,
+    ) : Parcelable
+
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SendEvmEnterAddressScreen(
-    viewModel: SendEvmViewModel,
-    navController: NavController,
-    prefilledData: PrefilledData?,
-    wallet: Wallet,
-    paymentAddressViewModel: AddressParserViewModel,
-    onNext: () -> Unit
-) {
-    val uiState = viewModel.uiState
-    val addressError = uiState.addressError
-    val recent: String? = "1EzZFZhopU4vBJKLiq5kUKphXZ4M22M1QjmEdfk"
-    val addressErrorMessage: ErrorMessage? = ErrorMessage(
-        title = stringResource(R.string.Send_Address_ErrorMessage_PhishingDetected),
-        description = stringResource(R.string.Send_Address_ErrorMessage_PhishingDetected_Description)
+fun EnterAddressScreen(navController: NavController, input: EnterAddressFragment.Input) {
+    val viewModel = viewModel<EnterAddressViewModel>(
+        factory = EnterAddressViewModel.Factory(
+            wallet = input.wallet,
+            address = input.address,
+            amount = input.amount
+        )
     )
-    val contacts = listOf(
-        SContact("My Wallet", "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"),
-        SContact("TalgatETH", "0x95222290DD7278Aa3Ddd389Cc1E1d165CC4BAfe5"),
-        SContact("Esso", "0x71C7656EC7ab88b098defB751B7401B5f6d8976F"),
-        SContact("Escobar", "0x2B5AD5c4795c026514f8317c7a215E218DcCD6cF"),
-        SContact("Vitalik", "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B"),
-        SContact("Binance_1", "0x28C6c06298d514Db089934071355E5743bf21d60"),
-        SContact("Kraken_Hot", "0x2910543Af39abA0Cd09dBb2D50200b3E800A63D2"),
-        SContact("FTX_Exploiter", "0x59ABf3837Fa962d6853b4Cc0a19513AA031fd32b"),
-        SContact("Coinbase_2", "0x503828976D22510aad0201ac7EC88293211D23Da"),
-        SContact("Metamask_DEV", "0x9696f59E4d72E237BE84fFD425DCaD154Bf96976")
+    val wallet = input.wallet
+    val paymentAddressViewModel = viewModel<AddressParserViewModel>(
+        factory = AddressParserModule.Factory(wallet.token, input.amount)
     )
 
+    val uiState = viewModel.uiState
     Scaffold(
         containerColor = Color.Transparent,
         contentColor = MaterialTheme.colorScheme.background,
@@ -103,21 +113,30 @@ fun SendEvmEnterAddressScreen(
                     .weight(1f)
                     .verticalScroll(rememberScrollState()),
             ) {
-                HSAddressInput(
+                FormsInputAddress(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                    initial = prefilledData?.address?.let { Address(it) },
-                    tokenQuery = wallet.token.tokenQuery,
-                    coinCode = wallet.coin.code,
-                    error = addressError,
+                    value = uiState.value,
+                    hint = stringResource(id = R.string.Send_Hint_Address),
+                    state = uiState.inputState,
                     textPreprocessor = paymentAddressViewModel,
-                    navController = navController
+                    navController = navController,
+                    chooseContactEnable = false,
+                    blockchainType = null,
                 ) {
                     viewModel.onEnterAddress(it)
                 }
-                if (uiState.address == null) {
-                    AddressSuggestions(recent, contacts)
+
+                if (uiState.value.isBlank()) {
+                    AddressSuggestions(uiState.recentAddress, uiState.contacts) {
+                        viewModel.onEnterAddress(it)
+                    }
                 } else {
-                    AddressCheck(false, addressErrorMessage)
+                    AddressCheck(
+                        false,
+                        uiState.addressFormatCheck,
+                        uiState.phishingCheck,
+                        uiState.blacklistCheck
+                    )
                 }
             }
             ButtonsGroupWithShade {
@@ -126,7 +145,20 @@ fun SendEvmEnterAddressScreen(
                         .fillMaxWidth()
                         .padding(start = 16.dp, end = 16.dp),
                     title = stringResource(R.string.Button_Next),
-                    onClick = onNext,
+                    onClick = {
+                        uiState.address?.let {
+                            navController.slideFromRight(
+                                R.id.sendXFragment,
+                                SendFragment.Input(
+                                    wallet = wallet,
+                                    sendEntryPointDestId = input.sendEntryPointDestId ?: R.id.enterAddressFragment,
+                                    title = input.title,
+                                    address = it,
+                                    amount = uiState.amount
+                                )
+                            )
+                        }
+                    },
                     enabled = uiState.canBeSendToAddress
                 )
             }
@@ -135,9 +167,11 @@ fun SendEvmEnterAddressScreen(
 }
 
 @Composable
-private fun AddressCheck(
+fun AddressCheck(
     locked: Boolean,
-    addressErrorMessage: ErrorMessage?
+    addressFormatCheck: AddressCheckData,
+    phishingCheck: AddressCheckData,
+    blacklistCheck: AddressCheckData
 ) {
     Column(
         modifier = Modifier
@@ -153,22 +187,41 @@ private fun AddressCheck(
     ) {
         AddressCheckCell(
             title = stringResource(R.string.Send_Address_AddressCheck),
-            inProgress = false,
-            validationResult = AddressCheckResult.Correct
+            inProgress = addressFormatCheck.inProgress,
+            validationResult = addressFormatCheck.validationResult
         )
         CheckCell(
             title = stringResource(R.string.Send_Address_PhishingCheck),
             locked = locked,
-            inProgress = false,
-            validationResult = AddressCheckResult.Detected
+            inProgress = phishingCheck.inProgress,
+            validationResult = phishingCheck.validationResult
         )
         CheckCell(
             title = stringResource(R.string.Send_Address_BlacklistCheck),
             locked = locked,
-            inProgress = false,
-            validationResult = AddressCheckResult.Clear
+            inProgress = blacklistCheck.inProgress,
+            validationResult = blacklistCheck.validationResult
         )
     }
+
+    val addressErrorMessage: ErrorMessage? = when {
+        phishingCheck.validationResult == AddressCheckResult.Detected -> {
+            ErrorMessage(
+                title = stringResource(R.string.Send_Address_ErrorMessage_PhishingDetected),
+                description = stringResource(R.string.Send_Address_ErrorMessage_PhishingDetected_Description)
+            )
+        }
+
+        blacklistCheck.validationResult == AddressCheckResult.Detected -> {
+            ErrorMessage(
+                title = stringResource(R.string.Send_Address_ErrorMessage_BlacklistDetected),
+                description = stringResource(R.string.Send_Address_ErrorMessage_BlacklistDetected_Description)
+            )
+        }
+
+        else -> null
+    }
+
     addressErrorMessage?.let { errorMessage ->
         VSpacer(16.dp)
         TextImportantError(
@@ -266,10 +319,7 @@ fun CheckLocked() {
 }
 
 @Composable
-private fun AddressSuggestions(
-    recent: String?,
-    contacts: List<SContact>
-) {
+fun AddressSuggestions(recent: String?, contacts: List<SContact>, onClick: (String) -> Unit) {
     recent?.let { address ->
         SectionHeaderText(stringResource(R.string.Send_Address_Recent))
         Box(
@@ -283,7 +333,7 @@ private fun AddressSuggestions(
                     RoundedCornerShape(12.dp)
                 )
                 .clickable {
-
+                    onClick.invoke(address)
                 }
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
@@ -316,7 +366,7 @@ private fun AddressSuggestions(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-
+                            onClick.invoke(contact.address)
                         }
                         .padding(horizontal = 16.dp, vertical = 12.dp)
                 ) {

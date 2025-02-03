@@ -16,6 +16,7 @@ import io.horizontalsystems.bankwallet.core.LocalizedException
 import io.horizontalsystems.bankwallet.core.ViewModelUiState
 import io.horizontalsystems.bankwallet.core.adapters.BitcoinFeeInfo
 import io.horizontalsystems.bankwallet.core.managers.BtcBlockchainManager
+import io.horizontalsystems.bankwallet.core.managers.RecentAddressManager
 import io.horizontalsystems.bankwallet.entities.Address
 import io.horizontalsystems.bankwallet.entities.Wallet
 import io.horizontalsystems.bankwallet.modules.contacts.ContactsRepository
@@ -44,6 +45,8 @@ class SendBitcoinViewModel(
     private val contactsRepo: ContactsRepository,
     private val showAddressInput: Boolean,
     private val localStorage: ILocalStorage,
+    private val address: Address,
+    private val recentAddressManager: RecentAddressManager
 ) : ViewModelUiState<SendBitcoinUiState>() {
     val coinMaxAllowedDecimals = wallet.token.decimals
     val fiatMaxAllowedDecimals = App.appConfigProvider.fiatDecimal
@@ -99,13 +102,15 @@ class SendBitcoinViewModel(
         viewModelScope.launch {
             feeRateService.start()
         }
+
+        addressService.setAddress(address)
     }
 
     override fun createState() = SendBitcoinUiState(
         availableBalance = amountState.availableBalance,
         amount = amountState.amount,
         feeRate = feeRateState.feeRate,
-        address = addressState.validAddress,
+        address = address,
         memo = memo,
         fee = fee,
         lockTimeInterval = pluginState.lockTimeInterval,
@@ -258,7 +263,7 @@ class SendBitcoinViewModel(
         try {
             sendResult = SendResult.Sending
 
-            val send = adapter.send(
+            val transactionRecord = adapter.send(
                 amountState.amount!!,
                 addressState.validAddress!!.hex,
                 memo,
@@ -268,10 +273,12 @@ class SendBitcoinViewModel(
                 btcBlockchainManager.transactionSortMode(adapter.blockchainType),
                 localStorage.rbfEnabled,
                 logger
-            ).blockingGet()
+            )
 
             logger.info("success")
-            sendResult = SendResult.Sent
+            sendResult = SendResult.Sent(transactionRecord)
+
+            recentAddressManager.setRecentAddress(address, blockchainType)
         } catch (e: Throwable) {
             logger.warning("failed", e)
             sendResult = SendResult.Failed(createCaution(e))
@@ -291,7 +298,7 @@ data class SendBitcoinUiState(
     val amount: BigDecimal?,
     val fee: BigDecimal?,
     val feeRate: Int?,
-    val address: Address?,
+    val address: Address,
     val memo: String?,
     val lockTimeInterval: LockTimeInterval?,
     val addressError: Throwable?,

@@ -56,7 +56,7 @@ import io.horizontalsystems.bankwallet.modules.balance.DeemedValue
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
 import io.horizontalsystems.bankwallet.modules.evmfee.FeeSettingsInfoDialog
 import io.horizontalsystems.bankwallet.modules.manageaccount.dialogs.BackupRequiredDialog
-import io.horizontalsystems.bankwallet.modules.send.SendFragment
+import io.horizontalsystems.bankwallet.modules.send.address.EnterAddressFragment
 import io.horizontalsystems.bankwallet.modules.syncerror.SyncErrorDialog
 import io.horizontalsystems.bankwallet.modules.transactions.TransactionViewItem
 import io.horizontalsystems.bankwallet.modules.transactions.TransactionsViewModel
@@ -186,7 +186,7 @@ private fun onTransactionClick(
     navController: NavController
 ) {
     val transactionItem = tokenBalanceViewModel.getTransactionItem(transactionViewItem) ?: return
-    transactionsViewModel.tmpItemToShow = transactionItem
+    transactionsViewModel.tmpTransactionRecordToShow = transactionItem.record
 
     navController.slideFromBottom(R.id.transactionInfoFragment)
 
@@ -445,8 +445,11 @@ private fun ButtonsRow(
                         viewItem.wallet.token.fullCoin.coin.code
                     )
                     navController.slideFromRight(
-                        R.id.sendXFragment,
-                        SendFragment.Input(viewItem.wallet, sendTitle)
+                        R.id.enterAddressFragment,
+                        EnterAddressFragment.Input(
+                            wallet = viewItem.wallet,
+                            title = sendTitle
+                        )
                     )
 
                     stat(

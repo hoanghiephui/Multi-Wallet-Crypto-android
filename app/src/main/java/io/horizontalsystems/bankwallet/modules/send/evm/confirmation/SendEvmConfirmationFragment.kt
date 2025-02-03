@@ -20,7 +20,6 @@ import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.AppLogger
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromBottom
-import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
 import io.horizontalsystems.bankwallet.core.stats.stat
@@ -29,6 +28,7 @@ import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmData
 import io.horizontalsystems.bankwallet.modules.send.evm.SendEvmModule
 import io.horizontalsystems.bankwallet.modules.sendevmtransaction.SendEvmTransactionView
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
+import io.horizontalsystems.core.SnackbarDuration
 import io.horizontalsystems.core.helpers.HudHelper
 import io.horizontalsystems.ethereumkit.models.Address
 import io.horizontalsystems.ethereumkit.models.TransactionData
@@ -55,7 +55,8 @@ class SendEvmConfirmationFragment : BaseComposeFragment() {
     data class Input(
         val transactionDataParcelable: SendEvmModule.TransactionDataParcelable,
         val additionalInfo: SendEvmData.AdditionalInfo?,
-        val blockchainType: BlockchainType
+        val blockchainType: BlockchainType,
+        val sendEntryPointDestId: Int
     ) : Parcelable {
         val transactionData: TransactionData
             get() = TransactionData(
@@ -66,16 +67,15 @@ class SendEvmConfirmationFragment : BaseComposeFragment() {
 
         constructor(
             sendData: SendEvmData,
-            blockchainType: BlockchainType
+            blockchainType: BlockchainType,
+            sendEntryPointDestId: Int
         ) : this(
             SendEvmModule.TransactionDataParcelable(sendData.transactionData),
             sendData.additionalInfo,
-            blockchainType
+            blockchainType,
+            sendEntryPointDestId
         )
     }
-
-    @Parcelize
-    data class Result(val success: Boolean) : Parcelable
 }
 
 @Composable
@@ -120,9 +120,9 @@ private fun SendEvmConfirmationScreen(
 
                     coroutineScope.launch {
                         buttonEnabled = false
-//                        HudHelper.showInProcessMessage(view, R.string.Send_Sending, SnackbarDuration.INDEFINITE)
+                        HudHelper.showInProcessMessage(view, R.string.Send_Sending, SnackbarDuration.INDEFINITE)
 
-                        val result = try {
+                        try {
                             logger.info("sending tx")
                             viewModel.send()
                             logger.info("success")
@@ -130,18 +130,14 @@ private fun SendEvmConfirmationScreen(
 
                             HudHelper.showSuccessMessage(view, R.string.Hud_Text_Done)
                             delay(1200)
-                            SendEvmConfirmationFragment.Result(true)
+
+                            navController.popBackStack(input.sendEntryPointDestId, true)
                         } catch (t: Throwable) {
                             logger.warning("failed", t)
                             HudHelper.showErrorMessage(view, t.javaClass.simpleName)
-                            SendEvmConfirmationFragment.Result(false)
                         }
 
                         buttonEnabled = true
-                        navController.slideFromRight(R.id.sendEvmProcessingFragment)
-                        //todo refactor this part
-//                        navController.setNavigationResultX(result)
-//                        navController.popBackStack()
                     }
                 },
                 enabled = uiState.sendEnabled && buttonEnabled

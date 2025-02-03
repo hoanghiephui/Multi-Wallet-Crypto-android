@@ -111,7 +111,7 @@ fun SendTronConfirmationScreen(
             )
         }
 
-        SendResult.Sent -> {
+        is SendResult.Sent -> {
             HudHelper.showSuccessMessage(
                 view,
                 R.string.Send_Success,
@@ -127,7 +127,7 @@ fun SendTronConfirmationScreen(
     }
 
     LaunchedEffect(sendResult) {
-        if (sendResult == SendResult.Sent) {
+        if (sendResult is SendResult.Sent) {
             delay(1200)
             navController.popBackStack(closeUntilDestId, true)
         }
@@ -135,7 +135,7 @@ fun SendTronConfirmationScreen(
 
     LifecycleEventEffect(event = Lifecycle.Event.ON_RESUME) {
         //additional close for cases when user closes app immediately after sending
-        if (sendResult == SendResult.Sent) {
+        if (sendResult is SendResult.Sent) {
             navController.popBackStack(closeUntilDestId, true)
         }
     }
@@ -322,7 +322,7 @@ private fun SendButton(modifier: Modifier, sendResult: SendResult?, onClickSend:
             )
         }
 
-        SendResult.Sent -> {
+        is SendResult.Sent -> {
             ButtonPrimaryYellow(
                 modifier = modifier,
                 title = stringResource(R.string.Send_Success),
