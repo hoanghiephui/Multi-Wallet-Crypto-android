@@ -24,7 +24,6 @@ object UserSubscriptionManager {
                 TransactionSpeedTools,
                 DuressMode,
                 AddressVerification,
-                Tor,
                 PrivacyMode,
                 Watchlist
             )
@@ -42,7 +41,6 @@ object UserSubscriptionManager {
                 TransactionSpeedTools,
                 DuressMode,
                 AddressVerification,
-                Tor,
                 PrivacyMode,
                 Watchlist
             )
