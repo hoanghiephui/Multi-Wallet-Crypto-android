@@ -29,7 +29,6 @@ import io.horizontalsystems.bankwallet.modules.amount.HSAmountInput
 import io.horizontalsystems.bankwallet.modules.availablebalance.AvailableBalance
 import io.horizontalsystems.bankwallet.modules.send.SendConfirmationFragment
 import io.horizontalsystems.bankwallet.modules.send.SendScreen
-import io.horizontalsystems.bankwallet.modules.sendtokenselect.PrefilledData
 import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
@@ -110,7 +109,7 @@ fun SendTronScreen(
                 amountInputType = amountInputType,
                 rate = viewModel.coinRate
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            VSpacer(12.dp)
             MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
             ButtonPrimaryYellow(
                 modifier = Modifier

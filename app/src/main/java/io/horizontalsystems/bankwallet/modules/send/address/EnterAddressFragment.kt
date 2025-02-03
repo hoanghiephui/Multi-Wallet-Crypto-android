@@ -61,7 +61,11 @@ import java.math.BigDecimal
 class EnterAddressFragment : BaseComposeFragment() {
     @Composable
     override fun GetContent(navController: NavController) {
-        EnterAddressScreen(navController, navController.requireInput())
+        val input = navController.requireInput<Input>() ?: run {
+            navController.popBackStack()
+            return
+        }
+        EnterAddressScreen(navController, input)
     }
 
     @Parcelize
@@ -73,6 +77,8 @@ class EnterAddressFragment : BaseComposeFragment() {
         val amount: BigDecimal? = null,
     ) : Parcelable
 
+    override val logScreen: String
+        get() = "EnterAddressFragment"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

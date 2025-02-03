@@ -63,6 +63,9 @@ class SendTokenSelectFragment : BaseComposeFragment() {
         )
     }
 
+    override val logScreen: String
+        get() = "SendTokenSelectFragment"
+
     @Parcelize
     data class Input(
         val blockchainTypes: List<BlockchainType>?,
