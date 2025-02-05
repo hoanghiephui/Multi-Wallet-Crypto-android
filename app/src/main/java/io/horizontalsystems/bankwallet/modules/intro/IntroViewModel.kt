@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.ILocalStorage
@@ -42,8 +43,8 @@ class IntroViewModel(
         localStorage.isAnalytic = checkAnalytic
         localStorage.isDetectCrash = checkDetectCrash
 
-        Firebase.analytics.setAnalyticsCollectionEnabled(checkAnalytic)
-        Firebase.crashlytics.setCrashlyticsCollectionEnabled(checkDetectCrash)
+        Firebase.analytics.setAnalyticsCollectionEnabled(if (!BuildConfig.DEBUG) checkAnalytic else false)
+        Firebase.crashlytics.isCrashlyticsCollectionEnabled = if (!BuildConfig.DEBUG) checkDetectCrash else false
     }
 
 }

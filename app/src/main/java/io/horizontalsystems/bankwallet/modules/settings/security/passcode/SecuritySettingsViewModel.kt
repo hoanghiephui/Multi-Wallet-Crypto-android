@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.ktx.Firebase
+import com.wallet.blockchain.bitcoin.BuildConfig
 import io.horizontalsystems.bankwallet.core.ILocalStorage
 import io.horizontalsystems.bankwallet.core.ViewModelUiState
 import io.horizontalsystems.bankwallet.core.managers.BalanceHiddenManager
@@ -81,14 +82,14 @@ class SecuritySettingsViewModel(
         analyticLog = enabled
         emitState()
         localStorage.isAnalytic = enabled
-        Firebase.analytics.setAnalyticsCollectionEnabled(enabled)
+        Firebase.analytics.setAnalyticsCollectionEnabled(if (!BuildConfig.DEBUG) enabled else false)
     }
 
     fun onSetCrashlytics(enabled: Boolean) {
         detectCrash = enabled
         emitState()
         localStorage.isDetectCrash = enabled
-        Firebase.crashlytics.setCrashlyticsCollectionEnabled(enabled)
+        Firebase.crashlytics.isCrashlyticsCollectionEnabled = if (!BuildConfig.DEBUG) enabled else false
     }
 }
 

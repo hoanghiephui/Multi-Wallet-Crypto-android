@@ -1,0 +1,76 @@
+{
+  "project_info": {
+    "project_number": "460553041080",
+    "project_id": "coinhub8899",
+    "storage_bucket": "coinhub8899.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:460553041080:android:b000262cb2dc7f295d704d",
+        "android_client_info": {
+          "package_name": "com.blockchain.btc.coinhub"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "460553041080-v8et2cfij6lmve6bhh67jf9cm8bp6pgq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.blockchain.btc.coinhub",
+            "certificate_hash": "56ae664d30cfbea22bfd6518e4f01b9644850d02"
+          }
+        },
+        {
+          "client_id": "460553041080-q9prueb7cg16s89v9v5c5dogl5047q3i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCD5429icZY8V_zcjr6pY8xFltdejGfbx4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "460553041080-q9prueb7cg16s89v9v5c5dogl5047q3i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:460553041080:android:be501a8db23f9b875d704d",
+        "android_client_info": {
+          "package_name": "com.blockchain.btc.coinhub.dev.testnet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "460553041080-q9prueb7cg16s89v9v5c5dogl5047q3i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCD5429icZY8V_zcjr6pY8xFltdejGfbx4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "460553041080-q9prueb7cg16s89v9v5c5dogl5047q3i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

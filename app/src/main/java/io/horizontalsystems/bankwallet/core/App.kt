@@ -567,8 +567,8 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
     }
 
     private fun setAnalytic() {
-        Firebase.analytics.setAnalyticsCollectionEnabled(localStorage.isAnalytic)
-        Firebase.crashlytics.isCrashlyticsCollectionEnabled = localStorage.isDetectCrash
+        Firebase.analytics.setAnalyticsCollectionEnabled(if (!BuildConfig.DEBUG) localStorage.isAnalytic else false)
+        Firebase.crashlytics.isCrashlyticsCollectionEnabled = if (!BuildConfig.DEBUG) localStorage.isDetectCrash else false
     }
 
     override val workManagerConfiguration: androidx.work.Configuration
