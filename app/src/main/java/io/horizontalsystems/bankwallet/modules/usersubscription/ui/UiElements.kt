@@ -35,9 +35,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -64,7 +61,6 @@ import io.horizontalsystems.bankwallet.modules.usersubscription.BuySubscriptionM
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.Steel20
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryDefaults
-import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryTransparent
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondary
 import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
@@ -83,6 +79,7 @@ import io.horizontalsystems.subscriptions.core.IPaidAction
 import io.horizontalsystems.subscriptions.core.Subscription
 import io.horizontalsystems.subscriptions.core.VIPClub
 import io.horizontalsystems.subscriptions.core.VIPSupport
+import io.horizontalsystems.subscriptions.core.numberOfDays
 
 enum class PremiumPlanType(@StringRes val titleResId: Int) {
     ProPlan(R.string.Premium_PlanPro),
@@ -118,6 +115,7 @@ fun SelectSubscriptionBottomSheet(
 
     uiState.error?.let {
         onError(it)
+        viewModel.onErrorHandled()
     }
 
     uiState.purchase?.let {
@@ -126,7 +124,11 @@ fun SelectSubscriptionBottomSheet(
         }
     }
 
-    val selectedItemIndex = remember { mutableIntStateOf(0) }
+    val selectedItemIndex = uiState.selectedIndex
+    val freeTrialPeriodDays = uiState.freeTrialPeriod?.let {
+        stringResource(R.string.Period_Days, it.numberOfDays())
+    }
+
     BottomSheetHeader(
         iconPainter = painterResource(R.drawable.prem_star_yellow_16),
         iconTint = ColorFilter.tint(ComposeAppTheme.colors.jacob),
@@ -147,21 +149,39 @@ fun SelectSubscriptionBottomSheet(
                         title = basePlan.id,
                         price = basePlan.stringRepresentation(),
                         note = "",
-                        isSelected = selectedItemIndex.intValue == index,
+                        isSelected = selectedItemIndex == index,
                         badgeText = null,
                         onClick = {
-                            selectedItemIndex.intValue = index
+                            viewModel.select(index)
                         }
                     )
                 }
             }
 
-            val bottomText = highlightText(
-                text = stringResource(R.string.Premium_EnjoyFirst7DaysFree_Description),
-                textColor = ComposeAppTheme.colors.leah,
-                highlightPart = stringResource(R.string.Premium_EnjoyFirst7DaysFree),
-                highlightColor = ComposeAppTheme.colors.remus
-            )
+            val bottomText = if (freeTrialPeriodDays != null) {
+                buildAnnotatedString {
+                    withStyle(SpanStyle(color = ComposeAppTheme.colors.remus)) {
+                        append(
+                            text = stringResource(
+                                R.string.Premium_EnjoyFreePeriod,
+                                freeTrialPeriodDays
+                            )
+                        )
+                    }
+                    append(" ")
+                    withStyle(SpanStyle(color = ComposeAppTheme.colors.leah)) {
+                        append(text = stringResource(R.string.Premium_CancelSubscriptionInfo))
+                    }
+                }
+            } else {
+                buildAnnotatedString {
+                    withStyle(SpanStyle(color = ComposeAppTheme.colors.leah)) {
+                        append(text = stringResource(R.string.Premium_CancelSubscriptionInfo))
+                    }
+                }
+            }
+
+
             VSpacer(12.dp)
             Text(
                 text = bottomText,
@@ -177,25 +197,23 @@ fun SelectSubscriptionBottomSheet(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             VSpacer(24.dp)
+
+            val buttonTitle = if (freeTrialPeriodDays != null) {
+                stringResource(R.string.Premium_GetFreePeriod, freeTrialPeriodDays)
+            } else {
+                stringResource(R.string.Premium_Subscribe)
+            }
             ButtonPrimaryYellow(
                 modifier = Modifier.fillMaxWidth(),
-                title = stringResource(R.string.Premium_Get7DaysFree),
+                title = buttonTitle,
                 onClick = {
                     activity?.let {
                         viewModel.launchPurchaseFlow(
                             subscriptionId = subscriptionId,
-                            planId = uiState.basePlans[selectedItemIndex.intValue].id,
+                            offerToken = uiState.basePlans[selectedItemIndex].offerToken,
                             activity = it
                         )
                     }
-                }
-            )
-            VSpacer(12.dp)
-            ButtonPrimaryTransparent(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                title = stringResource(R.string.Premium_AddPromoCode),
-                onClick = {
-                    //TODO
                 }
             )
             VSpacer(36.dp)
@@ -447,20 +465,20 @@ fun ColoredTextSecondaryButton(
 @Composable
 fun SubscriptionTabs(
     subscriptions: List<Subscription>,
-    selectedTabIndex: MutableState<Int>,
+    selectedTabIndex: Int,
     modifier: Modifier,
     onTabSelected: (Int) -> Unit = {}
 ) {
     if (subscriptions.isNotEmpty()) {
         TabRow(
-            selectedTabIndex = selectedTabIndex.value,
+            selectedTabIndex = selectedTabIndex,
             modifier = modifier,
             containerColor = ComposeAppTheme.colors.transparent, // Dark background
             contentColor = Color(0xFFEDD716),
             indicator = { tabPositions ->
                 SecondaryIndicator(
                     Modifier
-                        .tabIndicatorOffset(tabPositions[selectedTabIndex.value])
+                        .tabIndicatorOffset(tabPositions[selectedTabIndex])
                         .height(0.dp), // No indicator line
                     color = Color.Transparent
                 )
@@ -468,14 +486,13 @@ fun SubscriptionTabs(
         ) {
             subscriptions.forEachIndexed { index, tab ->
                 Tab(
-                    selected = selectedTabIndex.value == index,
+                    selected = selectedTabIndex == index,
                     onClick = {
-                        selectedTabIndex.value = index
                         onTabSelected(index)
                     },
                     modifier = Modifier.background(
                         brush =
-                        if (selectedTabIndex.value == index) yellowGradient else steelBrush,
+                        if (selectedTabIndex == index) yellowGradient else steelBrush,
                     ),
                 ) {
                     Row(
@@ -487,13 +504,13 @@ fun SubscriptionTabs(
                         Icon(
                             painter = painterResource(if (index == 0) R.drawable.prem_star_yellow_16 else R.drawable.prem_crown_yellow_16),
                             contentDescription = null,
-                            tint = if (selectedTabIndex.value == index) ComposeAppTheme.colors.dark else ComposeAppTheme.colors.jacob,
+                            tint = if (selectedTabIndex == index) ComposeAppTheme.colors.dark else ComposeAppTheme.colors.jacob,
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = tab.name,
-                            color = if (selectedTabIndex.value == index) ComposeAppTheme.colors.dark else ComposeAppTheme.colors.grey,
+                            color = if (selectedTabIndex == index) ComposeAppTheme.colors.dark else ComposeAppTheme.colors.grey,
                             style = ComposeAppTheme.typography.captionSB
                         )
                     }
@@ -544,7 +561,7 @@ fun InfoBottomSheet(
 fun SubscriptionBottomSheet(
     modalBottomSheetState: SheetState,
     subscriptions: List<Subscription>,
-    selectedTabIndex: MutableState<Int>,
+    selectedTabIndex: Int,
     navController: NavController,
     hideBottomSheet: () -> Unit,
     onError: (Throwable) -> Unit
@@ -556,8 +573,8 @@ fun SubscriptionBottomSheet(
     ) {
         if (subscriptions.isNotEmpty()) {
             SelectSubscriptionBottomSheet(
-                subscriptionId = subscriptions[selectedTabIndex.value].id,
-                type = PremiumPlanType.entries[selectedTabIndex.value],
+                subscriptionId = subscriptions[selectedTabIndex].id,
+                type = PremiumPlanType.entries[selectedTabIndex],
                 onDismiss = hideBottomSheet,
                 onPurchase = { type ->
                     hideBottomSheet()

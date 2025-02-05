@@ -21,7 +21,6 @@ object UserSubscriptionManager {
                 TokenInsights,
                 AdvancedSearch,
                 TradeSignals,
-                TransactionSpeedTools,
                 DuressMode,
                 AddressVerification,
                 PrivacyMode,
@@ -71,10 +70,10 @@ object UserSubscriptionManager {
 
     suspend fun launchPurchaseFlow(
         subscriptionId: String,
-        planId: String,
+        offerToken: String,
         activity: Activity
     ): HSPurchase? {
-        return service.launchPurchaseFlow(subscriptionId, planId, activity)
+        return service.launchPurchaseFlow(subscriptionId, offerToken, activity)
     }
 
     fun getBasePlans(subscriptionId: String): List<BasePlan> {
@@ -87,5 +86,9 @@ object UserSubscriptionManager {
 
     fun pause() {
 
+    }
+
+    suspend fun restore() {
+        service.onResume()
     }
 }

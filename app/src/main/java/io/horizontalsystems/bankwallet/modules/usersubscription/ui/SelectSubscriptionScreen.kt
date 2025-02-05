@@ -63,9 +63,10 @@ fun SelectSubscriptionScreen(
 
     val uiState = viewModel.uiState
     val subscriptions = uiState.subscriptions
+    val selectedTabIndex = uiState.selectedTabIndex
+    val hasFreeTrial = uiState.hasFreeTrial
 
     val coroutineScope = rememberCoroutineScope()
-    val selectedTabIndex = remember { mutableIntStateOf(0) }
     val plansModalBottomSheetState =
         androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val infoModalBottomSheetState =
@@ -73,7 +74,7 @@ fun SelectSubscriptionScreen(
     var isPlanSelectBottomSheetVisible by remember { mutableStateOf(false) }
     var isInfoBottomSheetVisible by remember { mutableStateOf(false) }
     val scrollScope = rememberCoroutineScope()
-    val pagerState = rememberPagerState(initialPage = selectedTabIndex.intValue) { 2 }
+    val pagerState = rememberPagerState { subscriptions.size }
     var infoBottomSheetAction: IPaidAction? = null
 
     Scaffold(
@@ -108,6 +109,8 @@ fun SelectSubscriptionScreen(
                         selectedTabIndex = selectedTabIndex,
                         modifier = Modifier.clip(RoundedCornerShape(12.dp, 12.dp, 0.dp, 0.dp)),
                         onTabSelected = {
+                            viewModel.setSelectedTabIndex(it)
+
                             scrollScope.launch {
                                 pagerState.scrollToPage(it)
                             }
@@ -194,13 +197,19 @@ fun SelectSubscriptionScreen(
                     }
 
                     ButtonsGroupWithShade {
+                        val buttonTitle = if (hasFreeTrial) {
+                            stringResource(R.string.Premium_TryForFree)
+                        } else {
+                            stringResource(R.string.Premium_Upgrade)
+                        }
+
                         Column(
                             modifier = Modifier.padding(horizontal = 24.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             ButtonPrimaryCustomColor(
                                 modifier = Modifier.fillMaxWidth(),
-                                title = stringResource(R.string.Premium_TryForFree),
+                                title = buttonTitle,
                                 brush = yellowGradient,
                                 onClick = {
                                     coroutineScope.launch {
@@ -213,7 +222,7 @@ fun SelectSubscriptionScreen(
                             ColoredTextSecondaryButton(
                                 title = stringResource(R.string.Premium_Restore),
                                 onClick = {
-                                    //
+                                    viewModel.restore()
                                 },
                                 color = ComposeAppTheme.colors.leah
                             )
