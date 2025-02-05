@@ -77,7 +77,7 @@ class SubscriptionServiceGooglePlay(
     }
 
     private suspend fun fetchAndHandleUserPurchases() {
-        Log.e("AAA", "billingClient.isReady: ${billingClient.isReady}")
+        Log.e("GooglePlay", "billingClient.isReady: ${billingClient.isReady}")
         activeSubscriptions.clear()
         if (!billingClient.isReady) {
             if (billingServiceDisconnected) {
@@ -86,7 +86,7 @@ class SubscriptionServiceGooglePlay(
             return
         }
 
-        Log.e("AAA", "fetchAndHandleUserPurchases")
+        Log.e("GooglePlay", "fetchAndHandleUserPurchases")
         val params = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.SUBS)
 
@@ -184,6 +184,7 @@ class SubscriptionServiceGooglePlay(
 
         return buildList {
             productDetailsResult?.productDetailsList?.forEach { productDetails ->
+                Log.e("GooglePlay", "productDetails: ${productDetails.productId}")
                 predefinedSubscriptions.find { it.id == productDetails.productId }?.let {
                     add(it)
                 }
@@ -257,8 +258,8 @@ class SubscriptionServiceGooglePlay(
     }
 
     private suspend fun handlePurchase(purchase: Purchase) {
-        Log.e("AAA", "handlePurchase: $purchase")
-        Log.e("AAA", "purchased: ${purchase.purchaseState == Purchase.PurchaseState.PURCHASED}")
+        Log.e("GooglePlay", "handlePurchase: $purchase")
+        Log.e("GooglePlay", "purchased: ${purchase.purchaseState == Purchase.PurchaseState.PURCHASED}")
         if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
             if (purchase.isAcknowledged) {
                 addAcknowledgedPurchase(purchase)
@@ -276,12 +277,12 @@ class SubscriptionServiceGooglePlay(
     }
 
     private fun addAcknowledgedPurchase(purchase: Purchase) {
-        Log.e("AAA", "addAcknowledgedPurchase $purchase")
+        Log.e("GooglePlay", "addAcknowledgedPurchase $purchase")
         activeSubscriptions.addAll(
             purchase.products.mapNotNull { productId ->
                 predefinedSubscriptions.find { it.id == productId }
             }
         )
-        Log.e("AAA", "activeSubscriptions: $activeSubscriptions")
+        Log.e("GooglePlay", "activeSubscriptions: $activeSubscriptions")
     }
 }
