@@ -64,7 +64,7 @@ object UserSubscriptionManager {
         return service.getSubscriptions()
     }
 
-    fun getActiveSubscriptions(): List<Subscription> {
+    fun getActiveUserSubscriptions(): List<UserSubscription> {
         return service.getActiveSubscriptions()
     }
 

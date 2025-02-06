@@ -24,6 +24,7 @@ import io.horizontalsystems.subscriptions.core.IPaidAction
 import io.horizontalsystems.subscriptions.core.PricingPhase
 import io.horizontalsystems.subscriptions.core.Subscription
 import io.horizontalsystems.subscriptions.core.SubscriptionService
+import io.horizontalsystems.subscriptions.core.UserSubscription
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -48,7 +49,7 @@ class SubscriptionServiceGooglePlay(
     private var productDetailsResult: ProductDetailsResult? = null
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
-    private val activeSubscriptions = mutableListOf<Subscription>()
+    private val activeSubscriptions = mutableListOf<UserSubscription>()
 
     private var billingServiceDisconnected = false
 
@@ -98,7 +99,7 @@ class SubscriptionServiceGooglePlay(
     }
 
     override fun isActionAllowed(paidAction: IPaidAction) = activeSubscriptions.any {
-        it.actions.contains(paidAction)
+        it.subscription.actions.contains(paidAction)
     }
 
     override fun getBasePlans(subscriptionId: String): List<BasePlan> {
@@ -192,7 +193,7 @@ class SubscriptionServiceGooglePlay(
         }
     }
 
-    override fun getActiveSubscriptions(): List<Subscription> {
+    override fun getActiveSubscriptions(): List<UserSubscription> {
         return activeSubscriptions
     }
 
@@ -280,7 +281,11 @@ class SubscriptionServiceGooglePlay(
         Log.e("GooglePlay", "addAcknowledgedPurchase $purchase")
         activeSubscriptions.addAll(
             purchase.products.mapNotNull { productId ->
-                predefinedSubscriptions.find { it.id == productId }
+                predefinedSubscriptions
+                    .find { it.id == productId }
+                    ?.let {
+                        UserSubscription(it, purchase.purchaseToken)
+                    }
             }
         )
         Log.e("GooglePlay", "activeSubscriptions: $activeSubscriptions")
