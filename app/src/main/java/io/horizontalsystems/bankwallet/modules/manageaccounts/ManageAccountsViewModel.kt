@@ -24,7 +24,7 @@ class ManageAccountsViewModel(
     var viewItems by mutableStateOf<Pair<List<AccountViewItem>, List<AccountViewItem>>?>(null)
     var finish by mutableStateOf(false)
     val purchaseStateUpdated = UserSubscriptionManager.purchaseStateUpdatedFlow.map {
-        UserSubscriptionManager.getActiveSubscriptions().isNotEmpty()
+        UserSubscriptionManager.getActiveUserSubscriptions().isNotEmpty()
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
