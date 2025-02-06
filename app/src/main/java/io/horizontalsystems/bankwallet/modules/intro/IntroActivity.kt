@@ -105,7 +105,6 @@ private fun StaticContent(
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -146,70 +145,22 @@ private fun StaticContent(
             }
         }
         Spacer(Modifier.weight(2f))
-        val (crashCheckedState, crashOnStateChange) = remember { mutableStateOf(true) }
-        val (analyticCheckedState, analyticOnStateChange) = remember { mutableStateOf(true) }
-        if (pagerState.currentPage == 0) {
-            Column {
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .toggleable(
-                            value = analyticCheckedState,
-                            onValueChange = { analyticOnStateChange(!analyticCheckedState) },
-                            role = Role.Checkbox
-                        )
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Checkbox(
-                        checked = analyticCheckedState,
-                        onCheckedChange = null // null recommended for accessibility with screenreaders
-                    )
-                    Text(
-                        text = "Analytics logs events for each crash",
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(start = 16.dp)
-                    )
-                }
-
-
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .height(48.dp)
-                        .toggleable(
-                            value = crashCheckedState,
-                            onValueChange = { crashOnStateChange(!crashCheckedState) },
-                            role = Role.Checkbox
-                        )
-                        .padding(horizontal = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Checkbox(
-                        checked = crashCheckedState,
-                        onCheckedChange = null // null recommended for accessibility with screenreaders
-                    )
-                    Text(
-                        text = "Crashlytics collects and analyzes crashes, non-fatal exceptions",
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(start = 16.dp)
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(30.dp))
-
-        }
         ButtonPrimaryYellow(
             modifier = Modifier
                 .padding(horizontal = 24.dp)
                 .fillMaxWidth(),
             title = stringResource(R.string.Button_Next),
             onClick = {
-                viewModel.onStartClicked()
-                viewModel.onSaveConfig(analyticCheckedState, crashCheckedState)
-                MainModule.start(context)
-                closeActivity()
+                if (pagerState.currentPage + 1 < pageCount) {
+                    coroutineScope.launch {
+                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                    }
+                } else {
+                    viewModel.onStartClicked()
+                    MainModule.start(context)
+                    closeActivity()
+
+                }
             })
         Spacer(Modifier.height(60.dp))
     }

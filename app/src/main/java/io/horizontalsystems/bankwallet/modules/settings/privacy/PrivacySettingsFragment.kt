@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -60,7 +61,7 @@ class PrivacySettingsFragment : BaseComposeFragment() {
         SecurityTorSettingsModule.Factory()
     }
 
-@Composable
+    @Composable
     override fun GetContent(navController: NavController) {
         PrivacyScreen(
             navController = navController,
@@ -135,20 +136,20 @@ fun PrivacyScreen(
     }
 
     Column(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        AppBar(
+            title = stringResource(R.string.Settings_Privacy),
+            navigationIcon = {
+                HsBackButton(onClick = { navController.popBackStack() })
+            }
+        )
+        Column(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
         ) {
-            AppBar(
-                title = stringResource(R.string.Settings_Privacy),
-                navigationIcon = {
-                    HsBackButton(onClick = { navController.popBackStack() })
-                }
-            )
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .verticalScroll(rememberScrollState())
-            ) {
             VSpacer(12.dp)
             TextImportantWarning(
                 modifier = Modifier.padding(horizontal = 16.dp),
@@ -160,13 +161,16 @@ fun PrivacyScreen(
             SectionPremiumUniversalLawrence {
                 CellUniversal {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_share_24px),
+                        painter = painterResource(id = R.drawable.baseline_analytics_24),
                         contentDescription = "Share",
                         tint = ComposeAppTheme.colors.jacob
                     )
                     HSpacer(width = 16.dp)
-                    body_leah(text = stringResource(R.string.ShareUiData))
-                    HFillSpacer(minWidth = 8.dp)
+                    body_leah(
+                        text = stringResource(R.string.ShareUiData),
+                        modifier = Modifier.weight(0.9f),
+                        overflow = TextOverflow.Ellipsis,
+                    )
                     HsSwitch(
                         checked = uiState.uiStatsEnabled,
                         onCheckedChange = {
@@ -175,12 +179,47 @@ fun PrivacyScreen(
 
                                 stat(page = StatPage.Privacy, event = StatEvent.EnableUiStats(it))
                             }
-                        }
+                        },
+                        modifier = Modifier
+                            .weight(0.1f)
+                            .padding(end = 8.dp)
+                    )
+                }
+
+                CellUniversal {
+                    Icon(
+                        painter = painterResource(id = R.drawable.baseline_analytics_24),
+                        contentDescription = "Share",
+                        tint = ComposeAppTheme.colors.jacob
+                    )
+                    HSpacer(width = 16.dp)
+                    body_leah(
+                        text = "Crashlytics collects and analyzes crashes, non-fatal exceptions",
+                        modifier = Modifier.weight(0.9f),
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    HsSwitch(
+                        checked = uiState.isEnableDetectCrash,
+                        onCheckedChange = {
+                            navController.paidAction(PrivacyMode) {
+                                viewModel.toggleDetectCrash(it)
+
+                                stat(page = StatPage.Privacy, event = StatEvent.EnableDetectCrash(it))
+                            }
+                        },
+                        modifier = Modifier
+                            .weight(0.1f)
+                            .padding(end = 8.dp)
+
                     )
                 }
             }
             InfoText(
                 text = stringResource(R.string.ShareUiDataDescription),
+            )
+            TextImportantWarning(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                text = "All data collected anonymously is processed immediately in compliance with the privacy policy, is not shared with third parties, and is only used for the purpose of improving application features."
             )
 
             VSpacer(20.dp)

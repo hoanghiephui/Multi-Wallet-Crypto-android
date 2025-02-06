@@ -29,6 +29,7 @@ import com.walletconnect.android.relay.ConnectionType
 import com.walletconnect.web3.wallet.client.Wallet
 import com.walletconnect.web3.wallet.client.Web3Wallet
 import dagger.hilt.android.HiltAndroidApp
+import io.horizontalsystems.bankwallet.analytics.AnalyticsHelper
 import io.horizontalsystems.bankwallet.core.BaseViewModel.Companion.SHOW_ADS
 import io.horizontalsystems.bankwallet.core.address.AddressSecurityCheckerChain
 import io.horizontalsystems.bankwallet.core.factories.AccountFactory
@@ -232,6 +233,9 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
     @Inject
     lateinit var ioDispatcher: CoroutineDispatcher
 
+    @Inject
+    lateinit var analyticsHelper: AnalyticsHelper
+
     override fun onCreate() {
         super.onCreate()
 
@@ -423,7 +427,7 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         statsManager = StatsManager(
             appDatabase.statsDao(),
             localStorage,
-            marketKit,
+            analyticsHelper,
             appConfigProvider,
             backgroundManager
         )
@@ -567,7 +571,7 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
     }
 
     private fun setAnalytic() {
-        Firebase.analytics.setAnalyticsCollectionEnabled(if (!BuildConfig.DEBUG) localStorage.isAnalytic else false)
+        Firebase.analytics.setAnalyticsCollectionEnabled(if (!BuildConfig.DEBUG) localStorage.uiStatsEnabled == true else false)
         Firebase.crashlytics.isCrashlyticsCollectionEnabled = if (!BuildConfig.DEBUG) localStorage.isDetectCrash else false
     }
 

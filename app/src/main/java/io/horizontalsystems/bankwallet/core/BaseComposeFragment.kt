@@ -112,7 +112,6 @@ abstract class BaseComposeFragment(
         firebaseAnalytics.apply {
             val bundle = bundleOf(
                 FirebaseAnalytics.Param.SCREEN_NAME to screenName,
-                FirebaseAnalytics.Param.SCREEN_NAME to screenName,
             )
             logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle)
         }

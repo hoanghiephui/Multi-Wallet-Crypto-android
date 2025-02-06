@@ -1,6 +1,8 @@
 package io.horizontalsystems.bankwallet.core.stats
 
 import com.google.gson.Gson
+import io.horizontalsystems.bankwallet.analytics.AnalyticsEvent
+import io.horizontalsystems.bankwallet.analytics.AnalyticsHelper
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.ILocalStorage
 import io.horizontalsystems.bankwallet.core.managers.MarketKitWrapper
@@ -43,6 +45,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.time.Instant
 import java.util.concurrent.Executors
 
@@ -53,7 +56,7 @@ fun stat(page: StatPage, section: StatSection? = null, event: StatEvent) {
 class StatsManager(
     private val statsDao: StatsDao,
     private val localStorage: ILocalStorage,
-    private val marketKit: MarketKitWrapper,
+    private val analyticsHelper: AnalyticsHelper,
     private val appConfigProvider: AppConfigProvider,
     private val backgroundManager: BackgroundManager,
 ) {
@@ -71,16 +74,22 @@ class StatsManager(
         scope.launch {
             UserSubscriptionManager.purchaseStateUpdatedFlow.collect {
                 uiStatsEnabled = areUiStatsEnabled()
+                isDetectCrashEnabled = areDetectCrashEnabledEnabled()
                 _uiStatsEnabledFlow.update { uiStatsEnabled }
+                _isDetectCrashEnabledFlow.update { isDetectCrashEnabled }
             }
         }
     }
 
     var uiStatsEnabled = areUiStatsEnabled()
         private set
+    var isDetectCrashEnabled = areDetectCrashEnabledEnabled()
+        private set
 
     private val _uiStatsEnabledFlow = MutableStateFlow(uiStatsEnabled)
     val uiStatsEnabledFlow = _uiStatsEnabledFlow.asStateFlow()
+    private val _isDetectCrashEnabledFlow = MutableStateFlow(isDetectCrashEnabled)
+    val isDetectCrashEnabledFlow = _isDetectCrashEnabledFlow.asStateFlow()
 
     private val gson by lazy { Gson() }
     private val executor = Executors.newCachedThreadPool()
@@ -99,6 +108,17 @@ class StatsManager(
         }
 
         return statsEnabledByDefault()
+    }
+
+    private fun areDetectCrashEnabledEnabled(): Boolean {
+        //not premium user
+        if (!UserSubscriptionManager.isActionAllowed(PrivacyMode)) {
+            return true
+        }
+
+        val isDetectCrash = localStorage.isDetectCrash
+
+        return isDetectCrash
     }
 
     private fun statsEnabledByDefault(): Boolean {
@@ -150,9 +170,17 @@ class StatsManager(
                 val stats = statsDao.getAll()
                 if (stats.isNotEmpty()) {
                     val statsArray = "[${stats.joinToString { it.json }}]"
-//                    Log.e("e", "send $statsArray")
-                    //marketKit.sendStats(statsArray, appConfigProvider.appVersion, appConfigProvider.appId).blockingGet()
-
+                    Timber.d("SendStats: $statsArray")
+                    analyticsHelper.logEvent(
+                        AnalyticsEvent(
+                            type = "ui_stats",
+                            extras = listOf(
+                                AnalyticsEvent.Param("stats", statsArray),
+                                AnalyticsEvent.Param("app_version", appConfigProvider.appVersion),
+                                AnalyticsEvent.Param("app_id", appConfigProvider.appId ?: ""),
+                            ),
+                        ),
+                    )
                     stats.chunked(sqliteMaxVariableNumber).forEach { chunk ->
                         statsDao.delete(chunk.map { it.id })
                     }
@@ -169,6 +197,12 @@ class StatsManager(
         localStorage.uiStatsEnabled = enabled
         uiStatsEnabled = enabled
         _uiStatsEnabledFlow.update { enabled }
+    }
+
+    fun toggleDetectCrash(enabled: Boolean) {
+        localStorage.isDetectCrash = enabled
+        isDetectCrashEnabled = enabled
+        _isDetectCrashEnabledFlow.update { enabled }
     }
 
 }

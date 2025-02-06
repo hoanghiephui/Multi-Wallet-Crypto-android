@@ -11,6 +11,7 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import io.horizontalsystems.bankwallet.ui.compose.Black50
 import io.horizontalsystems.bankwallet.ui.compose.Dark
 import io.horizontalsystems.bankwallet.ui.compose.Green50
@@ -86,7 +87,7 @@ class TextStyles {
 fun AppWidgetTheme(colors: ColorProviders = AppWidgetTheme.colors, content: @Composable () -> Unit) {
     CompositionLocalProvider(
         LocalColorProviders provides colors,
-        androidx.lifecycle.compose.LocalLifecycleOwner provides androidx.compose.ui.platform.LocalLifecycleOwner.current
+        LocalLifecycleOwner provides LocalLifecycleOwner.current
     ) {
         content()
     }

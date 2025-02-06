@@ -61,7 +61,7 @@ class SecuritySettingsFragment : BaseComposeFragment() {
 
                 navController = navController,
 
-            )
+                )
         }
     }
 
@@ -147,70 +147,6 @@ private fun SecurityCenterScreen(
             )
 
             VSpacer(height = 32.dp)
-            CellUniversalLawrenceSection {
-                Column {
-                    RowUniversal(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .fillMaxSize(),
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.baseline_analytics_24),
-                            tint = ComposeAppTheme.colors.grey,
-                            modifier = Modifier.size(24.dp),
-                            contentDescription = null
-                        )
-                        Spacer(Modifier.width(16.dp))
-                        body_leah(
-                            text = "Analytics logs events for each crash",
-                            modifier = Modifier.weight(0.8f),
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        HsSwitch(
-                            checked = uiState.analyticLog,
-                            onCheckedChange = {
-                                securitySettingsViewModel.onSetAnalytic(it)
-                            },
-                            modifier = Modifier
-                                .weight(0.2f)
-                                .padding(end = 8.dp, start = 24.dp)
-                        )
-                    }
-                    HorizontalDivider()
-                    RowUniversal(
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .fillMaxSize(),
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.baseline_analytics_24),
-                            tint = ComposeAppTheme.colors.grey,
-                            modifier = Modifier.size(24.dp),
-                            contentDescription = null
-                        )
-                        Spacer(Modifier.width(16.dp))
-                        body_leah(
-                            text = "Crashlytics collects and analyzes crashes, non-fatal exceptions",
-                            modifier = Modifier.weight(0.9f),
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        HsSwitch(
-                            checked = uiState.detectCrash,
-                            onCheckedChange = {
-                                securitySettingsViewModel.onSetCrashlytics(it)
-                            },
-                            modifier = Modifier
-                                .weight(0.1f)
-                                .padding(end = 8.dp)
-                        )
-                    }
-                }
-
-            }
-            TextImportantWarning(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                text = "All data collected anonymously is processed immediately in compliance with the privacy policy, is not shared with third parties, and is only used for the purpose of improving application features."
-            )
         }
     }
 }

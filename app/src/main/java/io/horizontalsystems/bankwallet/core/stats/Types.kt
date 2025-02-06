@@ -200,6 +200,7 @@ sealed class StatEvent {
     data class SwitchLanguage(val language: String): StatEvent()
     data class ShowSignals(val shown: Boolean): StatEvent()
     data class EnableUiStats(val enabled: Boolean): StatEvent()
+    data class EnableDetectCrash(val enabled: Boolean): StatEvent()
 
     data class SwitchBaseCurrency(val code: String) : StatEvent()
     data class SwitchBtcSource(val chainUid: String, val type: BtcRestoreMode) : StatEvent()
@@ -344,6 +345,7 @@ sealed class StatEvent {
             is WatchWallet -> "watch_wallet"
             is Add -> "add"
             is AddToken -> "add_token"
+            is EnableDetectCrash -> "enable_detect_crash"
         }
 
     val params: Map<StatParam, Any>?
