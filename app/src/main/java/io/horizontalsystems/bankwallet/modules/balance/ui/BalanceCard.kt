@@ -97,7 +97,6 @@ fun BalanceCardSwipable(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BalanceCard(
     onClick: () -> Unit,

@@ -1,7 +1,7 @@
 package io.horizontalsystems.bankwallet.modules.balance.ui
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,7 +24,10 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -42,6 +46,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -82,8 +87,12 @@ import io.horizontalsystems.bankwallet.ui.compose.components.HsIconButton
 import io.horizontalsystems.bankwallet.ui.compose.components.SelectorDialogCompose
 import io.horizontalsystems.bankwallet.ui.compose.components.SelectorItem
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
+import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
+import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_leah
+import io.horizontalsystems.bankwallet.ui.compose.components.title2_leah
+import io.horizontalsystems.bankwallet.ui.compose.components.title3_leah
 import io.horizontalsystems.core.helpers.HudHelper
 
 @Composable
@@ -266,7 +275,8 @@ fun BalanceItems(
 
             if (uiState.balanceTabButtonsEnabled && !accountViewItem.isWatchAccount) {
                 item {
-                    Row(
+                    BalanceAction()
+                    /*Row(
                         modifier = Modifier.padding(horizontal = 24.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -276,7 +286,10 @@ fun BalanceItems(
                             onClick = {
                                 navController.slideFromRight(R.id.sendTokenSelectFragment)
 
-                                stat(page = StatPage.Balance, event = StatEvent.Open(StatPage.SendTokenList))
+                                stat(
+                                    page = StatPage.Balance,
+                                    event = StatEvent.Open(StatPage.SendTokenList)
+                                )
                             }
                         )
                         HSpacer(8.dp)
@@ -284,11 +297,15 @@ fun BalanceItems(
                             modifier = Modifier.weight(1f),
                             title = stringResource(R.string.Balance_Receive),
                             onClick = {
-                                when (val receiveAllowedState = viewModel.getReceiveAllowedState()) {
+                                when (val receiveAllowedState =
+                                    viewModel.getReceiveAllowedState()) {
                                     ReceiveAllowedState.Allowed -> {
                                         navController.slideFromRight(R.id.receiveFragment)
 
-                                        stat(page = StatPage.Balance, event = StatEvent.Open(StatPage.ReceiveTokenList))
+                                        stat(
+                                            page = StatPage.Balance,
+                                            event = StatEvent.Open(StatPage.ReceiveTokenList)
+                                        )
                                     }
 
                                     is ReceiveAllowedState.BackupRequired -> {
@@ -302,7 +319,10 @@ fun BalanceItems(
                                             BackupRequiredDialog.Input(account, text)
                                         )
 
-                                        stat(page = StatPage.Balance, event = StatEvent.Open(StatPage.BackupRequired))
+                                        stat(
+                                            page = StatPage.Balance,
+                                            event = StatEvent.Open(StatPage.BackupRequired)
+                                        )
                                     }
 
                                     null -> Unit
@@ -317,11 +337,14 @@ fun BalanceItems(
                                 onClick = {
                                     navController.slideFromRight(R.id.multiswap)
 
-                                    stat(page = StatPage.Balance, event = StatEvent.Open(StatPage.Swap))
+                                    stat(
+                                        page = StatPage.Balance,
+                                        event = StatEvent.Open(StatPage.Swap)
+                                    )
                                 }
                             )
                         }
-                    }
+                    }*/
                     VSpacer(12.dp)
                 }
             }
@@ -351,7 +374,10 @@ fun BalanceItems(
                         onClick = {
                             navController.slideFromRight(R.id.manageWalletsFragment)
 
-                            stat(page = StatPage.Balance, event = StatEvent.Open(StatPage.CoinManager))
+                            stat(
+                                page = StatPage.Balance,
+                                event = StatEvent.Open(StatPage.CoinManager)
+                            )
                         }
                     )
 
@@ -369,7 +395,12 @@ fun BalanceItems(
                     HeaderNote.None -> Unit
                     HeaderNote.NonStandardAccount -> {
                         NoteError(
-                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp),
+                            modifier = Modifier.padding(
+                                start = 16.dp,
+                                end = 16.dp,
+                                top = 12.dp,
+                                bottom = 24.dp
+                            ),
                             text = stringResource(R.string.AccountRecovery_MigrationRequired),
                             onClick = {
                                 FaqManager.showFaqPage(
@@ -382,7 +413,12 @@ fun BalanceItems(
 
                     HeaderNote.NonRecommendedAccount -> {
                         NoteWarning(
-                            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 24.dp),
+                            modifier = Modifier.padding(
+                                start = 16.dp,
+                                end = 16.dp,
+                                top = 12.dp,
+                                bottom = 24.dp
+                            ),
                             text = stringResource(R.string.AccountRecovery_MigrationRecommended),
                             onClick = {
                                 FaqManager.showFaqPage(
@@ -556,6 +592,81 @@ fun <T> LazyListScope.wallets(
     })
     item {
         VSpacer(height = 10.dp)
+    }
+}
+
+@Composable
+private fun BalanceAction() {
+    Surface(
+        modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .fillMaxWidth()
+            .height(IntrinsicSize.Min),
+        shape = RoundedCornerShape(12.dp),
+        shadowElevation = 5.dp,
+        tonalElevation = 5.dp,
+        color = MaterialTheme.colorScheme.surfaceContainerLowest
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            BalanceButton(
+                modifier = Modifier.weight(1f),
+                onClick = {},
+                buttonIconRes = R.drawable.ic_arrow_up_right_12,
+                buttonTitleRes = R.string.Balance_Send
+            )
+
+            BalanceButton(
+                modifier = Modifier.weight(1f),
+                onClick = {},
+                buttonIconRes = R.drawable.ic_add_to_wallet_2_24,
+                buttonTitleRes = R.string.Balance_Receive
+            )
+            BalanceButton(
+                modifier = Modifier.weight(1f),
+                onClick = {},
+                buttonIconRes = R.drawable.ic_swap_24,
+                buttonTitleRes = R.string.Swap
+            )
+        }
+    }
+}
+
+@Composable
+private fun BalanceButton(
+    modifier: Modifier,
+    onClick: () -> Unit,
+    @StringRes
+    buttonTitleRes: Int,
+    @DrawableRes
+    buttonIconRes: Int
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        FilledTonalIconButton(onClick = onClick) {
+            Icon(
+                painter = painterResource(buttonIconRes),
+                contentDescription = null
+            )
+        }
+        subhead2_leah(
+            modifier = Modifier.padding(top = 6.dp),
+            text = stringResource(buttonTitleRes),
+            textAlign = TextAlign.Center,
+            overflow = TextOverflow.Ellipsis,
+        )
+    }
+}
+
+@Composable
+@Preview(showBackground = true)
+private fun BalanceActionPreview() {
+    ComposeAppTheme {
+        BalanceAction()
     }
 }
 

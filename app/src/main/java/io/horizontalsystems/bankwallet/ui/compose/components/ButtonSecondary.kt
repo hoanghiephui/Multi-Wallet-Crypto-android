@@ -149,7 +149,7 @@ fun ButtonSecondaryTransparent(
                     Text(
                         text = title,
                         maxLines = 1,
-                        style = ComposeAppTheme.typography.captionSB,
+                        style = ComposeAppTheme.typography.subhead2,
                         overflow = TextOverflow.Ellipsis,
                     )
                     Icon(
@@ -163,7 +163,7 @@ fun ButtonSecondaryTransparent(
                 Text(
                     text = title,
                     maxLines = 1,
-                    style = ComposeAppTheme.typography.captionSB,
+                    style = ComposeAppTheme.typography.subhead2,
                     overflow = TextOverflow.Ellipsis,
                 )
             }

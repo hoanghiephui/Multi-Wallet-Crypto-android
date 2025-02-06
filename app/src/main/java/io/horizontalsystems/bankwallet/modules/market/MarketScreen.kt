@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -50,7 +49,6 @@ import io.horizontalsystems.bankwallet.core.stats.statPage
 import io.horizontalsystems.bankwallet.core.stats.statTab
 import io.horizontalsystems.bankwallet.entities.Currency
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
-import io.horizontalsystems.bankwallet.modules.main.MainViewModel
 import io.horizontalsystems.bankwallet.modules.market.MarketModule.Tab
 import io.horizontalsystems.bankwallet.modules.market.favorites.MarketFavoritesScreen
 import io.horizontalsystems.bankwallet.modules.market.posts.MarketPostsScreen
@@ -225,59 +223,62 @@ fun MetricsBoard(
     marketGlobal: MarketGlobal?,
     currency: Currency
 ) {
-    Row(
+    Surface(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .fillMaxWidth()
-            .height(IntrinsicSize.Min)
-            .clip(RoundedCornerShape(12.dp))
-            .background(ComposeAppTheme.colors.lawrence)
+            .height(IntrinsicSize.Min),
+        shape = RoundedCornerShape(12.dp),
+        shadowElevation = 5.dp,
+        tonalElevation = 3.dp
     ) {
-        MarketTotalCard(
-            title = stringResource(R.string.MarketGlobalMetrics_TotalMarketCap),
-            value = marketGlobal?.marketCap,
-            changePercentage = marketGlobal?.marketCapChange,
-            currency = currency,
-            onClick = {
-                openMetricsPage(MetricsType.TotalMarketCap, navController)
-            }
-        )
+        Row {
+            MarketTotalCard(
+                title = stringResource(R.string.MarketGlobalMetrics_TotalMarketCap),
+                value = marketGlobal?.marketCap,
+                changePercentage = marketGlobal?.marketCapChange,
+                currency = currency,
+                onClick = {
+                    openMetricsPage(MetricsType.TotalMarketCap, navController)
+                }
+            )
 
-        VDivider()
+            VDivider()
 
-        MarketTotalCard(
-            title = stringResource(R.string.MarketGlobalMetrics_Volume),
-            value = marketGlobal?.volume,
-            changePercentage = marketGlobal?.volumeChange,
-            currency = currency,
-            onClick = {
-                openMetricsPage(MetricsType.Volume24h, navController)
-            }
-        )
+            MarketTotalCard(
+                title = stringResource(R.string.MarketGlobalMetrics_Volume),
+                value = marketGlobal?.volume,
+                changePercentage = marketGlobal?.volumeChange,
+                currency = currency,
+                onClick = {
+                    openMetricsPage(MetricsType.Volume24h, navController)
+                }
+            )
 
-        VDivider()
+            VDivider()
 
-        MarketTotalCard(
-            title = stringResource(R.string.MarketGlobalMetrics_TvlInDefi),
-            value = marketGlobal?.tvl,
-            changePercentage = marketGlobal?.tvlChange,
-            currency = currency,
-            onClick = {
-                openMetricsPage(MetricsType.TvlInDefi, navController)
-            }
-        )
+            MarketTotalCard(
+                title = stringResource(R.string.MarketGlobalMetrics_TvlInDefi),
+                value = marketGlobal?.tvl,
+                changePercentage = marketGlobal?.tvlChange,
+                currency = currency,
+                onClick = {
+                    openMetricsPage(MetricsType.TvlInDefi, navController)
+                }
+            )
 
-        VDivider()
+            VDivider()
 
-        MarketTotalCard(
-            title = stringResource(R.string.MarketGlobalMetrics_EtfInflow),
-            value = marketGlobal?.etfTotalInflow,
-            changeFiat = marketGlobal?.etfDailyInflow,
-            currency = currency,
-            onClick = {
-                openMetricsPage(MetricsType.Etf, navController)
-            }
-        )
+            MarketTotalCard(
+                title = stringResource(R.string.MarketGlobalMetrics_EtfInflow),
+                value = marketGlobal?.etfTotalInflow,
+                changeFiat = marketGlobal?.etfDailyInflow,
+                currency = currency,
+                onClick = {
+                    openMetricsPage(MetricsType.Etf, navController)
+                }
+            )
+        }
     }
 }
 

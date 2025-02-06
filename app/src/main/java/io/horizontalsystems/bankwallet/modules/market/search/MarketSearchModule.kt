@@ -26,7 +26,7 @@ object MarketSearchModule {
     }
 
     sealed class DiscoveryItem {
-        object TopCoins : DiscoveryItem()
+        data object TopCoins : DiscoveryItem()
 
         class Category(
             val coinCategory: CoinCategory,
