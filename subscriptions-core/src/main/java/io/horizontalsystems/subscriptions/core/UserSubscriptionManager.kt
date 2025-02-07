@@ -38,9 +38,7 @@ object UserSubscriptionManager {
                 TokenInsights,
                 AdvancedSearch,
                 TradeSignals,
-                TransactionSpeedTools,
                 DuressMode,
-                AddressVerification,
                 PrivacyMode,
                 Watchlist
             )
