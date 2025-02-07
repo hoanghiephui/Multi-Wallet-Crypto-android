@@ -237,8 +237,8 @@ private fun SettingSections(
     VSpacer(32.dp)
 
     CellUniversalLawrenceSection(
-        listOf(
-            {
+        buildList {
+            add {
                 HsSettingCell(
                     R.string.Settings_SecurityCenter,
                     R.drawable.ic_security,
@@ -249,8 +249,8 @@ private fun SettingSections(
                         stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.Security))
                     }
                 )
-            },
-            {
+            }
+            add {
                 HsSettingCell(
                     R.string.Settings_Privacy,
                     R.drawable.ic_eye_20,
@@ -260,8 +260,8 @@ private fun SettingSections(
                         stat(page = StatPage.AboutApp, event = StatEvent.Open(StatPage.Privacy))
                     }
                 )
-            },
-            {
+            }
+            add {
                 HsSettingCell(
                     R.string.Contacts,
                     R.drawable.ic_user_20,
@@ -274,8 +274,8 @@ private fun SettingSections(
                         stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.Contacts))
                     }
                 )
-            },
-            {
+            }
+            add {
                 HsSettingCell(
                     R.string.Settings_Appearance,
                     R.drawable.ic_brush_20,
@@ -285,18 +285,20 @@ private fun SettingSections(
                         stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.Appearance))
                     }
                 )
-            },
-            {
-                HsSettingCell(
-                    R.string.Settings_Subscription,
-                    R.drawable.ic_star_24,
-                    value = if (uiState.hasSubscription) stringResource(R.string.SettingsSubscription_Active) else null,
-                    onClick = {
-                        navController.slideFromRight(R.id.subscriptionFragment)
-                    }
-                )
-            },
-            {
+            }
+            if (!BuildConfig.FDROID_BUILD) {
+                add {
+                    HsSettingCell(
+                        R.string.Settings_Subscription,
+                        R.drawable.ic_star_24,
+                        value = if (uiState.hasSubscription) stringResource(R.string.SettingsSubscription_Active) else null,
+                        onClick = {
+                            navController.slideFromRight(R.id.subscriptionFragment)
+                        }
+                    )
+                }
+            }
+            add {
                 HsSettingCell(
                     R.string.Settings_BaseCurrency,
                     R.drawable.ic_currency,
@@ -310,8 +312,8 @@ private fun SettingSections(
                         )
                     }
                 )
-            },
-            {
+            }
+            add {
                 HsSettingCell(
                     R.string.Settings_Language,
                     R.drawable.ic_language,
@@ -323,7 +325,7 @@ private fun SettingSections(
                     }
                 )
             }
-        )
+        }
     )
 
     /*VSpacer(32.dp)
@@ -342,22 +344,24 @@ private fun SettingSections(
         )
     )
 
-    VSpacer(24.dp)
+    if (!BuildConfig.FDROID_BUILD) {
+        VSpacer(24.dp)
 
-    PremiumHeader()
+        PremiumHeader()
 
-    SectionPremiumUniversalLawrence {
-        HsSettingCell(
-            title = R.string.Settings_VipSupport,
-            icon = R.drawable.ic_support_yellow_24,
-            iconTint = ComposeAppTheme.colors.jacob,
-            onClick = {
-                navController.paidAction(VIPSupport) {
-                    openVipSupport.invoke()
+        SectionPremiumUniversalLawrence {
+            HsSettingCell(
+                title = R.string.Settings_VipSupport,
+                icon = R.drawable.ic_support_yellow_24,
+                iconTint = ComposeAppTheme.colors.jacob,
+                onClick = {
+                    navController.paidAction(VIPSupport) {
+                        openVipSupport.invoke()
+                    }
                 }
-            }
-        )
-    }*/
+            )
+        }
+    }
 
     VSpacer(32.dp)
 
@@ -371,6 +375,16 @@ private fun SettingSections(
                     navController.slideFromRight(R.id.aboutAppFragment)
 
                     stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.AboutApp))
+                }
+            )
+        }, {
+            HsSettingCell(
+                R.string.Settings_RateUs,
+                R.drawable.ic_star_20,
+                onClick = {
+                    RateAppManager.openPlayMarket(context)
+
+                    stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.RateUs))
                 }
             )
         }, {
