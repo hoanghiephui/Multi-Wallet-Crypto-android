@@ -8,9 +8,11 @@ import io.horizontalsystems.bankwallet.modules.balance.BalanceAccountsViewModel
 import io.horizontalsystems.bankwallet.modules.balance.BalanceModule
 import io.horizontalsystems.bankwallet.modules.balance.BalanceScreenState
 import io.horizontalsystems.bankwallet.modules.balance.cex.BalanceForAccountCex
+import io.horizontalsystems.bankwallet.modules.main.MainViewModel
 
 @Composable
-fun BalanceScreen(navController: NavController) {
+fun BalanceScreen(navController: NavController,
+                  mainViewModel: MainViewModel,) {
     val viewModel = viewModel<BalanceAccountsViewModel>(factory = BalanceModule.AccountsFactory())
 
     when (val tmpAccount = viewModel.balanceScreenState) {
@@ -20,7 +22,7 @@ fun BalanceScreen(navController: NavController) {
                 BalanceForAccountCex(navController, tmpAccount.accountViewItem)
             }
             else -> {
-                BalanceForAccount(navController, tmpAccount.accountViewItem)
+                BalanceForAccount(navController, tmpAccount.accountViewItem, mainViewModel)
             }
         }
         else -> {}

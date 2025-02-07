@@ -281,7 +281,10 @@ private fun MainScreen(
                                 )
                             }
                             if (uiState.isShowBalance) {
-                                BalanceScreen(fragmentNavController)
+                                BalanceScreen(
+                                    fragmentNavController,
+                                    mainViewModel = viewModel,
+                                )
                             } else {
                                 Column(
                                     modifier = Modifier
