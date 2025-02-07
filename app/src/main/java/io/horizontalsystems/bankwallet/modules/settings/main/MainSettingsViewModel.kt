@@ -139,12 +139,12 @@ class MainSettingsViewModel(
     }
 
     private fun syncCounter() {
-        if (wcPendingRequestCount > 0) {
-            wcCounterType = CounterType.PendingRequestCounter(wcPendingRequestCount)
+        wcCounterType = if (wcPendingRequestCount > 0) {
+            CounterType.PendingRequestCounter(wcPendingRequestCount)
         } else if (wcSessionsCount > 0) {
-            wcCounterType = CounterType.SessionCounter(wcSessionsCount)
+            CounterType.SessionCounter(wcSessionsCount)
         } else {
-            wcCounterType = null
+            null
         }
         emitState()
     }

@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.update
 import java.math.BigDecimal
 import java.time.Instant
+import androidx.core.net.toUri
 
 
 class RateAppManager(
@@ -97,25 +98,22 @@ class RateAppManager(
     }
 
     companion object {
-
         fun openPlayMarket(context: Context) {
             try {
-                ContextCompat.startActivity(context, getPlayMarketAppIntent(), null)
+                context.startActivity(getPlayMarketAppIntent(), null)
             } catch (e: ActivityNotFoundException) {
                 val appPlayStoreLink =
-                    "http://play.google.com/store/apps/details?id=com.wallet.blockchain.bitcoin"
+                    "http://play.google.com/store/apps/details?id=com.blockchain.btc.coinhub"
                 LinkHelper.openLinkInAppBrowser(context, appPlayStoreLink)
             }
         }
 
         private fun getPlayMarketAppIntent(): Intent {
             val uri =
-                Uri.parse("market://details?id=com.wallet.blockchain.bitcoin")  //context.packageName
+                "market://details?id=com.blockchain.btc.coinhub".toUri()  //context.packageName
             val goToMarketIntent = Intent(Intent.ACTION_VIEW, uri)
             goToMarketIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY or Intent.FLAG_ACTIVITY_MULTIPLE_TASK or Intent.FLAG_ACTIVITY_NEW_DOCUMENT)
             return goToMarketIntent
         }
-
     }
-
 }

@@ -22,7 +22,7 @@ android {
         versionCode 27
         versionName "0.2.7"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        resConfigs "de", "es", "en", "fa", "fr", "ko", "pt", "pt-rBR", "ru", "tr", "zh"
+        resourceConfigurations += ['de', 'es', 'en', 'fa', 'fr', 'ko', 'pt', 'pt-rBR', 'ru', 'tr', 'zh']
 
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas".toString())
@@ -109,6 +109,8 @@ android {
             applicationId 'com.blockchain.btc.coinhub'
             versionCode 154
             versionName '1.3.0'
+            resValue "string", "companyWebPageLink", "https://coinhub8899.web.app"
+            resValue "string", "appWebPageLink", "http://play.google.com/store/apps/details?id=com.blockchain.btc.coinhub"
         }
     }
 
@@ -367,6 +369,7 @@ dependencies {
 
     baseDebugImplementation project(':subscriptions-dev')
     baseReleaseImplementation project(':subscriptions-google-play')
+    coinhubImplementation project(':subscriptions-google-play')
 
     fdroidImplementation project(':subscriptions-fdroid')
     ciImplementation project(':subscriptions-dev')

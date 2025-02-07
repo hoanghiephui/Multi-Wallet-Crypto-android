@@ -1,6 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.send.address
 
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.ISendBitcoinAdapter
 import io.horizontalsystems.bankwallet.core.ISendTronAdapter
 import io.horizontalsystems.bankwallet.core.ISendZcashAdapter

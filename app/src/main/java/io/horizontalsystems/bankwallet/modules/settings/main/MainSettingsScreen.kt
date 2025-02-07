@@ -40,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.core.App
@@ -105,7 +106,6 @@ fun SettingsScreen(
                 openVipSupport = {
                     isVipSupportVisible = true
                 })
-            //SettingsFooter(viewModel.appVersion, viewModel.companyWebPage)
         }
         VipSupportBottomSheet(
             isBottomSheetVisible = isVipSupportVisible,
@@ -130,10 +130,9 @@ private fun SettingSections(
                 navController.slideFromBottom(R.id.buySubscriptionFragment)
             }
         )
-        VSpacer(20.dp)
+        VSpacer(32.dp)
     }
 
-    VSpacer(12.dp)
     CellUniversalLawrenceSection(
         listOf({
             HsSettingCell(
@@ -306,10 +305,7 @@ private fun SettingSections(
                     onClick = {
                         navController.slideFromRight(R.id.baseCurrencySettingsFragment)
 
-                        stat(
-                            page = StatPage.Settings,
-                            event = StatEvent.Open(StatPage.BaseCurrency)
-                        )
+                        stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.BaseCurrency))
                     }
                 )
             }
@@ -327,41 +323,6 @@ private fun SettingSections(
             }
         }
     )
-
-    /*VSpacer(32.dp)
-
-    CellUniversalLawrenceSection(
-        listOf(
-            {
-                HsSettingCell(
-                    R.string.Settings_BotSupport,
-                    R.drawable.ic_ai_assistant_24,
-                    onClick = {
-
-                    }
-                )
-            },
-        )
-    )
-
-    if (!BuildConfig.FDROID_BUILD) {
-        VSpacer(24.dp)
-
-        PremiumHeader()
-
-        SectionPremiumUniversalLawrence {
-            HsSettingCell(
-                title = R.string.Settings_VipSupport,
-                icon = R.drawable.ic_support_yellow_24,
-                iconTint = ComposeAppTheme.colors.jacob,
-                onClick = {
-                    navController.paidAction(VIPSupport) {
-                        openVipSupport.invoke()
-                    }
-                }
-            )
-        }
-    }
 
     VSpacer(32.dp)
 
@@ -400,61 +361,7 @@ private fun SettingSections(
         })
     )
 
-    /*VSpacer(24.dp)
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 32.dp)
-            .height(32.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        subhead1_grey(text = stringResource(id = R.string.Settings_JoinUnstoppables).uppercase())
-    }
-    CellUniversalLawrenceSection(
-        listOf({
-            HsSettingCell(
-                R.string.Settings_Telegram,
-                R.drawable.ic_telegram_24,
-                onClick = {
-                    LinkHelper.openLinkInAppBrowser(context, App.appConfigProvider.appTelegramLink)
-
-                    stat(
-                        page = StatPage.Settings,
-                        event = StatEvent.Open(StatPage.ExternalTelegram)
-                    )
-                }
-            )
-        }, {
-            HsSettingCell(
-                R.string.Settings_Twitter,
-                R.drawable.ic_twitter_24,
-                onClick = {
-                    LinkHelper.openLinkInAppBrowser(context, App.appConfigProvider.appTwitterLink)
-
-                    stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.ExternalTwitter))
-                }
-            )
-        })
-    )
-
-    VSpacer(32.dp)
-
-    CellUniversalLawrenceSection(
-        listOf {
-            HsSettingCell(
-                R.string.Settings_Donate,
-                R.drawable.ic_heart_24,
-                onClick = {
-                    navController.slideFromRight(R.id.donateTokenSelectFragment)
-
-                    stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.Donate))
-                }
-            )
-        }
-    )*/
-
-    VSpacer(32.dp)
+    VSpacer(24.dp)
 }
 
 @Composable
