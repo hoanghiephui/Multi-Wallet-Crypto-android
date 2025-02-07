@@ -15,22 +15,19 @@ object AdvancedSearch : IPaidAction
 object TradeSignals : IPaidAction
 
 @Parcelize
-object TransactionSpeedTools : IPaidAction
-
-@Parcelize
 object DuressMode : IPaidAction
 
 @Parcelize
-object AddressVerification : IPaidAction
+object AddressPhishing : IPaidAction
+
+@Parcelize
+object AddressBlacklist : IPaidAction
 
 @Parcelize
 object PrivacyMode : IPaidAction
 
 @Parcelize
 object VIPSupport : IPaidAction
-
-@Parcelize
-object VIPClub : IPaidAction
 
 @Parcelize
 object Watchlist: IPaidAction

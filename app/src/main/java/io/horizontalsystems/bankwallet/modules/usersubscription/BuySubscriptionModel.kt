@@ -2,7 +2,8 @@ package io.horizontalsystems.bankwallet.modules.usersubscription
 
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.providers.Translator
-import io.horizontalsystems.subscriptions.core.AddressVerification
+import io.horizontalsystems.subscriptions.core.AddressBlacklist
+import io.horizontalsystems.subscriptions.core.AddressPhishing
 import io.horizontalsystems.subscriptions.core.AdvancedSearch
 import io.horizontalsystems.subscriptions.core.BasePlan
 import io.horizontalsystems.subscriptions.core.DuressMode
@@ -13,8 +14,6 @@ import io.horizontalsystems.subscriptions.core.PricingPhase
 import io.horizontalsystems.subscriptions.core.PrivacyMode
 import io.horizontalsystems.subscriptions.core.TokenInsights
 import io.horizontalsystems.subscriptions.core.TradeSignals
-import io.horizontalsystems.subscriptions.core.TransactionSpeedTools
-import io.horizontalsystems.subscriptions.core.VIPClub
 import io.horizontalsystems.subscriptions.core.VIPSupport
 import io.horizontalsystems.subscriptions.core.Watchlist
 
@@ -25,12 +24,11 @@ object BuySubscriptionModel {
             TokenInsights -> R.string.Premium_UpgradeFeature_TokenInsights
             AdvancedSearch -> R.string.Premium_UpgradeFeature_AdvancedSearch
             TradeSignals -> R.string.Premium_UpgradeFeature_TradeSignals
-            TransactionSpeedTools -> R.string.Premium_UpgradeFeature_TxSpeedTools
             DuressMode -> R.string.Premium_UpgradeFeature_DuressMode
-            AddressVerification -> R.string.Premium_UpgradeFeature_AddressVerification
+            AddressPhishing -> R.string.Premium_UpgradeFeature_AddressPhishing
+            AddressBlacklist -> R.string.Premium_UpgradeFeature_AddressBlacklist
             PrivacyMode -> R.string.Premium_UpgradeFeature_PrivacyMode
             VIPSupport -> R.string.Premium_UpgradeFeature_VipSupport
-            VIPClub -> R.string.Premium_UpgradeFeature_VipClub
             Watchlist -> R.string.Market_Tab_Watchlist
             MultiWallet -> R.string.Premium_UpgradeFeature_MultiWallet
             NoAds -> R.string.Premium_UpgradeFeature_NoAds
@@ -42,12 +40,11 @@ object BuySubscriptionModel {
             TokenInsights -> R.string.Premium_UpgradeFeature_TokenInsights_Description
             AdvancedSearch -> R.string.Premium_UpgradeFeature_AdvancedSearch_Description
             TradeSignals -> R.string.Premium_UpgradeFeature_TradeSignals_Description
-            TransactionSpeedTools -> R.string.Premium_UpgradeFeature_TxSpeedTools_Description
             DuressMode -> R.string.Premium_UpgradeFeature_DuressMode_Description
-            AddressVerification -> R.string.Premium_UpgradeFeature_AddressVerification_Description
+            AddressPhishing -> R.string.Premium_UpgradeFeature_AddressPhishing_Description
+            AddressBlacklist -> R.string.Premium_UpgradeFeature_AddressBlacklist_Description
             PrivacyMode -> R.string.Premium_UpgradeFeature_PrivacyMode_Description
             VIPSupport -> R.string.Premium_UpgradeFeature_VipSupport_Description
-            VIPClub -> R.string.Premium_UpgradeFeature_VipClub_Description
             Watchlist -> R.string.Hud_Added_To_Watchlist
             MultiWallet -> R.string.Premium_UpgradeFeature_MultiWallet_Description
             NoAds -> R.string.Premium_UpgradeFeature_NoAds_Description
@@ -59,12 +56,11 @@ object BuySubscriptionModel {
             TokenInsights -> R.string.Premium_UpgradeFeature_TokenInsights_BigDescription
             AdvancedSearch -> R.string.Premium_UpgradeFeature_AdvancedSearch_BigDescription
             TradeSignals -> R.string.Premium_UpgradeFeature_TradeSignals_BigDescription
-            TransactionSpeedTools -> R.string.Premium_UpgradeFeature_TxSpeedTools_BigDescription
             DuressMode -> R.string.Premium_UpgradeFeature_DuressMode_BigDescription
-            AddressVerification -> R.string.Premium_UpgradeFeature_AddressVerification_BigDescription
+            AddressPhishing -> R.string.Premium_UpgradeFeature_AddressPhishing_BigDescription
+            AddressBlacklist -> R.string.Premium_UpgradeFeature_AddressBlacklist_BigDescription
             PrivacyMode -> R.string.Premium_UpgradeFeature_PrivacyMode_BigDescription
             VIPSupport -> R.string.Premium_UpgradeFeature_VipSupport_BigDescription
-            VIPClub -> R.string.Premium_UpgradeFeature_VipClub_BigDescription
             Watchlist -> R.string.Hud_Added_To_Watchlist
             MultiWallet -> R.string.Premium_UpgradeFeature_MultiWallet_BigDescription
             NoAds -> R.string.Premium_UpgradeFeature_NoAds_BigDescription
@@ -76,12 +72,11 @@ object BuySubscriptionModel {
             TokenInsights -> R.drawable.prem_portfolio_24
             AdvancedSearch -> R.drawable.prem_search_discovery_24
             TradeSignals -> R.drawable.prem_ring_24
-            TransactionSpeedTools -> R.drawable.prem_outgoingraw_24
             DuressMode -> R.drawable.prem_duress_24
-            AddressVerification -> R.drawable.prem_shield_24
+            AddressPhishing -> R.drawable.prem_shield_24
+            AddressBlacklist -> R.drawable.prem_warning_24
             PrivacyMode -> R.drawable.prem_fraud_24
             VIPSupport -> R.drawable.prem_vip_support_24
-            VIPClub -> R.drawable.prem_chat_support_24
             Watchlist -> R.drawable.star_filled_yellow_16
             MultiWallet -> R.drawable.ic_in_wallet_dark_24
             NoAds -> R.drawable.baseline_ads_click_24
