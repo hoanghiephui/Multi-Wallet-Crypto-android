@@ -24,7 +24,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -34,6 +37,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -62,7 +67,6 @@ import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.HSCircularProgressIndicator
 import io.horizontalsystems.bankwallet.ui.compose.components.HeaderStick
 import io.horizontalsystems.bankwallet.ui.compose.components.HsImage
-import io.horizontalsystems.bankwallet.ui.compose.components.ListEmptyView
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.ScreenMessageWithAction
@@ -70,6 +74,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.ScrollableTabs
 import io.horizontalsystems.bankwallet.ui.compose.components.SectionItemPosition
 import io.horizontalsystems.bankwallet.ui.compose.components.SectionUniversalItem
 import io.horizontalsystems.bankwallet.ui.compose.components.TabItem
+import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.sectionItemBorder
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
@@ -82,7 +87,7 @@ fun TransactionsScreen(
 ) {
     val accountsViewModel =
         viewModel<BalanceAccountsViewModel>(factory = BalanceModule.AccountsFactory())
-    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.TRANSACTION_NATIVE, viewModel)
+    val (adState, _) = rememberAdNativeView(BuildConfig.TRANSACTION_NATIVE, viewModel)
 
     val filterTypes by viewModel.filterTypesLiveData.observeAsState()
     val showFilterAlertDot by viewModel.filterResetEnabled.observeAsState(false)
@@ -90,86 +95,111 @@ fun TransactionsScreen(
     val uiState = viewModel.uiState
     val syncing = uiState.syncing
     val transactions = uiState.transactions
+    val scrollBehavior =
+        TopAppBarDefaults.exitUntilCollapsedScrollBehavior(rememberTopAppBarState())
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        containerColor = Color.Transparent,
+        contentColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            AppBar(
+                scrollBehavior = scrollBehavior,
+                title = stringResource(R.string.Transactions_Title),
+                showSpinner = syncing,
+                menuItems = listOf(
+                    MenuItem(
+                        title = TranslatableString.ResString(R.string.Transactions_Filter),
+                        icon = R.drawable.ic_manage_2_24,
+                        showAlertDot = showFilterAlertDot,
+                        onClick = {
+                            navController.slideFromRight(R.id.transactionFilterFragment)
 
-    Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-        AppBar(
-            title = stringResource(R.string.Transactions_Title),
-            showSpinner = syncing,
-            menuItems = listOf(
-                MenuItem(
-                    title = TranslatableString.ResString(R.string.Transactions_Filter),
-                    icon = R.drawable.ic_manage_2_24,
-                    showAlertDot = showFilterAlertDot,
-                    onClick = {
-                        navController.slideFromRight(R.id.transactionFilterFragment)
-
-                        stat(
-                            page = StatPage.Transactions,
-                            event = StatEvent.Open(StatPage.TransactionFilter)
-                        )
-                    },
+                            stat(
+                                page = StatPage.Transactions,
+                                event = StatEvent.Open(StatPage.TransactionFilter)
+                            )
+                        },
+                    )
                 )
             )
-        )
-        filterTypes?.let { filterTypes ->
-            FilterTypeTabs(
-                filterTypes = filterTypes,
-                onTransactionTypeClick = {
-                    viewModel.setFilterTransactionType(it)
-
-                    stat(page = StatPage.Transactions, event = StatEvent.SwitchTab(it.statTab))
-                }
-            )
         }
+    ) { innerPaddings ->
+        Column(
+            modifier = Modifier.padding(innerPaddings)
+        ) {
+            filterTypes?.let { filterTypes ->
+                FilterTypeTabs(
+                    filterTypes = filterTypes,
+                    onTransactionTypeClick = {
+                        viewModel.setFilterTransactionType(it)
 
-        Crossfade(uiState.viewState, label = "") { viewState ->
-            if (viewState == ViewState.Success) {
-                transactions?.let { transactionItems ->
-                    if (transactionItems.isEmpty()) {
-                        if (syncing) {
-                            ScreenMessageWithAction(
-                                text = stringResource(R.string.Transactions_WaitForSync),
-                                icon = R.drawable.ic_clock
-                            ) {
-                                MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
+                        stat(page = StatPage.Transactions, event = StatEvent.SwitchTab(it.statTab))
+                    }
+                )
+            }
+
+            Crossfade(uiState.viewState, label = "") { viewState ->
+                if (viewState == ViewState.Success) {
+                    transactions?.let { transactionItems ->
+                        if (transactionItems.isEmpty()) {
+                            if (syncing) {
+                                ScreenMessageWithAction(
+                                    text = stringResource(R.string.Transactions_WaitForSync),
+                                    icon = R.drawable.ic_clock
+                                ) {
+                                    MaxTemplateNativeAdViewComposable(
+                                        adState,
+                                        AdType.SMALL,
+                                        navController
+                                    )
+                                }
+                            } else {
+                                ScreenMessageWithAction(
+                                    text = stringResource(R.string.Transactions_EmptyList),
+                                    icon = R.drawable.ic_outgoingraw
+                                ) {
+                                    MaxTemplateNativeAdViewComposable(
+                                        adState,
+                                        AdType.SMALL,
+                                        navController
+                                    )
+                                }
                             }
                         } else {
-                            ScreenMessageWithAction(
-                                text = stringResource(R.string.Transactions_EmptyList),
-                                icon = R.drawable.ic_outgoingraw
+                            val listState = rememberSaveable(
+                                uiState.transactionListId,
+                                (accountsViewModel.balanceScreenState as? BalanceScreenState.HasAccount)?.accountViewItem?.id,
+                                saver = LazyListState.Saver
                             ) {
-                                MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
+                                LazyListState(0, 0)
                             }
-                        }
-                    } else {
-                        val listState = rememberSaveable(
-                            uiState.transactionListId,
-                            (accountsViewModel.balanceScreenState as? BalanceScreenState.HasAccount)?.accountViewItem?.id,
-                            saver = LazyListState.Saver
-                        ) {
-                            LazyListState(0, 0)
-                        }
 
-                        val onClick: (TransactionViewItem) -> Unit = remember {
-                            {
-                                onTransactionClick(
-                                    it,
-                                    viewModel,
-                                    navController
+                            val onClick: (TransactionViewItem) -> Unit = remember {
+                                {
+                                    onTransactionClick(
+                                        it,
+                                        viewModel,
+                                        navController
+                                    )
+                                }
+                            }
+
+                            LazyColumn(state = listState) {
+                                item {
+                                    VSpacer(height = 8.dp)
+                                    MaxTemplateNativeAdViewComposable(
+                                        adState,
+                                        AdType.SMALL,
+                                        navController
+                                    )
+                                }
+                                transactionList(
+                                    transactionsMap = transactionItems,
+                                    willShow = { viewModel.willShow(it) },
+                                    onClick = onClick,
+                                    onBottomReached = { viewModel.onBottomReached() }
                                 )
                             }
-                        }
-
-                        LazyColumn(state = listState) {
-                            item {
-                                MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
-                            }
-                            transactionList(
-                                transactionsMap = transactionItems,
-                                willShow = { viewModel.willShow(it) },
-                                onClick = onClick,
-                                onBottomReached = { viewModel.onBottomReached() }
-                            )
                         }
                     }
                 }

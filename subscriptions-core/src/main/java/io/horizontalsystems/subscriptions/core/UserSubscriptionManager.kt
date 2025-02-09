@@ -13,7 +13,7 @@ object UserSubscriptionManager {
 
     private val predefinedSubscriptions = listOf(
         Subscription(
-            id = "product.subscription_1",
+            id = "com.blockchain.btc.coinhub_month",
             name = "PRO",
             description = "",
             actions = listOf(
