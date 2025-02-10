@@ -2,6 +2,7 @@ package io.horizontalsystems.bankwallet.modules.usersubscription
 
 import android.app.Activity
 import androidx.lifecycle.viewModelScope
+import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.ViewModelUiState
 import io.horizontalsystems.subscriptions.core.BasePlan
 import io.horizontalsystems.subscriptions.core.HSPurchase
@@ -58,6 +59,7 @@ class BuySubscriptionChoosePlanViewModel : ViewModelUiState<BuySubscriptionChoos
                 error = e
             }
             UserSubscriptionManager.purchaseStateUpdated()
+            App.marketWidgetManager.updateWatchListWidgets()
             purchaseInProgress = false
             emitState()
         }

@@ -73,11 +73,14 @@ class MarketWidgetManager {
         var marketItems = marketRepository.getMarketItems(state.type)
         marketItems =
             marketItems.map { it.copy(imageLocalPath = imagePathCache[it.imageRemoteUrl]) }
-        hasSubscription = UserSubscriptionManager.purchaseStateUpdatedFlow.map {
-            UserSubscriptionManager.getActiveUserSubscriptions().isNotEmpty()
-        }.first()
+        hasSubscription = UserSubscriptionManager.getActiveUserSubscriptions().isNotEmpty()
         state =
-            state.copy(items = marketItems, loading = false, error = null, isPlusUser = hasSubscription)
+            state.copy(
+                items = marketItems,
+                loading = false,
+                error = null,
+                isPlusUser = hasSubscription
+            )
         setWidgetState(context, glanceId, state)
 
         marketItems = marketItems.map { item ->

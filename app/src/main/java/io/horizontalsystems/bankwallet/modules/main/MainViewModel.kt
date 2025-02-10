@@ -331,7 +331,7 @@ class MainViewModel(
                         }
                     }
                     deeplinkString.contains("plus") -> {
-                        deeplinkPage = DeeplinkPage(R.id.BillingPlusDialog, CoinFragment.Input("widget"))
+                        deeplinkPage = DeeplinkPage(R.id.buySubscriptionFragment, CoinFragment.Input("widget"))
                     }
                 }
 
@@ -346,7 +346,7 @@ class MainViewModel(
                 }
             }
 
-            deeplinkString.startsWith("unstoppable.money:") ||
+            deeplinkString.startsWith("coinhub8899.web.app:") ||
             deeplinkString.startsWith("tc:") -> {
                 val v = deepLink.getQueryParameter("v")?.toIntOrNull()
                 if (v != null) {

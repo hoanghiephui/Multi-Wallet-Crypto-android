@@ -84,10 +84,12 @@ class TextStyles {
 }
 
 @Composable
-fun AppWidgetTheme(colors: ColorProviders = AppWidgetTheme.colors, content: @Composable () -> Unit) {
+fun AppWidgetTheme(
+    colors: ColorProviders = AppWidgetTheme.colors,
+    content: @Composable () -> Unit
+) {
     CompositionLocalProvider(
-        LocalColorProviders provides colors,
-        LocalLifecycleOwner provides LocalLifecycleOwner.current
+        LocalColorProviders provides colors
     ) {
         content()
     }
