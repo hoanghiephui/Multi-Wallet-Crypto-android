@@ -1,6 +1,7 @@
 package io.horizontalsystems.bankwallet.modules.main
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -15,6 +16,8 @@ import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.modules.intro.IntroActivity
 import io.horizontalsystems.bankwallet.modules.keystore.KeyStoreActivity
 import io.horizontalsystems.bankwallet.modules.lockscreen.LockScreenActivity
+import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
+import io.horizontalsystems.bankwallet.worker.NewsNotificationWorker.Companion.INTENT_NEWS_NOTIFICATION
 import io.horizontalsystems.bankwallet.worker.Sync
 import io.horizontalsystems.core.hideKeyboard
 
@@ -34,6 +37,7 @@ class MainActivity : BaseActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         viewModel.setIntent(intent)
+        handleIntent(intent)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,6 +95,7 @@ class MainActivity : BaseActivity() {
         Sync.initialize(this)
 
         viewModel.setIntent(intent)
+        handleIntent(intent)
     }
 
     fun validate(
@@ -124,5 +129,14 @@ class MainActivity : BaseActivity() {
     } catch (e: MainScreenValidationError.KeystoreRuntimeException) {
         Toast.makeText(App.instance, "Issue with Keystore", Toast.LENGTH_SHORT).show()
         finish()
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        when (intent?.action) {
+            INTENT_NEWS_NOTIFICATION -> {
+                val url = intent.getStringExtra("news") ?: return
+                LinkHelper.openLinkInAppBrowser(this, url)
+            }
+        }
     }
 }

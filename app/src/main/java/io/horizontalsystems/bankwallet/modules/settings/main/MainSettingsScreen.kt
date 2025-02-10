@@ -305,7 +305,10 @@ private fun SettingSections(
                     onClick = {
                         navController.slideFromRight(R.id.baseCurrencySettingsFragment)
 
-                        stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.BaseCurrency))
+                        stat(
+                            page = StatPage.Settings,
+                            event = StatEvent.Open(StatPage.BaseCurrency)
+                        )
                     }
                 )
             }
@@ -374,6 +377,19 @@ private fun SettingSections(
     }
     CellUniversalLawrenceSection(
         listOf({
+            HsSettingCell(
+                R.string.Settings_Telegram,
+                R.drawable.ic_telegram_24,
+                onClick = {
+                    LinkHelper.openLinkInAppBrowser(context, App.appConfigProvider.appTelegramLink)
+
+                    stat(
+                        page = StatPage.Settings,
+                        event = StatEvent.Open(StatPage.ExternalTelegram)
+                    )
+                }
+            )
+        }, {
             HsSettingCell(
                 R.string.Settings_Twitter,
                 R.drawable.ic_twitter_24,

@@ -12,7 +12,9 @@ import com.wallet.blockchain.bitcoin.R
 
 const val SYNC_TOPIC = "sync"
 private const val SYNC_NOTIFICATION_ID = 210
+const val NEWS_NOTIFICATION_ID = 2025
 private const val SYNC_NOTIFICATION_CHANNEL_ID = "SyncCoinNotificationChannel"
+const val NEWS_NOTIFICATION_CHANNEL_ID = "NewsNotificationChannel"
 
 // All sync work needs an internet connectionS
 val SyncConstraints
@@ -27,6 +29,11 @@ val SyncConstraints
 fun Context.syncForegroundInfo() = ForegroundInfo(
     SYNC_NOTIFICATION_ID,
     syncWorkNotification(),
+)
+
+fun Context.newsForegroundInfo() = ForegroundInfo(
+    NEWS_NOTIFICATION_ID,
+    newsWorkNotification(),
 )
 
 /**
@@ -50,6 +57,32 @@ private fun Context.syncWorkNotification(): Notification {
     return NotificationCompat.Builder(
         this,
         SYNC_NOTIFICATION_CHANNEL_ID,
+    )
+        .setSmallIcon(
+            R.drawable.ic_logo_notification,
+        )
+        .setContentTitle(getString(R.string.sync_work_notification_title))
+        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        .build()
+}
+
+private fun Context.newsWorkNotification(): Notification {
+    val channel = NotificationChannel(
+        NEWS_NOTIFICATION_CHANNEL_ID,
+        getString(R.string.sync_work_notification_channel_name),
+        NotificationManager.IMPORTANCE_DEFAULT,
+    ).apply {
+        description = getString(R.string.sync_work_notification_channel_description)
+    }
+    // Register the channel with the system
+    val notificationManager: NotificationManager? =
+        getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+
+    notificationManager?.createNotificationChannel(channel)
+
+    return NotificationCompat.Builder(
+        this,
+        NEWS_NOTIFICATION_CHANNEL_ID,
     )
         .setSmallIcon(
             R.drawable.ic_logo_notification,

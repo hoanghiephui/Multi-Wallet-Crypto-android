@@ -91,7 +91,7 @@ internal class SyncWorker @AssistedInject constructor(
             .setContentIntent(pendingIntent)
             .build()
 
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+        if (checkSelfPermission(context, permission.POST_NOTIFICATIONS) == PERMISSION_GRANTED) {
             NotificationManagerCompat.from(context).notify(NOTIFICATION_ID, notification)
         }
     }
