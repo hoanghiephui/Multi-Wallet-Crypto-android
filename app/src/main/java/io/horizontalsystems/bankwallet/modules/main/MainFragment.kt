@@ -58,8 +58,6 @@ import androidx.navigation.NavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.android.play.core.review.ReviewManager
-import com.google.android.play.core.review.ReviewManagerFactory
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.slideFromBottom
@@ -95,7 +93,9 @@ import io.horizontalsystems.bankwallet.ui.extensions.HeaderUpdate
 import io.horizontalsystems.bankwallet.ui.extensions.rememberLifecycleEvent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import se.warting.inappupdate.compose.findActivity
 import se.warting.inappupdate.compose.rememberInAppUpdateState
+import se.warting.inappupdate.compose.review.rememberInAppReviewManager
 
 class MainFragment : BaseComposeFragment() {
     private val searchViewModel by viewModels<MarketSearchViewModel> { MarketSearchModule.Factory() }
@@ -186,7 +186,7 @@ private fun MainScreen(
     val modalBottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val lifecycleEvent = rememberLifecycleEvent()
     val updateState = rememberInAppUpdateState()
-    val manager: ReviewManager = ReviewManagerFactory.create(mainActivity)
+    val inAppReviewManager = rememberInAppReviewManager()
     val openPro by viewModel.openPro.collectAsStateWithLifecycle()
     val bottomBarHeight = remember { mutableFloatStateOf(0f) }
     val bottomBarOffsetHeightPx = remember { mutableFloatStateOf(0f) }
@@ -320,18 +320,17 @@ private fun MainScreen(
         HideContentBox(uiState.contentHidden)
     }
 
-    LaunchedEffect(key1 = uiState, block = {
+    LaunchedEffect(key1 = uiState.showRateAppDialog, block = {
         if (uiState.showRateAppDialog) {
-            val request = manager.requestReviewFlow()
-            request.addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val reviewInfo = task.result
-                    val flow = manager.launchReviewFlow(mainActivity, reviewInfo)
-                    flow.addOnCompleteListener { _ ->
-
-                    }
+            inAppReviewManager.launchReviewFlow(
+                activity = context.findActivity(),
+                onReviewRequestSuccess = {
+                    viewModel.closeRateDialog()
+                },
+                onReviewRequestFail = {
+                    viewModel.closeRateDialog()
                 }
-            }
+            )
         }
     })
 
