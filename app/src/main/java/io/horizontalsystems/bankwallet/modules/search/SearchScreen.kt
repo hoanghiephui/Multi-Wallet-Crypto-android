@@ -175,6 +175,7 @@ fun SearchScreen(
                                 R.id.coinFragment,
                                 CoinFragment.Input(coin.uid)
                             )
+                            searchViewModel.onClearSearch()
                         },
                         backgroundColor = MaterialTheme.colorScheme.inverseOnSurface,
                         onFavoriteClick = { favorite, coinUid ->
