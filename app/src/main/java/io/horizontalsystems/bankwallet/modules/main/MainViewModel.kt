@@ -2,6 +2,10 @@ package io.horizontalsystems.bankwallet.modules.main
 
 import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import cash.z.ecc.android.sdk.ext.collectWith
 import com.android.billing.models.ScreenState
@@ -99,6 +103,7 @@ class MainViewModel(
     private var wcSupportState: WCManager.SupportState? = null
     private var torEnabled = localStorage.torEnabled
     private var isShowBalance = false
+    private var isLoadBalance by mutableStateOf(true)
 
     val wallets: List<Account>
         get() = accountManager.accounts.filter { !it.isWatchAccount }
@@ -172,7 +177,8 @@ class MainViewModel(
         activeWallet = activeWallet,
         wcSupportState = wcSupportState,
         torEnabled = torEnabled,
-        isShowBalance = isShowBalance
+        isShowBalance = isShowBalance,
+        isLoadBalance = isLoadBalance
     )
 
     private fun isTransactionsTabEnabled(): Boolean =
@@ -223,7 +229,7 @@ class MainViewModel(
         emitState()
     }
 
-    private fun navigationItems(): List<MainModule.NavigationViewItem> {
+    private fun navigationItems(): List<NavigationViewItem> {
         return items.mapIndexed { index, mainNavItem ->
             getNavItem(mainNavItem, index == selectedTabIndex)
         }
@@ -420,6 +426,7 @@ class MainViewModel(
 
     fun openPageBalance(isBalance: Boolean) {
         isShowBalance = isBalance
+        isLoadBalance = false
         emitState()
     }
 

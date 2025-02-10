@@ -70,6 +70,7 @@ import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.core.stats.statTab
 import io.horizontalsystems.bankwallet.modules.balance.ui.BalanceScreen
 import io.horizontalsystems.bankwallet.modules.billing.showBillingPlusDialog
+import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.keystore.NoSystemLockWarning
 import io.horizontalsystems.bankwallet.modules.main.MainModule.MainNavigation
 import io.horizontalsystems.bankwallet.modules.manageaccount.dialogs.BackupRequiredDialog
@@ -280,18 +281,22 @@ private fun MainScreen(
                                     isWithBalance = true
                                 )
                             }
-                            if (uiState.isShowBalance) {
-                                BalanceScreen(
-                                    fragmentNavController,
-                                    mainViewModel = viewModel,
-                                )
+                            if (uiState.isLoadBalance) {
+                                Loading()
                             } else {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxSize(),
-                                    verticalArrangement = Arrangement.Center
-                                ) {
-                                    NoSystemLockWarning()
+                                if (uiState.isShowBalance) {
+                                    BalanceScreen(
+                                        fragmentNavController,
+                                        mainViewModel = viewModel,
+                                    )
+                                } else {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxSize(),
+                                        verticalArrangement = Arrangement.Center
+                                    ) {
+                                        NoSystemLockWarning()
+                                    }
                                 }
                             }
                         }

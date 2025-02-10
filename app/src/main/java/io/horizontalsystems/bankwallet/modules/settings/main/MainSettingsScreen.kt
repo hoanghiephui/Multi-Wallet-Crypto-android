@@ -362,6 +362,29 @@ private fun SettingSections(
     )
 
     VSpacer(24.dp)
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 32.dp)
+            .height(32.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        subhead1_grey(text = stringResource(id = R.string.Settings_JoinUnstoppables).uppercase())
+    }
+    CellUniversalLawrenceSection(
+        listOf({
+            HsSettingCell(
+                R.string.Settings_Twitter,
+                R.drawable.ic_twitter_24,
+                onClick = {
+                    LinkHelper.openLinkInAppBrowser(context, App.appConfigProvider.appTwitterLink)
+
+                    stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.ExternalTwitter))
+                }
+            )
+        })
+    )
 }
 
 @Composable

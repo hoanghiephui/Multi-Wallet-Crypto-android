@@ -13,3 +13,4 @@ project(":in-app-update").projectDir = new File("In-App-Update/inappupdatecompos
 include ':lightweightlibrary'
 project(":lightweightlibrary").projectDir = new File("lightweight-charts-android/lightweightlibrary")
 include ':billing'
+include ':feature:address'

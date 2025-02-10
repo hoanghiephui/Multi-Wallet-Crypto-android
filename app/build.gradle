@@ -36,7 +36,7 @@ android {
         resValue "string", "appWebPageLink", "http://play.google.com/store/apps/details?id=com.wallet.blockchain.bitcoin"
         resValue "string", "analyticsLink", "https://unstoppable.money/analytics"
         resValue "string", "appGithubLink", "https://github.com/hoanghiephui/unstoppable-wallet-android"
-        resValue "string", "appTwitterLink", "https://twitter.com/UnstoppableByHS"
+        resValue "string", "appTwitterLink", "https://x.com/CoinDex68"
         resValue "string", "appTelegramLink", "https://t.me/unstoppable_announcements"
         resValue "string", "reportEmail", "living.solutions.vn@gmail.com"
         resValue "string", "releaseNotesUrl", "https://api.github.com/repos/horizontalsystems/unstoppable-wallet-android/releases/tags/"
