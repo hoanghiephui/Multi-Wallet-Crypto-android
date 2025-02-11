@@ -5,12 +5,14 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -29,18 +31,22 @@ import io.horizontalsystems.bankwallet.modules.chart.ChartViewModel
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Chart
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
+import io.horizontalsystems.bankwallet.modules.market.platform.InfoBottomSheet
 import io.horizontalsystems.bankwallet.modules.market.topcoins.SelectorDialogState
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
+import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AlertGroup
+import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryToggle
 import io.horizontalsystems.bankwallet.ui.compose.components.CoinList
-import io.horizontalsystems.bankwallet.ui.compose.components.DescriptionCard
 import io.horizontalsystems.bankwallet.ui.compose.components.HeaderSorting
+import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
+import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.SortMenu
-import io.horizontalsystems.bankwallet.ui.compose.components.TopCloseButton
 import io.horizontalsystems.marketkit.models.CoinCategory
+import kotlinx.coroutines.launch
 
 class MarketCategoryFragment : BaseComposeFragment() {
 
@@ -75,7 +81,7 @@ class MarketCategoryFragment : BaseComposeFragment() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CategoryScreen(
     viewModel: MarketCategoryViewModel,
@@ -84,16 +90,42 @@ fun CategoryScreen(
     onCoinClick: (String) -> Unit,
     navController: NavController
 ) {
+    val coroutineScope = rememberCoroutineScope()
     var scrollToTopAfterUpdate by rememberSaveable { mutableStateOf(false) }
     val viewItemState by viewModel.viewStateLiveData.observeAsState(ViewState.Loading)
     val viewItems by viewModel.viewItemsLiveData.observeAsState()
     val isRefreshing by viewModel.isRefreshingLiveData.observeAsState(false)
     val selectorDialogState by viewModel.selectorDialogStateLiveData.observeAsState()
+    val infoModalBottomSheetState =
+        androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var isInfoBottomSheetVisible by remember { mutableStateOf(false) }
 
-    Surface(color = ComposeAppTheme.colors.tyler) {
-        Column {
-            TopCloseButton(onCloseButtonClick = onCloseButtonClick)
-
+    Scaffold(
+        backgroundColor = ComposeAppTheme.colors.tyler,
+        topBar = {
+            AppBar(
+                title = viewModel.categoryName,
+                navigationIcon = {
+                    HsBackButton(onClick = onCloseButtonClick = onCloseButtonClick)
+                },
+                menuItems = listOf(
+                    MenuItem(
+                        title = TranslatableString.ResString(R.string.Info_Title),
+                        icon = R.drawable.ic_info_24,
+                        onClick = {
+                            coroutineScope.launch {
+                                infoModalBottomSheetState.show()
+                            }
+                            isInfoBottomSheetVisible = true
+                        },
+                    )
+                )
+            )
+        },
+    ) { innerPaddings ->
+        Column(
+            modifier = Modifier.padding(innerPaddings)
+        ) {
             HSSwipeRefresh(
                 refreshing = isRefreshing,
                 onRefresh = {
@@ -107,12 +139,14 @@ fun CategoryScreen(
                         }
 
                         is ViewState.Error -> {
-                            ListErrorView(stringResource(R.string.SyncError), viewModel::onErrorClick)
+                            ListErrorView(
+                                stringResource(R.string.SyncError),
+                                viewModel::onErrorClick
+                            )
                         }
 
                         ViewState.Success -> {
                             viewItems?.let {
-                                val header by viewModel.headerLiveData.observeAsState()
                                 val menu by viewModel.menuLiveData.observeAsState()
 
                                 CoinList(
@@ -122,17 +156,15 @@ fun CategoryScreen(
                                     onRemoveFavorite = { uid -> viewModel.onRemoveFavorite(uid) },
                                     onCoinClick = onCoinClick,
                                     preItems = {
-                                        header?.let {
-                                            item {
-                                                DescriptionCard(it.title, it.description, it.icon)
-                                            }
-                                        }
                                         item {
                                             Chart(chartViewModel = chartViewModel)
                                         }
                                         menu?.let {
                                             stickyHeader {
-                                                HeaderSorting(borderTop = true, borderBottom = true) {
+                                                HeaderSorting(
+                                                    borderTop = true,
+                                                    borderBottom = true
+                                                ) {
                                                     Box(modifier = Modifier.weight(1f)) {
                                                         SortMenu(
                                                             it.sortingFieldSelect.selected.titleResId,
@@ -183,6 +215,20 @@ fun CategoryScreen(
             null -> {
             }
         }
+    }
+    if (isInfoBottomSheetVisible) {
+        InfoBottomSheet(
+            icon = R.drawable.ic_info_24,
+            title = viewModel.categoryName,
+            description = viewModel.categoryDescription,
+            bottomSheetState = infoModalBottomSheetState,
+            hideBottomSheet = {
+                coroutineScope.launch {
+                    infoModalBottomSheetState.hide()
+                }
+                isInfoBottomSheetVisible = false
+            }
+        )
     }
 }
 
