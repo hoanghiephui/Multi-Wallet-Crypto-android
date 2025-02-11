@@ -125,7 +125,8 @@ fun SwapScreen(navController: NavController, tokenIn: Token?) {
     )
     val uiState = viewModel.uiState
     val context = LocalContext.current
-    val (adState, _) = rememberAdNativeView(BuildConfig.SWAP_COIN_NATIVE, viewModel)
+    val (adState, _) = rememberAdNativeView(BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "SwapScreen", viewModel)
     SwapScreenInner(
         uiState = uiState,
         onClickClose = navController::popBackStack,

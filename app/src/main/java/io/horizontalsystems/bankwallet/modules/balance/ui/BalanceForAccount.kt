@@ -101,7 +101,10 @@ fun BalanceForAccount(
         HudHelper.showErrorMessage(view, text = message)
         viewModel.errorShown()
     }
-    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.BALANCE_NATIVE, viewModel)
+    val (adState, reloadAd) = rememberAdNativeView(
+        BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "BalanceForAccount", viewModel
+    )
 
     when (viewModel.connectionResult) {
         WalletConnectListViewModel.ConnectionResult.Error -> {

@@ -80,7 +80,8 @@ fun CexDepositScreen(
                 val addressViewModel =
                     viewModel<DepositAddressViewModel>(factory = DepositAddressViewModel.Factory(cexAsset, viewModel.network))
                 val context = LocalContext.current
-                val (adState, reloadAd) = rememberAdNativeView(BuildConfig.TOKEN_BALANCE_NATIVE, addressViewModel)
+                val (adState, reloadAd) = rememberAdNativeView(BuildConfig.HOME_MARKET_NATIVE,
+                    adPlacements = "CexDepositScreen", addressViewModel)
 
                 ReceiveAddressScreen(
                     title = stringResource(R.string.CexDeposit_Title, cexAsset.id),

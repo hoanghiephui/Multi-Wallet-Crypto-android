@@ -87,7 +87,8 @@ fun TransactionsScreen(
 ) {
     val accountsViewModel =
         viewModel<BalanceAccountsViewModel>(factory = BalanceModule.AccountsFactory())
-    val (adState, _) = rememberAdNativeView(BuildConfig.TRANSACTION_NATIVE, viewModel)
+    val (adState, _) = rememberAdNativeView(BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "TransactionsScreen", viewModel)
 
     val filterTypes by viewModel.filterTypesLiveData.observeAsState()
     val showFilterAlertDot by viewModel.filterResetEnabled.observeAsState(false)

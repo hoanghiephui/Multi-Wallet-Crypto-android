@@ -39,7 +39,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
@@ -59,17 +58,12 @@ import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.alternativeImageUrl
 import io.horizontalsystems.bankwallet.core.iconPlaceholder
 import io.horizontalsystems.bankwallet.core.imageUrl
-import io.horizontalsystems.bankwallet.core.navigateWithTermsAccepted
-import io.horizontalsystems.bankwallet.core.paidAction
-import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.modules.market.ImageSource
 import io.horizontalsystems.bankwallet.modules.market.MarketViewItem
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchModule.DiscoveryItem
 import io.horizontalsystems.bankwallet.modules.walletconnect.list.ui.DraggableCardSimple
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
-import io.horizontalsystems.subscriptions.core.MultiWallet
-import io.horizontalsystems.subscriptions.core.Watchlist
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -108,9 +102,7 @@ fun CoinList(
                             if (item.favorited) {
                                 onRemoveFavorite(item.coinUid)
                             } else {
-                                navController.paidAction(Watchlist) {
-                                    onAddFavorite(item.coinUid)
-                                }
+                                onAddFavorite(item.coinUid)
                             }
                             coroutineScope.launch {
                                 delay(200)

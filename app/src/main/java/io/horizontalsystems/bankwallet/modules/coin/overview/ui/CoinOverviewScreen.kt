@@ -111,7 +111,8 @@ fun CoinOverviewScreen(
     val context = LocalContext.current
 
     val coinSymbol = "${fullCoin.coin.code}USDT"
-    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.TRANSACTION_NATIVE, viewModel)
+    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "CoinOverviewScreen", viewModel)
 
     LaunchedEffect(key1 = Unit, block = {
         binanceViewModel.onBinanceAvailable(coinSymbol)

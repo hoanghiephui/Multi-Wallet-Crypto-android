@@ -23,6 +23,7 @@ import timber.log.Timber
 @Composable
 fun rememberAdNativeView(
     adUnitId: String,
+    adPlacements: String,
     revenueListener: MaxAdRevenueListener
 ): Pair<AdNativeUiState, () -> Unit> {
     if (!SHOW_ADS) {
@@ -36,8 +37,10 @@ fun rememberAdNativeView(
     var retryCount by remember { mutableIntStateOf(0) }
     val maxRetries = 3
     val scope = rememberCoroutineScope()
-    val nativeAdLoader = remember(context, adUnitId) {
+    val nativeAdLoader = remember(context, adUnitId, adPlacements) {
         MaxNativeAdLoader(adUnitId, context).apply {
+            placement = adPlacements
+            setExtraParameter("content_url", "https://play.google.com/store/apps/details?id=com.blockchain.btc.coinhub")
             setRevenueListener(revenueListener)
             setNativeAdListener(object : MaxNativeAdListener() {
                 override fun onNativeAdLoaded(loadedNativeAdView: MaxNativeAdView?, ad: MaxAd) {
@@ -104,7 +107,7 @@ fun rememberAdNativeView(
     }
 
     // Return the ad state and the reload function
-    return remember(revenueListener, loadedAd) {
+    return remember(revenueListener, loadedAd, adPlacements) {
         Pair(loadedAd, reloadAd)
     }
 }

@@ -53,7 +53,8 @@ fun SendSolanaScreen(
     val amountCaution = uiState.amountCaution
     val proceedEnabled = uiState.canBeSend
     val amountInputType = amountInputModeViewModel.inputType
-    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.SEND_COIN_NATIVE, viewModel)
+    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "SendSolanaScreen", viewModel)
 
     val paymentAddressViewModel = viewModel<AddressParserViewModel>(
         factory = AddressParserModule.Factory(wallet.token, amount)

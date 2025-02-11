@@ -139,7 +139,8 @@ fun SendBitcoinScreen(
     val amountInputType = amountInputModeViewModel.inputType
     val feeRateCaution = uiState.feeRateCaution
     val rate = viewModel.coinRate
-    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.SEND_COIN_NATIVE, viewModel)
+    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "SendBitcoinScreen", viewModel)
     val paymentAddressViewModel = viewModel<AddressParserViewModel>(
         factory = AddressParserModule.Factory(wallet.token, amount)
     )

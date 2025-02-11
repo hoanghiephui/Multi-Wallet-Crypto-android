@@ -91,7 +91,8 @@ fun TokenBalanceScreen(
     navController: NavController
 ) {
     val uiState = viewModel.uiState
-    val (adState, _) = rememberAdNativeView(BuildConfig.TOKEN_BALANCE_NATIVE, viewModel)
+    val (adState, _) = rememberAdNativeView(BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "TokenBalanceScreen", viewModel)
 
     Scaffold(
         containerColor = Color.Transparent,

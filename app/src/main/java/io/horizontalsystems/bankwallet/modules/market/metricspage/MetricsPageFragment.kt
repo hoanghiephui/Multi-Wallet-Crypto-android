@@ -86,7 +86,8 @@ class MetricsPageFragment : BaseComposeFragment() {
         onCoinClick: (String) -> Unit,
     ) {
         val uiState = viewModel.uiState
-        val (adState, reloadAd) = rememberAdNativeView(BuildConfig.METRICS_NATIVE, viewModel)
+        val (adState, reloadAd) = rememberAdNativeView(BuildConfig.HOME_MARKET_NATIVE,
+            adPlacements = "MetricsPageFragment", viewModel)
 
         Column(Modifier.background(color = MaterialTheme.colorScheme.background)) {
             AppBar(

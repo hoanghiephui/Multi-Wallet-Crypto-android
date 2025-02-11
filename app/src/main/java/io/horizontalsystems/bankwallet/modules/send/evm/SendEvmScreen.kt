@@ -59,7 +59,8 @@ fun SendEvmScreen(
     )
     val amountUnique = paymentAddressViewModel.amountUnique
     val view = LocalView.current
-    val (adState, _) = rememberAdNativeView(BuildConfig.SEND_COIN_NATIVE, viewModel)
+    val (adState, _) = rememberAdNativeView(BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "SendEvmScreen", viewModel)
     val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {

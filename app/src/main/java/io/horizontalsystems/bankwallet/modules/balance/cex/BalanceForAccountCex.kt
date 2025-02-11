@@ -75,7 +75,8 @@ fun BalanceForAccountCex(navController: NavController, accountViewItem: AccountV
     val viewModel = viewModel<BalanceCexViewModel>(factory = BalanceModule.FactoryCex())
     val uiState = viewModel.uiState
     val totalState = viewModel.totalUiState
-    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.BALANCE_NATIVE, viewModel)
+    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "BalanceForAccountCex", viewModel)
     val context = LocalContext.current
 
     val activeScreen = uiState.isActiveScreen

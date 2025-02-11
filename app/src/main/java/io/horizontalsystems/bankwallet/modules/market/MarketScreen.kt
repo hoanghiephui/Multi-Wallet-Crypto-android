@@ -82,7 +82,11 @@ fun MarketScreen(
     val uiState = marketViewModel.uiState
     val tabs = marketViewModel.tabs
 
-    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.HOME_MARKET_NATIVE, marketViewModel)
+    val (adState, reloadAd) = rememberAdNativeView(
+        BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "MarketScreen",
+        marketViewModel
+    )
     var isRefreshing by remember {
         mutableStateOf(false)
     }

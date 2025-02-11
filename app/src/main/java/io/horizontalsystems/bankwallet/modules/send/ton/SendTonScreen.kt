@@ -59,7 +59,8 @@ fun SendTonScreen(
         factory = AddressParserModule.Factory(wallet.token, amount)
     )
     val amountUnique = paymentAddressViewModel.amountUnique
-    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.SEND_COIN_NATIVE, viewModel)
+    val (adState, reloadAd) = rememberAdNativeView(BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "SendTonScreen", viewModel)
 
     ComposeAppTheme {
         val focusRequester = remember { FocusRequester() }

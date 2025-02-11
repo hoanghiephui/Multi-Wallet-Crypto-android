@@ -43,7 +43,8 @@ fun BalanceNoAccount(
     navController: NavController,
     viewModel: BalanceAccountsViewModel
 ) {
-    val (adState, _) = rememberAdNativeView(BuildConfig.BALANCE_NATIVE, viewModel)
+    val (adState, _) = rememberAdNativeView(BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "BalanceNoAccount", viewModel)
 
     Column(
         modifier = Modifier
