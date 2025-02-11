@@ -5,8 +5,8 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -81,7 +81,11 @@ class MarketCategoryFragment : BaseComposeFragment() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class,
+    ExperimentalMaterial3Api::class
+)
 @Composable
 fun CategoryScreen(
     viewModel: MarketCategoryViewModel,
@@ -101,12 +105,12 @@ fun CategoryScreen(
     var isInfoBottomSheetVisible by remember { mutableStateOf(false) }
 
     Scaffold(
-        backgroundColor = ComposeAppTheme.colors.tyler,
+        contentColor = ComposeAppTheme.colors.tyler,
         topBar = {
             AppBar(
                 title = viewModel.categoryName,
                 navigationIcon = {
-                    HsBackButton(onClick = onCloseButtonClick = onCloseButtonClick)
+                    HsBackButton(onClick = onCloseButtonClick)
                 },
                 menuItems = listOf(
                     MenuItem(

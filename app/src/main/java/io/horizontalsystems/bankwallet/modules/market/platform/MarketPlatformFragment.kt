@@ -3,16 +3,14 @@ package io.horizontalsystems.bankwallet.modules.market.platform
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -78,7 +76,7 @@ class MarketPlatformFragment : BaseComposeFragment() {
 
                 PlatformScreen(
                     factory = factory,
-                    platform = platform,onCloseButtonClick = { navController.popBackStack() },
+                    platform = platform, onCloseButtonClick = { navController.popBackStack() },
                     onCoinClick = { coinUid ->
                         val arguments = CoinFragment.Input(coinUid)
                         navController.slideFromRight(R.id.coinFragment, arguments)
@@ -90,11 +88,16 @@ class MarketPlatformFragment : BaseComposeFragment() {
             } ?: navController.popBackStack()
         }
     }
+
     override val logScreen: String
         get() = "MarketPlatformFragment"
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class,
+    ExperimentalMaterial3Api::class
+)
 @Composable
 private fun PlatformScreen(
     factory: ViewModelProvider.Factory,
@@ -115,7 +118,7 @@ private fun PlatformScreen(
     var isInfoBottomSheetVisible by remember { mutableStateOf(false) }
 
     Scaffold(
-        backgroundColor = ComposeAppTheme.colors.tyler,
+        contentColor = ComposeAppTheme.colors.tyler,
         topBar = {
             AppBar(
                 title = platform.name,
@@ -250,11 +253,11 @@ private fun PlatformScreen(
 private fun HeaderContent(title: String, description: String, image: ImageSource) {
     Row(
         modifier = Modifier
-                .padding(horizontal = 16.dp)
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(top = 12.dp, bottom = 16.dp)
+            .padding(horizontal = 16.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(top = 12.dp, bottom = 16.dp)
                 .weight(1f)
         ) {
             title3_leah(
@@ -322,7 +325,7 @@ fun InfoBottomSheet(
     }
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun HeaderContentPreview() {
     ComposeAppTheme {

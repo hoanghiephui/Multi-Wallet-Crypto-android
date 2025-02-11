@@ -3,7 +3,6 @@ package io.horizontalsystems.bankwallet.modules.market.etf
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -17,8 +16,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -110,7 +110,9 @@ fun EtfPage(
     var openPeriodSelector by rememberSaveable { mutableStateOf(false) }
     var openSortingSelector by rememberSaveable { mutableStateOf(false) }
 
-    Column(Modifier.background(color = ComposeAppTheme.colors.tyler)) {
+    Scaffold(
+        contentColor = ComposeAppTheme.colors.tyler,
+        topBar = {
         AppBar(
             menuItems = listOf(
                 MenuItem(
@@ -121,9 +123,10 @@ fun EtfPage(
                     }
                 )
             )
-        )
-
+        ) }
+    ) {
         HSSwipeRefresh(
+            modifier = Modifier.padding(it),
             refreshing = uiState.isRefreshing,
             onRefresh = {
                 viewModel.refresh()

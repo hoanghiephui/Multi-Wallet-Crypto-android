@@ -106,15 +106,15 @@ fun MarketScreen(
             }
         ) {
             CollapsingLayout(
-                expandedContent = { modifier ->
+                expandedContent = { _ ->
                     Crossfade(uiState.marketGlobal, label = "") {
                         MetricsBoard(navController, it, uiState.currency)
                     }
                 },
-                collapsedContent = { modifier ->
+                collapsedContent = { _ ->
 
                 }
-            ) { modifier ->
+            ) { _ ->
                 TabsSection(
                     navController = navController,
                     tabs = tabs,
@@ -133,9 +133,6 @@ fun MarketScreen(
             }
         }
     }
-
-
-
 
     TrackScreenViewEvent("MarketScreen")
 }
