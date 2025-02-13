@@ -41,7 +41,7 @@ android {
         resValue "string", "reportEmail", "living.solutions.vn@gmail.com"
         resValue "string", "releaseNotesUrl", "https://api.github.com/repos/horizontalsystems/unstoppable-wallet-android/releases/tags/"
         resValue "string", "walletConnectAppMetaDataName", "CoinDex"
-        resValue "string", "walletConnectAppMetaDataUrl", "coinhub8899.web.app"
+        resValue "string", "walletConnectAppMetaDataUrl", "coindex.money"
         resValue "string", "walletConnectAppMetaDataIcon", "https://raw.githubusercontent.com/hoanghiephui/unstoppable-wallet-android/master/ic_launcher-playstore.png"
         resValue "string", "accountsBackupFileSalt", "unstoppable"
 
