@@ -500,7 +500,7 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
         tonConnectManager = TonConnectManager(
             context = this,
             adapterFactory = adapterFactory,
-            appName = "Unstoppable Wallet",
+            appName = "CoinDex Wallet",
             appVersion = appConfigProvider.appVersion
         )
         tonConnectManager.start()

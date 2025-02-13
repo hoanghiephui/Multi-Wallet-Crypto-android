@@ -346,7 +346,7 @@ class MainViewModel(
                 }
             }
 
-            deeplinkString.startsWith("coinhub8899.web.app:") ||
+            deeplinkString.startsWith("coindex.money:") ||
             deeplinkString.startsWith("tc:") -> {
                 val v = deepLink.getQueryParameter("v")?.toIntOrNull()
                 if (v != null) {
@@ -355,7 +355,7 @@ class MainViewModel(
                 }
             }
 
-            deeplinkString.startsWith("https://unstoppable.money/referral") -> {
+            deeplinkString.startsWith("https://coindex.money/referral") -> {
                 val userId: String? = deepLink.getQueryParameter("userId")
                 val referralCode: String? = deepLink.getQueryParameter("referralCode")
                 if (userId != null && referralCode != null) {
