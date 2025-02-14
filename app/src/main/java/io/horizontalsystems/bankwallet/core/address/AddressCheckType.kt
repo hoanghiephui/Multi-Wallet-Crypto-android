@@ -1,6 +1,6 @@
 package io.horizontalsystems.bankwallet.core.address
 
-import io.horizontalsystems.bankwallet.R
+import com.wallet.blockchain.bitcoin.R
 
 enum class AddressCheckType {
     Phishing,

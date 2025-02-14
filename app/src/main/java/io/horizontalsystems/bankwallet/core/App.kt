@@ -30,8 +30,6 @@ import com.walletconnect.web3.wallet.client.Wallet
 import com.walletconnect.web3.wallet.client.Web3Wallet
 import dagger.hilt.android.HiltAndroidApp
 import io.horizontalsystems.bankwallet.analytics.AnalyticsHelper
-import io.horizontalsystems.bankwallet.core.BaseViewModel.Companion.SHOW_ADS
-import io.horizontalsystems.bankwallet.core.address.AddressSecurityCheckerChain
 import io.horizontalsystems.bankwallet.core.factories.AccountFactory
 import io.horizontalsystems.bankwallet.core.factories.AdapterFactory
 import io.horizontalsystems.bankwallet.core.factories.EvmAccountManagerFactory
