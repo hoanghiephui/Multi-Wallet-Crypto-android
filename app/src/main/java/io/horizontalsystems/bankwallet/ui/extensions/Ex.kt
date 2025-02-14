@@ -10,10 +10,11 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 
 @Composable
 fun ComposableLifecycle(
-    lifeCycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+    lifeCycleOwner: LifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current,
     onEvent: (LifecycleOwner, Lifecycle.Event) -> Unit
 ) {
     DisposableEffect(lifeCycleOwner) {
@@ -28,7 +29,7 @@ fun ComposableLifecycle(
 }
 
 @Composable
-fun rememberLifecycleEvent(lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current): Lifecycle.Event {
+fun rememberLifecycleEvent(lifecycleOwner: LifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current): Lifecycle.Event {
     var state by remember { mutableStateOf(Lifecycle.Event.ON_ANY) }
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
