@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -23,6 +24,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -51,8 +54,9 @@ import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchModule.
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
-import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryCircle
+import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.HeaderStick
+import io.horizontalsystems.bankwallet.ui.compose.components.HsIconButton
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.HsImage
 import io.horizontalsystems.bankwallet.ui.compose.components.ListEmptyView
@@ -246,28 +250,6 @@ fun MarketCoin(
         borderTop = true,
         onClick = onClick
     ) {
-        if (favourited) {
-            ButtonSecondaryCircle(
-                modifier = Modifier.padding(end = 16.dp),
-                icon = R.drawable.ic_checkmark_20,
-                contentDescription = stringResource(R.string.CoinPage_Favorite),
-                tint = ComposeAppTheme.colors.light,
-                background = ComposeAppTheme.colors.yellowD,
-                onClick = {
-                    onFavoriteClick(true, coinUid)
-                }
-            )
-        } else {
-            ButtonSecondaryCircle(
-                modifier = Modifier.padding(end = 16.dp),
-                icon = R.drawable.ic_plus_20,
-                contentDescription = stringResource(R.string.CoinPage_Favorite),
-                onClick = {
-                    onFavoriteClick(false, coinUid)
-                }
-            )
-        }
-
         HsImage(
             url = coinIconUrl,
             alternativeUrl = alternativeCoinIconUrl,
@@ -291,6 +273,34 @@ fun MarketCoin(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
+        }
+        HSpacer(16.dp)
+        if (favourited) {
+            HsIconButton(
+                modifier = Modifier.size(20.dp),
+                onClick = {
+                    onFavoriteClick(true, coinUid)
+                }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_heart_filled_20),
+                    contentDescription = "heart icon button",
+                    tint = ComposeAppTheme.colors.jacob
+                )
+            }
+        } else {
+            HsIconButton(
+                modifier = Modifier.size(20.dp),
+                onClick = {
+                    onFavoriteClick(false, coinUid)
+                }
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_heart_20),
+                    contentDescription = "heart icon button",
+                    tint = ComposeAppTheme.colors.grey
+                )
+            }
         }
     }
 }

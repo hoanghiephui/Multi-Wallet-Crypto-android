@@ -154,7 +154,7 @@ fun CoinTabs(
                             add(
                                 MenuItem(
                                     title = TranslatableString.ResString(R.string.CoinPage_Unfavorite),
-                                    icon = R.drawable.ic_filled_star_24,
+                                    icon = R.drawable.ic_heart_filled_24,
                                     tint = MaterialTheme.colorScheme.onSurface,
                                     onClick = {
                                         viewModel.onUnfavoriteClick()
@@ -170,7 +170,8 @@ fun CoinTabs(
                             add(
                                 MenuItem(
                                     title = TranslatableString.ResString(R.string.CoinPage_Favorite),
-                                    icon = R.drawable.ic_star_24,
+                                    icon = R.drawable.ic_heart_24,
+                                    tint = ComposeAppTheme.colors.grey,
                                     onClick = {
                                         if (isPlusMode) {
                                             viewModel.onFavoriteClick()

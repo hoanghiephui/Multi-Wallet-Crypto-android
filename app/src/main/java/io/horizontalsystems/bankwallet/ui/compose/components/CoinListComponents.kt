@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -45,6 +46,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -68,7 +70,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun CoinList(
+fun CoinListSlidable(
     listState: LazyListState = rememberLazyListState(),
     items: List<MarketViewItem>,
     scrollToTop: Boolean,
@@ -112,7 +114,7 @@ fun CoinList(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        painter = painterResource(id = if (item.favorited) R.drawable.ic_star_off_24 else R.drawable.ic_star_24),
+                        painter = painterResource(id = if (item.favorited) R.drawable.ic_heart_broke_24 else R.drawable.ic_heart_24),
                         tint = ComposeAppTheme.colors.claude,
                         contentDescription = stringResource(if (item.favorited) R.string.CoinPage_Unfavorite else R.string.CoinPage_Favorite),
                     )
@@ -150,6 +152,93 @@ fun CoinList(
                     modifier = Modifier.align(Alignment.BottomCenter)
                 )
             }
+        }
+        item {
+            Spacer(modifier = Modifier.height(32.dp))
+        }
+        if (scrollToTop) {
+            coroutineScope.launch {
+                listState.scrollToItem(0)
+            }
+        }
+    }
+}
+
+@Composable
+fun CoinList(
+    listState: LazyListState = rememberLazyListState(),
+    items: List<MarketViewItem>,
+    scrollToTop: Boolean,
+    onAddFavorite: (String) -> Unit,
+    onRemoveFavorite: (String) -> Unit,
+    onCoinClick: (String) -> Unit,
+    userScrollEnabled: Boolean = true,
+    preItems: LazyListScope.() -> Unit
+) {
+    val coroutineScope = rememberCoroutineScope()
+
+    LazyColumn(state = listState, userScrollEnabled = userScrollEnabled) {
+        preItems.invoke(this)
+        itemsIndexed(items, key = { _, item -> item.coinUid }) { _, item ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .defaultMinSize(minHeight = 24.dp)
+                    .clickable { onCoinClick.invoke(item.fullCoin.coin.uid) }
+                    .background(ComposeAppTheme.colors.tyler)
+                    .padding(horizontal = 16.dp)
+                    .padding(vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                HsImage(
+                    url = item.fullCoin.coin.imageUrl,
+                    alternativeUrl = item.fullCoin.coin.alternativeImageUrl,
+                    placeholder = item.fullCoin.iconPlaceholder,
+                    modifier = Modifier
+                        .padding(end = 16.dp)
+                        .size(32.dp)
+                        .clip(CircleShape)
+                )
+                Column(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    MarketCoinFirstRow(item.fullCoin.coin.code, item.value, item.signal)
+                    Spacer(modifier = Modifier.height(3.dp))
+                    MarketCoinSecondRow(item.subtitle, item.marketDataValue, item.rank)
+                }
+                HSpacer(16.dp)
+                if (item.favorited) {
+                    HsIconButton(
+                        modifier = Modifier.size(20.dp),
+                        onClick = {
+                            onRemoveFavorite(item.coinUid)
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_heart_filled_20),
+                            contentDescription = "heart icon button",
+                            tint = ComposeAppTheme.colors.jacob
+                        )
+                    }
+                } else {
+                    HsIconButton(
+                        modifier = Modifier.size(20.dp),
+                        onClick = {
+                            onAddFavorite(item.coinUid)
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_heart_20),
+                            contentDescription = "heart icon button",
+                            tint = ComposeAppTheme.colors.grey
+                        )
+                    }
+                }
+            }
+            Divider(
+                thickness = 1.dp,
+                color = ComposeAppTheme.colors.steel10,
+            )
         }
         item {
             Spacer(modifier = Modifier.height(32.dp))
@@ -364,6 +453,7 @@ fun CategoryCard(
                         )
                     }
                 }
+
                 is DiscoveryItem.Category -> {
                     Crossfade(
                         targetState = type.coinCategory.imageUrl,
@@ -371,7 +461,8 @@ fun CategoryCard(
                         modifier = Modifier
                             .height(108.dp)
                             .width(76.dp)
-                            .align(Alignment.TopEnd), label = ""
+                            .align(Alignment.TopEnd)
+                    , label = ""
                     ) { imageRes ->
                         Image(
                             painter = rememberAsyncImagePainter(imageRes),

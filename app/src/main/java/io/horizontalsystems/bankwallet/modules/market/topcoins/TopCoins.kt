@@ -39,7 +39,7 @@ import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
 import io.horizontalsystems.bankwallet.ui.compose.Select
 import io.horizontalsystems.bankwallet.ui.compose.components.AlertGroup
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonSecondaryWithIcon
-import io.horizontalsystems.bankwallet.ui.compose.components.CoinList
+import io.horizontalsystems.bankwallet.ui.compose.components.CoinListSlidable
 import io.horizontalsystems.bankwallet.ui.compose.components.HSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.HeaderSorting
 import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
@@ -100,7 +100,7 @@ fun TopCoins(
                     listState.scrollToItem(0)
                 }
 
-                CoinList(
+                CoinListSlidable(
                     listState = listState,
                     items = uiState.viewItems,
                     scrollToTop = false,
