@@ -1,15 +1,10 @@
 package io.horizontalsystems.subscriptions.core
 
 import android.app.Activity
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import android.content.Context
 
 object UserSubscriptionManager {
     var authToken: String? = ""
-
-    private val _purchaseStateUpdatedFlow: MutableSharedFlow<Unit> = MutableSharedFlow()
-    val purchaseStateUpdatedFlow: SharedFlow<Unit> = _purchaseStateUpdatedFlow.asSharedFlow()
 
     private val predefinedSubscriptions = listOf(
         Subscription(
@@ -46,9 +41,8 @@ object UserSubscriptionManager {
     )
     private lateinit var service: SubscriptionService
 
-    suspend fun purchaseStateUpdated() {
-        _purchaseStateUpdatedFlow.emit(Unit)
-    }
+    val activeSubscriptionStateFlow
+        get() = service.activeSubscriptionStateFlow
 
     fun registerService(service: SubscriptionService) {
         service.predefinedSubscriptions = predefinedSubscriptions
@@ -63,16 +57,16 @@ object UserSubscriptionManager {
         return service.getSubscriptions()
     }
 
-    fun getActiveUserSubscriptions(): List<UserSubscription> {
-        return service.getActiveSubscriptions()
-    }
-
     suspend fun launchPurchaseFlow(
         subscriptionId: String,
         offerToken: String,
         activity: Activity
     ): HSPurchase? {
         return service.launchPurchaseFlow(subscriptionId, offerToken, activity)
+    }
+
+    fun launchManageSubscriptionScreen(context: Context) {
+        service.launchManageSubscriptionScreen(context)
     }
 
     fun getBasePlans(subscriptionId: String): List<BasePlan> {
