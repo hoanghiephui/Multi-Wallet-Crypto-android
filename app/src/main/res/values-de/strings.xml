@@ -93,7 +93,7 @@
     <string name="Language_Portuguese">Portugiesisch</string>
     <!--Rate App-->
     <string name="RateApp_Title_Rate_This_App">GT!</string>
-    <string name="RateApp_Description_Rate_This_App">Gefällt Ihnen Unstoppable? Teilen Sie uns Ihr Feedback und Ihre Ideen zur Weiterentwicklung mit.</string>
+    <string name="RateApp_Description_Rate_This_App">Gefällt Ihnen CoinDex? Teilen Sie uns Ihr Feedback und Ihre Ideen zur Weiterentwicklung mit.</string>
     <string name="RateApp_Button_RateIt">Bewerten</string>
     <string name="RateApp_Button_NotNow">Nicht jetzt</string>
     <!--Restore-->
@@ -110,7 +110,7 @@
     <string name="Restore_PrivateKeyHint">Geben Sie EVM privaten Schlüssel, BIP32 Root-Schlüssel oder  Account Extended Private Key ein</string>
     <string name="Restore_PhraseHint">12, 15, 18, 21 oder 24 Wörter eingeben</string>
     <string name="Restore_NonStandardRestore">Nicht standardmäßige Wiederherstellung</string>
-    <string name="Restore_NonStandard_Description">Diese Seite bietet einen speziellen Wallet-Wiederherstellungsmechanismus für Unstoppable-Benutzer, die ein nicht standardmäßiges Wallet haben. Im Allgemeinen könnten solche Wallets in der Unstoppable-Version 0.27–0.28 mit einer nicht-englischen mnemonischen Wortliste und/oder einem Sonderzeichen in der Wallet-Passphrase (d. h. einem diakritischen Symbol) erstellt worden sein.
+    <string name="Restore_NonStandard_Description">Diese Seite bietet einen speziellen Wallet-Wiederherstellungsmechanismus für CoinDex-Benutzer, die ein nicht standardmäßiges Wallet haben. Im Allgemeinen könnten solche Wallets in der CoinDex-Version 0.27–0.28 mit einer nicht-englischen mnemonischen Wortliste und/oder einem Sonderzeichen in der Wallet-Passphrase (d. h. einem diakritischen Symbol) erstellt worden sein.
 \n\nWenn Sie ein betroffener Benutzer sind, wird Ihr Wallet-Guthaben nach der Wiederherstellung eines solchen Wallets in Version 0.29 oder höher als 0 angezeigt.Auf dieser Seite können Sie den Zugriff auf Ihre nicht standardmäßige Brieftasche wiederherstellen. Nach der Wiederherstellung wird empfohlen, eine neue Brieftasche zu erstellen (die standardkonform ist) und Gelder dorthin zu verschieben.</string>
     <string name="Restore_Bip_Recommended">(durchschnitt)</string>
     <string name="Restore_PrivateKey_InvalidKey">Ungültiger Schlüssel</string>
@@ -394,7 +394,7 @@
     <string name="FeeSettings_Overpricing">Die festgelegte Transaktionsgebühr ist höher als für die Bearbeitung dieser Transaktion jetzt erforderlich.</string>
     <string name="FeeSettings_FeeRate">Gebühr (SAT/BYTE)</string>
     <string name="FeeSettings_FeeRate_RecommendedInfo">Hier ist der empfohlene Wert, um die nächsten 2 Blöcke zu treffen</string>
-    <string name="FeeSettings_FeeRate_Info">Blockchains require users to pay network fees when sending transactions. The fees are higher when a lot of transactions are taking place on the network.\n\nThe Unstoppable wallet estimates fee based on the current blockchain activity and recommends the optimal value in order for the transaction to be processed within reasonable amount of time.\n\nThe recommended fee rate shown as the amount of satoshi user needs to pay for a single byte of the transaction. Thus, the total fee depends on the total size of the transaction which is measured in bytes.\n\nUsers may use provided controls to increase or decrease the fee rate value. The change in fee rate changes the total fee for the transaction the user will pay.\n\nSetting fee rate below recommended value may result in a transaction being held as pending for hours, or being rejected. The lower the value, the longer it will take for the transaction to confirm. For transactions where priority is important, we recommend setting higher fee rate.</string>
+    <string name="FeeSettings_FeeRate_Info">Blockchains require users to pay network fees when sending transactions. The fees are higher when a lot of transactions are taking place on the network.\n\nThe CoinDex wallet estimates fee based on the current blockchain activity and recommends the optimal value in order for the transaction to be processed within reasonable amount of time.\n\nThe recommended fee rate shown as the amount of satoshi user needs to pay for a single byte of the transaction. Thus, the total fee depends on the total size of the transaction which is measured in bytes.\n\nUsers may use provided controls to increase or decrease the fee rate value. The change in fee rate changes the total fee for the transaction the user will pay.\n\nSetting fee rate below recommended value may result in a transaction being held as pending for hours, or being rejected. The lower the value, the longer it will take for the transaction to confirm. For transactions where priority is important, we recommend setting higher fee rate.</string>
     <!--Fee Info -->
     <string name="FeeInfo_Title">Transaktionsgeschwindigkeit</string>
     <string name="FeeInfo_Description">Sowohl Bitcoin als auch Ethereum Blockchains verlangen vom Benutzer, Netzwerkgebühren zu zahlen, wenn er Transaktionen versendet. Die Gebühren sind höher, wenn viele Transaktionen im Netzwerk durchgeführt werden und niedriger, wenn die Blockchain weniger beschäftigt ist.</string>
@@ -615,7 +615,7 @@
     <string name="StatusInfo_Processing">In Bearbeitung</string>
     <string name="StatusInfo_Confirmed">Abgeschlossen</string>
     <string name="StatusInfo_Failed">Fehlgeschlagen</string>
-    <string name="StatusInfo_PendingDescription">Die Transaktion wurde noch nicht in der Blockchain bestätigt. Transaktionen, die mit einer empfohlenen oder höheren Gebühreneinstellung gesendet werden, werden in der Regel innerhalb von  Minuten bearbeitet. Transaktionen, die mit einer niedrigen Gebühr gesendet werden, können einige Stunden oder sogar Tage ausstehend bleiben und können sogar abgelehnt werden. Beachten Sie auch, dass der Status einer einzelnen Transaktion, der in der Oberfläche von Unstoppable Wallet angezeigt wird, normalerweise mit einer kurzen Verzögerung aktualisiert wird.</string>
+    <string name="StatusInfo_PendingDescription">Die Transaktion wurde noch nicht in der Blockchain bestätigt. Transaktionen, die mit einer empfohlenen oder höheren Gebühreneinstellung gesendet werden, werden in der Regel innerhalb von  Minuten bearbeitet. Transaktionen, die mit einer niedrigen Gebühr gesendet werden, können einige Stunden oder sogar Tage ausstehend bleiben und können sogar abgelehnt werden. Beachten Sie auch, dass der Status einer einzelnen Transaktion, der in der Oberfläche von CoinDex Wallet angezeigt wird, normalerweise mit einer kurzen Verzögerung aktualisiert wird.</string>
     <string name="StatusInfo_ProcessingDescription">Die Transaktion wurde bereits in die Blockchain aufgenommen, ist aber noch nicht endgültig abgeschlossen. Zu diesem Zeitpunkt kann die Transaktion für kleinere Zahlungen als abgeschlossen betrachtet werden. Bei größeren Zahlungen wird empfohlen, zu warten, bis der Transaktionsstatus auf abgeschlossen wechselt.</string>
     <string name="StatusInfo_ConfirmedDescription">Die Transaktion ist abgeschlossen und gilt als dauerhaft und unumkehrbar.</string>
     <string name="StatusInfo_FailedDescription">Die Transaktion wurde nicht verarbeitet und es wurde kein Werttransfer durchgeführt. Abhängig vom Grund des Scheiterns können einige fehlgeschlagene Transaktionen Transaktionsgebühren kosten. Transaktionen, die durch eine andere Transaktion ersetzt oder storniert wurden, verbrauchen keine Transaktionsgebühren und scheinen ebenfalls fehlgeschlagen zu sein. Die unaufhaltsame App kann den Grund für fehlgeschlagene Transaktionen nicht anzeigen. aber Benutzer können es selbst auf einem öffentlichen Block-Explorer etherscan.io.</string>
@@ -646,7 +646,7 @@
     <string name="SettingsCurrency_Title">Währung</string>
     <string name="SettingsCurrency_Other">ANDERE</string>
     <string name="SettingsCurrency_DisclaimerTitle">Haftungsausschluss</string>
-    <string name="SettingsCurrency_DisclaimerText">Die Wechselkursdaten werden von einem Drittanbieterdienst Coingecko.com bereitgestellt\n\nDie Wallet-App von Unstoppable garantiert nicht, dass diese Werte immer korrekt sind und mit den Marktdaten übereinstimmen. Die Wahrscheinlichkeit für Inkonsistenzen ist höher, wenn Sie eine andere Basiswährung als %s auswählen.</string>
+    <string name="SettingsCurrency_DisclaimerText">Die Wechselkursdaten werden von einem Drittanbieterdienst Coingecko.com bereitgestellt\n\nDie Wallet-App von CoinDex garantiert nicht, dass diese Werte immer korrekt sind und mit den Marktdaten übereinstimmen. Die Wahrscheinlichkeit für Inkonsistenzen ist höher, wenn Sie eine andere Basiswährung als %s auswählen.</string>
     <!--Settings-->
     <string name="Settings_Title">Einstellungen</string>
     <string name="Settings_SecurityCenter">Sicherheit</string>
@@ -724,7 +724,7 @@
     <string name="BackupManager_AppSettingsTitle">App-Einstellungen</string>
     <string name="BackupManager_AppSettingsDescription">Sprache, Währung, Erscheinung ...</string>
     <!-- Privacy  -->
-    <string name="Privacy_Information">Unstoppable sammelt keine persönlichen Daten, die Ihre privaten Informationen offen legen, z.B. Münzsalden oder Adressen. Während wir einige UI-Nutzungsstatistiken sammeln, dient es allein dazu, unsere Benutzer- und App-Nutzungstrends zu verstehen. Dies kann deaktiviert werden, wenn Sie es wünschen.</string>
+    <string name="Privacy_Information">CoinDex sammelt keine persönlichen Daten, die Ihre privaten Informationen offen legen, z.B. Münzsalden oder Adressen. Während wir einige UI-Nutzungsstatistiken sammeln, dient es allein dazu, unsere Benutzer- und App-Nutzungstrends zu verstehen. Dies kann deaktiviert werden, wenn Sie es wünschen.</string>
     <string name="Privacy_BulletedText1">Die Brieftasche sammelt keine persönlichen Daten.</string>
     <string name="Privacy_BulletedText2">Es gibt keine Benutzerkonten oder Datenbanken, die Benutzerdaten speichern.</string>
     <string name="Privacy_BulletedText3">Wenn erlaubt, teilt die Brieftasche App-Nutzungsgewohnheiten mit dem unaufhaltsamen Team. Dies ist zu verstehen, welche Funktionen von unseren Benutzern verwendet werden (oder nicht). Als datenschutzorientierte App brauchen wir eine Möglichkeit, unsere Bemühungen zu bewerten, und ohne dies haben wir keine Ahnung, ob die von uns erstellten Funktionen genutzt werden oder nicht.</string>
@@ -763,7 +763,7 @@
     <string name="SettingsSecurity_DisableDuressPin">Duress Code deaktivieren</string>
     <string name="SettingsSecurity_DuressPinDescription">Ein spezialisierter Modus, der entworfen wurde, um ausgewählte Brieftaschen unter Zwang zu schützen.</string>
     <string name="SettingsSecurity_ManageKeys">Wallets verwalten</string>
-    <string name="SettingsSecurity_AppRestartWarning">Diese Aktion wird das Unstoppable Wallet neu starten.</string>
+    <string name="SettingsSecurity_AppRestartWarning">Diese Aktion wird das CoinDex Wallet neu starten.</string>
     <string name="SettingsSecurity_TorConnectionDescription">Vollständig anonymisieren Sie Ihr Internet während Sie diese App verwenden. Beachten Sie, dass in einigen Fällen die WalletConnect-Funktion für DeFi-Apps sehr langsam oder gar nicht funktionieren kann.</string>
     <string name="SettingsSecurity_SortingShuffle">Zufällig</string>
     <string name="SettingsSecurity_SortingShuffleDescription">Zufällige Indizierung</string>
@@ -1229,7 +1229,7 @@
     <string name="BalanceSyncError_ButtonReport">Melden</string>
     <!--Release notes-->
     <string name="ReleaseNotes_JoinUnstoppables">UNSTOPPABLES beitreten</string>
-    <string name="ProUsersInfo_UnstoppablePass">Unstoppable Pass</string>
+    <string name="ProUsersInfo_UnstoppablePass">CoinDex Pass</string>
     <string name="ProUsersInfo_Description">Um diese Daten zu aktivieren, solltest du Bronze-Level UW NFTs “Coin Info+”\n\nerwerben:</string>
     <string name="ProUsersInfo_Features_DexVolume">DEX-Volume und Rang</string>
     <string name="ProUsersInfo_Features_DesLiquidity">DEX Liquiditätsrang</string>
@@ -1248,7 +1248,7 @@
     <string name="Alert_KeysInvalidatedDescription">Deine verschlüsselten Daten wurden kürzlich ungültig gemacht, weil dein Android-Sperrbildschirm geändert wurde</string>
     <string name="Alert_TitleWarning">Warnung</string>
     <string name="Alert_CustomKeyboardIsUsed">Es sieht so aus, als ob Ihr Gerät eine nicht-standardmäßige Tastatur verwendet. Unaufhaltsam empfiehlt die Auswahl der Standardtastatur auf Ihrem Gerät, da Tastaturen von Drittanbietern möglicherweise Daten von Benutzern erfassen und ausgeben können. \n\nKlicken Sie auf \'Überspringen\', wenn Sie Ihre bevorzugte Tastatur weiter verwenden möchten.</string>
-    <string name="Alert_DeviceIsRootedWarning">Das Unstoppable-Team empfiehlt, die App nur auf nicht gerooteten (nicht jailbroken) Mobiltelefonen auszuführen.\n\nBitte beachten Sie, wenn Sie ein gerootetes Gerät verwenden, kann die App die Sicherheit Ihrer Kryptowährung vor bösartiger Software nicht mehr garantieren.</string>
+    <string name="Alert_DeviceIsRootedWarning">Das CoinDex-Team empfiehlt, die App nur auf nicht gerooteten (nicht jailbroken) Mobiltelefonen auszuführen.\n\nBitte beachten Sie, wenn Sie ein gerootetes Gerät verwenden, kann die App die Sicherheit Ihrer Kryptowährung vor bösartiger Software nicht mehr garantieren.</string>
     <!--OS Pin-->
     <string name="OSPin_Confirm_Title">Telefon PIN</string>
     <string name="OSPin_Confirm_Desciption">Diese App erfordert, dass Zugangsperre (Bildschirmsperre) aktiviert ist.

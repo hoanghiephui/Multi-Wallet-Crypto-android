@@ -16,7 +16,7 @@ fun BalanceScreen(navController: NavController,
     val viewModel = viewModel<BalanceAccountsViewModel>(factory = BalanceModule.AccountsFactory())
 
     when (val tmpAccount = viewModel.balanceScreenState) {
-        BalanceScreenState.NoAccount -> BalanceNoAccount(navController, viewModel)
+        BalanceScreenState.NoAccount -> StartSetupWalletScreen(navController)
         is BalanceScreenState.HasAccount -> when (tmpAccount.accountViewItem.type) {
             is AccountType.Cex -> {
                 BalanceForAccountCex(navController, tmpAccount.accountViewItem)

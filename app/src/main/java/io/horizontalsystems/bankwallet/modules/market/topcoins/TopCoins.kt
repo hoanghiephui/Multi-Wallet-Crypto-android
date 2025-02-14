@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.AdNativeUiState
 import io.horizontalsystems.bankwallet.core.BaseViewModel.Companion.SHOW_ADS
@@ -33,6 +34,7 @@ import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.market.SortingField
 import io.horizontalsystems.bankwallet.modules.market.TopMarket
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
 import io.horizontalsystems.bankwallet.ui.compose.Select
 import io.horizontalsystems.bankwallet.ui.compose.components.AlertGroup
@@ -48,7 +50,6 @@ import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 @Composable
 fun TopCoins(
     onCoinClick: (String) -> Unit,
-    nativeAd: AdNativeUiState,
     isRefreshing: (Boolean) -> Unit,
     onSetRefreshCallback: (refresh: () -> Unit) -> Unit,
     navController: NavController
@@ -59,7 +60,11 @@ fun TopCoins(
             SortingField.HighestCap,
         )
     )
-
+    val (adState, reloadAd) = rememberAdNativeView(
+        BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "TopCoins",
+        viewModel
+    )
     var openSortingSelector by rememberSaveable { mutableStateOf(false) }
     var openTopSelector by rememberSaveable { mutableStateOf(false) }
     var openPeriodSelector by rememberSaveable { mutableStateOf(false) }
@@ -70,7 +75,7 @@ fun TopCoins(
     }
     onSetRefreshCallback {
         viewModel.refresh()
-
+        reloadAd()
         stat(page = StatPage.Markets, section = StatSection.Coins, event = StatEvent.Refresh)
     }
 
@@ -154,7 +159,7 @@ fun TopCoins(
                             item {
                                 VSpacer(12.dp)
                                 NativeAdView(
-                                    adsState = nativeAd,
+                                    adsState = adState,
                                     modifier = Modifier
                                         .padding(horizontal = 8.dp)
                                         .height(138.dp)

@@ -3,8 +3,8 @@ package io.horizontalsystems.bankwallet.modules.market.search
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.horizontalsystems.bankwallet.core.BaseViewModel
 import io.horizontalsystems.bankwallet.core.IAppNumberFormatter
 import io.horizontalsystems.bankwallet.core.managers.CurrencyManager
 import io.horizontalsystems.bankwallet.core.managers.MarketFavoritesManager
@@ -35,7 +35,7 @@ class MarketSearchViewModel(
     private val topSectorsRepository: TopSectorsRepository,
     private val currencyManager: CurrencyManager,
     private val numberFormatter: IAppNumberFormatter
-) : ViewModel() {
+) : BaseViewModel() {
     private var searchState = marketSearchService.stateFlow.value
     private var discoveryState = marketDiscoveryService.stateFlow.value
     private var listId: String = ""

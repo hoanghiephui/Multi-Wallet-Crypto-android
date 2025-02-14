@@ -71,14 +71,19 @@ class StatsManager(
                 }
             }
         }
-        scope.launch {
-            UserSubscriptionManager.activeSubscriptionStateFlow.collect {
-                uiStatsEnabled = areUiStatsEnabled()
-                isDetectCrashEnabled = areDetectCrashEnabledEnabled()
-                _uiStatsEnabledFlow.update { uiStatsEnabled }
-                _isDetectCrashEnabledFlow.update { isDetectCrashEnabled }
+        try {
+            scope.launch {
+                UserSubscriptionManager.activeSubscriptionStateFlow.collect {
+                    uiStatsEnabled = areUiStatsEnabled()
+                    isDetectCrashEnabled = areDetectCrashEnabledEnabled()
+                    _uiStatsEnabledFlow.update { uiStatsEnabled }
+                    _isDetectCrashEnabledFlow.update { isDetectCrashEnabled }
+                }
             }
+        } catch (ex: Exception) {
+            ex.printStackTrace()
         }
+
     }
 
     var uiStatsEnabled = areUiStatsEnabled()

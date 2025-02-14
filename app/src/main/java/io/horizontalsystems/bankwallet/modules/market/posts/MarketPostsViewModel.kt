@@ -1,16 +1,16 @@
 package io.horizontalsystems.bankwallet.modules.market.posts
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.BaseViewModel
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.core.helpers.DateHelper
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
 
-class MarketPostsViewModel(private val service: MarketPostService) : ViewModel() {
+class MarketPostsViewModel(private val service: MarketPostService) : BaseViewModel() {
 
     val itemsLiveData = MutableLiveData<List<MarketPostsModule.PostViewItem>>()
     val viewStateLiveData = MutableLiveData<ViewState>(ViewState.Loading)

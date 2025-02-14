@@ -82,11 +82,6 @@ fun MarketScreen(
     val uiState = marketViewModel.uiState
     val tabs = marketViewModel.tabs
 
-    val (adState, reloadAd) = rememberAdNativeView(
-        BuildConfig.HOME_MARKET_NATIVE,
-        adPlacements = "MarketScreen",
-        marketViewModel
-    )
     var isRefreshing by remember {
         mutableStateOf(false)
     }
@@ -102,7 +97,6 @@ fun MarketScreen(
             topPadding = 0,
             onRefresh = {
                 onRefresh?.invoke()
-                reloadAd()
             }
         ) {
             CollapsingLayout(
@@ -119,7 +113,6 @@ fun MarketScreen(
                     navController = navController,
                     tabs = tabs,
                     selectedTab = uiState.selectedTab,
-                    nativeAd = adState,
                     isRefreshing = {
                         isRefreshing = it
                     },
@@ -142,7 +135,6 @@ fun TabsSection(
     navController: NavController,
     tabs: Array<Tab>,
     selectedTab: Tab,
-    nativeAd: AdNativeUiState,
     onTabClick: (Tab) -> Unit,
     isRefreshing: (Boolean) -> Unit,
     onSetRefreshCallback: (refresh: () -> Unit) -> Unit,
@@ -172,7 +164,6 @@ fun TabsSection(
         when (tabs[page]) {
             Tab.Coins -> TopCoins(
                 onCoinClick = { onCoinClick(it, navController) },
-                nativeAd = nativeAd,
                 isRefreshing = isRefreshing,
                 onSetRefreshCallback = onSetRefreshCallback,
                 navController = navController

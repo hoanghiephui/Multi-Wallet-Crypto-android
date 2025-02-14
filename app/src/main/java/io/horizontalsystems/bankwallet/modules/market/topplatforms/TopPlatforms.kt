@@ -28,7 +28,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.BaseViewModel.Companion.SHOW_ADS
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
@@ -42,6 +44,7 @@ import io.horizontalsystems.bankwallet.modules.market.MarketDataValue
 import io.horizontalsystems.bankwallet.modules.market.SortingField
 import io.horizontalsystems.bankwallet.modules.market.TimeDuration
 import io.horizontalsystems.bankwallet.modules.market.topcoins.OptionController
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
 import io.horizontalsystems.bankwallet.ui.compose.Select
 import io.horizontalsystems.bankwallet.ui.compose.components.AlertGroup
@@ -52,7 +55,9 @@ import io.horizontalsystems.bankwallet.ui.compose.components.HsImage
 import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
 import io.horizontalsystems.bankwallet.ui.compose.components.MarketCoinFirstRow
 import io.horizontalsystems.bankwallet.ui.compose.components.MarketDataValueComponent
+import io.horizontalsystems.bankwallet.ui.compose.components.NativeAdView
 import io.horizontalsystems.bankwallet.ui.compose.components.SectionItemBorderedRowUniversalClear
+import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import java.math.BigDecimal
 
@@ -69,12 +74,18 @@ fun TopPlatforms(
     var openPeriodSelector by rememberSaveable { mutableStateOf(false) }
     var openSortingSelector by rememberSaveable { mutableStateOf(false) }
     val uiState = viewModel.uiState
+    val (adState, reloadAd) = rememberAdNativeView(
+        BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "TopPlatforms",
+        viewModel
+    )
 
     LaunchedEffect(uiState) {
         isRefreshing(uiState.isRefreshing)
     }
     onSetRefreshCallback {
         viewModel.refresh()
+        reloadAd()
         stat(page = StatPage.Markets, section = StatSection.Platforms, event = StatEvent.Refresh)
     }
     Crossfade(
@@ -132,6 +143,20 @@ fun TopPlatforms(
                                     HSpacer(width = 16.dp)
                                 }
                             }
+                        },
+                        preAdsItem = {
+                            if (SHOW_ADS) {
+                                item {
+                                    VSpacer(12.dp)
+                                    NativeAdView(
+                                        adsState = adState,
+                                        modifier = Modifier
+                                            .padding(horizontal = 8.dp)
+                                            .height(138.dp)
+                                    )
+                                    VSpacer(8.dp)
+                                }
+                            }
                         }
                     )
                 }
@@ -181,7 +206,8 @@ private fun TopPlatformsList(
     sortingField: SortingField,
     timeDuration: TimeDuration,
     onItemClick: (Platform) -> Unit,
-    preItems: LazyListScope.() -> Unit
+    preItems: LazyListScope.() -> Unit,
+    preAdsItem: LazyListScope.() -> Unit = {},
 ) {
     val state = rememberSaveable(sortingField, timeDuration, saver = LazyListState.Saver) {
         LazyListState(0, 0)
@@ -192,6 +218,7 @@ private fun TopPlatformsList(
         modifier = Modifier.fillMaxSize()
     ) {
         preItems.invoke(this)
+        preAdsItem()
         items(viewItems, key = {
             it.platform.uid
         }) { item ->

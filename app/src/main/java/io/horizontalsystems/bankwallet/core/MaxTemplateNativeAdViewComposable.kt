@@ -30,7 +30,8 @@ import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 fun MaxTemplateNativeAdViewComposable(
     adViewState: AdNativeUiState,
     adType: AdType = AdType.MEDIUM,
-    navController: NavController
+    navController: NavController,
+    useDefault: Boolean = true
 ) {
     if (!SHOW_ADS) return
     Crossfade(adViewState, label = "MaxTemplateNativeAdView") { viewState ->
@@ -48,7 +49,7 @@ fun MaxTemplateNativeAdViewComposable(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(adType.height)
-                        .padding(horizontal = 16.dp),
+                        .then(if (useDefault) Modifier.padding(horizontal = 16.dp) else Modifier),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Loading()
@@ -60,7 +61,7 @@ fun MaxTemplateNativeAdViewComposable(
                     OutlinedCard(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
+                            .then(if (useDefault) Modifier.padding(horizontal = 16.dp) else Modifier),
                         shape = RoundedCornerShape(12.dp),
                         colors = CardDefaults.cardColors()
                     ) {

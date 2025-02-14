@@ -93,7 +93,7 @@
     <string name="Language_Portuguese">葡萄牙语</string>
     <!--Rate App-->
     <string name="RateApp_Title_Rate_This_App">GM！</string>
-    <string name="RateApp_Description_Rate_This_App">喜欢Unstoppable？分享反馈和想法以使其更进一步。</string>
+    <string name="RateApp_Description_Rate_This_App">喜欢CoinDex？分享反馈和想法以使其更进一步。</string>
     <string name="RateApp_Button_RateIt">评价它</string>
     <string name="RateApp_Button_NotNow">暂不</string>
     <!--Restore-->
@@ -110,7 +110,7 @@
     <string name="Restore_PrivateKeyHint">輸入 EVM 私鑰、BIP32 Root Key 或  Account Extended Private Key</string>
     <string name="Restore_PhraseHint">输入12、15、18、21或24个单词</string>
     <string name="Restore_NonStandardRestore">非标准还原</string>
-    <string name="Restore_NonStandard_Description">此页面为拥有非标准钱包的 Unstoppable 用户提供了一种特殊的钱包恢复机制。 通常，此类钱包可以在 Unstoppable 版本 0.27 - 0.28 中使用非英语助记词列表和/或钱包密码短语中的特殊字符（即变音符号）创建。\n\n如果您是受影响的用户，那么在 0.29 或更高版本中恢复此类钱包后，您的钱包余额将显示为 0。 此页面将使您能够恢复对非标准钱包的访问。 恢复后，建议您创建一个新钱包（符合标准）并将资金转移到那里。</string>
+    <string name="Restore_NonStandard_Description">此页面为拥有非标准钱包的 CoinDex 用户提供了一种特殊的钱包恢复机制。 通常，此类钱包可以在 CoinDex 版本 0.27 - 0.28 中使用非英语助记词列表和/或钱包密码短语中的特殊字符（即变音符号）创建。\n\n如果您是受影响的用户，那么在 0.29 或更高版本中恢复此类钱包后，您的钱包余额将显示为 0。 此页面将使您能够恢复对非标准钱包的访问。 恢复后，建议您创建一个新钱包（符合标准）并将资金转移到那里。</string>
     <string name="Restore_Bip_Recommended">(平均)</string>
     <string name="Restore_PrivateKey_InvalidKey">错误密钥</string>
     <string name="SelectContacts_All">所有</string>
@@ -393,7 +393,7 @@
     <string name="FeeSettings_Overpricing">当前设置的交易费用高于处理此交易所需的费用。</string>
     <string name="FeeSettings_FeeRate">费率(SAT/BYTE)</string>
     <string name="FeeSettings_FeeRate_RecommendedInfo">这是击中下2个区块的推荐值</string>
-    <string name="FeeSettings_FeeRate_Info">Blockchains require users to pay network fees when sending transactions. The fees are higher when a lot of transactions are taking place on the network.\n\nThe Unstoppable wallet estimates fee based on the current blockchain activity and recommends the optimal value in order for the transaction to be processed within a reasonable amount of time.\n\nThe recommended fee rate shown as the amount of satoshi user needs to pay for a single byte of the transaction. Thus, the total fee depends on the total size of the transaction which is measured in bytes.\n\nUsers may use provided controls to increase or decrease the fee rate value. The change in fee rate changes the total fee for the transaction the user will pay.\n\nSetting fee rate below recommended value may result in a transaction being held as pending for hours, or being rejected. The lower the value, the longer it will take for the transaction to confirm. For transactions where priority is important, we recommend setting higher fee rate.</string>
+    <string name="FeeSettings_FeeRate_Info">Blockchains require users to pay network fees when sending transactions. The fees are higher when a lot of transactions are taking place on the network.\n\nThe CoinDex wallet estimates fee based on the current blockchain activity and recommends the optimal value in order for the transaction to be processed within a reasonable amount of time.\n\nThe recommended fee rate shown as the amount of satoshi user needs to pay for a single byte of the transaction. Thus, the total fee depends on the total size of the transaction which is measured in bytes.\n\nUsers may use provided controls to increase or decrease the fee rate value. The change in fee rate changes the total fee for the transaction the user will pay.\n\nSetting fee rate below recommended value may result in a transaction being held as pending for hours, or being rejected. The lower the value, the longer it will take for the transaction to confirm. For transactions where priority is important, we recommend setting higher fee rate.</string>
     <!--Fee Info -->
     <string name="FeeInfo_Title">交易速度</string>
     <string name="FeeInfo_Description">比特币和Etherum区块链都要求用户在发送交易时支付网络费用。当区块链上发生大量交易时费用较高；而区块链空闲时费用较低。</string>
@@ -614,10 +614,10 @@
     <string name="StatusInfo_Processing">正在处理</string>
     <string name="StatusInfo_Confirmed">已完成</string>
     <string name="StatusInfo_Failed">失败</string>
-    <string name="StatusInfo_PendingDescription">交易尚未在区块链上得到确认。带有推荐或更高费用设置发送的交易通常会在数分钟内得到处理。以低费用发送的交易将在数小时甚至数天内仍将处于待处理状态，并且可能会被拒绝。请注意，在Unstoppable钱包界面中的个别交易的状态通常将在较短延时内得到更新。</string>
+    <string name="StatusInfo_PendingDescription">交易尚未在区块链上得到确认。带有推荐或更高费用设置发送的交易通常会在数分钟内得到处理。以低费用发送的交易将在数小时甚至数天内仍将处于待处理状态，并且可能会被拒绝。请注意，在CoinDex钱包界面中的个别交易的状态通常将在较短延时内得到更新。</string>
     <string name="StatusInfo_ProcessingDescription">交易已包括在区块链中，但尚未达到永久终结状态。此时，可以安全地考虑以较小金额完成的交易。对于大额支付，建议等待直至交易状态变为已完成。</string>
     <string name="StatusInfo_ConfirmedDescription">交易已完成并被视为永久和不可逆。</string>
-    <string name="StatusInfo_FailedDescription">交易没有得到处理，也没有进行价值转移。根据失败原因的不同，某些失败的交易可能会耗费交易费用。被另一笔交易替换或取消的交易不会耗费交易费用，并且也会出现失败。 Unstoppable应用无法显示交易失败的原因。 但用户可以在如etherscan.io等公共区块探索程序上查看 。</string>
+    <string name="StatusInfo_FailedDescription">交易没有得到处理，也没有进行价值转移。根据失败原因的不同，某些失败的交易可能会耗费交易费用。被另一笔交易替换或取消的交易不会耗费交易费用，并且也会出现失败。 CoinDex应用无法显示交易失败的原因。 但用户可以在如etherscan.io等公共区块探索程序上查看 。</string>
     <!-- Transaction Info Options -->
     <string name="TransactionInfoOptions_SpeedUp_Title">加速</string>
     <string name="TransactionInfoOptions_SpeedUp_Button">重新发送</string>
@@ -723,7 +723,7 @@
     <string name="BackupManager_AppSettingsTitle">应用设置</string>
     <string name="BackupManager_AppSettingsDescription">语言、 货币、 外观 ...</string>
     <!-- Privacy  -->
-    <string name="Privacy_Information">Unstoppable 不收集暴露您私人信息的个人数据，例如币余额或地址。虽然我们收集了一些用户界面使用统计数据，但这仅用于了解我们的用户群和应用程序使用趋势。如果您希望，可以禁用此功能。</string>
+    <string name="Privacy_Information">CoinDex 不收集暴露您私人信息的个人数据，例如币余额或地址。虽然我们收集了一些用户界面使用统计数据，但这仅用于了解我们的用户群和应用程序使用趋势。如果您希望，可以禁用此功能。</string>
     <string name="Privacy_BulletedText1">钱包没有收集任何个人数据。</string>
     <string name="Privacy_BulletedText2">我们没有用户账户或存储用户数据的数据库。</string>
     <string name="Privacy_BulletedText3">如果允许，钱包将与不可阻挡团队分享应用程序使用习惯。这是为了了解我们的用户正在使用哪些功能（或未使用）。作为一个关注隐私的应用程序，我们需要一种评估我们努力的方式，如果没有这个，我们就无法知道我们构建的功能是否被使用。</string>
@@ -745,7 +745,7 @@
     <string name="BtcBlockchainSettings_TransactionSettings">交易设置</string>
     <string name="BtcBlockchainSettings_TransactionInputsOutputs">交易输入 / 输出</string>
     <string name="BtcBlockchainSettings_TransactionInputsOutputsSettingsDescription">通过改变交易结构的方式使您的BTC、LTC、BCH交易更难被追踪。</string>
-    <string name="BtcBlockchainSettings_TransactionInputsOutputsDescription">大多数比特币交易，以及比特币现金、Dash和莱特币等加密货币的交易，都会产生两种输出。一种输出是发送给接收者的数量，另一个是返回给发送者的找零输出。大多数钱包构造交易的方式使第三方很容易理解哪些输出发送给了接收方，哪些是返回给发送方的找零。当返回给发送方的输出稍后用于未来的交易时，这两个交易之间的连接就变得明显了。\n\nUnstoppable钱包实施了一些措施，让人们更难弄清楚哪些输出流向了哪里。\n\n对于Unstoppable用户有两种选项可用：\n\n1. 随机变换：每一交易的交易输出顺序均实现了随机化。有时候便令可能是第一个输出，有时可能是第二个。如果用户信任应用的开发者，那么可以考虑这一推荐选项。\n\n2. 确定性：有一个共同商定的交易输出顺序标准（称为BIP69）。在开源钱包中，该标准确保钱包用户不需要信任应用程序开发者如何实现输出顺序。由于这个标准非常新，还没有太多钱包对其进行了实现。因此，有可能可以看到在一个区块链上的一个交易是否是从使用或不使用该标准的钱包上发送。</string>
+    <string name="BtcBlockchainSettings_TransactionInputsOutputsDescription">大多数比特币交易，以及比特币现金、Dash和莱特币等加密货币的交易，都会产生两种输出。一种输出是发送给接收者的数量，另一个是返回给发送者的找零输出。大多数钱包构造交易的方式使第三方很容易理解哪些输出发送给了接收方，哪些是返回给发送方的找零。当返回给发送方的输出稍后用于未来的交易时，这两个交易之间的连接就变得明显了。\n\nCoinDex钱包实施了一些措施，让人们更难弄清楚哪些输出流向了哪里。\n\n对于CoinDex用户有两种选项可用：\n\n1. 随机变换：每一交易的交易输出顺序均实现了随机化。有时候便令可能是第一个输出，有时可能是第二个。如果用户信任应用的开发者，那么可以考虑这一推荐选项。\n\n2. 确定性：有一个共同商定的交易输出顺序标准（称为BIP69）。在开源钱包中，该标准确保钱包用户不需要信任应用程序开发者如何实现输出顺序。由于这个标准非常新，还没有太多钱包对其进行了实现。因此，有可能可以看到在一个区块链上的一个交易是否是从使用或不使用该标准的钱包上发送。</string>
     <!--Info screen-->
     <string name="Info_Title">信息</string>
     <!--Setting_Security-->
@@ -795,7 +795,7 @@
     <string name="SettingsTerms_Bugs">这个应用程序的代码可能会出现未发现的软件问题，可能导致应用程序故障。</string>
     <!--Setting_Tell Friends-->
     <string name="SettingsShare_Title">分享</string>
-    <string name="SettingsShare_Text">Be Unstoppable</string>
+    <string name="SettingsShare_Text">Be CoinDex</string>
     <!--Setting_Contact-->
     <string name="SettingsContact_Title">联系我们</string>
     <!--Setting_Notifications-->
@@ -839,7 +839,7 @@
 \n- BIP-86 (新建)
 \n
 \n虽然无法阻挡的钱包支持他们中的所有4个，但它建议使用 BIP-84 格式操作的 %2$s 钱包。 以此格式操作的钱包在发送 %3$s 交易时可以支付最低费用。</string>
-    <string name="ManageCoins_BchTypeDescription">有2种比特币现金钱包可用于接收应收款的常见地址格式：\n\n- TYPE 0（较旧）\n- TYPE 145（较新）\n\n虽然Unstoppable钱包支持全部两种格式，但是我们建议使用以TYPE 145格式运作的比特币现金钱包。</string>
+    <string name="ManageCoins_BchTypeDescription">有2种比特币现金钱包可用于接收应收款的常见地址格式：\n\n- TYPE 0（较旧）\n- TYPE 145（较新）\n\n虽然CoinDex钱包支持全部两种格式，但是我们建议使用以TYPE 145格式运作的比特币现金钱包。</string>
     <string name="ManageCoins_ContractAddress">联系地址</string>
     <!-- Experimental Feature -->
     <!-- Bitcoin Hodling -->
@@ -1224,7 +1224,7 @@
     <string name="BalanceSyncError_ButtonReport">报告</string>
     <!--Release notes-->
     <string name="ReleaseNotes_JoinUnstoppables">加入未加入的</string>
-    <string name="ProUsersInfo_UnstoppablePass">Unstoppable Pass</string>
+    <string name="ProUsersInfo_UnstoppablePass">CoinDex Pass</string>
     <string name="ProUsersInfo_Description">若要启用此数据，您应该获得精灵等级的 UW NFTs “Coin Info+”\n\n也可以访问下面的数据：</string>
     <string name="ProUsersInfo_Features_DexVolume">DEX 音量和等级</string>
     <string name="ProUsersInfo_Features_DesLiquidity">DEX 流动性和等级</string>
@@ -1242,8 +1242,8 @@
     <string name="Alert_KeysInvalidatedTitle">Android密钥库错误</string>
     <string name="Alert_KeysInvalidatedDescription">因为您的Android锁定屏幕已被更改，所以保存您钱包的加密数据目前已失效。</string>
     <string name="Alert_TitleWarning">警告</string>
-    <string name="Alert_CustomKeyboardIsUsed">您的设备似乎使用了非默认键盘。Unstoppable建议选择设备上的默认键盘，因为第三方键盘可能会收集和暴露用户输入的数据。\n\n如果您要继续使用您的首选键盘，请单击“跳过”（Skip）按钮。</string>
-    <string name="Alert_DeviceIsRootedWarning">Unstoppable团队建议仅在未获取根权限（未越狱）的手机上使用应用。\n\n请注意，使用已获取根权限的设备，应用将难以保证您的加密货币免受来自恶意软件的安全威胁。</string>
+    <string name="Alert_CustomKeyboardIsUsed">您的设备似乎使用了非默认键盘。CoinDex建议选择设备上的默认键盘，因为第三方键盘可能会收集和暴露用户输入的数据。\n\n如果您要继续使用您的首选键盘，请单击“跳过”（Skip）按钮。</string>
+    <string name="Alert_DeviceIsRootedWarning">CoinDex团队建议仅在未获取根权限（未越狱）的手机上使用应用。\n\n请注意，使用已获取根权限的设备，应用将难以保证您的加密货币免受来自恶意软件的安全威胁。</string>
     <!--OS Pin-->
     <string name="OSPin_Confirm_Title">电话PIN码</string>
     <string name="OSPin_Confirm_Desciption">此应用要求电话已启用密码（屏幕锁定）。\n\n您可以在Android设置中启用密码。\n\n请注意，禁用操作系统级别的PIN码后，电话的安全存储保障措施将使以前保存的数据无效。您必须恢复您的钱包密钥才能回到您的钱包。</string>

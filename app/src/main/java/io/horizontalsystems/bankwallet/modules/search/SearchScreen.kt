@@ -48,7 +48,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.AdType
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.modules.coin.CoinFragment
@@ -56,6 +59,7 @@ import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchResults
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchSection
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchViewModel
 import io.horizontalsystems.bankwallet.modules.market.search.MarketSearchViewModel.MainPage
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_grey
@@ -69,6 +73,11 @@ fun SearchScreen(
     var text by rememberSaveable { mutableStateOf("") }
     var expanded by rememberSaveable { mutableStateOf(false) }
     val mainState by searchViewModel.mainState.collectAsStateWithLifecycle()
+    val (adState, reloadAd) = rememberAdNativeView(
+        BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "Search",
+        searchViewModel
+    )
     Box(
         Modifier
             .fillMaxSize()
@@ -89,11 +98,11 @@ fun SearchScreen(
             }
             SearchBar(
                 modifier =
-                Modifier
-                    .align(Alignment.TopCenter)
-                    .semantics {
-                        traversalIndex = 0f
-                    },
+                    Modifier
+                        .align(Alignment.TopCenter)
+                        .semantics {
+                            traversalIndex = 0f
+                        },
                 inputField = {
                     SearchBarDefaults.InputField(
                         onSearch = {
@@ -210,6 +219,14 @@ fun SearchScreen(
                         searchViewModel.fetchItems()
                     }
                 )
+                item {
+                    MaxTemplateNativeAdViewComposable(
+                        adState,
+                        AdType.SMALL,
+                        navController,
+                        false
+                    )
+                }
             }
 
         }

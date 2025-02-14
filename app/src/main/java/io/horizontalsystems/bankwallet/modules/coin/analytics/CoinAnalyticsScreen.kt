@@ -18,7 +18,11 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.AdNativeUiState
+import io.horizontalsystems.bankwallet.core.AdType
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
@@ -37,6 +41,7 @@ import io.horizontalsystems.bankwallet.modules.coin.majorholders.CoinMajorHolder
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.coin.reports.CoinReportsFragment
 import io.horizontalsystems.bankwallet.modules.metricchart.ProChartFragment
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
 import io.horizontalsystems.bankwallet.ui.compose.components.InfoText
 import io.horizontalsystems.bankwallet.ui.compose.components.ListEmptyView
@@ -60,10 +65,18 @@ fun CoinAnalyticsScreen(
     val viewModel =
         viewModel<CoinAnalyticsViewModel>(factory = CoinAnalyticsModule.Factory(fullCoin))
     val uiState = viewModel.uiState
+    val (adState, reloadAd) = rememberAdNativeView(
+        BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "CoinAnalyticsScreen",
+        viewModel
+    )
 
     HSSwipeRefresh(
         refreshing = uiState.isRefreshing,
-        onRefresh = { viewModel.refresh() },
+        onRefresh = {
+            viewModel.refresh()
+            reloadAd()
+        },
     ) {
         Crossfade(uiState.viewState, label = "") { viewState ->
             when (viewState) {
@@ -85,6 +98,7 @@ fun CoinAnalyticsScreen(
                                 item.blocks,
                                 navController,
                                 fragmentManager,
+                                adState
                             )
                         }
 
@@ -107,8 +121,13 @@ private fun AnalyticsData(
     blocks: List<CoinAnalyticsModule.BlockViewItem>,
     navController: NavController,
     fragmentManager: FragmentManager,
+    adState: AdNativeUiState,
 ) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
+        item {
+            VSpacer(8.dp)
+            MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
+        }
         items(blocks) { block ->
             if (block.showAsPreview) {
                 AnalyticsPreviewBlock(block, navController)
