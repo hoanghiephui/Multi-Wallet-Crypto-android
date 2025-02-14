@@ -235,7 +235,7 @@ fun CoinList(
                     }
                 }
             }
-            Divider(
+            HorizontalDivider(
                 thickness = 1.dp,
                 color = ComposeAppTheme.colors.steel10,
             )

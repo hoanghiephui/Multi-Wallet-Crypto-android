@@ -42,6 +42,7 @@ import io.horizontalsystems.bankwallet.modules.coin.coinmarkets.CoinMarketsScree
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.CoinOverviewScreen
 import io.horizontalsystems.bankwallet.ui.AdMaxRewardedLoader
 import io.horizontalsystems.bankwallet.ui.AdRewardedCallback
+import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
