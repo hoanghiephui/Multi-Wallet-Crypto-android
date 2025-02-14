@@ -165,7 +165,7 @@ fun SelectSubscriptionScreen(
                             tint = ComposeAppTheme.colors.leah
                         )
                     }
-                    VSpacer(24.dp)
+                    /*VSpacer(24.dp)
                     subhead2_grey(
                         text = stringResource(R.string.Premium_WhatUsersSay),
                         modifier = Modifier
@@ -174,7 +174,7 @@ fun SelectSubscriptionScreen(
                         textAlign = TextAlign.Center
                     )
                     VSpacer(16.dp)
-                    ReviewSliderBlock()
+                    ReviewSliderBlock()*/
                     VSpacer(52.dp)
                 }
             }

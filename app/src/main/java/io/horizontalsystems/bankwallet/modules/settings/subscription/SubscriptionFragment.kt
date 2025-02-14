@@ -13,10 +13,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -51,12 +53,12 @@ class SubscriptionFragment : BaseComposeFragment() {
 @Composable
 fun SubscriptionScreen(navController: NavController) {
     val viewModel = viewModel<SubscriptionViewModel>()
-    val context = LocalContext.current
     val uiState = viewModel.uiState
     val context = LocalContext.current
 
     Scaffold(
-        backgroundColor = ComposeAppTheme.colors.tyler,
+        containerColor = Color.Transparent,
+        contentColor = MaterialTheme.colorScheme.background,
         topBar = {
             AppBar(
                 title = stringResource(R.string.Settings_Subscription),

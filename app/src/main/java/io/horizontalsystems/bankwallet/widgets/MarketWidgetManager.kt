@@ -23,7 +23,14 @@ import java.net.UnknownHostException
 class MarketWidgetManager {
 
     private var coroutineScope: CoroutineScope? = CoroutineScope(Dispatchers.Default)
-    private var hasSubscription = UserSubscriptionManager.getActiveUserSubscriptions().isNotEmpty()
+    private var hasSubscription = false
+    init {
+        coroutineScope?.launch {
+            UserSubscriptionManager.activeSubscriptionStateFlow.collect {
+                hasSubscription = it != null
+            }
+        }
+    }
     fun updateWatchListWidgets() {
         coroutineScope?.launch {
             val context = App.instance
@@ -73,7 +80,6 @@ class MarketWidgetManager {
         var marketItems = marketRepository.getMarketItems(state.type)
         marketItems =
             marketItems.map { it.copy(imageLocalPath = imagePathCache[it.imageRemoteUrl]) }
-        hasSubscription = UserSubscriptionManager.getActiveUserSubscriptions().isNotEmpty()
         state =
             state.copy(
                 items = marketItems,
