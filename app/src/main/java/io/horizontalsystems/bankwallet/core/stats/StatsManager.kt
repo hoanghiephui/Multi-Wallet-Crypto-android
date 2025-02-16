@@ -71,7 +71,7 @@ class StatsManager(
             }
         }
         scope.launch {
-            UserSubscriptionManager.activeSubscriptionStateFlow.collect {
+            UserSubscriptionManager.activeSubscriptionStateFlow?.collect {
                 uiStatsEnabled = areUiStatsEnabled()
                 isDetectCrashEnabled = areDetectCrashEnabledEnabled()
                 _uiStatsEnabledFlow?.update { uiStatsEnabled }

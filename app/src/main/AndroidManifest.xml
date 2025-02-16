@@ -22,8 +22,7 @@
         android:label="@string/App_Name"
         android:supportsRtl="true"
         android:largeHeap="true"
-        android:theme="@style/Theme.AppTheme.DayNight"
-        tools:ignore="GoogleAppIndexingWarning">
+        android:theme="@style/Theme.AppTheme.DayNight">
 
         <receiver
             android:name="io.horizontalsystems.bankwallet.widgets.MarketWidgetReceiver"
@@ -49,22 +48,17 @@
         <activity
             android:name="io.horizontalsystems.bankwallet.modules.main.MainActivity"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait"
             android:theme="@style/Theme.App.Starting"
             android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
         </activity>
         <activity
-            android:name="io.horizontalsystems.bankwallet.modules.qrscanner.QRScannerActivity"
-            android:screenOrientation="portrait" />
+            android:name="io.horizontalsystems.bankwallet.modules.qrscanner.QRScannerActivity" />
         <activity
-            android:name="io.horizontalsystems.bankwallet.modules.lockscreen.LockScreenActivity"
-            android:screenOrientation="portrait" />
+            android:name="io.horizontalsystems.bankwallet.modules.lockscreen.LockScreenActivity"/>
         <activity
-            android:name="io.horizontalsystems.bankwallet.modules.intro.IntroActivity"
-            android:screenOrientation="portrait" />
+            android:name="io.horizontalsystems.bankwallet.modules.intro.IntroActivity"/>
         <activity
-            android:name="io.horizontalsystems.bankwallet.modules.keystore.KeyStoreActivity"
-            android:screenOrientation="portrait" />
+            android:name="io.horizontalsystems.bankwallet.modules.keystore.KeyStoreActivity"/>
 
         <activity-alias
             android:name="${applicationId}.MainLauncherAlias"
