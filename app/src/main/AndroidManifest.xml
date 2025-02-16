@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -99,6 +98,13 @@
                 <data android:host="coindex.money" />
                 <data android:pathPrefix="/referral" />
             </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="coindex.money" />
+            </intent-filter>
         </activity-alias>
         <activity-alias
             android:name="${applicationId}.DarkLauncherAlias"
@@ -138,6 +144,13 @@
                 <data android:scheme="https" />
                 <data android:host="coindex.money" />
                 <data android:pathPrefix="/referral" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="coindex.money" />
             </intent-filter>
         </activity-alias>
         <activity-alias
@@ -179,6 +192,13 @@
                 <data android:host="coindex.money" />
                 <data android:pathPrefix="/referral" />
             </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="coindex.money" />
+            </intent-filter>
         </activity-alias>
         <activity-alias
             android:name="${applicationId}.LeoLauncherAlias"
@@ -218,6 +238,13 @@
                 <data android:host="coindex.money" />
                 <data android:pathPrefix="/referral" />
             </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="coindex.money" />
+            </intent-filter>
         </activity-alias>
         <activity-alias
             android:name="${applicationId}.MustangLauncherAlias"
@@ -255,7 +282,6 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" />
                 <data android:host="coindex.money" />
-                <data android:pathPrefix="/referral" />
             </intent-filter>
         </activity-alias>
         <activity-alias
@@ -296,6 +322,13 @@
                 <data android:host="coindex.money" />
                 <data android:pathPrefix="/referral" />
             </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="coindex.money" />
+            </intent-filter>
         </activity-alias>
         <activity-alias
             android:name="${applicationId}.PunkLauncherAlias"
@@ -334,6 +367,13 @@
                 <data android:scheme="https" />
                 <data android:host="coindex.money" />
                 <data android:pathPrefix="/referral" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="coindex.money" />
             </intent-filter>
         </activity-alias>
         <activity-alias
@@ -374,6 +414,13 @@
                 <data android:host="coindex.money" />
                 <data android:pathPrefix="/referral" />
             </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="coindex.money" />
+            </intent-filter>
         </activity-alias>
         <activity-alias
             android:name="${applicationId}.Ball8LauncherAlias"
@@ -412,6 +459,13 @@
                 <data android:scheme="https" />
                 <data android:host="coindex.money" />
                 <data android:pathPrefix="/referral" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="coindex.money" />
             </intent-filter>
         </activity-alias>
         <activity-alias
@@ -452,6 +506,13 @@
                 <data android:host="coindex.money" />
                 <data android:pathPrefix="/referral" />
             </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="coindex.money" />
+            </intent-filter>
         </activity-alias>
         <activity-alias
             android:name="${applicationId}.PepeLauncherAlias"
@@ -490,6 +551,13 @@
                 <data android:scheme="https" />
                 <data android:host="coindex.money" />
                 <data android:pathPrefix="/referral" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="coindex.money" />
             </intent-filter>
         </activity-alias>
         <activity-alias
@@ -530,6 +598,13 @@
                 <data android:host="coindex.money" />
                 <data android:pathPrefix="/referral" />
             </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="coindex.money" />
+            </intent-filter>
         </activity-alias>
         <activity-alias
             android:name="${applicationId}.GigachadLauncherAlias"
@@ -568,6 +643,13 @@
                 <data android:scheme="https" />
                 <data android:host="coindex.money" />
                 <data android:pathPrefix="/referral" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="coindex.money" />
             </intent-filter>
         </activity-alias>
         <activity-alias
@@ -608,6 +690,13 @@
                 <data android:host="coindex.money" />
                 <data android:pathPrefix="/referral" />
             </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="coindex.money" />
+            </intent-filter>
         </activity-alias>
         <activity-alias
             android:name="${applicationId}.YeschadLauncherAlias"
@@ -646,6 +735,13 @@
                 <data android:scheme="https" />
                 <data android:host="coindex.money" />
                 <data android:pathPrefix="/referral" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" />
+                <data android:host="coindex.money" />
             </intent-filter>
         </activity-alias>
 
