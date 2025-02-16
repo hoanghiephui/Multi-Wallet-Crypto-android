@@ -214,8 +214,8 @@ class SubscriptionServiceGooglePlay(
     }
 
     override fun launchManageSubscriptionScreen(context: Context) {
-        val packageName = "io.horizontalsystems.bankwallet"
-        val s = "https://play.google.com/store/account/subscriptions?sku=test.subscription_1&package=$packageName"
+        val packageName = "com.blockchain.btc.coinhub"
+        val s = "https://play.google.com/store/account/subscriptions?sku=com.blockchain.btc.coinhub_month&package=$packageName"
         val intent = Intent(ACTION_VIEW, Uri.parse(s)).apply {
             // The URL should either launch directly in a non-browser app (if it's
             // the default) or in the disambiguation dialog.
