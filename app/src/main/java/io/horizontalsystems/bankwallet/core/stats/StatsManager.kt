@@ -5,7 +5,6 @@ import io.horizontalsystems.bankwallet.analytics.AnalyticsEvent
 import io.horizontalsystems.bankwallet.analytics.AnalyticsHelper
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.ILocalStorage
-import io.horizontalsystems.bankwallet.core.managers.MarketKitWrapper
 import io.horizontalsystems.bankwallet.core.providers.AppConfigProvider
 import io.horizontalsystems.bankwallet.core.storage.StatsDao
 import io.horizontalsystems.bankwallet.entities.AccountType
@@ -71,19 +70,14 @@ class StatsManager(
                 }
             }
         }
-        try {
-            scope.launch {
-                UserSubscriptionManager.activeSubscriptionStateFlow.collect {
-                    uiStatsEnabled = areUiStatsEnabled()
-                    isDetectCrashEnabled = areDetectCrashEnabledEnabled()
-                    _uiStatsEnabledFlow.update { uiStatsEnabled }
-                    _isDetectCrashEnabledFlow.update { isDetectCrashEnabled }
-                }
+        scope.launch {
+            UserSubscriptionManager.activeSubscriptionStateFlow.collect {
+                uiStatsEnabled = areUiStatsEnabled()
+                isDetectCrashEnabled = areDetectCrashEnabledEnabled()
+                _uiStatsEnabledFlow?.update { uiStatsEnabled }
+                _isDetectCrashEnabledFlow?.update { isDetectCrashEnabled }
             }
-        } catch (ex: Exception) {
-            ex.printStackTrace()
         }
-
     }
 
     var uiStatsEnabled = areUiStatsEnabled()

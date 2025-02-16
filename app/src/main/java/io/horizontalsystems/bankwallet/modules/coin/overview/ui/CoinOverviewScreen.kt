@@ -1,6 +1,7 @@
 package io.horizontalsystems.bankwallet.modules.coin.overview.ui
 
 import android.content.Context
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -392,7 +393,7 @@ private fun CandlestickChart(
     fullCoin: FullCoin,
 ) {
     TitlePrice(viewModel.currency, priceTitle?.data)
-    CrossSlide(targetState = candlestickSeries) { state ->
+    AnimatedContent(targetState = candlestickSeries) { state ->
         when (state) {
             CandlestickSeries.Loading -> {
                 Box(modifier = Modifier.height(300.dp)) {
@@ -505,9 +506,8 @@ fun ViewChart(
     showCandlestick: @Composable (ColumnScope.() -> Unit),
     showChartDefault: @Composable (ColumnScope.() -> Unit)
 ) {
-    CrossSlide(
+    AnimatedContent(
         targetState = currentPage,
-        reverseAnimation = false
     ) { screen ->
         when (screen) {
             CHART_DEFAULT -> {

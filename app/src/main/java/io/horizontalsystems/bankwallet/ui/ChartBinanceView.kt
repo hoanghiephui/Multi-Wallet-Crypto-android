@@ -194,9 +194,11 @@ class ChartBinanceView @JvmOverloads constructor(
             grid = gridOptions {
                 horzLines = gridLineOptions {
                     color = "#F0F3FA".toIntColor()
+                    visible = false
                 }
                 vertLines = gridLineOptions {
                     color = "#F0F3FA".toIntColor()
+                    visible = false
                 }
             }
         }
@@ -257,7 +259,7 @@ class ChartBinanceView @JvmOverloads constructor(
                     minMove = 1f,
                 ),
                 priceScaleId = priceScale,
-                lastValueVisible = true,
+                lastValueVisible = false,
                 priceLineVisible = true
             ),
             onSeriesCreated = { api ->

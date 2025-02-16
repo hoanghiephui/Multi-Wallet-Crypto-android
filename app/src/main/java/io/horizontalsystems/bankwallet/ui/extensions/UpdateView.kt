@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
@@ -33,7 +34,6 @@ import se.warting.inappupdate.compose.APP_UPDATE_REQUEST_CODE
 import se.warting.inappupdate.compose.InAppUpdateState
 import se.warting.inappupdate.compose.findActivity
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HeaderUpdate(
     updateState: InAppUpdateState,
@@ -42,6 +42,7 @@ fun HeaderUpdate(
     rememberCoroutineScope: CoroutineScope
 ) {
     BottomSheetHeader(
+        modifier = Modifier.navigationBarsPadding(),
         iconPainter = painterResource(R.drawable.ic_baseline_update_24),
         iconTint = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
         title = "Software update",
