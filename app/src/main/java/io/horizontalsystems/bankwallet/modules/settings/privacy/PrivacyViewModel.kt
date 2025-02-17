@@ -8,10 +8,10 @@ import io.horizontalsystems.bankwallet.core.ViewModelUiState
 import io.horizontalsystems.bankwallet.core.stats.StatsManager
 import kotlinx.coroutines.launch
 
-class PrivacyViewModel(private val statsManager: StatsManager) :
-    ViewModelUiState<PrivacyUiState>() {
-    private var uiStatsEnabled = statsManager.uiStatsEnabled
+class PrivacyViewModel(private val statsManager: StatsManager) : ViewModelUiState<PrivacyUiState>() {
+    private var uiStatsEnabled = statsManager.uiStatsEnabledFlow.value
     private var isDetectCrash = statsManager.isDetectCrashEnabled
+
 
     init {
         viewModelScope.launch {

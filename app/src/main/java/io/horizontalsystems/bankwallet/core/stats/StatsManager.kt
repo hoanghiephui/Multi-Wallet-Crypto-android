@@ -60,26 +60,22 @@ class StatsManager(
     private val appConfigProvider: AppConfigProvider,
     private val backgroundManager: BackgroundManager,
 ) {
-
     private val scope = CoroutineScope(Dispatchers.IO)
-
-    var uiStatsEnabled = areUiStatsEnabled()
-        private set
-    var isDetectCrashEnabled = areDetectCrashEnabledEnabled()
-        private set
-
+    private var uiStatsEnabled = areUiStatsEnabled()
+    private var isDetectCrashEnabled = areDetectCrashEnabledEnabled()
     private val _uiStatsEnabledFlow = MutableStateFlow(uiStatsEnabled)
     val uiStatsEnabledFlow = _uiStatsEnabledFlow.asStateFlow()
     private val _isDetectCrashEnabledFlow = MutableStateFlow(isDetectCrashEnabled)
     val isDetectCrashEnabledFlow = _isDetectCrashEnabledFlow.asStateFlow()
 
+    private val gson by lazy { Gson() }
     private val executor = Executors.newCachedThreadPool()
     private val syncInterval = 60 * 60 // 1H in seconds
     private val sqliteMaxVariableNumber = 999
 
     init {
         scope.launch {
-            UserSubscriptionManager.activeSubscriptionStateFlow?.collect {
+            UserSubscriptionManager.activeSubscriptionStateFlow.collect {
                 uiStatsEnabled = areUiStatsEnabled()
                 isDetectCrashEnabled = areDetectCrashEnabledEnabled()
                 _uiStatsEnabledFlow?.update { uiStatsEnabled }
