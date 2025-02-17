@@ -1,5 +1,7 @@
 package io.horizontalsystems.bankwallet.modules.settings.main
 
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.DrawableRes
@@ -45,6 +47,7 @@ import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
 import io.horizontalsystems.bankwallet.core.App
 import io.horizontalsystems.bankwallet.core.managers.RateAppManager
+import io.horizontalsystems.bankwallet.core.paidAction
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
@@ -64,12 +67,16 @@ import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.BadgeText
 import io.horizontalsystems.bankwallet.ui.compose.components.CellSingleLineLawrenceSection
 import io.horizontalsystems.bankwallet.ui.compose.components.CellUniversalLawrenceSection
+import io.horizontalsystems.bankwallet.ui.compose.components.PremiumHeader
 import io.horizontalsystems.bankwallet.ui.compose.components.RowUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.caption_grey
+import io.horizontalsystems.bankwallet.ui.compose.components.cell.SectionPremiumUniversalLawrence
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_grey
 import io.horizontalsystems.bankwallet.ui.helpers.LinkHelper
+import io.horizontalsystems.bankwallet.widgets.MarketWidgetReceiver
+import io.horizontalsystems.subscriptions.core.VIPSupport
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -229,6 +236,28 @@ private fun SettingSections(
         }
         )
     )
+
+    VSpacer(24.dp)
+
+    PremiumHeader()
+
+    SectionPremiumUniversalLawrence {
+        HsSettingCell(
+            title = R.string.widget_setting,
+            icon = R.drawable.outline_widgets_24,
+            iconTint = ComposeAppTheme.colors.jacob,
+            onClick = {
+                navController.paidAction(VIPSupport) {
+                    val appWidgetManager = AppWidgetManager.getInstance(context)
+                    val myProvider = ComponentName(context, MarketWidgetReceiver::class.java)
+
+                    if (appWidgetManager.isRequestPinAppWidgetSupported) {
+                        appWidgetManager.requestPinAppWidget(myProvider, null, null)
+                    }
+                }
+            }
+        )
+    }
 
     VSpacer(32.dp)
 

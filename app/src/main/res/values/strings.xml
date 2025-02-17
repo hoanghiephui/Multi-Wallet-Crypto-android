@@ -1865,4 +1865,6 @@
     <string name="Notification_Title1">📈 Price alert</string>
     <string name="Notification_PriceUp1">%s is ⬆️ %s, %s is ⬆️ %s, %s is ⬆️ %s in the last 24h️</string>
     <string name="Notification_PriceDown1">%s is ⬇️ %s, %s is ⬇️ %s, %s is ⬇️ %s in the last 24h</string>
+
+    <string name="widget_setting">Add widget to monitor exchange rates</string>
 </resources>
