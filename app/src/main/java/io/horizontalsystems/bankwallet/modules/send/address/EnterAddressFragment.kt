@@ -40,6 +40,7 @@ import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
 import io.horizontalsystems.bankwallet.core.address.AddressCheckResult
 import io.horizontalsystems.bankwallet.core.address.AddressCheckType
+import io.horizontalsystems.bankwallet.core.paidAction
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.requireInput
 import io.horizontalsystems.bankwallet.core.slideFromBottom
@@ -62,6 +63,8 @@ import io.horizontalsystems.bankwallet.ui.compose.components.subhead1_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_lucian
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_remus
+import io.horizontalsystems.subscriptions.core.AddressBlacklist
+import io.horizontalsystems.subscriptions.core.IPaidAction
 import kotlinx.parcelize.Parcelize
 import java.math.BigDecimal
 
@@ -149,7 +152,11 @@ fun EnterAddressScreen(navController: NavController, input: EnterAddressFragment
                         uiState.addressValidationError,
                         uiState.checkResults,
                         navController
-                    )
+                    ) { paidAction ->
+                        navController.paidAction(paidAction) {
+                            viewModel.onEnterAddress(uiState.value)
+                        }
+                    }
                 }
             }
             ButtonsGroupWithShade {
@@ -184,7 +191,8 @@ fun AddressCheck(
     addressValidationInProgress: Boolean,
     addressValidationError: Throwable?,
     checkResults: Map<AddressCheckType, AddressCheckData>,
-    navController: NavController
+    navController: NavController,
+    onPaidAction: (action: IPaidAction) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -209,7 +217,8 @@ fun AddressCheck(
                 checkType = addressCheckType,
                 inProgress = checkData.inProgress,
                 checkResult = checkData.checkResult,
-                navController
+                navController,
+                onPaidAction
             )
         }
     }
@@ -256,7 +265,8 @@ private fun CheckCell(
     checkType: AddressCheckType,
     inProgress: Boolean,
     checkResult: AddressCheckResult,
-    navController: NavController
+    navController: NavController,
+    onPaidAction: (action: IPaidAction) -> Unit
 ) {
     val onClickInfo: (() -> Unit)? = when (checkResult) {
         AddressCheckResult.Clear -> {
@@ -265,6 +275,12 @@ private fun CheckCell(
                     R.id.feeSettingsInfoDialog,
                     FeeSettingsInfoDialog.Input(Translator.getString(checkType.clearInfoTitle), Translator.getString(checkType.clearInfoDescription))
                 )
+            }
+        }
+
+        AddressCheckResult.NotAllowed -> {
+            {
+                onPaidAction(AddressBlacklist)
             }
         }
 
@@ -332,7 +348,7 @@ private fun AddressCheckCell(
 @Composable
 fun CheckValue(
     inProgress: Boolean,
-    validationResult: AddressCheckResult,
+    checkResult: AddressCheckResult,
 ) {
     if (inProgress) {
         CircularProgressIndicator(
@@ -341,9 +357,9 @@ fun CheckValue(
             strokeWidth = 2.dp
         )
     } else {
-        when (validationResult) {
+        when (checkResult) {
             AddressCheckResult.Clear -> {
-                subhead2_remus(stringResource(validationResult.title))
+                subhead2_remus(stringResource(checkResult.title))
                 Icon(
                     modifier = Modifier.padding(start = 10.dp),
                     painter = painterResource(R.drawable.ic_info_20),
@@ -352,9 +368,13 @@ fun CheckValue(
                 )
             }
 
-            AddressCheckResult.Detected -> subhead2_lucian(stringResource(validationResult.title))
+            AddressCheckResult.Detected -> {
+                subhead2_lucian(stringResource(checkResult.title))
+            }
 
-            else -> subhead2_grey(stringResource(R.string.NotAvailable))
+            else -> {
+                subhead2_grey(stringResource(R.string.NotAvailable))
+            }
         }
     }
 }
