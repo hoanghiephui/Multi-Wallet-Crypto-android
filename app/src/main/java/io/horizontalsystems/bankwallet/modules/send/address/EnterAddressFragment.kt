@@ -19,25 +19,28 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tonapps.tonkeeper.api.shortAddress
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.AdType
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.address.AddressCheckResult
 import io.horizontalsystems.bankwallet.core.address.AddressCheckType
 import io.horizontalsystems.bankwallet.core.paidAction
@@ -51,6 +54,7 @@ import io.horizontalsystems.bankwallet.modules.address.AddressParserViewModel
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
 import io.horizontalsystems.bankwallet.modules.evmfee.FeeSettingsInfoDialog
 import io.horizontalsystems.bankwallet.modules.send.SendFragment
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
@@ -105,6 +109,10 @@ fun EnterAddressScreen(navController: NavController, input: EnterAddressFragment
     val paymentAddressViewModel = viewModel<AddressParserViewModel>(
         factory = AddressParserModule.Factory(wallet.token, input.amount)
     )
+    val (adState, reloadAd) = rememberAdNativeView(
+        BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "EnterAddressScreen", viewModel
+    )
 
     val uiState = viewModel.uiState
     Scaffold(
@@ -143,7 +151,11 @@ fun EnterAddressScreen(navController: NavController, input: EnterAddressFragment
                 }
 
                 if (uiState.value.isBlank()) {
-                    AddressSuggestions(uiState.recentAddress, uiState.recentContact, uiState.contacts) {
+                    AddressSuggestions(
+                        uiState.recentAddress,
+                        uiState.recentContact,
+                        uiState.contacts
+                    ) {
                         viewModel.onEnterAddress(it)
                     }
                 } else {
@@ -158,6 +170,8 @@ fun EnterAddressScreen(navController: NavController, input: EnterAddressFragment
                         }
                     }
                 }
+                VSpacer(height = 8.dp)
+                MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
             }
             ButtonsGroupWithShade {
                 ButtonPrimaryYellow(
@@ -171,7 +185,8 @@ fun EnterAddressScreen(navController: NavController, input: EnterAddressFragment
                                 R.id.sendXFragment,
                                 SendFragment.Input(
                                     wallet = wallet,
-                                    sendEntryPointDestId = input.sendEntryPointDestId ?: R.id.enterAddressFragment,
+                                    sendEntryPointDestId = input.sendEntryPointDestId
+                                        ?: R.id.enterAddressFragment,
                                     title = input.title,
                                     address = it,
                                     amount = uiState.amount
@@ -237,7 +252,8 @@ private fun Errors(
             modifier = Modifier.padding(horizontal = 16.dp),
             icon = R.drawable.ic_attention_20,
             title = stringResource(R.string.SwapSettings_Error_InvalidAddress),
-            text = addressValidationError.message ?: stringResource(R.string.SwapSettings_Error_InvalidAddress)
+            text = addressValidationError.message
+                ?: stringResource(R.string.SwapSettings_Error_InvalidAddress)
         )
         VSpacer(32.dp)
     } else {
@@ -273,7 +289,10 @@ private fun CheckCell(
             {
                 navController.slideFromBottom(
                     R.id.feeSettingsInfoDialog,
-                    FeeSettingsInfoDialog.Input(Translator.getString(checkType.clearInfoTitle), Translator.getString(checkType.clearInfoDescription))
+                    FeeSettingsInfoDialog.Input(
+                        Translator.getString(checkType.clearInfoTitle),
+                        Translator.getString(checkType.clearInfoDescription)
+                    )
                 )
             }
         }
@@ -389,7 +408,12 @@ fun CheckLocked() {
 }
 
 @Composable
-fun AddressSuggestions(recent: String?, recentContact: SContact?, contacts: List<SContact>, onClick: (String) -> Unit) {
+fun AddressSuggestions(
+    recent: String?,
+    recentContact: SContact?,
+    contacts: List<SContact>,
+    onClick: (String) -> Unit
+) {
     if (recentContact != null) {
         Column(
             modifier = Modifier
