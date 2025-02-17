@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 
 class PrivacyViewModel(private val statsManager: StatsManager) : ViewModelUiState<PrivacyUiState>() {
     private var uiStatsEnabled = statsManager.uiStatsEnabledFlow.value
-    private var isDetectCrash = statsManager.isDetectCrashEnabled
+    private var isDetectCrash = statsManager.isDetectCrashEnabledFlow.value
 
 
     init {

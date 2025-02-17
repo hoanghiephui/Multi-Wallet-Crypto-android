@@ -418,7 +418,6 @@ class App : CoreApp(), WorkConfiguration.Provider, ImageLoaderFactory {
             localStorage,
             analyticsHelper,
             appConfigProvider,
-            backgroundManager
         )
 
         rateAppManager = RateAppManager(walletManager, adapterManager, localStorage)

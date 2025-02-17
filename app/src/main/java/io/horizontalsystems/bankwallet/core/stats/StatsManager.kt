@@ -58,7 +58,6 @@ class StatsManager(
     private val localStorage: ILocalStorage,
     private val analyticsHelper: AnalyticsHelper,
     private val appConfigProvider: AppConfigProvider,
-    private val backgroundManager: BackgroundManager,
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
     private var uiStatsEnabled = areUiStatsEnabled()
