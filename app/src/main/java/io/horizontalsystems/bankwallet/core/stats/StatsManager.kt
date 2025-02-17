@@ -1,5 +1,6 @@
 package io.horizontalsystems.bankwallet.core.stats
 
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.gson.Gson
 import io.horizontalsystems.bankwallet.analytics.AnalyticsEvent
 import io.horizontalsystems.bankwallet.analytics.AnalyticsHelper
@@ -72,19 +73,11 @@ class StatsManager(
     private val _isDetectCrashEnabledFlow = MutableStateFlow(isDetectCrashEnabled)
     val isDetectCrashEnabledFlow = _isDetectCrashEnabledFlow.asStateFlow()
 
-    private val gson by lazy { Gson() }
     private val executor = Executors.newCachedThreadPool()
     private val syncInterval = 60 * 60 // 1H in seconds
     private val sqliteMaxVariableNumber = 999
 
     init {
-        scope.launch {
-            backgroundManager.stateFlow.collect { state ->
-                if (state == BackgroundManagerState.EnterForeground) {
-                    sendStats()
-                }
-            }
-        }
         scope.launch {
             UserSubscriptionManager.activeSubscriptionStateFlow?.collect {
                 uiStatsEnabled = areUiStatsEnabled()
@@ -134,26 +127,20 @@ class StatsManager(
 
     fun logStat(eventPage: StatPage, eventSection: StatSection? = null, event: StatEvent) {
         if (!uiStatsEnabled) return
+        val params = mutableListOf(
+            AnalyticsEvent.Param(FirebaseAnalytics.Param.SCREEN_NAME, eventPage.key),
+            AnalyticsEvent.Param(FirebaseAnalytics.Param.ITEM_NAME, event.name),
+        )
 
-        executor.submit {
-            try {
-                val eventMap = buildMap {
-                    put("event_page", eventPage.key)
-                    put("event", event.name)
-                    eventSection?.let { put("event_section", it.key) }
-                    event.params?.let { params ->
-                        putAll(params.map { (param, value) -> param.key to value })
-                    }
-                    put("time", Instant.now().epochSecond)
-                }
-
-                val json = gson.toJson(eventMap)
-//                Log.e("e", json)
-                statsDao.insert(StatRecord(json))
-            } catch (error: Throwable) {
-//                Log.e("e", "logStat error", error)
-            }
+        if (eventSection != null) {
+            params.add(AnalyticsEvent.Param(FirebaseAnalytics.Param.ITEM_ID, eventSection.key))
         }
+        analyticsHelper.logEvent(
+            AnalyticsEvent(
+                type = "ui_stats",
+                extras = params,
+            ),
+        )
     }
 
     fun sendStats() {
@@ -174,7 +161,7 @@ class StatsManager(
                         AnalyticsEvent(
                             type = "ui_stats",
                             extras = listOf(
-                                AnalyticsEvent.Param("stats", statsArray),
+                                AnalyticsEvent.Param(FirebaseAnalytics.Param.CONTENT, statsArray),
                                 AnalyticsEvent.Param("app_version", appConfigProvider.appVersion),
                                 AnalyticsEvent.Param("app_id", appConfigProvider.appId ?: ""),
                             ),
