@@ -7,11 +7,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import io.horizontalsystems.bankwallet.core.providers.Translator
+import io.horizontalsystems.bankwallet.core.slideFromBottomForResult
 import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.AdType
@@ -25,12 +29,14 @@ import io.horizontalsystems.bankwallet.modules.address.HSAddressCell
 import io.horizontalsystems.bankwallet.modules.amount.AmountInputModeViewModel
 import io.horizontalsystems.bankwallet.modules.amount.HSAmountInput
 import io.horizontalsystems.bankwallet.modules.availablebalance.AvailableBalance
+import io.horizontalsystems.bankwallet.modules.send.AddressRiskyBottomSheetAlert
 import io.horizontalsystems.bankwallet.modules.send.SendScreen
 import io.horizontalsystems.bankwallet.modules.send.evm.confirmation.SendEvmConfirmationFragment
 import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.components.ButtonPrimaryYellow
 import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.core.helpers.HudHelper
+import io.horizontalsystems.marketkit.models.BlockchainType
 import java.math.BigDecimal
 
 @Composable
@@ -42,6 +48,7 @@ fun SendEvmScreen(
     wallet: Wallet,
     amount: BigDecimal?,
     hideAddress: Boolean,
+    riskyAddress: Boolean,
     sendEntryPointDestId: Int,
 ) {
     val viewModel = viewModel<SendEvmViewModel>(
@@ -59,6 +66,7 @@ fun SendEvmScreen(
     )
     val amountUnique = paymentAddressViewModel.amountUnique
     val view = LocalView.current
+    val keyboardController = LocalSoftwareKeyboardController.current
     val (adState, _) = rememberAdNativeView(BuildConfig.HOME_MARKET_NATIVE,
         adPlacements = "SendEvmScreen", viewModel)
     val focusRequester = remember { FocusRequester() }
@@ -74,8 +82,8 @@ fun SendEvmScreen(
         if (uiState.showAddressInput) {
             HSAddressCell(
                 title = stringResource(R.string.Send_Confirmation_To),
-                value = uiState.address.hex
-            ) {
+                value = uiState.address.hex,
+            riskyAddress = riskyAddress,) {
                 navController.popBackStack()
             }
             VSpacer(16.dp)
@@ -100,39 +108,68 @@ fun SendEvmScreen(
             amountUnique = amountUnique
         )
 
-        VSpacer(8.dp)
-        AvailableBalance(
-            coinCode = wallet.coin.code,
-            coinDecimal = viewModel.coinMaxAllowedDecimals,
-            fiatDecimal = viewModel.fiatMaxAllowedDecimals,
-            availableBalance = availableBalance,
-            amountInputType = amountInputType,
-            rate = viewModel.coinRate
-        )
+            VSpacer(8.dp)
+            AvailableBalance(
+                coinCode = wallet.coin.code,
+                coinDecimal = viewModel.coinMaxAllowedDecimals,
+                fiatDecimal = viewModel.fiatMaxAllowedDecimals,
+                availableBalance = availableBalance,
+                amountInputType = amountInputType,
+                rate = viewModel.coinRate
+            )
         VSpacer(8.dp)
         MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
-        ButtonPrimaryYellow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp),
-            title = stringResource(R.string.Send_DialogProceed),
-            onClick = {
-                if (viewModel.hasConnection()) {
-                    viewModel.getSendData()?.let {
-                        navController.slideFromRight(
-                            R.id.sendEvmConfirmationFragment,
-                            SendEvmConfirmationFragment.Input(
-                                sendData = it,
-                                blockchainType = viewModel.wallet.token.blockchainType,
-                                sendEntryPointDestId = sendEntryPointDestId
+            ButtonPrimaryYellow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                title = stringResource(R.string.Button_Check),
+                onClick = {
+                    val sendData = viewModel.getSendData() ?: return@ButtonPrimaryYellow
+                    if (!viewModel.hasConnection()) {
+                        HudHelper.showErrorMessage(view, R.string.Hud_Text_NoInternet)
+                    } else if (riskyAddress) {
+                        keyboardController?.hide()
+                        navController.slideFromBottomForResult<AddressRiskyBottomSheetAlert.Result>(
+                            R.id.addressRiskyBottomSheetAlert,
+                            AddressRiskyBottomSheetAlert.Input(
+                                alertText = Translator.getString(R.string.Send_RiskyAddress_AlertText)
                             )
+                        ) {
+                            openSendConfirm(
+                                sendData,
+                                viewModel.wallet.token.blockchainType,
+                                navController,
+                                sendEntryPointDestId
+                            )
+                        }
+                    } else {
+                        openSendConfirm(
+                            sendData,
+                            viewModel.wallet.token.blockchainType,
+                            navController,
+                            sendEntryPointDestId
                         )
                     }
-                } else {
-                    HudHelper.showErrorMessage(view, R.string.Hud_Text_NoInternet)
-                }
-            },
-            enabled = proceedEnabled
-        )
+                },
+                enabled = proceedEnabled
+            )
+        }
     }
+}
+
+private fun openSendConfirm(
+    sendEvmData: SendEvmData,
+    blockchainType: BlockchainType,
+    navController: NavController,
+    sendEntryPointDestId: Int
+) {
+    navController.slideFromRight(
+        R.id.sendEvmConfirmationFragment,
+        SendEvmConfirmationFragment.Input(
+            sendData = sendEvmData,
+            blockchainType = blockchainType,
+            sendEntryPointDestId = sendEntryPointDestId
+        )
+    )
 }

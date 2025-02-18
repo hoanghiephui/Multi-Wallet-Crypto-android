@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -15,6 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import io.horizontalsystems.bankwallet.core.providers.Translator
+import io.horizontalsystems.bankwallet.core.slideFromBottomForResult
 import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.analytics.TrackScreenViewEvent
@@ -27,6 +30,7 @@ import io.horizontalsystems.bankwallet.modules.address.HSAddressCell
 import io.horizontalsystems.bankwallet.modules.amount.AmountInputModeViewModel
 import io.horizontalsystems.bankwallet.modules.amount.HSAmountInput
 import io.horizontalsystems.bankwallet.modules.availablebalance.AvailableBalance
+import io.horizontalsystems.bankwallet.modules.send.AddressRiskyBottomSheetAlert
 import io.horizontalsystems.bankwallet.modules.send.SendConfirmationFragment
 import io.horizontalsystems.bankwallet.modules.send.SendScreen
 import io.horizontalsystems.bankwallet.rememberAdNativeView
@@ -44,6 +48,7 @@ fun SendTronScreen(
     amountInputModeViewModel: AmountInputModeViewModel,
     sendEntryPointDestId: Int,
     amount: BigDecimal?,
+    riskyAddress: Boolean
 ) {
     val view = LocalView.current
     val wallet = viewModel.wallet
@@ -53,6 +58,7 @@ fun SendTronScreen(
     val amountCaution = uiState.amountCaution
     val proceedEnabled = uiState.proceedEnabled
     val amountInputType = amountInputModeViewModel.inputType
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     val paymentAddressViewModel = viewModel<AddressParserViewModel>(
         factory = AddressParserModule.Factory(wallet.token, amount)
@@ -75,7 +81,8 @@ fun SendTronScreen(
             if (uiState.showAddressInput) {
                 HSAddressCell(
                     title = stringResource(R.string.Send_Confirmation_To),
-                    value = uiState.address.hex
+                    value = uiState.address.hex,
+                    riskyAddress = riskyAddress
                 ) {
                     navController.popBackStack()
                 }
@@ -116,20 +123,22 @@ fun SendTronScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 16.dp),
-                title = stringResource(R.string.Send_DialogProceed),
+                title = stringResource(R.string.Button_Check),
                 onClick = {
-                    if (viewModel.hasConnection()) {
-                        viewModel.onNavigateToConfirmation()
-
-                        navController.slideFromRight(
-                            R.id.sendConfirmation,
-                            SendConfirmationFragment.Input(
-                                SendConfirmationFragment.Type.Tron,
-                                sendEntryPointDestId
-                            )
-                        )
-                    } else {
+                    if (!viewModel.hasConnection()) {
                         HudHelper.showErrorMessage(view, R.string.Hud_Text_NoInternet)
+                    } else if (riskyAddress) {
+                        keyboardController?.hide()
+                        navController.slideFromBottomForResult<AddressRiskyBottomSheetAlert.Result>(
+                            R.id.addressRiskyBottomSheetAlert,
+                            AddressRiskyBottomSheetAlert.Input(
+                                alertText = Translator.getString(R.string.Send_RiskyAddress_AlertText)
+                            )
+                        ) {
+                            openConfirm(viewModel, navController, sendEntryPointDestId)
+                        }
+                    } else {
+                        openConfirm(viewModel, navController, sendEntryPointDestId)
                     }
                 },
                 enabled = proceedEnabled
@@ -137,4 +146,20 @@ fun SendTronScreen(
         }
     }
     TrackScreenViewEvent("SendTronScreen")
+}
+
+private fun openConfirm(
+    viewModel: SendTronViewModel,
+    navController: NavController,
+    sendEntryPointDestId: Int
+) {
+    viewModel.onNavigateToConfirmation()
+
+    navController.slideFromRight(
+        R.id.sendConfirmation,
+        SendConfirmationFragment.Input(
+            SendConfirmationFragment.Type.Tron,
+            sendEntryPointDestId
+        )
+    )
 }

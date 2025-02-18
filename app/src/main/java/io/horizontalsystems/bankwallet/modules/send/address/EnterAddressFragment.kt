@@ -189,6 +189,7 @@ fun EnterAddressScreen(navController: NavController, input: EnterAddressFragment
                                         ?: R.id.enterAddressFragment,
                                     title = input.title,
                                     address = it,
+                                    riskyAddress = uiState.checkResults.any { result -> result.value.checkResult == AddressCheckResult.Detected },
                                     amount = uiState.amount
                                 )
                             )
