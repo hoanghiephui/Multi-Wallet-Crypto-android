@@ -8,18 +8,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import io.horizontalsystems.bankwallet.core.providers.Translator
-import io.horizontalsystems.bankwallet.core.slideFromBottomForResult
 import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.AdType
 import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
+import io.horizontalsystems.bankwallet.core.providers.Translator
+import io.horizontalsystems.bankwallet.core.slideFromBottomForResult
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.Address
 import io.horizontalsystems.bankwallet.entities.Wallet
@@ -67,8 +66,10 @@ fun SendEvmScreen(
     val amountUnique = paymentAddressViewModel.amountUnique
     val view = LocalView.current
     val keyboardController = LocalSoftwareKeyboardController.current
-    val (adState, _) = rememberAdNativeView(BuildConfig.HOME_MARKET_NATIVE,
-        adPlacements = "SendEvmScreen", viewModel)
+    val (adState, _) = rememberAdNativeView(
+        BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "SendEvmScreen", viewModel
+    )
     val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
@@ -83,7 +84,8 @@ fun SendEvmScreen(
             HSAddressCell(
                 title = stringResource(R.string.Send_Confirmation_To),
                 value = uiState.address.hex,
-            riskyAddress = riskyAddress,) {
+                riskyAddress = riskyAddress,
+            ) {
                 navController.popBackStack()
             }
             VSpacer(16.dp)
@@ -108,42 +110,34 @@ fun SendEvmScreen(
             amountUnique = amountUnique
         )
 
-            VSpacer(8.dp)
-            AvailableBalance(
-                coinCode = wallet.coin.code,
-                coinDecimal = viewModel.coinMaxAllowedDecimals,
-                fiatDecimal = viewModel.fiatMaxAllowedDecimals,
-                availableBalance = availableBalance,
-                amountInputType = amountInputType,
-                rate = viewModel.coinRate
-            )
+        VSpacer(8.dp)
+        AvailableBalance(
+            coinCode = wallet.coin.code,
+            coinDecimal = viewModel.coinMaxAllowedDecimals,
+            fiatDecimal = viewModel.fiatMaxAllowedDecimals,
+            availableBalance = availableBalance,
+            amountInputType = amountInputType,
+            rate = viewModel.coinRate
+        )
         VSpacer(8.dp)
         MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
-            ButtonPrimaryYellow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp),
-                title = stringResource(R.string.Button_Check),
-                onClick = {
-                    val sendData = viewModel.getSendData() ?: return@ButtonPrimaryYellow
-                    if (!viewModel.hasConnection()) {
-                        HudHelper.showErrorMessage(view, R.string.Hud_Text_NoInternet)
-                    } else if (riskyAddress) {
-                        keyboardController?.hide()
-                        navController.slideFromBottomForResult<AddressRiskyBottomSheetAlert.Result>(
-                            R.id.addressRiskyBottomSheetAlert,
-                            AddressRiskyBottomSheetAlert.Input(
-                                alertText = Translator.getString(R.string.Send_RiskyAddress_AlertText)
-                            )
-                        ) {
-                            openSendConfirm(
-                                sendData,
-                                viewModel.wallet.token.blockchainType,
-                                navController,
-                                sendEntryPointDestId
-                            )
-                        }
-                    } else {
+        ButtonPrimaryYellow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 16.dp),
+            title = stringResource(R.string.Button_Check),
+            onClick = {
+                val sendData = viewModel.getSendData() ?: return@ButtonPrimaryYellow
+                if (!viewModel.hasConnection()) {
+                    HudHelper.showErrorMessage(view, R.string.Hud_Text_NoInternet)
+                } else if (riskyAddress) {
+                    keyboardController?.hide()
+                    navController.slideFromBottomForResult<AddressRiskyBottomSheetAlert.Result>(
+                        R.id.addressRiskyBottomSheetAlert,
+                        AddressRiskyBottomSheetAlert.Input(
+                            alertText = Translator.getString(R.string.Send_RiskyAddress_AlertText)
+                        )
+                    ) {
                         openSendConfirm(
                             sendData,
                             viewModel.wallet.token.blockchainType,
@@ -151,12 +145,20 @@ fun SendEvmScreen(
                             sendEntryPointDestId
                         )
                     }
-                },
-                enabled = proceedEnabled
-            )
-        }
+                } else {
+                    openSendConfirm(
+                        sendData,
+                        viewModel.wallet.token.blockchainType,
+                        navController,
+                        sendEntryPointDestId
+                    )
+                }
+            },
+            enabled = proceedEnabled
+        )
     }
 }
+
 
 private fun openSendConfirm(
     sendEvmData: SendEvmData,
