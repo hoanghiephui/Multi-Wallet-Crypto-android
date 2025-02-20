@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 
 class SubscriptionViewModel : ViewModelUiState<ManageSubscriptionUiState>() {
     private var userHasActiveSubscription = false
+    private var packageSubscription: UserSubscription? = null
 
     init {
         viewModelScope.launch {
@@ -20,11 +21,13 @@ class SubscriptionViewModel : ViewModelUiState<ManageSubscriptionUiState>() {
     }
 
     override fun createState() = ManageSubscriptionUiState(
-        userHasActiveSubscription = userHasActiveSubscription
+        userHasActiveSubscription = userHasActiveSubscription,
+        packageSubscription = packageSubscription
     )
 
     private fun refreshData(userSubscription: UserSubscription?) {
         userHasActiveSubscription = userSubscription != null
+        packageSubscription = userSubscription
     }
 
     fun restorePurchase() {
@@ -40,4 +43,5 @@ class SubscriptionViewModel : ViewModelUiState<ManageSubscriptionUiState>() {
 
 data class ManageSubscriptionUiState(
     val userHasActiveSubscription: Boolean,
+    val packageSubscription: UserSubscription? = null
 )

@@ -92,6 +92,22 @@ fun SubscriptionScreen(navController: NavController) {
                             contentDescription = null,
                         )
                     }
+                    CellUniversal(
+                        onClick = {
+                            navController.slideFromBottom(R.id.buySubscriptionFragment)
+                        }
+                    ) {
+                        body_leah(
+                            text = stringResource(R.string.SettingsSubscription_GetPremium),
+                            maxLines = 1,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Image(
+                            modifier = Modifier.size(20.dp),
+                            painter = painterResource(id = R.drawable.ic_arrow_right),
+                            contentDescription = null,
+                        )
+                    }
                 } else {
                     CellUniversal(
                         borderTop = false,
