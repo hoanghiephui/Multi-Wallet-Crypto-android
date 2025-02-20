@@ -1,7 +1,6 @@
 package io.horizontalsystems.bankwallet.modules.main
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -92,7 +91,7 @@ class MainActivity : BaseActivity() {
                 viewModel.onTcDappRequestHandled()
             }
         }
-        Sync.initialize(this)
+        Sync.initialize(this, viewModel.isShowNotificationPrice, viewModel.isShowNotificationNews)
 
         viewModel.setIntent(intent)
         handleIntent(intent)

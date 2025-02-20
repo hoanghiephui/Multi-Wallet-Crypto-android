@@ -29,7 +29,8 @@ class MainActivityViewModel(
     private val localStorage: ILocalStorage,
     private val tonConnectManager: TonConnectManager
 ) : ViewModel() {
-
+    val isShowNotificationPrice = localStorage.isShowNotificationPrice
+    val isShowNotificationNews = localStorage.isShowNotificationNews
     val navigateToMainLiveData = MutableLiveData(false)
     val wcEvent = MutableLiveData<Wallet.Model?>()
     val tcSendRequest = MutableLiveData<SendRequestEntity?>()

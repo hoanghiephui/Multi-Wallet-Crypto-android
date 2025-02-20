@@ -134,6 +134,8 @@ interface ILocalStorage {
 
     var priceChangeInterval: PriceChangeInterval
     val priceChangeIntervalFlow: StateFlow<PriceChangeInterval>
+    var isShowNotificationPrice: Boolean
+    var isShowNotificationNews: Boolean
 
     fun clear()
 }

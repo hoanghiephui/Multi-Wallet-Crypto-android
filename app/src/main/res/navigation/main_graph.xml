@@ -413,4 +413,7 @@
     <dialog
         android:id="@+id/BillingPlusDialog"
         android:name="io.horizontalsystems.bankwallet.modules.billing.BillingPlusDialog"/>
+    <fragment
+        android:id="@+id/notificationSetting"
+        android:name="io.horizontalsystems.bankwallet.modules.settings.notification.SettingNotificationScreen"/>
 </navigation>

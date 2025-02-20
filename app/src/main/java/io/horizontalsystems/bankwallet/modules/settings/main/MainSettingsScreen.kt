@@ -233,8 +233,15 @@ private fun SettingSections(
                     stat(page = StatPage.Settings, event = StatEvent.Open(StatPage.BackupManager))
                 }
             )
-        }
-        )
+        }, {
+            HsSettingCell(
+                R.string.Notification_Title,
+                R.drawable.outline_notifications_active_24 ,
+                onClick = {
+                    navController.slideFromRight(R.id.notificationSetting)
+                }
+            )
+        })
     )
 
     VSpacer(24.dp)

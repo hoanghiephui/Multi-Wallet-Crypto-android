@@ -2,6 +2,7 @@ package io.horizontalsystems.bankwallet.core.managers
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import io.horizontalsystems.bankwallet.core.ILocalStorage
@@ -32,9 +33,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.launch
 import java.util.UUID
-import androidx.core.content.edit
 
 class LocalStorageManager(
     private val preferences: SharedPreferences
@@ -77,11 +76,13 @@ class LocalStorageManager(
         private const val MARKET_FAVORITES_SORTING = "market_favorites_sorting"
         private const val MARKET_FAVORITES_SHOW_SIGNALS = "market_favorites_show_signals"
         private const val MARKET_FAVORITES_TIME_DURATION = "market_favorites_time_duration"
-        private const val MARKET_FAVORITES_MANUAL_SORTING_ORDER = "market_favorites_manual_sorting_order"
+        private const val MARKET_FAVORITES_MANUAL_SORTING_ORDER =
+            "market_favorites_manual_sorting_order"
         private const val RELAUNCH_BY_SETTING_CHANGE = "relaunch_by_setting_change"
         private const val MARKETS_TAB_ENABLED = "markets_tab_enabled"
         private const val BALANCE_AUTO_HIDE_ENABLED = "balance_auto_hide_enabled"
-        private const val NON_RECOMMENDED_ACCOUNT_ALERT_DISMISSED_ACCOUNTS = "non_recommended_account_alert_dismissed_accounts"
+        private const val NON_RECOMMENDED_ACCOUNT_ALERT_DISMISSED_ACCOUNTS =
+            "non_recommended_account_alert_dismissed_accounts"
         private const val PERSONAL_SUPPORT_ENABLED = "personal_support_enabled"
         private const val APP_ID = "app_id"
         private const val APP_AUTO_LOCK_INTERVAL = "app_auto_lock_interval"
@@ -95,13 +96,18 @@ class LocalStorageManager(
 
         private const val ANALYTIC = "ANALYTIC"
         private const val DETECT_CRASH = "DETECT_CRASH"
+        private const val NOTIFICATION_PRICE = "NOTIFICATION_PRICE"
+        private const val NOTIFICATION_NEWS = "NOTIFICATION_NEWS"
     }
 
     private val coroutineScope = CoroutineScope(Dispatchers.Default)
     private val _utxoExpertModeEnabledFlow = MutableStateFlow(false)
     override val utxoExpertModeEnabledFlow = _utxoExpertModeEnabledFlow
 
-    private val _marketSignalsStateChangedFlow =  MutableSharedFlow<Boolean>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val _marketSignalsStateChangedFlow = MutableSharedFlow<Boolean>(
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
     override val marketSignalsStateChangedFlow = _marketSignalsStateChangedFlow
 
     private val gson by lazy { Gson() }
@@ -160,6 +166,7 @@ class LocalStorageManager(
                     preferences.edit { putString(APP_ID, newId) }
                     newId
                 }
+
                 else -> id
             }
         }
@@ -453,7 +460,8 @@ class LocalStorageManager(
         }
 
     override var marketFavoritesManualSortingOrder: List<String>
-        get() = preferences.getString(MARKET_FAVORITES_MANUAL_SORTING_ORDER, null)?.split(",") ?: listOf()
+        get() = preferences.getString(MARKET_FAVORITES_MANUAL_SORTING_ORDER, null)?.split(",")
+            ?: listOf()
         set(value) {
             preferences.edit {
                 putString(
@@ -528,7 +536,8 @@ class LocalStorageManager(
     override val marketsTabEnabledFlow = _marketsTabEnabledFlow.asStateFlow()
 
     override var nonRecommendedAccountAlertDismissedAccounts: Set<String>
-        get() = preferences.getStringSet(NON_RECOMMENDED_ACCOUNT_ALERT_DISMISSED_ACCOUNTS, setOf()) ?: setOf()
+        get() = preferences.getStringSet(NON_RECOMMENDED_ACCOUNT_ALERT_DISMISSED_ACCOUNTS, setOf())
+            ?: setOf()
         set(value) {
             preferences.edit {
                 putStringSet(
@@ -584,6 +593,7 @@ class LocalStorageManager(
             preferences.contains(UI_STATS_ENABLED) -> {
                 preferences.getBoolean(UI_STATS_ENABLED, true)
             }
+
             else -> true
         }
         set(value) {
@@ -593,5 +603,16 @@ class LocalStorageManager(
             } else {
                 editor.putBoolean(UI_STATS_ENABLED, value).apply()
             }
+        }
+
+    override var isShowNotificationPrice: Boolean
+        get() = preferences.getBoolean(NOTIFICATION_PRICE, true)
+        set(value) {
+            preferences.edit { putBoolean(NOTIFICATION_PRICE, value) }
+        }
+    override var isShowNotificationNews: Boolean
+        get() = preferences.getBoolean(NOTIFICATION_NEWS, true)
+        set(value) {
+            preferences.edit { putBoolean(NOTIFICATION_NEWS, value) }
         }
 }
