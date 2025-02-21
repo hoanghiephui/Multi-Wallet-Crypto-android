@@ -94,7 +94,7 @@ class SendFragment : BaseComposeFragment() {
             BlockchainType.Avalanche,
             BlockchainType.Optimism,
             BlockchainType.Base,
-            BlockchainType.Gnosis,
+            BlockchainType.ZkSync,BlockchainType.Gnosis,
             BlockchainType.Fantom,
             BlockchainType.ArbitrumOne -> {
                 SendEvmScreen(
