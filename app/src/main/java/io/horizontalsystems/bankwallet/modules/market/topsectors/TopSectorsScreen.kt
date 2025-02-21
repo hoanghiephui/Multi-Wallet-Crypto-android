@@ -26,7 +26,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.AdType
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
@@ -37,6 +40,7 @@ import io.horizontalsystems.bankwallet.core.stats.statSortType
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.market.topcoins.OptionController
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.Select
 import io.horizontalsystems.bankwallet.ui.compose.components.AlertGroup
@@ -61,7 +65,11 @@ fun TopSectorsScreen(
     val uiState = viewModel.uiState
     var openPeriodSelector by rememberSaveable { mutableStateOf(false) }
     var openSortingSelector by rememberSaveable { mutableStateOf(false) }
-
+    val (adState, reloadAd) = rememberAdNativeView(
+        BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "TopSectorsScreen",
+        viewModel
+    )
     val state =
         rememberSaveable(uiState.sortingField, uiState.timePeriod, saver = LazyListState.Saver) {
             LazyListState(0, 0)
@@ -72,6 +80,7 @@ fun TopSectorsScreen(
     }
     onSetRefreshCallback {
         viewModel.refresh()
+        reloadAd()
     }
 
     Crossfade(uiState.viewState, label = "") { viewState ->
@@ -110,6 +119,11 @@ fun TopSectorsScreen(
                             )
                             HSpacer(width = 16.dp)
                         }
+                    }
+                    item {
+                        VSpacer(8.dp)
+                        MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
+                        VSpacer(8.dp)
                     }
                     items(uiState.items) { item ->
                         TopSectorItem(

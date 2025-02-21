@@ -30,8 +30,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.AdType
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
@@ -45,6 +48,7 @@ import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.market.ImageSource
 import io.horizontalsystems.bankwallet.modules.market.topcoins.OptionController
 import io.horizontalsystems.bankwallet.modules.market.topplatforms.Platform
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
 import io.horizontalsystems.bankwallet.ui.compose.Select
@@ -116,7 +120,11 @@ private fun PlatformScreen(
     val infoModalBottomSheetState =
         androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var isInfoBottomSheetVisible by remember { mutableStateOf(false) }
-
+    val (adState, reloadAd) = rememberAdNativeView(
+        BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "PlatformScreen",
+        viewModel
+    )
     Scaffold(
         contentColor = ComposeAppTheme.colors.tyler,
         topBar = {
@@ -148,7 +156,7 @@ private fun PlatformScreen(
                 onRefresh = {
                     viewModel.refresh()
                     chartViewModel.refresh()
-
+                    reloadAd()
                     stat(page = StatPage.TopPlatform, event = StatEvent.Refresh)
                 }
             ) {
@@ -206,7 +214,13 @@ private fun PlatformScreen(
                                             }
                                         }
                                     },
-                                    navController = navController
+                                    navController = navController,
+                                    preAdsItem = {
+                                        item {
+                                            VSpacer(height = 8.dp)
+                                            MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
+                                        }
+                                    }
                                 )
                                 if (scrollToTopAfterUpdate) {
                                     scrollToTopAfterUpdate = false

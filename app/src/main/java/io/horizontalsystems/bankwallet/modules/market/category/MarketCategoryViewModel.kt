@@ -3,6 +3,7 @@ package io.horizontalsystems.bankwallet.modules.market.category
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.horizontalsystems.bankwallet.core.BaseViewModel
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
 import io.horizontalsystems.bankwallet.core.stats.stat
@@ -21,9 +22,9 @@ import kotlinx.coroutines.rx2.asFlow
 
 class MarketCategoryViewModel(
     private val service: MarketCategoryService,
-) : ViewModel() {
+) : BaseViewModel() {
 
-    private val marketFields = MarketField.values().toList()
+    private val marketFields = MarketField.entries
     private var marketItems: List<MarketItemWrapper> = listOf()
     private var marketField = MarketField.PriceDiff
 

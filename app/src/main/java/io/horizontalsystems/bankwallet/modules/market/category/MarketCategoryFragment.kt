@@ -20,8 +20,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.AdType
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
@@ -33,6 +36,7 @@ import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Chart
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
 import io.horizontalsystems.bankwallet.modules.market.platform.InfoBottomSheet
 import io.horizontalsystems.bankwallet.modules.market.topcoins.SelectorDialogState
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.HSSwipeRefresh
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
@@ -45,6 +49,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.HsBackButton
 import io.horizontalsystems.bankwallet.ui.compose.components.ListErrorView
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
 import io.horizontalsystems.bankwallet.ui.compose.components.SortMenu
+import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.marketkit.models.CoinCategory
 import kotlinx.coroutines.launch
 
@@ -103,7 +108,11 @@ fun CategoryScreen(
     val infoModalBottomSheetState =
         androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var isInfoBottomSheetVisible by remember { mutableStateOf(false) }
-
+    val (adState, reloadAd) = rememberAdNativeView(
+        BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "CategoryScreen",
+        viewModel
+    )
     Scaffold(
         contentColor = ComposeAppTheme.colors.tyler,
         topBar = {
@@ -135,6 +144,7 @@ fun CategoryScreen(
                 onRefresh = {
                     viewModel.refresh()
                     chartViewModel.refresh()
+                    reloadAd()
                 }
             ) {
                 Crossfade(viewItemState) { state ->
@@ -194,7 +204,13 @@ fun CategoryScreen(
                                             }
                                         }
                                     },
-                                    navController = navController
+                                    navController = navController,
+                                    preAdsItem = {
+                                        item {
+                                            VSpacer(8.dp)
+                                            MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
+                                        }
+                                    },
                                 )
                                 if (scrollToTopAfterUpdate) {
                                     scrollToTopAfterUpdate = false
