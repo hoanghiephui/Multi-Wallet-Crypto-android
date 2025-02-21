@@ -1,8 +1,8 @@
 package io.horizontalsystems.bankwallet.modules.managewallets
 
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.horizontalsystems.bankwallet.core.BaseViewModel
 import io.horizontalsystems.bankwallet.core.Clearable
 import io.horizontalsystems.bankwallet.core.alternativeImageUrl
 import io.horizontalsystems.bankwallet.core.badge
@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 class ManageWalletsViewModel(
     private val service: ManageWalletsService,
     private val clearables: List<Clearable>
-) : ViewModel() {
+) : BaseViewModel() {
 
     val viewItemsLiveData = MutableLiveData<List<CoinViewItem<Token>>>()
 
@@ -58,7 +58,7 @@ class ManageWalletsViewModel(
     }
 
     val addTokenEnabled: Boolean
-        get() = service.accountType?.canAddTokens ?: false
+        get() = service.accountType?.canAddTokens == true
 
     override fun onCleared() {
         clearables.forEach(Clearable::clear)

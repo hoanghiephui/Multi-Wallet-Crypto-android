@@ -26,12 +26,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.AdType
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.shorten
 import io.horizontalsystems.bankwallet.entities.ViewState
 import io.horizontalsystems.bankwallet.modules.coin.MajorHolderItem
 import io.horizontalsystems.bankwallet.modules.coin.overview.ui.Loading
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
@@ -90,7 +94,6 @@ private fun CoinMajorHoldersScreen(
         factory = CoinMajorHoldersModule.Factory(coinUid, blockchain)
     )
 ) {
-
     Surface(color = MaterialTheme.colorScheme.background) {
         Column {
             AppBar(
@@ -119,7 +122,7 @@ private fun CoinMajorHoldersScreen(
                     }
 
                     ViewState.Success -> {
-                        CoinMajorHoldersContent(viewModel)
+                        CoinMajorHoldersContent(viewModel, navController)
                     }
                 }
             }
@@ -130,9 +133,14 @@ private fun CoinMajorHoldersScreen(
 @Composable
 private fun CoinMajorHoldersContent(
     viewModel: CoinMajorHoldersViewModel,
+    navController: NavController
 ) {
     val uiState = viewModel.uiState
-
+    val (adState, _) = rememberAdNativeView(
+        BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "CoinMajorHoldersScreen",
+        viewModel
+    )
     LazyColumn(
         modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(bottom = 30.dp)
@@ -140,6 +148,10 @@ private fun CoinMajorHoldersContent(
 
         item {
             HoldersGeneralInfo(uiState.top10Share, uiState.totalHoldersCount)
+        }
+
+        item {
+            MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
         }
 
         item {

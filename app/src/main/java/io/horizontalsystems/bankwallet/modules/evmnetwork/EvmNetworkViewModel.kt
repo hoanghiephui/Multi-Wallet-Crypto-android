@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.BaseViewModel
 import io.horizontalsystems.bankwallet.core.managers.EvmSyncSourceManager
 import io.horizontalsystems.bankwallet.core.managers.uris
 import io.horizontalsystems.bankwallet.core.providers.Translator
@@ -17,7 +18,7 @@ import kotlinx.coroutines.flow.onEach
 class EvmNetworkViewModel(
     val blockchain: Blockchain,
     private val evmSyncSourceManager: EvmSyncSourceManager
-) : ViewModel() {
+) : BaseViewModel() {
 
     private var currentSyncSource = evmSyncSourceManager.getSyncSource(blockchain.type)
 

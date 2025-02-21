@@ -3,8 +3,8 @@ package io.horizontalsystems.bankwallet.modules.manageaccounts
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import io.horizontalsystems.bankwallet.core.BaseViewModel
 import io.horizontalsystems.bankwallet.core.IAccountManager
 import io.horizontalsystems.bankwallet.core.managers.ActiveAccountState
 import io.horizontalsystems.bankwallet.entities.Account
@@ -19,7 +19,7 @@ import kotlinx.coroutines.reactive.asFlow
 class ManageAccountsViewModel(
     private val accountManager: IAccountManager,
     private val mode: ManageAccountsModule.Mode,
-) : ViewModel() {
+) : BaseViewModel() {
 
     var viewItems by mutableStateOf<Pair<List<AccountViewItem>, List<AccountViewItem>>?>(null)
     var finish by mutableStateOf(false)

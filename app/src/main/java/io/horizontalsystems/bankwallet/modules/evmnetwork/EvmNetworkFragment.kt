@@ -42,8 +42,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.AdType
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.composablePopup
 import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
@@ -56,6 +59,7 @@ import io.horizontalsystems.bankwallet.modules.walletconnect.list.ui.ActionsRow
 import io.horizontalsystems.bankwallet.modules.walletconnect.list.ui.DraggableCardSimple
 import io.horizontalsystems.bankwallet.modules.walletconnect.list.ui.getShape
 import io.horizontalsystems.bankwallet.modules.walletconnect.list.ui.showDivider
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
@@ -127,6 +131,11 @@ private fun EvmNetworkScreen(
     )
     var revealedCardId by remember { mutableStateOf<String?>(null) }
     val view = LocalView.current
+    val (adState, _) = rememberAdNativeView(
+        BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "EvmNetworkScreen",
+        viewModel
+    )
 
     Surface(color = MaterialTheme.colorScheme.background) {
         Column {
@@ -179,7 +188,7 @@ private fun EvmNetworkScreen(
                 }
 
                 if (viewModel.viewState.customItems.isNotEmpty()) {
-                    CustomRpcListSection(
+                    customRpcListSection(
                         viewModel.viewState.customItems,
                         revealedCardId,
                         onClick = { syncSource ->
@@ -204,6 +213,11 @@ private fun EvmNetworkScreen(
                 }
 
                 item {
+                    VSpacer(height = 8.dp)
+                    MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
+                }
+
+                item {
                     Spacer(Modifier.height(32.dp))
                     AddButton {
                         navController.navigate(AddRpcPage)
@@ -216,7 +230,7 @@ private fun EvmNetworkScreen(
     }
 }
 
-private fun LazyListScope.CustomRpcListSection(
+private fun LazyListScope.customRpcListSection(
     items: List<EvmNetworkViewModel.ViewItem>,
     revealedCardId: String?,
     onClick: (EvmSyncSource) -> Unit,

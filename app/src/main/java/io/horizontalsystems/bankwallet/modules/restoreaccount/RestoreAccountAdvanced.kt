@@ -1,6 +1,7 @@
 package io.horizontalsystems.bankwallet.modules.restoreaccount
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
 import io.horizontalsystems.bankwallet.modules.restoreaccount.restoremenu.RestoreMenuModule.RestoreOption
 import io.horizontalsystems.bankwallet.modules.restoreaccount.restoremenu.RestoreMenuViewModel
 import io.horizontalsystems.bankwallet.modules.restoreaccount.restoremnemonic.RestorePhrase
@@ -13,6 +14,7 @@ fun AdvancedRestoreScreen(
     openSelectCoinsScreen: () -> Unit,
     openNonStandardRestore: () -> Unit,
     onBackClick: () -> Unit,
+    fragmentNavController: NavController
 ) {
     when (restoreMenuViewModel.restoreOption) {
         RestoreOption.RecoveryPhrase -> {
@@ -23,6 +25,7 @@ fun AdvancedRestoreScreen(
                 openSelectCoins = openSelectCoinsScreen,
                 openNonStandardRestore = openNonStandardRestore,
                 onBackClick = onBackClick,
+                navController = fragmentNavController
             )
         }
         RestoreOption.PrivateKey -> {

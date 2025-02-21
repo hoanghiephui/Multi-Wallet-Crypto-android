@@ -16,10 +16,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.AdType
 import io.horizontalsystems.bankwallet.core.Caution
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.entities.DataState
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
@@ -28,6 +32,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.FormsInput
 import io.horizontalsystems.bankwallet.ui.compose.components.FormsInputStateWarning
 import io.horizontalsystems.bankwallet.ui.compose.components.HeaderText
 import io.horizontalsystems.bankwallet.ui.compose.components.MenuItem
+import io.horizontalsystems.bankwallet.ui.compose.components.VSpacer
 import io.horizontalsystems.marketkit.models.Blockchain
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,7 +46,11 @@ fun AddRpcScreen(
         navController.popBackStack()
         viewModel.onScreenClose()
     }
-
+    val (adState, _) = rememberAdNativeView(
+        BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "AddRpcScreen",
+        viewModel
+    )
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -83,6 +92,8 @@ fun AddRpcScreen(
                 onValueChange = viewModel::onEnterBasicAuth,
                 hint = ""
             )
+            VSpacer(height = 8.dp)
+            MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
             Spacer(Modifier.height(60.dp))
         }
 

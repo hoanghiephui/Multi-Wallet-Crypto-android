@@ -3,8 +3,8 @@ package io.horizontalsystems.bankwallet.modules.evmnetwork.addrpc
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.BaseViewModel
 import io.horizontalsystems.bankwallet.core.Caution
 import io.horizontalsystems.bankwallet.core.managers.EvmSyncSourceManager
 import io.horizontalsystems.bankwallet.core.providers.Translator
@@ -14,12 +14,11 @@ import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.marketkit.models.Blockchain
 import java.net.MalformedURLException
 import java.net.URI
-import java.net.URISyntaxException
 
 class AddRpcViewModel(
     private val blockchain: Blockchain,
     private val evmSyncSourceManager: EvmSyncSourceManager
-) : ViewModel() {
+) : BaseViewModel() {
 
     private var url = ""
     private var auth: String? = null
@@ -51,7 +50,7 @@ class AddRpcViewModel(
             if (!hasRequiredProtocol) {
                 throw MalformedURLException()
             }
-        } catch (e: Throwable) {
+        } catch (_: Throwable) {
             urlCaution = Caution(Translator.getString(R.string.AddEvmSyncSource_Error_InvalidUrl), Caution.Type.Error)
             syncState()
             return

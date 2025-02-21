@@ -28,7 +28,7 @@ class RestoreAccountFragment : BaseComposeFragment(screenshotEnabled = false) {
     override fun GetContent(navController: NavController) {
         val input = navController.getInput<ManageAccountsModule.Input>()
         val popUpToInclusiveId = input?.popOffOnSuccess ?: R.id.restoreAccountFragment
-        val inclusive = input?.popOffInclusive ?: false
+        val inclusive = input?.popOffInclusive == true
 
         RestoreAccountNavHost(
             navController,
@@ -63,6 +63,7 @@ private fun RestoreAccountNavHost(
                 openSelectCoins = { navController.navigate("restore_select_coins") },
                 openNonStandardRestore = { navController.navigate("restore_phrase_nonstandard") },
                 onBackClick = { fragmentNavController.popBackStack() },
+                navController = fragmentNavController
             )
         }
         composablePage("restore_phrase_advanced") {
@@ -75,7 +76,8 @@ private fun RestoreAccountNavHost(
 
                     stat(page = StatPage.ImportWalletFromKeyAdvanced, event = StatEvent.Open(StatPage.ImportWalletNonStandard))
                 },
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { navController.popBackStack() },
+                fragmentNavController = fragmentNavController
             )
         }
         composablePage("restore_select_coins") {

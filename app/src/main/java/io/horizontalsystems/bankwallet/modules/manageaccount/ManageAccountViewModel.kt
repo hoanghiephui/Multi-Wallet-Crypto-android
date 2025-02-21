@@ -3,9 +3,9 @@ package io.horizontalsystems.bankwallet.modules.manageaccount
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.BaseViewModel
 import io.horizontalsystems.bankwallet.core.IAccountManager
 import io.horizontalsystems.bankwallet.entities.Account
 import io.horizontalsystems.bankwallet.entities.AccountType
@@ -18,7 +18,7 @@ import kotlinx.coroutines.reactive.asFlow
 class ManageAccountViewModel(
     accountId: String,
     private val accountManager: IAccountManager
-) : ViewModel() {
+) : BaseViewModel() {
 
     val account: Account = accountManager.account(accountId)!!
 
@@ -80,7 +80,12 @@ class ManageAccountViewModel(
             items.add(BackupItem.LocalBackup(true))
             items.add(BackupItem.InfoText(R.string.BackupRecoveryPhrase_BackupRequiredText))
         } else {
-            items.add(BackupItem.ManualBackup(showAttention = !account.isBackedUp, completed = account.isBackedUp))
+            items.add(
+                BackupItem.ManualBackup(
+                    showAttention = !account.isBackedUp,
+                    completed = account.isBackedUp
+                )
+            )
             items.add(BackupItem.LocalBackup(false))
             items.add(BackupItem.InfoText(R.string.BackupRecoveryPhrase_BackupRecomendedText))
         }

@@ -25,9 +25,13 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.AdType
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.imageUrl
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
@@ -66,7 +70,11 @@ private fun SolanaNetworkScreen(
     if (viewModel.closeScreen) {
         navController.popBackStack()
     }
-
+    val (adState, _) = rememberAdNativeView(
+        BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "SolanaNetworkScreen",
+        viewModel
+    )
     Surface(color = MaterialTheme.colorScheme.background) {
         Column {
             AppBar(
@@ -113,6 +121,9 @@ private fun SolanaNetworkScreen(
                             viewModel.onSelectViewItem(item)
                         }
                     }
+
+                    VSpacer(8.dp)
+                    MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
                     Spacer(Modifier.height(32.dp))
                 }
 

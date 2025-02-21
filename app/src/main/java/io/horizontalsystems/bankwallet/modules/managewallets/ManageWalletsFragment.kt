@@ -14,33 +14,27 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.AdNativeUiState
+import io.horizontalsystems.bankwallet.core.AdType
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromBottomForResult
 import io.horizontalsystems.bankwallet.core.slideFromRight
@@ -50,6 +44,7 @@ import io.horizontalsystems.bankwallet.core.stats.stat
 import io.horizontalsystems.bankwallet.modules.enablecoin.restoresettings.RestoreSettingsViewModel
 import io.horizontalsystems.bankwallet.modules.restoreaccount.restoreblockchains.CoinViewItem
 import io.horizontalsystems.bankwallet.modules.zcashconfigure.ZcashConfigure
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.HsIconButton
@@ -106,7 +101,11 @@ private fun ManageWalletsScreen(
 
         stat(page = StatPage.CoinManager, event = StatEvent.Open(StatPage.BirthdayInput))
     }
-
+    val (adState, reloadAd) = rememberAdNativeView(
+        BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "ManageWalletsScreen",
+        viewModel
+    )
     SearchBar(
         title = stringResource(R.string.ManageCoins_title),
         onSearchTextChanged = {
@@ -128,7 +127,7 @@ private fun ManageWalletsScreen(
             )
         ),
         content = {
-            Content(coinItems, viewModel, navController)
+            Content(coinItems, viewModel, navController, adState)
         }
     )
 }
@@ -137,7 +136,8 @@ private fun ManageWalletsScreen(
 private fun Content(
     coinItems: List<CoinViewItem<Token>>?,
     viewModel: ManageWalletsViewModel,
-    navController: NavController
+    navController: NavController,
+    adState: AdNativeUiState
 ) {
     coinItems?.let { items ->
         if (items.isEmpty()) {
@@ -147,6 +147,9 @@ private fun Content(
             )
         } else {
             LazyColumn {
+                item {
+                    MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
+                }
                 item {
                     Spacer(modifier = Modifier.height(12.dp))
                     HorizontalDivider(

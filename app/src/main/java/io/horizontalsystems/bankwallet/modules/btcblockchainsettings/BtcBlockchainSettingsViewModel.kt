@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.BaseViewModel
 import io.horizontalsystems.bankwallet.core.imageUrl
 import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.entities.BtcRestoreMode
@@ -16,7 +17,7 @@ import kotlinx.coroutines.rx2.asFlow
 
 class BtcBlockchainSettingsViewModel(
     private val service: BtcBlockchainSettingsService
-) : ViewModel() {
+) : BaseViewModel() {
 
     var closeScreen by mutableStateOf(false)
         private set

@@ -28,10 +28,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.wallet.blockchain.bitcoin.BuildConfig
 import com.wallet.blockchain.bitcoin.R
+import io.horizontalsystems.bankwallet.core.AdType
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
+import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.modules.btcblockchainsettings.BtcBlockchainSettingsModule.BlockchainSettingsIcon
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
+import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
 import io.horizontalsystems.bankwallet.ui.compose.TranslatableString
 import io.horizontalsystems.bankwallet.ui.compose.components.AppBar
@@ -72,7 +76,11 @@ private fun BtcBlockchainSettingsScreen(
     viewModel: BtcBlockchainSettingsViewModel,
     navController: NavController
 ) {
-
+    val (adState, _) = rememberAdNativeView(
+        BuildConfig.HOME_MARKET_NATIVE,
+        adPlacements = "BtcBlockchainSettingsScreen",
+        viewModel
+    )
     if (viewModel.closeScreen) {
         navController.popBackStack()
     }
@@ -120,6 +128,8 @@ private fun BtcBlockchainSettingsScreen(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     text = stringResource(R.string.BtcBlockchainSettings_RestoreSourceChangeWarning)
                 )
+                VSpacer(height = 8.dp)
+                MaxTemplateNativeAdViewComposable(adState, AdType.SMALL, navController)
                 Spacer(Modifier.height(32.dp))
             }
 
