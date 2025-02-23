@@ -23,6 +23,7 @@ buildscript {
         mavenCentral()
         maven { url 'https://artifact.bytedance.com/repository/pangle' }
         maven { url 'https://artifacts.applovin.com/android' }
+        maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.8.1'
@@ -47,6 +48,7 @@ allprojects {
         mavenLocal()
         maven { url "https://jitpack.io" }
         maven { url 'https://artifact.bytedance.com/repository/pangle' }
+        maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
     }
 }
 
