@@ -37,8 +37,6 @@ import io.horizontalsystems.core.BackgroundManagerState
 import io.horizontalsystems.core.toHexString
 import io.horizontalsystems.hdwalletkit.HDExtendedKey
 import io.horizontalsystems.marketkit.models.HsTimePeriod
-import io.horizontalsystems.subscriptions.core.PrivacyMode
-import io.horizontalsystems.subscriptions.core.UserSubscriptionManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,7 +58,7 @@ class StatsManager(
     private val appConfigProvider: AppConfigProvider,
 ) {
     private val scope = CoroutineScope(Dispatchers.IO)
-    private var uiStatsEnabled = areUiStatsEnabled()
+    private var uiStatsEnabled = localStorage.uiStatsEnabled ?: statsEnabledByDefault()
     private var isDetectCrashEnabled = areDetectCrashEnabledEnabled()
     private val _uiStatsEnabledFlow = MutableStateFlow(uiStatsEnabled)
     val uiStatsEnabledFlow = _uiStatsEnabledFlow.asStateFlow()

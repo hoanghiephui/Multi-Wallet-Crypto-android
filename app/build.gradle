@@ -183,8 +183,8 @@ android {
             resValue "string", "blocksDecodedEthereumRpc", "https://api.blocksdecoded.com/v1/ethereum-rpc/mainnet"
             resValue "string", "chainalysisBaseUrl", "https://public.chainalysis.com/api/v1/"
             resValue "string", "chainalysisApiKey", "928bb256db73f1cb93e1b3366a145d9fbe06e28581c8b665b82ad70bbfef1db4"
-            resValue "string", "hashDitBaseUrl", "https://api.diting.pro/v2/hashdit/"
-            resValue "string", "hashDitApiKey", "KuyxZfvJXFrpAcztshhYqeWaRusxyGRDDhFYkeIw"
+            resValue "string", "hashDitBaseUrl", "https://service.hashdit.io/v2/hashdit/"
+            resValue "string", "hashDitApiKey", "aGMkgODYiUFtTYrSRcEZsIfPHeASOlGYXClJZNWF"
             signingConfig signingConfigs.debug
         }
     }
@@ -336,12 +336,12 @@ dependencies {
 
     // Wallet kits
     implementation 'com.github.horizontalsystems:ton-kit-android:1cb4c1e'
-    implementation 'com.github.horizontalsystems:bitcoin-kit-android:3f3194f'
+    implementation 'com.github.horizontalsystems:bitcoin-kit-android:ff7cfa4'
     implementation 'com.github.horizontalsystems:ethereum-kit-android:d423acf'
     implementation 'com.github.horizontalsystems:blockchain-fee-rate-kit-android:1d3bd49'
     implementation 'com.github.horizontalsystems:market-kit-android:988d5a3'
     implementation 'com.github.horizontalsystems:solana-kit-android:ce738d8'
-    implementation 'com.github.horizontalsystems:tron-kit-android:dc3dca7'
+    implementation 'com.github.horizontalsystems:tron-kit-android:bdd7602'
     // Zcash SDK
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.4'
     implementation "cash.z.ecc.android:zcash-android-sdk:2.2.6"

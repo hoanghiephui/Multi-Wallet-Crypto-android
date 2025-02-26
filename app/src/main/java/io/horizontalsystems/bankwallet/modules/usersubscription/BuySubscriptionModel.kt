@@ -11,7 +11,6 @@ import io.horizontalsystems.subscriptions.core.IPaidAction
 import io.horizontalsystems.subscriptions.core.MultiWallet
 import io.horizontalsystems.subscriptions.core.NoAds
 import io.horizontalsystems.subscriptions.core.PricingPhase
-import io.horizontalsystems.subscriptions.core.PrivacyMode
 import io.horizontalsystems.subscriptions.core.TokenInsights
 import io.horizontalsystems.subscriptions.core.TradeSignals
 import io.horizontalsystems.subscriptions.core.VIPSupport
@@ -27,7 +26,6 @@ object BuySubscriptionModel {
             DuressMode -> R.string.Premium_UpgradeFeature_DuressMode
             AddressPhishing -> R.string.Premium_UpgradeFeature_AddressPhishing
             AddressBlacklist -> R.string.Premium_UpgradeFeature_AddressBlacklist
-            PrivacyMode -> R.string.Premium_UpgradeFeature_PrivacyMode
             VIPSupport -> R.string.Premium_UpgradeFeature_VipSupport
             Watchlist -> R.string.Market_Tab_Watchlist
             MultiWallet -> R.string.Premium_UpgradeFeature_MultiWallet
@@ -43,7 +41,6 @@ object BuySubscriptionModel {
             DuressMode -> R.string.Premium_UpgradeFeature_DuressMode_Description
             AddressPhishing -> R.string.Premium_UpgradeFeature_AddressPhishing_Description
             AddressBlacklist -> R.string.Premium_UpgradeFeature_AddressBlacklist_Description
-            PrivacyMode -> R.string.Premium_UpgradeFeature_PrivacyMode_Description
             VIPSupport -> R.string.Premium_UpgradeFeature_VipSupport_Description
             Watchlist -> R.string.Hud_Added_To_Watchlist
             MultiWallet -> R.string.Premium_UpgradeFeature_MultiWallet_Description
@@ -59,7 +56,6 @@ object BuySubscriptionModel {
             DuressMode -> R.string.Premium_UpgradeFeature_DuressMode_BigDescription
             AddressPhishing -> R.string.Premium_UpgradeFeature_AddressPhishing_BigDescription
             AddressBlacklist -> R.string.Premium_UpgradeFeature_AddressBlacklist_BigDescription
-            PrivacyMode -> R.string.Premium_UpgradeFeature_PrivacyMode_BigDescription
             VIPSupport -> R.string.Premium_UpgradeFeature_VipSupport_BigDescription
             Watchlist -> R.string.Hud_Added_To_Watchlist
             MultiWallet -> R.string.Premium_UpgradeFeature_MultiWallet_BigDescription
@@ -75,7 +71,6 @@ object BuySubscriptionModel {
             DuressMode -> R.drawable.prem_duress_24
             AddressPhishing -> R.drawable.prem_shield_24
             AddressBlacklist -> R.drawable.prem_warning_24
-            PrivacyMode -> R.drawable.prem_fraud_24
             VIPSupport -> R.drawable.prem_vip_support_24
             Watchlist -> R.drawable.star_filled_yellow_16
             MultiWallet -> R.drawable.ic_in_wallet_dark_24
