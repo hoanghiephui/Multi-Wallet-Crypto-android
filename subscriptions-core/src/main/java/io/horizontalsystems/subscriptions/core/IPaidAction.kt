@@ -34,3 +34,6 @@ object MultiWallet: IPaidAction
 
 @Parcelize
 object NoAds: IPaidAction
+
+@Parcelize
+object PrivacyMode : IPaidAction
