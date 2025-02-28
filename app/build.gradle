@@ -90,6 +90,7 @@ android {
     productFlavors {
         base {
             dimension = "distribution"
+            signingConfig signingConfigs.debug
         }
 
         fdroid {
@@ -116,6 +117,7 @@ android {
 
     buildTypes {
         debug {
+            signingConfig null
             debuggable true
             minifyEnabled false
             resValue "string", "twitterBearerToken", "AAAAAAAAAAAAAAAAAAAAAJgeNwEAAAAA6xVpR6xLKTrxIA3kkSyRA92LDpA%3Da6auybDwcymUyh2BcS6zZwicUdxGtrzJC0qvOSdRwKLeqBGhwB"
