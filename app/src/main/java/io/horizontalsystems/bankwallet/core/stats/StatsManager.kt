@@ -32,12 +32,9 @@ import io.horizontalsystems.bankwallet.modules.settings.appearance.PriceChangeIn
 import io.horizontalsystems.bankwallet.modules.theme.ThemeType
 import io.horizontalsystems.bankwallet.modules.transactionInfo.options.SpeedUpCancelType
 import io.horizontalsystems.bankwallet.modules.transactions.FilterTransactionType
-import io.horizontalsystems.core.BackgroundManager
-import io.horizontalsystems.core.BackgroundManagerState
 import io.horizontalsystems.core.toHexString
 import io.horizontalsystems.hdwalletkit.HDExtendedKey
 import io.horizontalsystems.marketkit.models.HsTimePeriod
-import io.horizontalsystems.subscriptions.core.PrivacyMode
 import io.horizontalsystems.subscriptions.core.UserSubscriptionManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -84,10 +81,6 @@ class StatsManager(
     }
 
     private fun areUiStatsEnabled(): Boolean {
-        //not premium user
-        if (!UserSubscriptionManager.isActionAllowed(paidAction = PrivacyMode)) {
-            return true
-        }
 
         val uiStatsEnabled = localStorage.uiStatsEnabled
         if (uiStatsEnabled != null) {
@@ -98,10 +91,6 @@ class StatsManager(
     }
 
     private fun areDetectCrashEnabledEnabled(): Boolean {
-        //not premium user
-        if (!UserSubscriptionManager.isActionAllowed(PrivacyMode)) {
-            return true
-        }
 
         val isDetectCrash = localStorage.isDetectCrash
 

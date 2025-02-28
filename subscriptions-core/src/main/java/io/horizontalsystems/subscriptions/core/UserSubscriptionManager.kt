@@ -19,7 +19,6 @@ object UserSubscriptionManager {
                 DuressMode,
                 AddressPhishing,
                 AddressBlacklist,
-                PrivacyMode,
                 Watchlist
             )
         ),
@@ -34,7 +33,6 @@ object UserSubscriptionManager {
                 AdvancedSearch,
                 TradeSignals,
                 DuressMode,
-                PrivacyMode,
                 Watchlist
             )
         ),

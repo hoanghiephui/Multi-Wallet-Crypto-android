@@ -28,7 +28,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.wallet.blockchain.bitcoin.R
 import io.horizontalsystems.bankwallet.core.BaseComposeFragment
-import io.horizontalsystems.bankwallet.core.paidAction
 import io.horizontalsystems.bankwallet.core.stats.StatEvent
 import io.horizontalsystems.bankwallet.core.stats.StatPage
 import io.horizontalsystems.bankwallet.core.stats.stat
@@ -48,7 +47,6 @@ import io.horizontalsystems.bankwallet.ui.compose.components.body_leah
 import io.horizontalsystems.bankwallet.ui.compose.components.cell.CellUniversal
 import io.horizontalsystems.bankwallet.ui.compose.components.cell.SectionUniversalLawrence
 import io.horizontalsystems.bankwallet.ui.extensions.ConfirmationDialog
-import io.horizontalsystems.subscriptions.core.PrivacyMode
 import kotlin.system.exitProcess
 
 class PrivacySettingsFragment : BaseComposeFragment() {
@@ -169,11 +167,9 @@ fun PrivacyScreen(
                     HsSwitch(
                         checked = uiState.uiStatsEnabled,
                         onCheckedChange = {
-                            navController.paidAction(PrivacyMode) {
-                                viewModel.toggleUiStats(it)
+                            viewModel.toggleUiStats(it)
 
-                                stat(page = StatPage.Privacy, event = StatEvent.EnableUiStats(it))
-                            }
+                            stat(page = StatPage.Privacy, event = StatEvent.EnableUiStats(it))
                         },
                         modifier = Modifier
                             .weight(0.1f)
@@ -196,11 +192,9 @@ fun PrivacyScreen(
                     HsSwitch(
                         checked = uiState.isEnableDetectCrash,
                         onCheckedChange = {
-                            navController.paidAction(PrivacyMode) {
-                                viewModel.toggleDetectCrash(it)
+                            viewModel.toggleDetectCrash(it)
 
-                                stat(page = StatPage.Privacy, event = StatEvent.EnableDetectCrash(it))
-                            }
+                            stat(page = StatPage.Privacy, event = StatEvent.EnableDetectCrash(it))
                         },
                         modifier = Modifier
                             .weight(0.1f)
