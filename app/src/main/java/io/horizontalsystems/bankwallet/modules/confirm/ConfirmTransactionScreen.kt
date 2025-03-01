@@ -2,6 +2,7 @@ package io.horizontalsystems.bankwallet.modules.confirm
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -64,7 +65,7 @@ fun ConfirmTransactionScreen(
         bottomBar = {
             ButtonsGroupWithShade {
                 Column(
-                    modifier = Modifier.padding(horizontal = 16.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp).navigationBarsPadding(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     content = buttonsSlot
                 )

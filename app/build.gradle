@@ -117,7 +117,7 @@ android {
 
     buildTypes {
         debug {
-            signingConfig null
+            signingConfig signingConfigs.debug
             debuggable true
             minifyEnabled false
             resValue "string", "twitterBearerToken", "AAAAAAAAAAAAAAAAAAAAAJgeNwEAAAAA6xVpR6xLKTrxIA3kkSyRA92LDpA%3Da6auybDwcymUyh2BcS6zZwicUdxGtrzJC0qvOSdRwKLeqBGhwB"

@@ -70,7 +70,6 @@ class SwapConfirmFragment : BaseComposeFragment() {
         get() = "SwapConfirmFragment"
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SwapConfirmScreen(navController: NavController) {
     val coroutineScope = rememberCoroutineScope()

@@ -1,8 +1,10 @@
 package io.horizontalsystems.bankwallet.modules.receive
 
 import android.content.Intent
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -73,6 +75,7 @@ fun ReceiveScreen(
     val navController = rememberNavController()
 
     NavHost(
+        modifier = Modifier.navigationBarsPadding(),
         navController = navController,
         startDestination = "receive_screen"
     ) {

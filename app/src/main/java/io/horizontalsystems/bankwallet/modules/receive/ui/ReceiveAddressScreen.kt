@@ -22,19 +22,19 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -129,193 +129,201 @@ fun ReceiveAddressScreen(
 ) {
     val localView = LocalView.current
     val openAmountDialog = remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
-    val scope = rememberCoroutineScope()
+    val modalBottomSheetState =
+        androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    ModalBottomSheetLayout(
-        sheetState = sheetState,
-        sheetBackgroundColor = ComposeAppTheme.colors.transparent,
-        sheetContent = {
+    var isPlanSelectBottomSheetVisible by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    Scaffold(
+        containerColor = Color.Transparent,
+        contentColor = MaterialTheme.colorScheme.background,
+        topBar = {
+            AppBar(
+                title = title,
+                navigationIcon = {
+                    HsBackButton(onClick = onBackPress)
+                },
+                menuItems = listOf(
+                    MenuItem(
+                        title = TranslatableString.ResString(R.string.Button_Done),
+                        onClick = closeModule
+                    )
+                )
+            )
+        }
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
+        ) {
+            Crossfade(uiState.viewState, label = "") { viewState ->
+                Column {
+                    when (viewState) {
+                        is ViewState.Error -> {
+                            ListErrorView(stringResource(R.string.SyncError), onErrorClick)
+                        }
+
+                        ViewState.Loading -> {
+                            Loading()
+                        }
+
+                        ViewState.Success -> {
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth()
+                                    .verticalScroll(rememberScrollState()),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                            ) {
+                                VSpacer(12.dp)
+                                uiState.alertText?.let {
+                                    WarningTextView(it)
+                                }
+                                VSpacer(12.dp)
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp)
+                                        .clip(RoundedCornerShape(24.dp))
+                                        .background(ComposeAppTheme.colors.lawrence),
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                TextHelper.copyText(uiState.uri)
+                                                HudHelper.showSuccessMessage(
+                                                    localView,
+                                                    R.string.Hud_Text_Copied
+                                                )
+
+                                                stat(
+                                                    page = StatPage.Receive,
+                                                    event = StatEvent.Copy(StatEntity.ReceiveAddress)
+                                                )
+                                            },
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                    ) {
+                                        VSpacer(32.dp)
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(8.dp))
+                                                .background(ComposeAppTheme.colors.white)
+                                                .size(224.dp),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            QrCodeImage(uiState.uri)
+                                        }
+                                        VSpacer(12.dp)
+                                        subhead2_leah(
+                                            modifier = Modifier.padding(horizontal = 32.dp),
+                                            text = uiState.address,
+                                            textAlign = TextAlign.Center,
+                                        )
+                                        VSpacer(12.dp)
+                                        subhead2_grey(
+                                            modifier = Modifier.padding(horizontal = 32.dp),
+                                            text = uiState.networkName,
+                                            textAlign = TextAlign.Center,
+                                        )
+                                        VSpacer(24.dp)
+                                    }
+                                    if (uiState.additionalItems.isNotEmpty()) {
+                                        AdditionalDataSection(
+                                            items = uiState.additionalItems,
+                                            onClearAmount = {
+                                                setAmount(null)
+
+                                                stat(page = StatPage.Receive, event = StatEvent.RemoveAmount)
+                                            },
+                                            showAccountNotActiveWarningDialog = {
+                                                scope.launch {
+                                                    isPlanSelectBottomSheetVisible = true
+                                                    modalBottomSheetState.show()
+                                                }
+                                            }
+                                        )
+                                    }
+
+                                    if (uiState.usedAddresses.isNotEmpty()) {
+                                        HorizontalDivider(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            thickness = 1.dp,
+                                            color = ComposeAppTheme.colors.steel10
+                                        )
+                                        RowUniversal(
+                                            modifier = Modifier.height(48.dp),
+                                            onClick = {
+                                                showUsedAddresses.invoke(uiState.usedAddresses, uiState.usedChangeAddresses)
+                                            }
+                                        ) {
+                                            subhead2_grey(
+                                                modifier = Modifier
+                                                    .padding(start = 16.dp)
+                                                    .weight(1f),
+                                                text = stringResource(R.string.Balance_Receive_UsedAddresses),
+                                            )
+
+                                            Icon(
+                                                modifier = Modifier.padding(end = 16.dp),
+                                                painter = painterResource(id = R.drawable.ic_arrow_right),
+                                                contentDescription = null,
+                                                tint = ComposeAppTheme.colors.grey
+                                            )
+                                        }
+                                    }
+                                }
+                                VSpacer(12.dp)
+                                MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL, navController)
+                                VSpacer(45.dp)
+
+                                ActionButtonsRow(
+                                    uri = uiState.uri,
+                                    watchAccount = uiState.watchAccount,
+                                    openAmountDialog = openAmountDialog,
+                                    onShareClick = onShareClick,
+                                )
+
+                                VSpacer(32.dp)
+                            }
+                        }
+                    }
+                }
+            }
+            if (openAmountDialog.value) {
+                AmountInputDialog(
+                    initialAmount = uiState.amount,
+                    onDismissRequest = { openAmountDialog.value = false },
+                    onAmountConfirm = { amount ->
+                        setAmount(amount)
+                        openAmountDialog.value = false
+
+                        stat(page = StatPage.Receive, event = StatEvent.SetAmount)
+                    }
+                )
+            }
+        }
+    }
+    TrackScreenViewEvent(screenName = "ReceiveAddressScreen: ${uiState.networkName}")
+    if (isPlanSelectBottomSheetVisible) {
+        ModalBottomSheet(
+            onDismissRequest = {
+                isPlanSelectBottomSheetVisible = false
+            },
+            sheetState = modalBottomSheetState,
+            containerColor = ComposeAppTheme.colors.transparent
+        ) {
             BottomSheetWarning(
                 title = stringResource(R.string.Tron_AddressNotActive_Title),
                 text = stringResource(R.string.Tron_AddressNotActive_Info),
                 onActionButtonClick = onBackPress,
                 onCloseClick = {
-                    scope.launch { sheetState.hide() }
+                    scope.launch { modalBottomSheetState.hide() }
                 }
             )
         }
-    ) {
-        Scaffold(
-            containerColor = Color.Transparent,
-            contentColor = MaterialTheme.colorScheme.background,
-            topBar = {
-                AppBar(
-                    title = title,
-                    navigationIcon = {
-                        HsBackButton(onClick = onBackPress)
-                    },
-                    menuItems = listOf(
-                        MenuItem(
-                            title = TranslatableString.ResString(R.string.Button_Done),
-                            onClick = closeModule
-                        )
-                    )
-                )
-            }
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(it)
-            ) {
-                Crossfade(uiState.viewState, label = "") { viewState ->
-                    Column {
-                        when (viewState) {
-                            is ViewState.Error -> {
-                                ListErrorView(stringResource(R.string.SyncError), onErrorClick)
-                            }
-
-                            ViewState.Loading -> {
-                                Loading()
-                            }
-
-                            ViewState.Success -> {
-                                Column(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxWidth()
-                                        .verticalScroll(rememberScrollState()),
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                ) {
-                                    VSpacer(12.dp)
-                                    uiState.alertText?.let {
-                                        WarningTextView(it)
-                                    }
-                                    VSpacer(12.dp)
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 16.dp)
-                                            .clip(RoundedCornerShape(24.dp))
-                                            .background(ComposeAppTheme.colors.lawrence),
-                                    ) {
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .clickable {
-                                                    TextHelper.copyText(uiState.uri)
-                                                    HudHelper.showSuccessMessage(
-                                                        localView,
-                                                        R.string.Hud_Text_Copied
-                                                    )
-
-                                                    stat(
-                                                        page = StatPage.Receive,
-                                                        event = StatEvent.Copy(StatEntity.ReceiveAddress)
-                                                    )
-                                                },
-                                            horizontalAlignment = Alignment.CenterHorizontally,
-                                        ) {
-                                            VSpacer(32.dp)
-                                            Box(
-                                                modifier = Modifier
-                                                    .clip(RoundedCornerShape(8.dp))
-                                                    .background(ComposeAppTheme.colors.white)
-                                                    .size(224.dp),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                QrCodeImage(uiState.uri)
-                                            }
-                                            VSpacer(12.dp)
-                                            subhead2_leah(
-                                                modifier = Modifier.padding(horizontal = 32.dp),
-                                                text = uiState.address,
-                                                textAlign = TextAlign.Center,
-                                            )
-                                            VSpacer(12.dp)
-                                            subhead2_grey(
-                                                modifier = Modifier.padding(horizontal = 32.dp),
-                                                text = uiState.networkName,
-                                                textAlign = TextAlign.Center,
-                                            )
-                                            VSpacer(24.dp)
-                                        }
-                                        if (uiState.additionalItems.isNotEmpty()) {
-                                            AdditionalDataSection(
-                                                items = uiState.additionalItems,
-                                                onClearAmount = {
-                                                    setAmount(null)
-
-                                                    stat(page = StatPage.Receive, event = StatEvent.RemoveAmount)
-                                                },
-                                                showAccountNotActiveWarningDialog = {
-                                                    scope.launch { sheetState.show() }
-                                                }
-                                            )
-                                        }
-
-                                        if (uiState.usedAddresses.isNotEmpty()) {
-                                            HorizontalDivider(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                thickness = 1.dp,
-                                                color = ComposeAppTheme.colors.steel10
-                                            )
-                                            RowUniversal(
-                                                modifier = Modifier.height(48.dp),
-                                                onClick = {
-                                                    showUsedAddresses.invoke(uiState.usedAddresses, uiState.usedChangeAddresses)
-                                                }
-                                            ) {
-                                                subhead2_grey(
-                                                    modifier = Modifier
-                                                        .padding(start = 16.dp)
-                                                        .weight(1f),
-                                                    text = stringResource(R.string.Balance_Receive_UsedAddresses),
-                                                )
-
-                                                Icon(
-                                                    modifier = Modifier.padding(end = 16.dp),
-                                                    painter = painterResource(id = R.drawable.ic_arrow_right),
-                                                    contentDescription = null,
-                                                    tint = ComposeAppTheme.colors.grey
-                                                )
-                                            }
-                                        }
-                                    }
-                                    VSpacer(12.dp)
-                                    MaxTemplateNativeAdViewComposable(nativeAd, AdType.SMALL, navController)
-                                    VSpacer(45.dp)
-
-                                    ActionButtonsRow(
-                                        uri = uiState.uri,
-                                        watchAccount = uiState.watchAccount,
-                                        openAmountDialog = openAmountDialog,
-                                        onShareClick = onShareClick,
-                                    )
-
-                                    VSpacer(32.dp)
-                                }
-                            }
-                        }
-                    }
-                }
-                if (openAmountDialog.value) {
-                    AmountInputDialog(
-                        initialAmount = uiState.amount,
-                        onDismissRequest = { openAmountDialog.value = false },
-                        onAmountConfirm = { amount ->
-                            setAmount(amount)
-                            openAmountDialog.value = false
-
-                            stat(page = StatPage.Receive, event = StatEvent.SetAmount)
-                        }
-                    )
-                }
-            }
-        }
     }
-    TrackScreenViewEvent(screenName = "ReceiveAddressScreen: ${uiState.networkName}")
 }
 
 @Composable
