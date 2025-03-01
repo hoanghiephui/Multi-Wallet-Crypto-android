@@ -3,7 +3,6 @@ package io.horizontalsystems.bankwallet.modules.send.address
 import android.os.Parcelable
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,8 +23,13 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,15 +48,12 @@ import io.horizontalsystems.bankwallet.core.MaxTemplateNativeAdViewComposable
 import io.horizontalsystems.bankwallet.core.address.AddressCheckResult
 import io.horizontalsystems.bankwallet.core.address.AddressCheckType
 import io.horizontalsystems.bankwallet.core.paidAction
-import io.horizontalsystems.bankwallet.core.providers.Translator
 import io.horizontalsystems.bankwallet.core.requireInput
-import io.horizontalsystems.bankwallet.core.slideFromBottom
 import io.horizontalsystems.bankwallet.core.slideFromRight
 import io.horizontalsystems.bankwallet.entities.Wallet
 import io.horizontalsystems.bankwallet.modules.address.AddressParserModule
 import io.horizontalsystems.bankwallet.modules.address.AddressParserViewModel
 import io.horizontalsystems.bankwallet.modules.evmfee.ButtonsGroupWithShade
-import io.horizontalsystems.bankwallet.modules.evmfee.FeeSettingsInfoDialog
 import io.horizontalsystems.bankwallet.modules.send.SendFragment
 import io.horizontalsystems.bankwallet.rememberAdNativeView
 import io.horizontalsystems.bankwallet.ui.compose.ComposeAppTheme
@@ -68,7 +69,7 @@ import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_grey
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_lucian
 import io.horizontalsystems.bankwallet.ui.compose.components.subhead2_remus
 import io.horizontalsystems.subscriptions.core.AddressBlacklist
-import io.horizontalsystems.subscriptions.core.IPaidAction
+import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import java.math.BigDecimal
 
@@ -113,6 +114,11 @@ fun EnterAddressScreen(navController: NavController, input: EnterAddressFragment
         BuildConfig.HOME_MARKET_NATIVE,
         adPlacements = "EnterAddressScreen", viewModel
     )
+
+    val coroutineScope = rememberCoroutineScope()
+    val infoModalBottomSheetState =
+        androidx.compose.material3.rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    var checkTypeInfoBottomSheet by remember { mutableStateOf<AddressCheckType?>(null) }
 
     val uiState = viewModel.uiState
     Scaffold(
@@ -164,10 +170,16 @@ fun EnterAddressScreen(navController: NavController, input: EnterAddressFragment
                         uiState.addressValidationInProgress,
                         uiState.addressValidationError,
                         uiState.checkResults,
-                        navController
-                    ) { paidAction ->
-                        navController.paidAction(paidAction) {
-                            viewModel.onEnterAddress(uiState.value)
+                    ) { checkType ->
+                        if(uiState.checkResults.any { it.value.checkResult == AddressCheckResult.NotAllowed }) {
+                            navController.paidAction(AddressBlacklist) {
+                                viewModel.onEnterAddress(uiState.value)
+                            }
+                        } else {
+                            checkTypeInfoBottomSheet = checkType
+                            coroutineScope.launch {
+                                infoModalBottomSheetState.show()
+                            }
                         }
                     }
                 }
@@ -204,6 +216,19 @@ fun EnterAddressScreen(navController: NavController, input: EnterAddressFragment
             }
         }
     }
+
+    checkTypeInfoBottomSheet?.let { checkType ->
+        AddressEnterInfoBottomSheet(
+            checkType = checkType,
+            bottomSheetState = infoModalBottomSheetState,
+            hideBottomSheet = {
+                coroutineScope.launch {
+                    infoModalBottomSheetState.hide()
+                }
+                checkTypeInfoBottomSheet = null
+            }
+        )
+    }
 }
 
 @Composable
@@ -211,14 +236,14 @@ fun AddressCheck(
     addressValidationInProgress: Boolean,
     addressValidationError: Throwable?,
     checkResults: Map<AddressCheckType, AddressCheckData>,
-    navController: NavController,
-    onPaidAction: (action: IPaidAction) -> Unit
+    onClick: (type: AddressCheckType) -> Unit
 ) {
-    if (addressValidationError == null || addressValidationError is AddressValidationError.SendToSelfForbidden) {
+    VSpacer(16.dp)
+    if (addressValidationError == null) {
         Column(
             modifier = Modifier
-                .padding(top = 16.dp)
                 .padding(horizontal = 16.dp)
+                .padding(bottom = 16.dp)
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
                 .border(
@@ -233,14 +258,13 @@ fun AddressCheck(
                     checkType = addressCheckType,
                     inProgress = checkData.inProgress,
                     checkResult = checkData.checkResult,
-                    navController,
-                    onPaidAction
+                    onClick
                 )
             }
         }
-
-        Errors(addressValidationError, checkResults)
     }
+
+    Errors(addressValidationError, checkResults)
 }
 
 @Composable
@@ -249,7 +273,6 @@ private fun Errors(
     checkResults: Map<AddressCheckType, AddressCheckData>,
 ) {
     if (addressValidationError != null) {
-        VSpacer(16.dp)
         TextImportantError(
             modifier = Modifier.padding(horizontal = 16.dp),
             icon = R.drawable.ic_attention_20,
@@ -261,13 +284,13 @@ private fun Errors(
     } else {
         checkResults.forEach { (addressCheckType, addressCheckData) ->
             if (addressCheckData.checkResult == AddressCheckResult.Detected) {
-                VSpacer(16.dp)
                 TextImportantError(
                     modifier = Modifier.padding(horizontal = 16.dp),
                     icon = R.drawable.ic_attention_20,
                     title = stringResource(addressCheckType.detectedErrorTitle),
                     text = stringResource(addressCheckType.detectedErrorDescription)
                 )
+                VSpacer(16.dp)
             }
         }
 
@@ -283,41 +306,13 @@ private fun CheckCell(
     checkType: AddressCheckType,
     inProgress: Boolean,
     checkResult: AddressCheckResult,
-    navController: NavController,
-    onPaidAction: (action: IPaidAction) -> Unit
+    onClick: (type: AddressCheckType) -> Unit
 ) {
-    val onClickInfo: (() -> Unit)? = when (checkResult) {
-        AddressCheckResult.Clear -> {
-            {
-                navController.slideFromBottom(
-                    R.id.feeSettingsInfoDialog,
-                    FeeSettingsInfoDialog.Input(
-                        Translator.getString(checkType.clearInfoTitle),
-                        Translator.getString(checkType.clearInfoDescription)
-                    )
-                )
-            }
-        }
-
-        AddressCheckResult.NotAllowed -> {
-            {
-                onPaidAction(AddressBlacklist)
-            }
-        }
-
-        else -> null
-    }
-
     Row(
         modifier = Modifier
-            .padding(horizontal = 16.dp)
+            .clickable { onClick(checkType) }
             .height(40.dp)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClickInfo != null,
-                onClick = onClickInfo ?: {}
-            ),
+            .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
